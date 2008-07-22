@@ -25,6 +25,7 @@
 ====Automatic Matching====
   * To add a match you can click on a torrents name from the DL Now or Test Matches page. 
   * This will attempt to guess the show title and rip type to match later
+  * After adding a match always use the test matches to verify your shows get matched
 ====Manual Matching====
   * Say you want to download all releases of Big Brother USA from release group XXxxX
   * Pull up the test matches page, and find a torrent from the series
@@ -35,15 +36,16 @@
   * in the right box, enter the release group/rip info as displayed in the title
   * for example "Big.Brother.US" on the left and XviD-XXxxXX
   * Click the orange plus button to the right of the boxes
+  * After adding a match always use the test matches to verify your shows get matched
   * Really the two strings can be any two strings that match the release title, play arround!
 ===Deleting a Match===
-  * To delete a match, simply press the orange minus button next to it
+  * To delete a match press the orange minus button next to it
 
 ==Other Notes==
-The Test Matches and DL Now links go to the same page, but they work slightly different
-  * Test Matches will never download a torrent, it will just tell you what is matching. This allows you to see if your new match actually works right
-  * DL Now will download any new matching torrents and start them with the PCH's bittorrent program
+The Test Matches and DL Now links go to the same page but they work slightly different
+  * Test Matches will never download a torrent.  It will just tell you what is matching. This allows you to see if your new match actually works right
+  * DL Now will download any new matching torrents and start them with the PCH's bittorrent program.
 New matching torrents are also checked for at 30 minutes past the hour every hour.
-  * If you have put any of your own torrents in the /share/.torrents/ folder, they will also get started at 30 minutes past the hour
+  * If you have put any of your own torrents in the /share/.torrents/ folder, they will also get started at 30 minutes past the hour.
 All Feeds are cached localy for 50 minutes before a new one is fetched.
   * Please be patient when pulling up the DL Now and Test Matches page. If we have to fetch new feeds we are looking at 3-5s per feed to fetch and parse them.
