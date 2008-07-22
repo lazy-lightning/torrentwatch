@@ -12,12 +12,11 @@ This article is a stub, better directions coming
   * The first string(known as the key) must be unique for its feed. The second string can be anything.
 
 ===The Strings===
-  * The strings dont support globs(*) but do support regexp(.*)
-  * So .* is the equivilent of what you would expect from *
-  * i.e. "a.*d" will matched "abcd" but "a*d" means something completely different
+  * The strings dont support globs(**) but do support regexp(.**)
+  * So .* is the equivilent of what you would expect from **
+  * i.e. "a.**d" will matched "abcd" but "a**d" means something completely different
 
 ==Adding a Feed==
-  * To add a feed, Scroll down to 
   * To add a feed, type the url in the centered box under "New RSS Feed" at the bottom
   * To add a feed you MUST also add your first match.
   * If you just want to look at the feed without matches, put in a match that will never work(i.e. asdf asdf)
