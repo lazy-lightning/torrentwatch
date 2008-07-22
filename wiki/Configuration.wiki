@@ -28,9 +28,15 @@
   * Say you want to download all releases of Big Brother USA from release group XXxxX
   * Pull up the test matches page, and find a torrent from the series
   * Make note of how the title is displayed(Big.Brother.US or Big Brother: USA etc)
-  * E
+  * Go to the Configuration Page
+  * Under each feed is a list of matches, and then two empty boxes
+  * in the left box, enter the title as displayed on the test matches page
+  * in the right box, enter the release group/rip info as displayed in the title
+  * for example "Big.Brother.US" on the left and XviD-XXxxXX
+  * Click the orange plus button to the right of the boxes
+  * Really the two strings can be any two strings that match the release title, play arround!
 ===Deleting a Match===
-  * To delete a match, simply press the orange button next to it
+  * To delete a match, simply press the orange minus button next to it
 
 ==Other Notes==
 The Test Matches and DL Now links go to the same page, but they work slightly different
