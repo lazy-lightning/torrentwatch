@@ -1,0 +1,40 @@
+#summary Manual Installation Instructions
+#labels Phase-Deploy
+
+
+==To install via FTP==
+  # decompress the zip
+  # ftp to your popcorn, and upload these 3 files from the zip to your PCH
+    * tw.scripts.tar
+    * torrentwatch-installer.html
+    * torrentwatch-installer.cgi
+  # send the command "site chmod 755 torrentwatch-installer.cgi" through ftp
+  # On your popcorn remote push the source button
+  # Select HARD_DISK
+  # Select the 4th icon, which is files
+  # Select torrentwatch-installer.html
+  # Select Run from HARD_DISK
+  # Select Install to HARD_DISK
+
+If you get an error of "Request cannot be processed"
+This means the torrentwatch-installer.cgi is not executable. Redo step 3.
+
+==To Install via USB==
+  # decompress the zip to the base dir of the USB stick
+  # Push the source button on your PCH remote
+  # Remember which USB_DRIVE is being offered(A, A-1, B, B-1)
+   * I'm using A-1 for this example
+  # Select USB_DRIVE_A-1
+  # Select the 4th icon, which is files
+  # Select torrentwatch-installer.html
+  # Select Run from USB_DRIVE_A-1
+  # Select Install to HARD_DISK
+==Post Install==
+You will need to configure torrentwatch from your PC. Here we are going to setup so you can access that page from your PC.
+
+  # open your hosts file
+   * On Windows this is C:\Windows\System32\drivers\etc\hosts
+   * On Linux/Unix this is /etc/hosts
+  # Add the folowing line, making sure to use your PCH's ip
+   * 192.168.1.104 localhost.drives popcorn
+  # Bookmark http://localhost.drives:8883/HARD_DISK/tw-iface.php
