@@ -11,7 +11,7 @@
 ===The Strings===
   * The strings dont support globs(`*`) but do support regexp(.`*`)
   * So .`*` is the equivilent of what you would expect from `*`
-  * i.e. "a.`*`d" will matched "abcd" but "a`*`d" means something completely different
+  * i.e. "a.`*`d" will matched "abcd" but "a`*`d" means something [http://www.regular-expressions.info/repeat.htmlcompletely different]
 
 ==Adding a Feed==
   * To add a feed, type the url in the centered box under "New RSS Feed" at the bottom
