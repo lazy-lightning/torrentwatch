@@ -19,7 +19,7 @@
 ====The Strings====
   * The strings dont support globs(`*`) but do support regexp(.`*`)
   * So .`*` is the equivilent of what you would expect from `*`
-  * i.e. "a.`*`d" will matched "abcd" but "a`*`d" means something [http://www.regular-expressions.info/repeat.html completely different]
+  * i.e. "a.`*`d" will match "abcd" but "a`*`d" means something [http://www.regular-expressions.info/repeat.html completely different]
 
 ===Adding a Match===
 ====Automatic Matching====
