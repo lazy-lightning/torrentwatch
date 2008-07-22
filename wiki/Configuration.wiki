@@ -4,7 +4,8 @@
 ===Adding a Feed===
   * To add a feed, type the url in the centered box under "New RSS Feed" at the bottom
   * To add a feed you MUST also add your first match.
-  * If you just want to look at the feed without matches, put in a match that will never work(i.e. asdf asdf)
+  * If you just want to look at the feed without matching anything, put in a match that will never work(i.e. asdf asdf)
+  * Click the orange + button next to the boxes under your feed
 ===Deleting a Feed===
   * To Delete a feed, simple delete all the matches from the feed
 
