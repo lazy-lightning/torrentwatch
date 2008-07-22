@@ -1,8 +1,15 @@
 #summary How to Configure Torrent Watch
 #labels Phase-Deploy,Featured
 
-=Matches=
+==Adding a Feed==
+  * To add a feed, type the url in the centered box under "New RSS Feed" at the bottom
+  * To add a feed you MUST also add your first match.
+  * If you just want to look at the feed without matches, put in a match that will never work(i.e. asdf asdf)
+==Deleting a Feed==
+  * To Delete a feed, simple delete all the matches from the feed
 
+
+=Matches=
 ==What is a Match==
   * each feed has a set of matches attached to it
   * a match consists of 2 strings(the left and right on the config page)
@@ -12,13 +19,6 @@
   * The strings dont support globs(`*`) but do support regexp(.`*`)
   * So .`*` is the equivilent of what you would expect from `*`
   * i.e. "a.`*`d" will matched "abcd" but "a`*`d" means something [http://www.regular-expressions.info/repeat.html completely different]
-
-==Adding a Feed==
-  * To add a feed, type the url in the centered box under "New RSS Feed" at the bottom
-  * To add a feed you MUST also add your first match.
-  * If you just want to look at the feed without matches, put in a match that will never work(i.e. asdf asdf)
-==Deleting a Feed==
-  * To Delete a feed, simple delete all the matches from the feed
 
 ==Adding a Match==
 ===Automatic Matching===
@@ -32,7 +32,7 @@
 ==Deleting a Match==
   * To delete a match, simply press the orange button next to it
 
-==Other Notes==
+=Other Notes=
 The Test Matches and DL Now links go to the same page, but they work slightly different
   * Test Matches will never download a torrent, it will just tell you what is matching. This allows you to see if your new match actually works right
   * DL Now will download any new matching torrents and start them with the PCH's bittorrent program
