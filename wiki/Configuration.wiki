@@ -15,7 +15,7 @@
   * each feed has a set of matches attached to it
   * a match consists of 2 strings(the left and right on the config page)
   * to get a hit from a feed BOTH the strings must match the title of the feed item
-  * The first string(known as the key) must be unique for its feed. The second string can be anything.
+  * The first string, known as the key, must be unique for its feed. The second string can be anything.
 ====The Strings====
   * The strings dont support globs(`*`) but do support regexp(.`*`)
   * So .`*` is the equivilent of what you would expect from `*`
