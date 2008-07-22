@@ -1,0 +1,49 @@
+#summary How to Configure Torrent Watch
+#labels Phase-Deploy
+
+This article is a stub, better directions coming
+
+=Matches=
+
+==What is a Match==
+  * each feed has a set of matches attached to it
+  * a match consists of 2 strings(the left and right on the config page)
+  * to get a hit from a feed BOTH the strings must match the title of the feed item
+  * The first string(known as the key) must be unique for its feed. The second string can be anything.
+
+===The Strings===
+  * The strings dont support globs(*) but do support regexp(.*)
+  * So .* is the equivilent of what you would expect from *
+  * i.e. "a.*d" will matched "abcd" but "a*d" means something completely different
+
+==Adding a Feed==
+  * To add a feed, Scroll down to 
+  * To add a feed, type the url in the centered box under "New RSS Feed" at the bottom
+  * To add a feed you MUST also add your first match.
+  * If you just want to look at the feed without matches, put in a match that will never work(i.e. asdf asdf)
+==Deleting a Feed==
+
+==Adding a Match==
+===Automatic Matching===
+  * To add a match you can click on a torrents name from the DL Now or Test Matches page. 
+  * This will attempt to guess the show title and rip type to match later
+===Manual Matching===
+  * Say you want to download all releases of Big Brother USA from release group XXxxX
+  * Pull up the test matches page, and find a torrent from the series
+  * Make note of how the title is displayed(Big.Brother.US or Big Brother: USA etc)
+  * E
+
+==Deleting a Match==
+  * To delete a match, simply press the orange button next to it
+  * To delete a feed, just delete all matches from it and the feed will disapear
+
+
+
+==Other Notes==
+The Test Matches and DL Now links go to the same page, but they work slightly different
+  * Test Matches will never download a torrent, it will just tell you what is matching. This allows you to see if your new match actually works right
+  * DL Now will download any new matching torrents and start them with the PCH's bittorrent program
+New matching torrents are also checked for at 30 minutes past the hour every hour.
+  * If you have put any of your own torrents in the /share/.torrents/ folder, they will also get started at 30 minutes past the hour
+  * All Feeds are cached localy for 50 minutes before a new one is fetched.
+  * Please be patient when pulling up the DL Now and Test Matches page. If we have to fetch new feeds we are looking at 3-5s per feed to fetch and parse them.
