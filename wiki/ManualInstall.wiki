@@ -1,5 +1,5 @@
 #summary Manual Installation Instructions
-#labels Phase-Deploy
+#labels Phase-Deploy,Featured
 
 
 ==To install via FTP==
