@@ -16,15 +16,17 @@
   * a match consists of 2 strings(the left and right on the config page)
   * to get a hit from a feed BOTH the strings must match the title of the feed item
   * The first string, known as the key, must be unique for its feed. The second string can be anything.
+  * The matching is case in-sensitive
 ====The Strings====
-  * The strings dont support globs(`*`) but do support regexp(.`*`)
-  * So .`*` is the equivilent of what you would expect from `*`
-  * i.e. "a.`*`d" will match "abcd" but "a`*`d" means something [http://www.regular-expressions.info/repeat.html completely different]
+  * The strings don't support globs(`*`) but do support regexp(.`*`)
+  * So .`*` is the equivalent of what you would expect from `*`
+  * i.e. "a.`*`d" will match "abcd" or even "abra cadabra" but "a`*`d" means something [http://www.regular-expressions.info/repeat.html completely different]
 
 ===Adding a Match===
 ====Automatic Matching====
   * To add a match you can click on a torrents name from the DL Now or Test Matches page. 
   * This will attempt to guess the show title and rip type to match later
+  * Specifically this is for TV Episodes and wont generate a match on other torrents
   * After adding a match always use the test matches to verify your shows get matched
 ====Manual Matching====
   * Say you want to download all releases of Big Brother USA from release group XXxxX
@@ -34,12 +36,12 @@
   * Under each feed is a list of matches, and then two empty boxes
   * in the left box, enter the title as displayed on the test matches page
   * in the right box, enter the release group/rip info as displayed in the title
-  * for example "Big.Brother.US" on the left and XviD-XXxxXX
-  * Click the orange plus button to the right of the boxes
+  * for example "Big.Brother.US" on the left and XviD-XXxxXX on the right
+  * Click the orange + button to the right of the boxes
   * After adding a match always use the test matches to verify your shows get matched
   * Really the two strings can be any two strings that match the release title, play arround!
 ===Deleting a Match===
-  * To delete a match press the orange minus button next to it
+  * To delete a match press the orange - button next to it
 
 ==Other Notes==
 The Test Matches and DL Now links go to the same page but they work slightly different
