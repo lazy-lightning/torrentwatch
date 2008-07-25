@@ -7,7 +7,7 @@
   * If you just want to look at the feed without matching anything, put in a match that will never work(i.e. asdf asdf)
   * Click the orange + button next to the boxes under your feed
 ===Deleting a Feed===
-  * To Delete a feed, simple delete all the matches from the feed
+  * To Delete a feed delete all the matches from the feed
 
 
 ==Matches==
@@ -44,7 +44,7 @@
   * To delete a match press the orange - button next to it
 
 ==[http://www.feedrinse.com Feedrinse.com]==
-Another option for generating matches is to do it externally, with feedrinse.com.  Feedrinse has a nice interface for pruning down numerous feeds into a single feed of just the things you want.  You can then subscribe to that feed and tell torrentwatch to grab everything from the feed(use .* .* as your two strings).  An added bonus is you can adjust your matches from anywhere.
+Another option for generating matches is to do it externally, with feedrinse.com.  Feedrinse has a nice interface for pruning down numerous feeds into a single feed of just the things you want.  You can then subscribe to that feed and tell torrentwatch to grab everything from the feed(use .'*' .'*' as your two strings).  An added bonus is you can adjust your matches from anywhere.
 
 ==Other Notes==
 The Test Matches and DL Now links go to the same page but they work slightly different
