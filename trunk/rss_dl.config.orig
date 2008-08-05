@@ -1,0 +1,18 @@
+;;
+;; rss_dl.php configuration file
+;;
+
+[Settings]
+Cache Dir = /opt/sybhttpd/localhost.drives/HARD_DISK/.torrents/rss_cache
+Run Torrentwatch = 1
+Cron = /etc/cron.hourly
+Verbose = 0
+Use wget = 1
+
+[http://tvrss.net/feed/legacy/eztv/]
+BBC.The.Story.of.India = XviD
+Penn.and.Teller = PDTV
+
+
+[http://tvrss.net/feed/legacy/vtv/]
+Weeds = 4x
