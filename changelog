@@ -1,3 +1,10 @@
+6 aug 0.6-7
+  * 0.6-6 was broken, saved options Install and HTMLOutput to file breaking
+  rss_dl.php
+  * Changed all references of ['Settings'] to ['Global'] for these two options
+  * modified write_config_file to ignore Global
+  * modified feed_callback to ignore Global
+
 5 aug 2008: 0.6-6
   * modified add_torrent in torrentwatch.php to use 'Save Torrents' option
   * modified display_global_settings to display new option

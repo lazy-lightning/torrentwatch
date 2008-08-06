@@ -77,7 +77,7 @@
 		function _debug($string, $lvl = 1) {
 			global $config_values, $verbosity, $html_footer;
 			if($verbosity >= $lvl) {
-				if($config_values['Settings']['HTMLOutput'] )
+				if($config_values['Global']['HTMLOutput'] )
 					$html_footer .= $string;
 				else
 					echo($string);
@@ -131,9 +131,12 @@
 		function write_config_file() {
 			global $config_values, $config_file, $config_out;
 			_debug("Preparing to write config file to $config_file\n");
+
 			$config_out = ";;\n;; rss_dl.php config file\n;;\n\n";
 			function group_callback($group, $key) {
 				global $config_values, $config_out;
+				if($key == 'Global')
+					return;
 				$config_out .= "[$key]\n";
 				array_walk($config_values[$key], 'key_callback');
 				$config_out .= "\n\n";
@@ -331,7 +334,7 @@
 			global $config_values;
 			_debug("Running BTCLI Update Program\n");
 			exec('/share/.torrents/torrentwatch.php check', $output);
-			if($config_values['Settings']['HTMLOutput'])
+			if($config_values['Global']['HTMLOutput'])
 				btcli_html($output);
 			_debug(implode("\n", $output)."\n",0);
 

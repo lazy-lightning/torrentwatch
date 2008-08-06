@@ -75,10 +75,10 @@
 						usage();
 						exit(1);
 					case '-H':
-						$config_values['Settings']['HTMLOutput'] = 1;
+						$config_values['Global']['HTMLOutput'] = 1;
 						break;
 					case '-i':
-						$config_values['Settings']['Install'] = 1;
+						$config_values['Global']['Install'] = 1;
 						break;
 					case '-nv':
 						$verbosity = 0;
@@ -93,7 +93,7 @@
 						$test_run = 1;
 						break;
 					case '-u':
-						$config_values['Settings']['Install'] = 2;
+						$config_values['Global']['Install'] = 2;
 						break;
 					case '-v':
 						$verbosity = 1;
@@ -139,7 +139,7 @@
 				exit(1);
 			}
 			$cron = $config_values['Settings']['Cron'];
-			$i = $config_values['Settings']['Install'];
+			$i = $config_values['Global']['Install'];
 			// Check if we are already in the cron.hourly file
 			// $return = 0 : already in the file
 			// $return > 0 : not in file
@@ -173,7 +173,7 @@
 
 		function feed_callback($group, $key) {
 			global $config_values;
-			if(strcasecmp($key, "Settings") == 0)
+			if(strcasecmp($key, "Settings") == 0 or strcasecmp($key, "Global") == 0)
 				return;
 			_debug("\t\t$key\n",0);
 			if($config_values['Settings']['Cache Dir']) {
@@ -220,7 +220,7 @@
 			if($config_values['Settings']['Cache Dir'])
 				$rss->cache_dir = $config_values['Settings']['Cache Dir'];
 			if($rs = $rss->get($rssfile)) {
-				if($config_values['Settings']['HTMLOutput'])
+				if($config_values['Global']['HTMLOutput'])
 					show_feed_html($rs);
 				$alt = 'alt';
 				foreach($rs['items'] as $item) {
@@ -229,7 +229,7 @@
 					if($matched == 0) {
 						_Debug("No match for $item[title]\n", 2);
 					}
-					if($config_values['Settings']['HTMLOutput']) {
+					if($config_values['Global']['HTMLOutput']) {
 						show_torrent_html($item, $key, $alt);
 					}
 					
@@ -256,7 +256,7 @@
 
 			if($atom = $atom_parser->getRawOutput()) {
 				$atom = array_change_key_case_ext($atom, ARRAY_KEY_LOWERCASE);
-				if($config_values['Settings']['HTMLOutput'])
+				if($config_values['Global']['HTMLOutput'])
 					show_feed_html($atom['feed']);
 				$alt='alt';
 				
@@ -266,7 +266,7 @@
 					if($matched == 0) {
 						_debug("No match for ".$item['title']."\n");
 					}
-					if($config_values['Settings']['HTMLOutput']) {
+					if($config_values['Global']['HTMLOutput']) {
 						show_torrent_html($item, $key, $alt);
 					}
 	
@@ -296,21 +296,21 @@
   cache_setup();
 
   // Hooks for auto-run from the cron.hourly script
-  if($config_values['Settings']['Install']) {
-    if($config_values['Settings']['Install'] == 1)
+  if($config_values['Global']['Install']) {
+    if($config_values['Global']['Install'] == 1)
       setup_default_config();
-    setup_cron_hook($config_values['Settings']['Install'], $config_values['Settings']['Cron']);
+    setup_cron_hook($config_values['Global']['Install'], $config_values['Settings']['Cron']);
     exit;
   }
 
-  if($config_values['Settings']['HTMLOutput'])
+  if($config_values['Global']['HTMLOutput'])
 		setup_rss_list_html();
 
   _debug("Fetching Feeds ...\n");
   array_walk($config_values, 'feed_callback');
 
 
-	if($config_values['Settings']['HTMLOutput'])
+	if($config_values['Global']['HTMLOutput'])
 		finish_rss_list_html();
 
   if($config_values['Settings']['Run Torrentwatch'] and !$test_run) {
@@ -321,7 +321,7 @@
 
 	_debug(timer_get_time()."s\n",0);
 
-	if($config_values['Settings']['HTMLOutput']) {
+	if($config_values['Global']['HTMLOutput']) {
 		finish_html();
 	}
 
