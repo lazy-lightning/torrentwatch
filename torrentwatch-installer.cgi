@@ -193,11 +193,14 @@ install_harddisk()
 		rm $IFACE_DEST/tw-iface.cgi
 		ln -s $DEST/tw-iface.php $IFACE_DEST/tw-iface.cgi
 	fi
+	if [ ! -h $IFACE_DEST/tw-iface.local.css ]; then
+		rm $IFACE_DEST/tw-iface.local.css
+		ln -s $DEST/tw-iface.local.css $IFACE_DEST/tw-iface.local.css
+	fi
 	if [ ! -h $IFACE_DEST/tw-iface.css ]; then
 		rm $IFACE_DEST/tw-iface.css
 		ln -s $DEST/tw-iface.css $IFACE_DEST/tw-iface.css
 	fi
-
 	# Move the image files where they need to be for the interface
 	mkdir -p $IMAGE_DEST
 	mv $DEST/images/* $IMAGE_DEST

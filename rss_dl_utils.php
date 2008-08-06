@@ -307,9 +307,7 @@
 			global $test_run, $matched, $config_values;
 			$matched = 1;
 			$title = filename_encode($title);
-			$destdir = $config_values['Settings']['Torrent Dir'];
-			if(isset($config_values['Settings']['Torrent Dir']))
-				$destdir = $config_values['Settings']['Torrent Dir'];
+			$destdir = $config_values['Settings']['Watch Dir'];
 			if(check_cache($title)) {
 				$matched = 2;
 				if($test_run) {

@@ -41,9 +41,10 @@ function parse_options() {
 		} else if (strcmp($cmdline['mode'], 'setglobals') == 0) {
 			read_config_file();
 			$config_values['Settings']['Download Dir']=urldecode($cmdline['downdir']);
-			$config_values['Settings']['Torrent Dir']=urldecode($cmdline['torrentdir']);
+			$config_values['Settings']['Watch Dir']=urldecode($cmdline['watchdir']);
 			$config_values['Settings']['Deep Directories']=(isset($cmdline['deepdir']) ? 1 : 0);
 			$config_values['Settings']['Verify Episode']=(isset($cmdline['verifyepisodes']) ? 1 : 0);
+			$config_values['Settings']['Save Torrents']=(isset($cmdline['savetorrents']) ? 1 : 0);
 			write_config_file();
 			$exit = False;
 		} else if (strcmp($cmdline['mode'], 'matchtitle') == 0) {
@@ -121,19 +122,25 @@ function display_global_settings() {
 	$html_out .= '<td><input type="text" name="downdir" value='.$config_values['Settings']['Download Dir'].'></td>';
 	$html_out .= '</td></tr>';
 
-	$html_out .= '<tr><td style="text-align: right;">Torrent Directory:</td>';
-	$html_out .= '<td><input type="text" name="torrentdir" value='.$config_values['Settings']['Torrent Dir'].'></td>';
+	$html_out .= '<tr><td style="text-align: right;">Watch Directory:</td>';
+	$html_out .= '<td><input type="text" name="watchdir" value='.$config_values['Settings']['Watch Dir'].'></td>';
 	$html_out .= '</td></tr>';
+
+
+	$html_out .= '<tr><td style="text-align: right;">Save .torrent:</td>';
+	$html_out .= '<td><input type="checkbox" name="savetorrents" value=1 ';
+	if($config_values['Settings']['Save Torrents'] == 1)
+		$html_out .= 'checked=1';
+	$html_out .= '></td></tr>';
 
 	$html_out .= '<tr><td style="text-align: right;">Deep Directories:</td>';
 	$html_out .= '<td><input type="checkbox" name="deepdir" value=1 ';
 	if($config_values['Settings']['Deep Directories'] == 1)
 		$html_out .= 'checked=1';
 	$html_out .= '></td></tr>';
-
 	$html_out .= '<tr><td style="text-align: right;">Verify Episodes:</td>';
 	$html_out .= '<td><input type="checkbox" name="verifyepisodes" value=1 ';
-  if($config_values['Settings']['Verify Episode'] == 1)
+	if($config_values['Settings']['Verify Episode'] == 1)
 		$html_out .= 'checked=1';
 	$html_out .= '></td></tr></form>';
 

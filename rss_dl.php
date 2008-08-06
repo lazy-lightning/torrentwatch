@@ -37,7 +37,7 @@
 			_debug( "           -f <file> : cron file to hook\n",0);
 			_debug( "           -h : show this help\n",0);
 			_debug( "           -H : Output HTML\n",0);
-			_debug( "           -i : install cron hook\n",0);
+			_debug( "           -i : install cron hook and setup default config\n",0);
 			_debug( "           -nv: not verbose (default)\n",0);
 			_debug( "           -q : quiet (no output)\n",0);
 			_debug( "           -r <rssurl> <match1> <match2> : Remove torrent match\n",0);
@@ -106,6 +106,29 @@
 						break;
 				}
 			}
+		}
+
+		function setup_default_config() {
+			global $config_values;
+			function _default($a, $b) {
+				global $config_values;
+				if(!isset($config_values['Settings'][$a])) {
+					$config_values['Settings'][$a] = $b;
+				}
+			}
+			read_config_file();
+			// Special case for renamed var in 0.6-6
+			if(isset($config_values['Settings']['Torrent Dir']))  {
+				_default('Watch Dir', $config_values['Settings']['Torrent Dir']);
+				unset($config_values['Settings']['Torrent Dir']);
+			}
+			// Sensible Defaults 
+			_default('Watch Dir', "/share/.torrents");
+			_default('Download Dir', "/share/Video");
+			_default('Use wget', "1");
+			_default('Run Torrentwatch', "1");
+			_default('Cron', "/etc/cron.hourly");
+			write_config_file();
 		}
 
 		function setup_cron_hook() {
@@ -274,6 +297,8 @@
 
   // Hooks for auto-run from the cron.hourly script
   if($config_values['Settings']['Install']) {
+    if($config_values['Settings']['Install'] == 1)
+      setup_default_config();
     setup_cron_hook($config_values['Settings']['Install'], $config_values['Settings']['Cron']);
     exit;
   }

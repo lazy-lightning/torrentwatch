@@ -3,7 +3,10 @@
 ;;
 
 [Settings]
-Cache Dir = /opt/sybhttpd/localhost.drives/HARD_DISK/.torrents/rss_cache
+Cache Dir = /share/.torrents/rss_cache
+Watch Dir = /share/.torrents
+Download Dir = /share/Video
+Save Torrents = 0
 Run Torrentwatch = 1
 Cron = /etc/cron.hourly
 Verbose = 0

@@ -1,3 +1,15 @@
+5 aug 2008: 0.6-6
+  * modified add_torrent in torrentwatch.php to use 'Save Torrents' option
+  * modified display_global_settings to display new option
+  * modified parse_options() in tw-iface.php to handle new option
+  * add function setup_default_config() called just before cron installer
+  * modified tw-iface.php to send different css sheet if environment var
+  REMOTE_ADDR=127.0.0.1
+  * Duplicated tw-iface.css to tw-iface.local.css
+  * Adjust torrentwatch-installer.cgi to link tw-iface.local.css
+  * Renamed 'Torrent Dir' to 'Watch Dir' to avoid confusion
+  * Special case in setup_default_config() to move the setting
+
 3 aug 2008: 0.6-5
   * Completed dltorrent option for tw-iface.php
     * seperated out get_torrent_link() function from check_for_torrent()
