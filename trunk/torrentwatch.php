@@ -45,7 +45,10 @@ function add_torrent($filename, $dest) {
 		_debug("Starting: $filename\n");
 	else
 		_debug("Failed Starting: $filename\n");
-	unlink($filename);
+	if($config_values['Settings']['Save Torrents'])
+		rename($filename, "$dest/".basename($filename));
+	else
+		unlink($filename);
 }
 
 function check_for_torrents($directory, $dest) {
@@ -69,12 +72,12 @@ function check_for_torrents($directory, $dest) {
 
 read_config_file();
 parse_options();
-if(!isset($config_values['Settings']['Torrent Dir']) or
+if(!isset($config_values['Settings']['Watch Dir']) or
 		!isset($config_values['Settings']['Download Dir'])) {
 	_debug("torrentwatch.php: Bad Config\n\n", 0);
 	exit(1);
 }
-check_for_torrents($config_values['Settings']['Torrent Dir'], $config_values['Settings']['Download Dir']);
+check_for_torrents($config_values['Settings']['Watch Dir'], $config_values['Settings']['Download Dir']);
 if(!$hit)
 	_debug("No New Torrents to add\n", 0);
 exit(0);
