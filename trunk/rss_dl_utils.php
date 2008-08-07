@@ -78,7 +78,7 @@
 		function _debug($string, $lvl = 1) {
 			global $config_values, $verbosity, $html_footer;
 			if($verbosity >= $lvl) {
-				if($config_values['Global']['HTMLOutput'] )
+				if(isset($config_values['Global']['HTMLOutput']))
 					$html_footer .= $string;
 				else
 					echo($string);
@@ -335,7 +335,7 @@
 			global $config_values;
 			_debug("Running BTCLI Update Program\n");
 			exec('/share/.torrents/torrentwatch.php check', $output);
-			if($config_values['Global']['HTMLOutput'])
+			if(isset($config_values['Global']['HTMLOutput']))
 				btcli_html($output);
 			_debug(implode("\n", $output)."\n",0);
 

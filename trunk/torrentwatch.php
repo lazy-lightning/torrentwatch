@@ -36,7 +36,7 @@ function add_torrent($filename, $dest) {
 	$trans_remote = '/mnt/syb8634/bin/transmission-remote';
 	$trans_connect = '-g /share/.transmission';
 	$trans_exec = "$trans_remote $trans_connect";
-	$trans_downdir = '-f';
+	$trans_down_dir = '-f';
 	$trans_add = '-a';
 
 	_debug("Adding Torrent $filename\n",0);
@@ -50,10 +50,12 @@ function add_torrent($filename, $dest) {
 	if($config_values['Settings']['Client'] == "btpd")
 		exec("$btcli_exec $btcli_add \"$dest\" \"$filename\"", $output, $return);
 	else if($config_values['Settings']['Client'] == "transmission") {
+		/* Transmission wont let us explicitly set download dir till they release 1.30 */
 		$trans_dl = transmission_get_dl_dir();
 		if(!($trans_dl == $dest))
 			exec("$trans_exec $trans_down_dir \"$dest\"");
 		exec("$trans_exec $trans_add \"$filename\"", $output, $return);
+		/* sometimes our download ends up here anyways, depending on when the file gets written to disk */
 		if(!($trans_dl == $dest))
 			exec("$trans_exec $trans_down_dir \"$trans_dl\"");
 	} else {
@@ -96,6 +98,7 @@ if(!isset($config_values['Settings']['Watch Dir']) or
 	_debug("torrentwatch.php: Bad Config\n\n", 0);
 	exit(1);
 }
+$hit = 0;
 check_for_torrents($config_values['Settings']['Watch Dir'], $config_values['Settings']['Download Dir']);
 if(!$hit)
 	_debug("No New Torrents to add\n", 0);

@@ -214,7 +214,7 @@
 			if($config_values['Settings']['Cache Dir'])
 				$rss->cache_dir = $config_values['Settings']['Cache Dir'];
 			if($rs = $rss->get($rssfile)) {
-				if($config_values['Global']['HTMLOutput'])
+				if(isset($config_values['Global']['HTMLOutput']))
 					show_feed_html($rs);
 				$alt = 'alt';
 				foreach($rs['items'] as $item) {
@@ -223,7 +223,7 @@
 					if($matched == 0) {
 						_Debug("No match for $item[title]\n", 2);
 					}
-					if($config_values['Global']['HTMLOutput']) {
+					if(isset($config_values['Global']['HTMLOutput'])) {
 						show_torrent_html($item, $key, $alt);
 					}
 					
@@ -250,7 +250,7 @@
 
 			if($atom = $atom_parser->getRawOutput()) {
 				$atom = array_change_key_case_ext($atom, ARRAY_KEY_LOWERCASE);
-				if($config_values['Global']['HTMLOutput'])
+				if(isset($config_values['Global']['HTMLOutput']))
 					show_feed_html($atom['feed']);
 				$alt='alt';
 				
@@ -260,7 +260,7 @@
 					if($matched == 0) {
 						_debug("No match for ".$item['title']."\n");
 					}
-					if($config_values['Global']['HTMLOutput']) {
+					if(isset($config_values['Global']['HTMLOutput'])) {
 						show_torrent_html($item, $key, $alt);
 					}
 	
@@ -297,14 +297,14 @@
     exit;
   }
 
-  if($config_values['Global']['HTMLOutput'])
+  if(isset($config_values['Global']['HTMLOutput']))
 		setup_rss_list_html();
 
   _debug("Fetching Feeds ...\n");
   array_walk($config_values, 'feed_callback');
 
 
-	if($config_values['Global']['HTMLOutput'])
+	if(isset($config_values['Global']['HTMLOutput']))
 		finish_rss_list_html();
 
   if($config_values['Settings']['Run Torrentwatch'] and !$test_run) {
@@ -315,7 +315,7 @@
 
 	_debug(timer_get_time()."s\n",0);
 
-	if($config_values['Global']['HTMLOutput']) {
+	if(isset($config_values['Global']['HTMLOutput'])) {
 		finish_html();
 	}
 
