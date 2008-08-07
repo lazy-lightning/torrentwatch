@@ -26,7 +26,6 @@ function parse_options() {
 			$filler = "\n";
 			$exec = '/share/.torrents/rss_dl.php -v -D -H';
 		} else if(strcmp($cmdline['mode'], 'emptycache') == 0) {
-			read_config_file();
 			$exec = "rm -f ".$config_values['Settings']['Cache Dir']."/*";
 			$exit = False;
 		} else if(strcmp($cmdline['mode'], 'test') == 0) {
@@ -39,7 +38,6 @@ function parse_options() {
 			$exec = '/opt/sybhttpd/localhost.drives/HARD_DISK/.torrents/rss_dl.php -v -a "'.$cmdline['rss'].'" "'.$cmdline['key'].'" "'.$cmdline['data'].'"';
 			$exit = False;
 		} else if (strcmp($cmdline['mode'], 'setglobals') == 0) {
-			read_config_file();
 			$config_values['Settings']['Download Dir']=urldecode($cmdline['downdir']);
 			$config_values['Settings']['Watch Dir']=urldecode($cmdline['watchdir']);
 			$config_values['Settings']['Deep Directories']=(isset($cmdline['deepdir']) ? 1 : 0);
@@ -55,7 +53,6 @@ function parse_options() {
 			$exit = False;
 		} else  if (strcmp($cmdline['mode'], 'dltorrent') == 0) {
 			global $config_values;
-			read_config_file();
 			if(isset($config_values['Settings']['Cache Dir']))
 				$old = $config_values['Settings']['Cache Dir'];
 			unset($config_values['Settings']['Cache Dir']);
@@ -73,7 +70,7 @@ function parse_options() {
 		}
 	}
 
-	if($exec) {
+	if(isset($exec)) {
 		exec($exec, $output);
 		$html_out .= "<div class='execoutput'>".implode($filler, $output)."</div>";
 		echo($html_out);
@@ -152,7 +149,7 @@ function display_config() {
 	function rss_callback($item, $key) {
 		global $config_values, $html_out;
 		$html_out .= "\n";
-		if(strcmp($key, 'Settings') == 0)
+		if(strcmp($key, 'Settings') == 0 or strcmp($key, 'Global') == 0)
 			return;
 		//$html_out .= '<tr><td colspan=3>&nbsp;</td></tr>';
 		$html_out .= '<tr><td class="feedlink" colspan="3">Feed: <a href="'.$key.'" target="_Blank">'.$key.'</a></td></tr>';
@@ -186,14 +183,17 @@ function display_config() {
 }
 
 function display_options() {
-	global $html_out;
+	global $html_out, $config_values;
 	$html_out .= '<div class="mainoptions"><ul>';
 	$html_out .= '<li id="config"><a href="tw-iface.cgi">Configure</a></li>';
 	$html_out .= '<li id="test"><a href="tw-iface.cgi?mode=test">Test Matches</a></li>';
 	$html_out .= '<li id="view"><a href="tw-iface.cgi?mode=viewlog">View log</a></li>';
 	$html_out .= '<li id="empty"><a href="tw-iface.cgi?mode=emptycache">Empty Cache</a></li>';
 	$html_out .= '<li id="dl"><a href="tw-iface.cgi?mode=dlnow">DL New Torrents</a></li>';
-	$html_out .= '<li id="webui"><a href="http://popcorn:8883/torrent/bt.cgi">BitTorrent WebUI</a></li>';
+	if($config_values['Settings']['Client'] == "btpd")
+		$html_out .= '<li id="webui"><a href="http://popcorn:8883/torrent/bt.cgi">BitTorrent WebUI</a></li>';
+	else if($config_values['Settings']['Client'] == "transmission")
+		$html_out .= '<li id="webui"><a href="http://popcorn:8077/index.php5">Clutch</a></li>';
 	$html_out .= '</ul></div>';
 	echo($html_out);
 	$html_out = "";
@@ -217,10 +217,13 @@ echo ("</head><body><div class='container'>");
 echo 
 $html_out = "";
 
-display_options();
-if($argv[1])
-	parse_options();
 read_config_file();
+display_options();
+if($argv[1]) {
+	parse_options();
+	unset($config_values);
+	read_config_file();
+}
 display_config();
 
 
