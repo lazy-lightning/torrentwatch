@@ -1,6 +1,7 @@
 <?php
     
 		global $config_values;
+		$config_values['Global'] = array();
 		$config_file = '/share/.torrents/rss_dl.config';
 		$time = 0;
 
@@ -288,9 +289,9 @@
 		}
 
 		function get_torrent_link($rs) {
-			if(isset($rs[id])) { // Atom
-				if(stristr($rs[id], 'torrent')) // torrent link in id
-					return $rs[id];
+			if(isset($rs['id'])) { // Atom
+				if(stristr($rs['id'], 'torrent')) // torrent link in id
+					return $rs['id'];
 				else {// torrent hidden in summary
 					$url = guess_atom_torrent($rs['summary']);
 					if($url)
@@ -299,10 +300,10 @@
 						return NULL;
 					}
 				}
-			} else if(isset($rs[enclosure])) { // RSS Enclosure
-				return $rs[enclosure][url];
+			} else if(isset($rs['enclosure'])) { // RSS Enclosure
+				return $rs['enclosure']['url'];
 			} else {  // Standard RSS
-				return $rs[link];
+				return $rs['link'];
 			}
 		}
 
@@ -442,10 +443,10 @@
 			$html_out .=  "<img src='images/rss.png'>".str_replace('.', '.<wbr>', $item['title']);
 			$html_out .= "</a>";
 			$html_out .=  "</td>\n";
-			if($item['id']) { // ATOM
-				$html_out .= "<td>".strip_tags($item[summary])."</td>\n";
-				//$html_out .= "<td>".date("M j h:ia", strtotime($item[published]))."</td>\n";
-				$html_out .="<td>".$item[published]."</td>\n";
+			if(isset($item['id'])) { // ATOM
+				$html_out .= "<td>".strip_tags($item['summary'])."</td>\n";
+				//$html_out .= "<td>".date("M j h:ia", strtotime($item['published']))."</td>\n";
+				$html_out .="<td>".$item['published']."</td>\n";
 			} else { // RSS
 				$html_out .=  "<td>".str_replace('.', '.<wbr>', $item['description'])."</td>\n";
 				$html_out .=  "<td>".date("M j h:ia", strtotime($item['pubDate']))."</td>\n";
@@ -495,9 +496,9 @@ function btcli_html($output) {
 	$html_header = $tmp.$html_header;
 }
 
-define(FEED_UNKNOWN, 0);
-define(FEED_ATOM, 1);
-define(FEED_RSS, 2);
+define('FEED_UNKNOWN', 0);
+define('FEED_ATOM', 1);
+define('FEED_RSS', 2);
 function guess_feedtype($feedfile) {
 	if(!file_exists($feedfile))
 		return FEED_UNKNOWN;
@@ -528,4 +529,23 @@ function guess_atom_torrent($summary) {
 function filename_encode($filename) {
 	return preg_replace("/\?|\/|\\|\+|\=|\>|\<|\,|\"|\*|\|/", "_", $filename);
 }
-php?>
+
+function transmission_get_dl_dir() {
+	$capture = 0;
+	$contents = file_get_contents("/share/.transmission/daemon/state");
+	$opts = explode(":", $contents);
+	foreach($opts as $opt) {
+		$opt = trim($opt);
+		$len = strlen($opt);
+		for($i = strlen($opt)-1; preg_match("/[0-9]/", $opt[$i]); $i--)
+			;
+		$string = substr($opt, 0, $i+1);
+		if($capture == 1) {
+			return $string;
+		}
+		if($string == "default-directory")
+			$capture = 1;
+	}
+	return Null;
+}
+?>

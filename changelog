@@ -1,3 +1,13 @@
+7 aug 0.6-??
+  * Fixed up warnings thrown by php from beta firmware
+  * Added option "Client" to choose bittorrent client(btpd or transmission)
+  * Modified setup_default_config() to default us to btpd
+  * modified add_torrent() in torrentwatch.php to call chosen client
+
+6 aug 0.6-8
+  * 0.6-7 also broken, referenced missing file
+  * Removed reference to Eolin.HTTPRequest from rss_dl.php
+
 6 aug 0.6-7
   * 0.6-6 was broken, saved options Install and HTMLOutput to file breaking
   rss_dl.php

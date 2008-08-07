@@ -12,13 +12,6 @@
 
 		// These are our extra functions
 		require_once('rss_dl_utils.php');
-
-		// **unused** doesn't work right.  We use wget instead
-		// This is our HTTP requestor.  It has been hacked to not use the system gethostbyname()
-		// and use our own.  It is from
-		// http://dev.textcube.org/browser/branches/1.7/lib/components/Eolin.PHP.HTTPRequest.php?rev=6298
-		require_once('Eolin.PHP.HTTPRequest.php');
-
     
 		// DEFAULT CONFIG -
 		$config_values;
@@ -128,6 +121,7 @@
 			_default('Use wget', "1");
 			_default('Run Torrentwatch', "1");
 			_default('Cron', "/etc/cron.hourly");
+			_default('Client', "btpd");
 			write_config_file();
 		}
 
@@ -202,10 +196,10 @@
 
 		function check_for_torrent($item, $key, $rs) {
 			global $matched;
-			if(preg_match('/'.strtolower($item).'/', strtolower($rs[title])) && preg_match('/'.strtolower($key).'/', strtolower($rs[title]))) {
-				_debug('Match found for '.$rs[title]."\t");
+			if(preg_match('/'.strtolower($item).'/', strtolower($rs['title'])) && preg_match('/'.strtolower($key).'/', strtolower($rs['title']))) {
+				_debug('Match found for '.$rs['title']."\t");
 				if($link = get_torrent_link($rs)) 
-					fetch_torrent($rs[title], $link);
+					fetch_torrent($rs['title'], $link);
 				else {
 					_debug("Unable to find URL for ".$rs['title']."\n");
 					$matched = -1;
@@ -296,7 +290,7 @@
   cache_setup();
 
   // Hooks for auto-run from the cron.hourly script
-  if($config_values['Global']['Install']) {
+  if(isset($config_values['Global']['Install'])) {
     if($config_values['Global']['Install'] == 1)
       setup_default_config();
     setup_cron_hook($config_values['Global']['Install'], $config_values['Settings']['Cron']);
