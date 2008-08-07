@@ -33,14 +33,33 @@ function add_torrent($filename, $dest) {
 	$btcli_connect='-d /opt/sybhttpd/localhost.drives/HARD_DISK/.btpd/';
 	$btcli_exec="$btcli $btcli_connect";
 
+	$trans_remote = '/mnt/syb8634/bin/transmission-remote';
+	$trans_connect = '-g /share/.transmission';
+	$trans_exec = "$trans_remote $trans_connect";
+	$trans_downdir = '-f';
+	$trans_add = '-a';
+
 	_debug("Adding Torrent $filename\n",0);
 	$hit = 1;
 	if($config_values['Settings']['Deep Directories']) {
 		preg_match("/(.*)\.torrent/", $filename, $matches);
+		$orig = $dest;
 		$dest = "$dest/$matches[1]";
 	}
 	exec("mkdir -p \"$dest\"");
-	exec("$btcli_exec $btcli_add \"$dest\" \"$filename\"", $output, $return);
+	if($config_values['Settings']['Client'] == "btpd")
+		exec("$btcli_exec $btcli_add \"$dest\" \"$filename\"", $output, $return);
+	else if($config_values['Settings']['Client'] == "transmission") {
+		$trans_dl = transmission_get_dl_dir();
+		if(!($trans_dl == $dest))
+			exec("$trans_exec $trans_down_dir \"$dest\"");
+		exec("$trans_exec $trans_add \"$filename\"", $output, $return);
+		if(!($trans_dl == $dest))
+			exec("$trans_exec $trans_down_dir \"$trans_dl\"");
+	} else {
+		_debug("Invalid Torrent Client: ".$config_values['Settings']['Client']."\n",0);
+		exit(1);
+	}
 	if($return = 0)
 		_debug("Starting: $filename\n");
 	else

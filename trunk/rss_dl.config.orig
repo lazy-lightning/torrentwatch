@@ -11,6 +11,7 @@ Run Torrentwatch = 1
 Cron = /etc/cron.hourly
 Verbose = 0
 Use wget = 1
+Client = Transmission
 
 [http://tvrss.net/feed/legacy/eztv/]
 BBC.The.Story.of.India = XviD
