@@ -7,6 +7,7 @@ rm -rf release
 mkdir -p release
 
 rm *~
+rm -rf images/.svn
 cp *installer* release
 cp twupload.ftp release
 tar -cf release/tw.scripts.tar $RELEASE_FILES
