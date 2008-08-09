@@ -1,6 +1,12 @@
+9 aug 0.8-??
+  * modified add_torrent() to take directory and name of torrent seperatly
+  * fixes a bug where deep directorys chooses the wrong destination directory
+
 7 aug 0.6-??
-  * Fixed up warnings thrown by php from beta firmware
+  * Fixed up warnings
+  * adjusted tw-iface handling of when to read config file
   * Added option "Client" to choose bittorrent client(btpd or transmission)
+  * display_options() now shows btwebui or clutch depending on Client setting
   * Modified setup_default_config() to default us to btpd
   * modified add_torrent() in torrentwatch.php to call chosen client
 
