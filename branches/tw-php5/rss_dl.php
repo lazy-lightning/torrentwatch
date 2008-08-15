@@ -118,6 +118,7 @@
 			// Sensible Defaults 
 			_default('Watch Dir', "/share/.torrents");
 			_default('Download Dir', "/share/Video");
+			_default('Cache Dir', "/share/.torrents");
 			_default('Use wget', "1");
 			_default('Run Torrentwatch', "1");
 			_default('Cron', "/etc/cron.hourly");
@@ -167,7 +168,7 @@
 
 		function feed_callback($group, $key) {
 			global $config_values;
-			if(strcasecmp($key, "Settings") == 0 or strcasecmp($key, "Global") == 0)
+			if($key == "Settings" or $key == "Global")
 				return;
 			_debug("\t\t$key\n",0);
 			if($config_values['Settings']['Cache Dir']) {
@@ -211,7 +212,7 @@
 			global $config_values, $matched;
 			$rss = new lastRSS;
 			$rss->stripHTML = True;
-			if($config_values['Settings']['Cache Dir'])
+			if(isset($config_values['Settings']['Cache Dir']))
 				$rss->cache_dir = $config_values['Settings']['Cache Dir'];
 			if($rs = $rss->get($rssfile)) {
 				if(isset($config_values['Global']['HTMLOutput']))
@@ -234,7 +235,7 @@
 					}
 				}
 				unset($item);
-      } else {
+			} else {
 				_debug("Failed to open rss feed: $key stored in $rssfile\n",0);
 			}
 		}
@@ -243,7 +244,7 @@
 			global $config_values, $matched;
 
 
-			if($config_values['Settings']['Cache Dir'])
+			if(isset($config_values['Settings']['Cache Dir']))
 				$atom_parser = new myAtomParser($atomfile, $config_values['Settings']['Cache Dir']);
 			else
 				$atom_parser = new myAtomParser($atomfile);
@@ -282,36 +283,36 @@
 //
 
 	timer_init();
-  read_config_file();
+	read_config_file();
 	if(isset($config_values['Settings']['Verbose']))
 		$verbosity = $config_values['Settings']['Verbose'];
-  parse_args();
-  _debug(date("F j, Y, g:i a")."\n",0);
-  cache_setup();
+	parse_args();
+	_debug(date("F j, Y, g:i a")."\n",0);
+	cache_setup();
 
-  // Hooks for auto-run from the cron.hourly script
-  if(isset($config_values['Global']['Install'])) {
-    if($config_values['Global']['Install'] == 1)
-      setup_default_config();
-    setup_cron_hook($config_values['Global']['Install'], $config_values['Settings']['Cron']);
-    exit;
-  }
+	// Hooks for auto-run from the cron.hourly script
+	if(isset($config_values['Global']['Install'])) {
+		if($config_values['Global']['Install'] == 1)
+			setup_default_config();
+		setup_cron_hook($config_values['Global']['Install'], $config_values['Settings']['Cron']);
+		exit;
+	}
 
-  if(isset($config_values['Global']['HTMLOutput']))
+	if(isset($config_values['Global']['HTMLOutput']))
 		setup_rss_list_html();
 
-  _debug("Fetching Feeds ...\n");
-  array_walk($config_values, 'feed_callback');
+	_debug("Fetching Feeds ...\n");
+	array_walk($config_values, 'feed_callback');
 
 
 	if(isset($config_values['Global']['HTMLOutput']))
 		finish_rss_list_html();
 
-  if($config_values['Settings']['Run Torrentwatch'] and !$test_run) {
+	if($config_values['Settings']['Run Torrentwatch'] and !$test_run) {
 		update_btcli();
-  } else {
-    _debug("Skipping BTCLI Update\n");
-  }
+	} else {
+		_debug("Skipping BTCLI Update\n");
+	}
 
 	_debug(timer_get_time()."s\n",0);
 
