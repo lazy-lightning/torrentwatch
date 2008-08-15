@@ -445,8 +445,6 @@ define('FEED_UNKNOWN', 0);
 define('FEED_ATOM', 1);
 define('FEED_RSS', 2);
 function guess_feedtype($feedfile) {
-	if(!file_exists($feedfile))
-		return FEED_UNKNOWN;
 
 	$content = file($feedfile);
 	for($i = 0;$i < count($content);$i++) {

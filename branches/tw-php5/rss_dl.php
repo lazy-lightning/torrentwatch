@@ -171,26 +171,16 @@
 			if($key == "Settings" or $key == "Global")
 				return;
 			_debug("\t\t$key\n",0);
-			if($config_values['Settings']['Cache Dir']) {
-				$rssfile = $config_values['Settings']['Cache Dir'].'/'.filename_encode($key);
-				_debug($key . " becomes " . $rssfile . "\n",2);
-				if(!file_exists($rssfile) or time()-filemtime($rssfile) > (60*50)) {  // Cache rss's for 60*50 secconds(50min)
-					fetch_http($key, $rssfile);
-				}
-			} else {
-				$rssfile = '/tmp/torrenttest.rss';
-				fetch_http($key, $rssfile);
-			}
-			switch(guess_feedtype($rssfile)) {
+			switch(guess_feedtype($key)) {
 				case FEED_RSS:
-					parse_one_rss($key, $rssfile);
+					parse_one_rss($key);
 					break;
 				case FEED_ATOM:
-					parse_one_atom($key, $rssfile);
+					parse_one_atom($key);
 					break;
 				case FEED_UNKNOWN:
 				default:
-					_debug("Unknown Feed $key stored in $rssfile\n");
+					_debug("Unknown Feed $key\n");
 					break;
 			}
 		}
@@ -208,13 +198,14 @@
 			}
 		}
 
-		function parse_one_rss($key, $rssfile) {
+		function parse_one_rss($key) {
 			global $config_values, $matched;
 			$rss = new lastRSS;
 			$rss->stripHTML = True;
+			$rss->cache_time = 50*60;
 			if(isset($config_values['Settings']['Cache Dir']))
 				$rss->cache_dir = $config_values['Settings']['Cache Dir'];
-			if($rs = $rss->get($rssfile)) {
+			if($rs = $rss->get($key)) {
 				if(isset($config_values['Global']['HTMLOutput']))
 					show_feed_html($rs);
 				$alt = 'alt';
@@ -236,18 +227,18 @@
 				}
 				unset($item);
 			} else {
-				_debug("Failed to open rss feed: $key stored in $rssfile\n",0);
+				_debug("Failed to open rss feed: $key\n",0);
 			}
 		}
     
-		function parse_one_atom($key, $atomfile) {
+		function parse_one_atom($key) {
 			global $config_values, $matched;
 
 
 			if(isset($config_values['Settings']['Cache Dir']))
-				$atom_parser = new myAtomParser($atomfile, $config_values['Settings']['Cache Dir']);
+				$atom_parser = new myAtomParser($key, $config_values['Settings']['Cache Dir']);
 			else
-				$atom_parser = new myAtomParser($atomfile);
+				$atom_parser = new myAtomParser($key);
 
 			if($atom = $atom_parser->getRawOutput()) {
 				$atom = array_change_key_case_ext($atom, ARRAY_KEY_LOWERCASE);

@@ -46,7 +46,7 @@ function add_torrent($directory, $filename, $dest) {
 		$dest = "$dest/$matches[1]";
 		_debug("Deep Directorys, change dest to $dest\n", 1);
 	}
-	exec("mkdir -p \"$dest\"");
+	mkdir($dest, 777, TRUE);
 	if($config_values['Settings']['Client'] == "btpd")
 		exec("$btcli_exec $btcli_add \"$dest\" \"$directory/$filename\"", $output, $return);
 	else if($config_values['Settings']['Client'] == "transmission") {

@@ -62,9 +62,8 @@ class lastRSS {
 		if ($this->cache_dir != '') {
 			$cache_file = $this->cache_dir . '/rsscache_' . md5($rss_url);
 			// Changed to only support local files
-			//$timedif = @(time() - filemtime($cache_file));
-			//if ($timedif < $this->cache_time) {
-			if (file_exists($cache_file) and filemtime($cache_file) > filemtime($rss_url)) {
+			$timedif = @(time() - filemtime($cache_file));
+			if ($timedif < $this->cache_time) {
 				// cached file is fresh enough, return cached array
 				$result = unserialize(join('', file($cache_file)));
 				// set 'cached' to 1 only if cached file is correct
