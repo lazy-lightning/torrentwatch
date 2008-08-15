@@ -40,10 +40,22 @@ function add_torrent($directory, $filename, $dest) {
 	$trans_add = '-a';
 
 	$hit = 1;
-	if($config_values['Settings']['Deep Directories']) {
+	if(isset($config_values['Settings']['Deep Directories'])) {
 		preg_match("/(.*)\.torrent/", $filename, $matches);
-		$orig = $dest;
-		$dest = "$dest/$matches[1]";
+		switch($config_values['Settings']['Deep Directories']) {
+			case '0':
+				break;
+			case 'Title':
+				$guess = guess_match($matches[1]);
+				if(isset($guess['key'])) {
+					$dest = "$dest/".$guess['key'];
+					break;
+				}
+			case 'Full':
+			default:
+				$dest = "$dest/$matches[1]";
+				break;
+		}
 		_debug("Deep Directorys, change dest to $dest\n", 1);
 	}
 	exec("mkdir -p \"$dest\"");
