@@ -40,7 +40,7 @@ function parse_options() {
 		} else if (strcmp($cmdline['mode'], 'setglobals') == 0) {
 			$config_values['Settings']['Download Dir']=urldecode($cmdline['downdir']);
 			$config_values['Settings']['Watch Dir']=urldecode($cmdline['watchdir']);
-			$config_values['Settings']['Deep Directories']=(isset($cmdline['deepdir']) ? 1 : 0);
+			$config_values['Settings']['Deep Directories']=urldecode($cmdline['deepdir']);
 			$config_values['Settings']['Verify Episode']=(isset($cmdline['verifyepisodes']) ? 1 : 0);
 			$config_values['Settings']['Save Torrents']=(isset($cmdline['savetorrents']) ? 1 : 0);
 			write_config_file();
@@ -59,6 +59,7 @@ function parse_options() {
 			echo("<div class='execoutput'>");
 			echo("Fetching ".trim(urldecode($cmdline['title']))." from ".trim(urldecode($cmdline['link']))."<br>");
 			fetch_torrent(trim(urldecode($cmdline['title'])), trim(urldecode($cmdline['link'])));
+			echo("Calling update_bycli<br>");
 			update_btcli();
 			echo("</div>");
 			if(isset($old))
@@ -131,10 +132,18 @@ function display_global_settings() {
 	$html_out .= '></td></tr>';
 
 	$html_out .= '<tr><td style="text-align: right;">Deep Directories:</td>';
-	$html_out .= '<td><input type="checkbox" name="deepdir" value=1 ';
-	if($config_values['Settings']['Deep Directories'] == 1)
-		$html_out .= 'checked=1';
-	$html_out .= '></td></tr>';
+	$tmp1 = $tmp2 = $tmp3 = "";
+	If($config_values['Settings']['Deep Directories'] == 'Full')
+		$tmp1 = 'selected="selected"';
+	else if($config_values['Settings']['Deep Directories'] == 'Title')
+		$tmp2 = 'selected="selected"';
+	else
+		$tmp3 = 'selected="selected"';
+	$html_out .= '<td><select name="deepdir"><option value="Full" '.$tmp1.'>Full Name</option>';
+	$html_out .= '<option value="Title" '.$tmp2.'>Show Title</option>';
+	$html_out .= '<option value="0" '.$tmp3.'>Off</option></select>';
+	$html_out .= '</td></tr>';
+
 	$html_out .= '<tr><td style="text-align: right;">Verify Episodes:</td>';
 	$html_out .= '<td><input type="checkbox" name="verifyepisodes" value=1 ';
 	if($config_values['Settings']['Verify Episode'] == 1)
