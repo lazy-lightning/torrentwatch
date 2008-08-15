@@ -438,9 +438,9 @@
 			global $html_out, $matched, $test_run;
 
 			$feed = my_urlencode($feed);
-			$html_out .=  "<tr class='item $alt'>\n<td>";
+			$html_out .=  "<tr class='item $alt'>\n<td class='title'>";
 			$html_out .= "<a href='tw-iface.cgi?mode=matchtitle&rss=$feed&title=".rawurlencode($item['title'])."'>";
-			$html_out .=  "<img src='images/rss.png'>".str_replace('.', '.<wbr>', $item['title']);
+			$html_out .= str_replace('.', '.<wbr>', $item['title']);
 			$html_out .= "</a>";
 			$html_out .=  "</td>\n";
 			if(isset($item['id'])) { // ATOM
@@ -486,7 +486,7 @@ function show_feed_html($rss) {
 	$html_out .= "<th>Description</th>";
 	$html_out .= "<th width='100'>Pub. Date</th>";
 	$html_out .= "<th width='80' style='text-align: center;'>Status</th>\n</tr>\n";
-	$html_header .= "<div class='feeditem'><a href='#".$rss['title']."'><img src='images/rss.png'>".$rss['title']."</a></div>\n";
+	$html_header .= "<div class='feeditem'><a href='#".$rss['title']."'>".$rss['title']."</a></div>\n";
 }
 function btcli_html($output) {
 	global $html_header;

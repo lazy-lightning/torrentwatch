@@ -109,6 +109,9 @@ div.configuration {
 div.feeditem {
 	display: inline;
 	margin: 4px;
+	background: url(images/rss.png) no-repeat left center;
+	padding: 1px 0 0 20px;
+	height: 20px;
 }
 
 div.feedcurrent {
@@ -153,7 +156,9 @@ tr.item {
 	height: 26px;
 }
 
-tr.item td {
+tr.item td.title {
+	background: url(images/rss.png) no-repeat left center;
+	padding-left: 20px;
 }
 
 tr.item a {
