@@ -36,6 +36,7 @@ function parse_options() {
 			$config_values['Settings']['Deep Directories']=(isset($_GET['deepdir']) ? 1 : 0);
 			$config_values['Settings']['Verify Episode']=(isset($_GET['verifyepisodes']) ? 1 : 0);
 			$config_values['Settings']['Save Torrents']=(isset($_GET['savetorrents']) ? 1 : 0);
+			$config_values['Settings']['Client']=urldecode($_GET['client']);
 			write_config_file();
 			$exit = False;
 		} else if ($_GET['mode'] == 'matchtitle') {
@@ -100,38 +101,58 @@ function display_form($rss = FALSE) {
 
 function display_global_settings() {
 	global $config_values, $html_out;
-	
+
+	$html_out .= "\n";	
 	$html_out .= '<tr><td colspan=2>&nbsp;</td></tr>';
-  $html_out .= '<form action="tw-iface.cgi"><input type="hidden" name="mode" value="setglobals">';
+	$html_out .= '<form action="tw-iface.cgi"><input type="hidden" name="mode" value="setglobals">';
 	$html_out .= '<tr><td colspan=2 style="text-align: center;">Global Settings ';
-	$html_out .= '<input type="image" src="images/add.png" name="optional"></td></tr>';
+	$html_out .= '<input type="image" src="images/add.png" name="optional"></td></tr>'."\n";
+
+	$html_out .= '<tr>';
+	$html_out .= '<td style="text-align: right;">Torrent Client:</td>';
+	$html_out .= '<td><SELECT name="client">';
+	$btpd = "";
+	$trans = "";
+	switch($config_values['Settings']['Client']) {
+		case 'btpd':
+			$btpd = 'selected="selected"';
+			break;
+		case 'transmission':
+			$trans = 'selected="selected"';
+			break;
+		default:
+			// Shouldn't happen
+			break;
+	}
+	$html_out .= '<option value="btpd" '.$btpd.'>BTPD</option>';
+	$html_out .= '<option value="transmission" '.$trans.'>Transmission</option></Select></td>';
+	$html_out .= '</td></tr>'."\n";
 
 	$html_out .= '<tr>';
 	$html_out .= '<td style="text-align: right;">Download Directory:</td>';
 	$html_out .= '<td><input type="text" name="downdir" value='.$config_values['Settings']['Download Dir'].'></td>';
-	$html_out .= '</td></tr>';
-
+	$html_out .= '</td></tr>'."\n";
 	$html_out .= '<tr><td style="text-align: right;">Watch Directory:</td>';
 	$html_out .= '<td><input type="text" name="watchdir" value='.$config_values['Settings']['Watch Dir'].'></td>';
-	$html_out .= '</td></tr>';
+	$html_out .= '</td></tr>'."\n";
 
 
 	$html_out .= '<tr><td style="text-align: right;">Save .torrent:</td>';
 	$html_out .= '<td><input type="checkbox" name="savetorrents" value=1 ';
 	if($config_values['Settings']['Save Torrents'] == 1)
 		$html_out .= 'checked=1';
-	$html_out .= '></td></tr>';
+	$html_out .= '></td></tr>'."\n";
 
 	$html_out .= '<tr><td style="text-align: right;">Deep Directories:</td>';
 	$html_out .= '<td><input type="checkbox" name="deepdir" value=1 ';
 	if($config_values['Settings']['Deep Directories'] == 1)
 		$html_out .= 'checked=1';
-	$html_out .= '></td></tr>';
+	$html_out .= '></td></tr>'."\n";
 	$html_out .= '<tr><td style="text-align: right;">Verify Episodes:</td>';
 	$html_out .= '<td><input type="checkbox" name="verifyepisodes" value=1 ';
 	if($config_values['Settings']['Verify Episode'] == 1)
 		$html_out .= 'checked=1';
-	$html_out .= '></td></tr></form>';
+	$html_out .= '></td></tr></form>'."\n";
 
 }
 	
