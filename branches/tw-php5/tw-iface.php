@@ -33,7 +33,7 @@ function parse_options() {
 		} else if ($_GET['mode'] == 'setglobals') {
 			$config_values['Settings']['Download Dir']=urldecode($_GET['downdir']);
 			$config_values['Settings']['Watch Dir']=urldecode($_GET['watchdir']);
-			$config_values['Settings']['Deep Directories']=(isset($_GET['deepdir']) ? 1 : 0);
+			$config_values['Settings']['Deep Directories']=urldecode($_GET['deepdir']);
 			$config_values['Settings']['Verify Episode']=(isset($_GET['verifyepisodes']) ? 1 : 0);
 			$config_values['Settings']['Save Torrents']=(isset($_GET['savetorrents']) ? 1 : 0);
 			$config_values['Settings']['Client']=urldecode($_GET['client']);
@@ -144,10 +144,23 @@ function display_global_settings() {
 	$html_out .= '></td></tr>'."\n";
 
 	$html_out .= '<tr><td style="text-align: right;">Deep Directories:</td>';
-	$html_out .= '<td><input type="checkbox" name="deepdir" value=1 ';
-	if($config_values['Settings']['Deep Directories'] == 1)
-		$html_out .= 'checked=1';
-	$html_out .= '></td></tr>'."\n";
+	$tmp1 = $tmp2 = $tmp3 = "";
+	switch($config_values['Settings']['Deep Directories']) {
+		case 'Full':
+			$tmp1 = 'selected="selected"';
+			break;
+		case 'Title':
+			$tmp2 = 'selected="selected"';
+			break;
+		default:
+			$tmp3 = 'selected="selected"';
+			break;
+	}
+	$html_out .= '<td><select name="deepdir">';
+	$html_out .= '<option value="Full" '.$tmp1.'>Full Name</option>';
+	$html_out .= '<option value="Title" '.$tmp2.'>Show Title</option>';
+	$html_out .= '<option value="0" '.$tmp3.'>Off</option></select></td></tr>';
+
 	$html_out .= '<tr><td style="text-align: right;">Verify Episodes:</td>';
 	$html_out .= '<td><input type="checkbox" name="verifyepisodes" value=1 ';
 	if($config_values['Settings']['Verify Episode'] == 1)

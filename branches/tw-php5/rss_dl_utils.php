@@ -517,16 +517,26 @@ function client_add_torrent($directory, $filename, $dest) {
 	$btcli_exec="$btcli $btcli_connect";
 
 	$trans_remote = '/mnt/syb8634/bin/transmission-remote';
-	$trans_connect = '-g /share/.transmission';
-	$trans_exec = "$trans_remote $trans_connect";
-	$trans_down_dir = '-f';
+	$trans_down_dir = '-w';
 	$trans_add = '-a';
 
 	$hit = 1;
-	if($config_values['Settings']['Deep Directories']) {
+	if(isset($config_values['Settings']['Deep Directories'])) {
 		preg_match("/(.*)\.torrent/", $filename, $matches);
-		$orig = $dest;
-		$dest = "$dest/$matches[1]";
+		switch($config_values['Settings']['Deep Directories']) {
+			case '0':
+				break;
+			case 'Title':
+				$guess = guess_match($matches[1]);
+				if(isset($guess['key'])) {
+					$dest = "$dest/".$guess['key'];
+					break;
+				}
+			case 'Full':
+			default:
+				$dest = "$dest/$matches[1]";
+				break;
+		}
 		_debug("Deep Directorys, change dest to $dest\n", 1);
 	}
 	if(!file_exists($dest) or !is_dir($dest)) {
@@ -539,11 +549,11 @@ function client_add_torrent($directory, $filename, $dest) {
 		/* Transmission wont let us explicitly set download dir till they release 1.30 */
 		$trans_dl = transmission_get_dl_dir();
 		if(!($trans_dl == $dest))
-			exec("$trans_exec $trans_down_dir \"$dest\"");
-		exec("$trans_exec $trans_add \"$directory/$filename\"", $output, $return);
+			exec("$trans_remote $trans_down_dir \"$dest\"");
+		exec("$trans_remote $trans_add \"$directory/$filename\"", $output, $return);
 		/* sometimes our download ends up here anyways, depending on when the file gets written to disk */
 		if(!($trans_dl == $dest))
-			exec("$trans_exec $trans_down_dir \"$trans_dl\"");
+			exec("$trans_remote $trans_down_dir \"$trans_dl\"");
 	} else {
 		_debug("Invalid Torrent Client: ".$config_values['Settings']['Client']."\n",0);
 		exit(1);
