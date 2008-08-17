@@ -171,14 +171,15 @@
 			if($key == "Settings" or $key == "Global")
 				return;
 			_debug("\t\t$key\n",0);
-			switch(guess_feedtype($key)) {
-				case FEED_RSS:
+			if(!isset($config_values[$key]['xxOPTIONSxx']['Type']))
+				$config_values[$key]['xxOPTIONSxx']['Type'] = guess_feedtype($key);
+			switch($config_values[$key]['xxOPTIONSxx']['Type']) {
+				case 'RSS':
 					parse_one_rss($key);
 					break;
-				case FEED_ATOM:
+				case 'Atom':
 					parse_one_atom($key);
 					break;
-				case FEED_UNKNOWN:
 				default:
 					_debug("Unknown Feed $key\n");
 					break;
@@ -187,6 +188,8 @@
 
 		function check_for_torrent($item, $key, $rs) {
 			global $matched;
+			if($key == "xxOPTIONSxx")
+				return;
 			if(preg_match('/'.strtolower($item).'/', strtolower($rs['title'])) && preg_match('/'.strtolower($key).'/', strtolower($rs['title']))) {
 				_debug('Match found for '.$rs['title']."\t");
 				if($link = get_torrent_link($rs)) 
@@ -294,7 +297,7 @@
 
 	_debug("Fetching Feeds ...\n");
 	array_walk($config_values, 'feed_callback');
-
+	write_config_file();
 
 	if(isset($config_values['Global']['HTMLOutput']))
 		finish_rss_list_html();

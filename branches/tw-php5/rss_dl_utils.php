@@ -95,7 +95,7 @@
 						$line = trim($line, "]");
 						$group = trim($line);
 					} else {
-						$pieces = explode("=", $line, 2);
+						$pieces = explode("=", $line, 3);
 						$pieces[0] = trim($pieces[0] , "\"");
 						$pieces[1] = trim($pieces[1] , "\"");
 						$option = trim($pieces[0]);
@@ -167,6 +167,8 @@
 			$data = $argv[$pos+3];
 			switch($type) {
 				case RSS_ADD:
+					if(!isset($config_values[$rss])) // New Feed
+						$config_values[$rss]['xxOPTIONSxx']['Type'] = guess_feedtype($rss);
 					if(isset($config_values[$rss][$key])) {
 						_debug("$rss already has a match for $key.  Try a different key value.\n");
 						exit(1);
@@ -178,7 +180,8 @@
 					if(isset($config_values[$rss]) && strcmp($config_values[$rss][$key], $data) == 0) {
 						unset($config_values[$rss][$key]);
 						_debug("Match for $key = $data removed from $rss\n");
-						if(count($config_values[$rss]) == 0) {
+						$tmp = isset($config_values[$rss]['xxOPTIONSxx']) ? 1 : 0;
+						if(count($config_values[$rss]) == $tmp) {
 							unset($config_values[$rss]);
 							_debug("$rss has no more Matches, Removing.\n",2);
 						}
@@ -473,22 +476,14 @@ define('FEED_ATOM', 1);
 define('FEED_RSS', 2);
 function guess_feedtype($feedurl) {
 	global $config_values;
-	// First try the Cache
-	if(isset($config_values['Settings']['Cache Dir'])) {
-		if(file_exists($config_values['Settings']['Cache Dir'].'/rsscache_' . md5($feedurl)))
-			return FEED_RSS;
-		if(file_exists($config_values['Settings']['Cache Dir'].'/atomcache_'.md5($feedurl)))
-			return FEED_ATOM;
-	}
-	// Otherwise load it directly
 	$content = file($feedurl);
 	for($i = 0;$i < count($content);$i++) {
 		if(preg_match('/<feed xml/', $content[$i], $regs))
-			return FEED_ATOM;
+			return 'Atom';
 		else if (preg_match('/<rss/', $content[$i], $regs))
-			return FEED_RSS;
+			return 'RSS';
 	}
-	return FEED_UNKNOWN;
+	return "Unknown";
 }
 
 function guess_atom_torrent($summary) {

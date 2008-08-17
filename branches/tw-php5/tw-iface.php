@@ -187,6 +187,8 @@ function display_config() {
 
 	function match_callback($item, $key, $parent) {
 		global $config_values, $html_out;
+		if($key == "xxOPTIONSxx")
+			return;
 		$html_out .= "\n";
 		$new_rss = my_urlencode($parent);
     
