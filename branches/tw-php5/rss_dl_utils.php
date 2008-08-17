@@ -95,12 +95,19 @@
 						$line = trim($line, "]");
 						$group = trim($line);
 					} else {
-						$pieces = explode("=", $line);
+						$pieces = explode("=", $line, 2);
 						$pieces[0] = trim($pieces[0] , "\"");
 						$pieces[1] = trim($pieces[1] , "\"");
 						$option = trim($pieces[0]);
 						$value = trim($pieces[1]);
-						$config_values[$group][$option] = $value;
+						if(ereg("\[\]$", $option)) {
+							$option = substr($option, 0, strlen($option)-2);
+							if(isset($pieces[2])) {
+								$config_values[$group][$option][$value] = trim($pieces[2]);
+							} else
+								$config_values[$group][$option][] = $value;
+						} else
+							$config_values[$group][$option] = $value;
 					}
 				}
 			}
@@ -123,9 +130,19 @@
 				$config_out .= "\n\n";
 			}
 
-			function key_callback($group, $key) {
+			function key_callback($group, $key, $subkey = "") {
 				global $config_values, $config_out;
-				$config_out .= "$key = $group\n";
+				if(is_array($group)) {
+					array_walk($group, 'key_callback', $key.'[]');
+				} else {
+					if($subkey != "" ) {
+						if(!is_numeric($key)) {
+						$group = "$key = $group";
+						}
+						$key = $subkey;
+					}
+					$config_out .= "$key = $group\n";
+				}
 			}
 			array_walk($config_values, 'group_callback');
 			_debug("Finalized Config\n");
@@ -509,20 +526,16 @@ function transmission_get_dl_dir() {
 	}
 	return Null;
 }
-function client_add_torrent($directory, $filename, $dest) {
+function client_add_torrent($filename, $dest) {
 	global $config_values, $hit;
 	$btcli = '/mnt/syb8634/bin/btcli';
 	$btcli_add = 'add -d';
 	$btcli_connect='-d /opt/sybhttpd/localhost.drives/HARD_DISK/.btpd/';
 	$btcli_exec="$btcli $btcli_connect";
 
-	$trans_remote = '/mnt/syb8634/bin/transmission-remote';
-	$trans_down_dir = '-w';
-	$trans_add = '-a';
-
 	$hit = 1;
 	if(isset($config_values['Settings']['Deep Directories'])) {
-		preg_match("/(.*)\.torrent/", $filename, $matches);
+		preg_match("/(.*)\.torrent/", basename($filename), $matches);
 		switch($config_values['Settings']['Deep Directories']) {
 			case '0':
 				break;
@@ -544,24 +557,17 @@ function client_add_torrent($directory, $filename, $dest) {
 		mkdir($dest, 777, TRUE);
 	}
 	if($config_values['Settings']['Client'] == "btpd")
-		exec("$btcli_exec $btcli_add \"$dest\" \"$directory/$filename\"", $output, $return);
+		exec("$btcli_exec $btcli_add \"$dest\" \"$filename\"", $output, $return);
 	else if($config_values['Settings']['Client'] == "transmission") {
-		/* Transmission wont let us explicitly set download dir till they release 1.30 */
-		$trans_dl = transmission_get_dl_dir();
-		if(!($trans_dl == $dest))
-			exec("$trans_remote $trans_down_dir \"$dest\"");
-		exec("$trans_remote $trans_add \"$directory/$filename\"", $output, $return);
-		/* sometimes our download ends up here anyways, depending on when the file gets written to disk */
-		if(!($trans_dl == $dest))
-			exec("$trans_remote $trans_down_dir \"$trans_dl\"");
+		$response = file_get_contents("http://localhost:9091/transmission/rpc?method=torrent-add&download-dir=$dest&metainfo=".base64_encode(file_get_contents("$filename")));
 	} else {
 		_debug("Invalid Torrent Client: ".$config_values['Settings']['Client']."\n",0);
 		exit(1);
 	}
 	if($return == 0)
-		_debug("Starting: $filename in $dest\n",0);
+		_debug("Starting: ".basename($filename)." in $dest\n",0);
 	else 
-		_debug("Failed Starting: $filename  Return code $return\n",0);
+		_debug("Failed Starting: ".basename($filename)."  Return code $return\n",0);
 	if($config_values['Global']['HTMLOutput']) {
 		if($return == 0)
 			echo("Starting: $filename in $dest<br>\n");
@@ -569,16 +575,16 @@ function client_add_torrent($directory, $filename, $dest) {
 			echo("Failed Starting $filename  Return code $return<br>\n");
 	}
 	if($config_values['Settings']['Save Torrents'])
-		rename("$directory/$filename", "$dest/".basename($filename));
+		rename("$filename", "$dest/".basename($filename));
 	else
-		unlink("$directory/$filename");
+		unlink("$filename");
 }
 
 function check_for_torrents($directory, $dest) {
 	if($handle = opendir($directory)) {
 		while(false !== ($file = readdir($handle))) {
 			if(preg_match('/\.torrent$/', $file))
-				client_add_torrent($directory, $file, $dest);
+				client_add_torrent("$directory/$file", $dest);
 		}
 		closedir($handle);
 	} else {
@@ -586,4 +592,5 @@ function check_for_torrents($directory, $dest) {
 		exit(1);
 	}
 }
+
 ?>
