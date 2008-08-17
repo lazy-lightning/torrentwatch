@@ -220,7 +220,7 @@ function display_options() {
 	$html_out .= '<li id="dl"><a href="tw-iface.cgi?mode=dlnow">DL New Torrents</a></li>';
 	if($config_values['Settings']['Client'] == "btpd") {
 		$html_out .= '<li id="webui"><a href=http://"';
-		if($_SERVER['REMOTE_ADDR'] == "127.0.0.1") {
+		if($_SERVER['REMOTE_ADDR'] == "127.0.0.1")
 			$html_out .= '127.0.0.1';
 		else
 			$html_out .= 'popcorn';
@@ -240,7 +240,7 @@ function display_options() {
 
 echo ("<html><head><title>Torrentwatch Configuration Interface</title>\n");
 echo ("<meta http-equiv='expires' content='0'>\n");
-echo ('<link rel="Stylesheet" type="text/css" href="tw.iface');
+echo ('<link rel="Stylesheet" type="text/css" href="tw-iface');
 if($_SERVER["REMOTE_ADDR"] == '127.0.0.1')
 	echo ('.local');
 echo ('.css?'.time().'"></link>'."\n");
