@@ -24,19 +24,19 @@ body {
 }
 
 .add {
-	/* background: url(images/add.png) no-repeat; 
+	background: url(images/add.png) no-repeat; 
 	border: none;
 	height: 16px; 
-	width: 16px; */
+	width: 16px;
 	text-indent: -9999em;
 	
 }
 
 .del {
-	/* background: url(images/del.png) no-repeat;
+	background: url(images/del.png) no-repeat;
 	border: none;
 	height: 16px;
-	width: 16px; */
+	width: 16px;
 	text-indent: -9999em;
 	
 }

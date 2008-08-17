@@ -91,7 +91,8 @@ function display_form($rss = FALSE) {
 	} 
 	$html_out .= '<tr><td>';
 	$html_out .= '<input type="text" name="key"></td><td><input type="text" name="data"></td>';
-	$html_out .= '<td><input type="image" src="images/add.png" name="optional"></td>';
+/*	$html_out .= '<td><input type="image" src="images/add.png" name="optional"></td>'; */
+	$html_out .= '<td>&nbsp;<input class="add" type="submit" Value=""></td>'; 
 	if($rss) {	
 		$html_out .= '<tr><td class="feedlink" colspan="3">&nbsp;</td></tr>';
 		$html_out .= '<tr><td><br />&nbsp;<br /></td></tr>';
@@ -106,7 +107,8 @@ function display_global_settings() {
 	$html_out .= '<tr><td colspan=2>&nbsp;</td></tr>';
 	$html_out .= '<form action="tw-iface.cgi"><input type="hidden" name="mode" value="setglobals">';
 	$html_out .= '<tr><td colspan=2 style="text-align: center;">Global Settings ';
-	$html_out .= '<input type="image" src="images/add.png" name="optional"></td></tr>'."\n";
+/*	$html_out .= '<input type="image" src="images/add.png" name="optional"></td></tr>'."\n"; */
+	$html_out .= '<input class="add" type="submit" value=""></td>'; 
 
 	$html_out .= '<tr>';
 	$html_out .= '<td style="text-align: right;">Torrent Client:</td>';
@@ -194,8 +196,8 @@ function display_config() {
 		$html_out .= '<input type="hidden" name="rss" value="'.$new_rss.'">';
 		$html_out .= '<input type="hidden" name="key" value="'.$key.'">';
 		$html_out .= '<input type="hidden" name="data" value="'.$item.'">';
-		$html_out .= '<input type="image" src="images/del.png" name="optional">';
-		/* $html_out .= '<input class="del" type="submit" value="Delete">'; */
+		/* $html_out .= '<input type="image" src="images/del.png" name="optional">'; */
+		$html_out .= '&nbsp;<input class="del" type="submit" value="">'; 
 		$html_out .= '</form></td></tr>'."\n";
 	}
 
@@ -216,9 +218,14 @@ function display_options() {
 	$html_out .= '<li id="view"><a href="tw-iface.cgi?mode=viewlog">View log</a></li>';
 	$html_out .= '<li id="empty"><a href="tw-iface.cgi?mode=emptycache">Empty Cache</a></li>';
 	$html_out .= '<li id="dl"><a href="tw-iface.cgi?mode=dlnow">DL New Torrents</a></li>';
-	if($config_values['Settings']['Client'] == "btpd")
-		$html_out .= '<li id="webui"><a href="http://popcorn:8883/torrent/bt.cgi">BitTorrent WebUI</a></li>';
-	else if($config_values['Settings']['Client'] == "transmission")
+	if($config_values['Settings']['Client'] == "btpd") {
+		$html_out .= '<li id="webui"><a href=http://"';
+		if($_SERVER['REMOTE_ADDR'] == "127.0.0.1") {
+			$html_out .= '127.0.0.1';
+		else
+			$html_out .= 'popcorn';
+		$html_out .= '":8883/torrent/bt.cgi>BitTorrent WebUI</a></li>';
+	} else if($config_values['Settings']['Client'] == "transmission")
 		$html_out .= '<li id="webui"><a href="http://popcorn:8077/index.php5">Clutch</a></li>';
 	$html_out .= '</ul></div>';
 	echo($html_out);
@@ -231,13 +238,13 @@ function display_options() {
 //
 //
 
-echo ("<html><head><title>Torrentwatch Configuration Interface</title>");
-echo ("<meta http-equiv='expires' content='0'>");
+echo ("<html><head><title>Torrentwatch Configuration Interface</title>\n");
+echo ("<meta http-equiv='expires' content='0'>\n");
+echo ('<link rel="Stylesheet" type="text/css" href="tw.iface');
 if($_SERVER["REMOTE_ADDR"] == '127.0.0.1')
-	echo ('<link rel="StyleSheet" type="text/css" href="tw-iface.local.css?'.time().'"></link>');
-else
-	echo ('<link rel="StyleSheet" type="text/css" href="tw-iface.css?'.time().'"></link>');
-echo ("</head><body><div class='container'>");
+	echo ('.local');
+echo ('.css?'.time().'"></link>'."\n");
+echo ('</head>'."\n".'<body><div class="container">');
 $html_out = "";
 
 read_config_file();
