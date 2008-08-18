@@ -14,7 +14,7 @@ function parse_options() {
 
 	if(isset($_GET['mode'])) {
 		if($_GET['mode'] == 'viewlog') {
-			$exec = 'cat /var/rss_dl.log';
+			$output = file_get_contents('/var/rss_dl.log');
 		} else if($_GET['mode'] == 'dlnow') {
 			$filler = "\n";
 			$exec = '/share/.torrents/rss_dl.php -v -D -H';
@@ -25,10 +25,12 @@ function parse_options() {
 			$filler = "\n";
 			$exec = '/share/.torrents/rss_dl.php -v -H -t';
 		} else if($_GET['mode'] == 'del') {
-			$exec = '/opt/sybhttpd/localhost.drives/HARD_DISK/.torrents/rss_dl.php -v -r "'.urldecode($_GET['rss']).'" "'.$_GET['key'].'" "'.$_GET['data'].'"';
+			$output = "Removing ".$_GET['key']." = ".$_GET['data']." from ".urldecode($_GET['rss']);
+			update_config_real(RSS_DEL, urldecode($_GET['rss']), $_GET['key'], $_GET['data']);
 			$exit = False;
 		} else if ($_GET['mode'] == 'add') {
-			$exec = '/opt/sybhttpd/localhost.drives/HARD_DISK/.torrents/rss_dl.php -v -a "'.$_GET['rss'].'" "'.$_GET['key'].'" "'.$_GET['data'].'"';
+			$output = "Adding ".$_GET['key']." = ".$_GET['data']." to ".urldecode($_GET['rss']);
+			update_config_real(RSS_ADD, urldecode($_GET['rss']), $_GET['key'], $_GET['data']);
 			$exit = False;
 		} else if ($_GET['mode'] == 'setglobals') {
 			$config_values['Settings']['Download Dir']=urldecode($_GET['downdir']);
@@ -40,27 +42,17 @@ function parse_options() {
 			write_config_file();
 			$exit = False;
 		} else if ($_GET['mode'] == 'matchtitle') {
-			if(($tmp = guess_match(html_entity_decode($_GET['title']))))
-				$exec = '/opt/sybhttpd/localhost.drives/HARD_DISK/.torrents/rss_dl.php -v -a "'.$_GET['rss'].'" "'.$tmp['key'].'" "'.$tmp['data'].'"';
-			else
-				$exec = 'echo Could not generate Match';
+			if(($tmp = guess_match(html_entity_decode($_GET['title'])))) {
+				$output = "Adding ".$tmp['key']." = ".$tmp['data']." To ".urldecode($_GET['rss']);
+				update_config_real(RSS_ADD, urldecode($_GET['rss']), $tmp['key'], $tmp['data']);
+			} else
+				$output = "Could not generate Match\n";
 			$exit = False;
 		} else  if ($_GET['mode'] == 'dltorrent') {
-			global $config_values;
-			if(isset($config_values['Settings']['Cache Dir']))
-				$old = $config_values['Settings']['Cache Dir'];
-			unset($config_values['Settings']['Cache Dir']);
-			echo("<div class='execoutput'>");
-			echo("Fetching ".trim(urldecode($_GET['title']))." from ".trim(urldecode($_GET['link']))."<br>");
-			fetch_torrent(trim(urldecode($_GET['title'])), trim(urldecode($_GET['link'])));
-			update_btcli();
-			echo("</div>");
-			if(isset($old))
-				$config_values['Settings']['Cache Dir'] = $old;
+			client_add_torrent(trim(urldecode($_GET['link'])));
 			$exit = False;
-			//$html_out .= $html_header;
 		} else {
-			$html_out .= "<h2>Bad Paramaters passed to tw-iface.php</h2>";
+			$output = "Bad Paramaters passed to tw-iface.php";
 		}
 	}
 
@@ -68,6 +60,10 @@ function parse_options() {
 		exec($exec, $output);
 		$html_out .= "<div class='execoutput'>".implode($filler, $output)."</div>";
 		echo($html_out);
+		$html_out = "";
+	} else if (isset($output)) {
+		$html_out .= str_replace("\n", "<br>", "<div class='execoutput'>$output</div>");
+		echo $html_out;
 		$html_out = "";
 	}
 	if($exit) {

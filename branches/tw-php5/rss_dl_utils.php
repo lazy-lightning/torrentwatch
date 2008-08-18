@@ -165,13 +165,17 @@
 			$rss = $argv[$pos+1];
 			$key = $argv[$pos+2];
 			$data = $argv[$pos+3];
+			exit(update_config_real($type, $rss, $key, $data) ? 0 : 1);
+		}
+		function update_config_real($type, $rss, $key, $data) {
+			global $config_values;
 			switch($type) {
 				case RSS_ADD:
 					if(!isset($config_values[$rss])) // New Feed
 						$config_values[$rss]['xxOPTIONSxx']['Type'] = guess_feedtype($rss);
 					if(isset($config_values[$rss][$key])) {
 						_debug("$rss already has a match for $key.  Try a different key value.\n");
-						exit(1);
+						return FALSE;
 					}
 					$config_values[$rss][$key] = $data;
 					_debug("Match for $key $data added to $rss\n");
@@ -194,15 +198,15 @@
 							_debug("Key not set\n");
 						else if(strcmp($config_values[$rss][$key], $data) != 0)
 							_debug("Data doesn't match\ndata: \"".$config_values[$rss][$key]."\" != \"$data\"\n");
-						exit(1);
+						return FALSE;
 					}
 					break;
 				default:
 					_debug("Bad Type sent to update_config()\n", 0);
-					exit(1);
+					return FALSE;
 			}
 			write_config_file();
-			exit(0);
+			return TRUE;
 		}
 
 		function cache_setup()

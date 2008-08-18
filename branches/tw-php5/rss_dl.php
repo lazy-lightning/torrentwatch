@@ -270,6 +270,19 @@
 				_debug("Failed to parse atom feed: $atomfile \n");
 			}
 		}
+
+	function feeds_perform_matching() {
+		global $config_values;
+		if(isset($config_values['Global']['HTMLOutput']))
+			setup_rss_list_html();
+
+		_debug("Fetching Feeds ...\n");
+		array_walk($config_values, 'feed_callback');
+		write_config_file();
+
+		if(isset($config_values['Global']['HTMLOutput']))
+			finish_rss_list_html();
+	}
 //
 //
 // Begin Main Function
@@ -292,15 +305,7 @@
 		exit;
 	}
 
-	if(isset($config_values['Global']['HTMLOutput']))
-		setup_rss_list_html();
-
-	_debug("Fetching Feeds ...\n");
-	array_walk($config_values, 'feed_callback');
-	write_config_file();
-
-	if(isset($config_values['Global']['HTMLOutput']))
-		finish_rss_list_html();
+	feeds_perform_matching();
 
 	if($config_values['Settings']['Run Torrentwatch'] and !$test_run) {
 		update_btcli();
