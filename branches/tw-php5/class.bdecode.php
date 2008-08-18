@@ -55,8 +55,6 @@
          * Info: Parses bencoded file into array.
          * Args: {string} filepath: full or relative path to bencoded file
          **************************************************************************/
-	define('STYLE_FILE', 1)
-	define('STYLE_DIRECT', 2)
         function __construct($filepath, $torrent = NULL) {
             if($torrent)
                     $this->content = $torrent;
