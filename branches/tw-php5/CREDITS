@@ -6,8 +6,9 @@ Torrent Watch is available under the GNU General Public License v2. The complete
 text of this license can be found in the file LICENSE
 
 Main logic by Erik Bernhardson
-CSS styling and general html tweaking by Keith Solomon http://reciprocity.be/
+CSS styling, images and general html tweaking by Keith Solomon http://reciprocity.be/
 Initial debugging and test cases by DigiMuse
 CGI installer routine from the telnetd installer by lundman http://www.lundman.net/
+favorites.png by DGBthekafu from http://commons.wikimedia.org/wiki/Image:Gnome-favorites.png`
 
 

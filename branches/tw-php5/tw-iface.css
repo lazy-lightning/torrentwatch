@@ -123,7 +123,8 @@ div.feedlist a {
 }
 
 div.execoutput,
-div.configuration {
+div.configuration,
+div.Favorites {
 	background: white;
 	border: 1px solid gray;
 	float: left;

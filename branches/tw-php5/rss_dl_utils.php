@@ -143,7 +143,7 @@
 				} else {
 					if($subkey != "" ) {
 						if(!is_numeric($key)) {
-						$group = "$key = $group";
+						$group = "$key => $group";
 						}
 						$key = $subkey;
 					}
@@ -338,12 +338,6 @@
 			if(!$hit)
 				_debug("No New Torrents to add\n", 0);
 			return;
-			// OLD WAY
-			_debug("Running BTCLI Update Program\n");
-			exec('/share/.torrents/torrentwatch.php check', $output);
-			if(isset($config_values['Global']['HTMLOutput']))
-				btcli_html($output);
-			_debug(implode("\n", $output)."\n",0);
 
 		}
 
@@ -489,9 +483,6 @@ function btcli_html($output) {
 	$html_header = $tmp.$html_header;
 }
 
-define('FEED_UNKNOWN', 0);
-define('FEED_ATOM', 1);
-define('FEED_RSS', 2);
 function guess_feedtype($feedurl) {
 	global $config_values;
 	$content = file($feedurl);
@@ -584,7 +575,6 @@ function client_add_torrent($filename, $dest, $fav = NULL) {
 				break;
 			case 'Title':
 				$guess = guess_match($tor_name, TRUE);
-				print_r($guess);
 				if(isset($guess['key'])) {
 					$dest = "$dest/".$guess['key'];
 					break;
@@ -654,4 +644,61 @@ function check_for_torrents($directory, $dest) {
 	}
 }
 
+function update_favorite() {
+	if(!isset($_GET['button']))
+		return;
+	switch($_GET['button']) {
+		case 'Add':
+		Case 'Update':
+			add_favorite();
+			break;
+		case 'Delete':
+			del_favorite();
+			break;
+	}
+}
+
+function add_favorite() {
+	global $config_values;
+	$i = 0;
+
+	if(isset($_GET['idx'])) {
+		$idx = $_GET['idx'];
+	} else	{
+		$config_values['Favorites'][]['Name'] = $_GET['name'];
+		$idx = end(array_keys($config_values['Favorites']));
+	}
+	$list = array("filter"    => "Filter", 
+	              "not"       => "Not",
+	              "savein"    => "Save In",
+	              "episodes"  => "Episodes",
+	              "feed"      => "Feed",
+	              "quality"   => "Quality",
+	              "autostart" => "AutoStart");
+	foreach($list as $key => $data) {
+		if(!isset($_GET[$key])) {
+			unset($config_values['Favorites'][$idx]);
+			return;
+		}
+		$config_values['Favorites'][$idx][$data] = $_GET[$key]; 
+	}
+	write_config_file();
+}
+
+function del_favorite() {
+	if(isset($_GET['idx']) AND isset($config_values['Favorites'][$_GET['idx']])) {
+		unset($config_values['Favorites'][$_GET['fav']]);
+		write_config_file();
+	}
+}
+
+function add_feed() {
+}
+
+function del_feed() {
+	if(isset($_GET['idx']) AND isset($config_values['Feeds'][$_GET['idx']])) {
+		unset($config_values['Feeds'][$_GET['idx']]);
+		write_config_file();
+	}
+}
 ?>

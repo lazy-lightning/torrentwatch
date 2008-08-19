@@ -12,6 +12,14 @@ function parse_options() {
 
 	if(isset($_GET['mode'])) {
 		switch($_GET['mode']) {
+			case 'updatefavorite':
+				update_favorite();
+				$exit = False;
+				break;
+			case 'updaterss':
+				update_rss();
+				$exit = False;
+				break;
 			case 'showfeed':
 				echo $html_out;
 				$html_out = "";
@@ -96,28 +104,6 @@ function parse_options() {
 	return;
 }
 
-function display_form($rss = FALSE) {
-	global $html_out;
-	$html_out .= '<form action="tw-iface.cgi"><input type="hidden" name="mode" value="add">';
-	if($rss) {
-		$html_out .= '<input type="hidden" name="rss" value="'.$rss.'">';
-	} else {
-		$html_out .= '<tr><td colspan=3>&nbsp;</td></tr>';
-		$html_out .= '<tr style="text-align: center"><td colspan="2">';
-		$html_out .= 'New RSS Feed</td></tr><tr><td colspan="2">';
-		$html_out .= '<center><label>Feed: <input type="text" name="rss"></center></td></tr>';
-	} 
-	$html_out .= '<tr><td>';
-	$html_out .= '<input type="text" name="key"></td><td><input type="text" name="data"></td>';
-/*	$html_out .= '<td><input type="image" src="images/add.png" name="optional"></td>'; */
-	$html_out .= '<td>&nbsp;<input class="add" type="submit" Value=""></td>'; 
-	if($rss) {	
-		$html_out .= '<tr><td class="feedlink" colspan="3">&nbsp;</td></tr>';
-		$html_out .= '<tr><td><br />&nbsp;<br /></td></tr>';
-	}
-	$html_out .= '</form>';
-}
-
 function display_global_settings() {
 	global $config_values, $html_out;
 
@@ -191,59 +177,59 @@ function display_global_settings() {
 
 function display_favorites_info($item) {
 	global $config_values, $html_out;
-	$html_out .= '<div class="FavInfo">Filter: ';
-	$html_out .= '<input type="text" name="filter" value="'.$item['Filter'].'"><br>';
+	$html_out .= '<div class="FavInfo">Filter: '."\n";
+	$html_out .= '<input type="text" name="filter" value="'.$item['Filter'].'"><br>'."\n";
 	$html_out .= 'Not: ';
-	$html_out .= '<input type="text" name="not" value="'.$item['Not'].'"><br>';
+	$html_out .= '<input type="text" name="not" value="'.$item['Not'].'"><br>'."\n";
 	$html_out .= 'Save In: ';
-	$html_out .= '<input type="text" name="savein" value="'.$item['Save In'].'"><br>';
+	$html_out .= '<input type="text" name="savein" value="'.$item['Save In'].'"><br>'."\n";
 	$html_out .= 'Episodes: ';
-	$html_out .= '<input type="text" name="episodes" value="'.$item['Episodes'].'"><br>';
-	$html_out .= 'Feed: <select name="feed">';
-	$html_out .= '<option value="all">All</option>';
+	$html_out .= '<input type="text" name="episodes" value="'.$item['Episodes'].'"><br>'."\n";
+	$html_out .= 'Feed: <select name="feed">'."\n";
+	$html_out .= '<option value="all">All</option>'."\n";
 	foreach($config_values['Feeds'] as $feed) {
 		$html_out .= '<option value="'.urlencode($feed['Link']).'"';
 		if($feed['Link'] == $item['Feed'])
 			$html_out .= ' selected="selected"';
-		$html_out .= '>'.$feed['Name'].'</option>';
+		$html_out .= '>'.$feed['Name'].'</option>'."\n";
 	}
-	$html_out .= '</select>';
+	$html_out .= '</select>'."\n";
 	$html_out .= 'Quality: ';
-	$html_out .= '<input type="text" name="quality" value="'.$item['Quality'].'"><br>';
+	$html_out .= '<input type="text" name="quality" value="'.$item['Quality'].'"><br>'."\n";
 	$html_out .= 'AutoStart: ';
 	$html_out .= '<input type="text" name="autostart" value="'.$item['AutoStart'].'"><br></div>'."\n";
 }
 function display_favorites() {
 	global $config_values, $html_out;
 
-	$html_out .= '<div class="configuration">';
+	$html_out .= '<div class="Favorites">';
 	foreach($config_values['Favorites'] as $key => $item) {
-		$html_out .= '<div class="Favorite">';
-		$html_out .= '<form action="tw-iface.php">';
-		$html_out .= '<input type="hidden" mode="addfavorite">';
-		$html_out .= '<input type="hidden" name="fav" value="'.$key.'">';
-		$html_out .= '<div class="FavName">'.$key.'<br>';
-		$html_out .= '[ <input type="submit" value="Update"> - ';
-		$html_out .= '<input type="submit" value="Delete"> ]</div>';
+		$html_out .= '<div class="Favorite">'."\n";
+		$html_out .= '<form action="tw-iface.cgi">'."\n";
+		$html_out .= '<input type="hidden" name="mode" value="updatefavorite">'."\n";
+		$html_out .= '<input type="hidden" name="idx" value="'.$key.'">'."\n";
+		$html_out .= '<div class="FavName">'.$item['Name'].'<br>'."\n";
+		$html_out .= '[ <input type="submit" name="button" value="Update"> - '."\n";
+		$html_out .= '<input type="submit" name="button" value="Delete"> ]</div>'."\n";
 		display_favorites_info($item);
-		$html_out .= '</div><div class="clear"></form></div>'."\n";
+		$html_out .= '</form><div class="clear"></div></div>'."\n";
 	}
 	unset($item);
-	$html_out .= '<div class=Favorite">';
-	$html_out .= '<form action=tw-iface.php">';
-	$html_out .= '<input type="hidden" mode="addfavorite">';
-	$html_out .= '<div class="FavName">';
-	$html_out .= '<input type=text" name="fav" value="New Favorite"><br>';
-	$html_out .= '[ <input type="submit" value="Add"> ]</div>';
-	$item['Save In'] = 'Default';
+	$html_out .= '<div class=Favorite">'."\n";
+	$html_out .= '<form action=tw-iface.php">'."\n";
+	$html_out .= '<input type="hidden" mode="addfavorite">'."\n";
+	$html_out .= '<div class="FavName">'."\n";
+	$html_out .= '<input type=text" name="name" value="New Favorite"><br>'."\n";
+	$html_out .= '[ <input type="submit" value="Add"> ]</div>'."\n";
+	$item = array('Save In' => 'Default');
 	display_favorites_info($item);
 	$html_out .= '</div><div class="clear"></form></div>'."\n";
-	$html_out .= '</div>';
+	$html_out .= '</div>'."\n";
 }
 
 function display_feeds() {
 	global $config_values, $html_out;
-	$html_out .= '<ul>';
+	$html_out .= '<ul>'."\n";
 	$html_out .= '<li id="feed"><a href="tw-iface.cgi?mode=showfeed&feed=all">All</a></li>';
 	foreach($config_values['Feeds'] as $key => $item) {
 		$html_out .= '<li id="feed"><a href="tw-iface.cgi?mode=showfeed&feed='.$key.'">';;
@@ -254,7 +240,7 @@ function display_feeds() {
 
 function display_options() {
 	global $html_out, $config_values;
-	$html_out .= '<ul>';
+	$html_out .= '<ul>'."\n";
 	$html_out .= '<li id="favorites"><a href="tw-iface.cgi">Favorites</a></li>';
 	$html_out .= '<li id="config"><a href="tw-iface.cgi?mode=config">Configure</a></li>';
 	$html_out .= '<li id="view"><a href="tw-iface.cgi?mode=viewlog">View log</a></li>';
@@ -268,7 +254,7 @@ function display_options() {
 		$html_out .= '":8883/torrent/bt.cgi>BitTorrent WebUI</a></li>';
 	} else if($config_values['Settings']['Client'] == "transmission")
 		$html_out .= '<li id="webui"><a href="http://popcorn:9091/transmission/web/">Transmission</a></li>';
-	$html_out .= '</ul>';
+	$html_out .= '</ul>'."\n";
 }
 
 //
@@ -283,15 +269,15 @@ echo ('<link rel="Stylesheet" type="text/css" href="tw-iface');
 if($_SERVER["REMOTE_ADDR"] == '127.0.0.1')
 	echo ('.local');
 echo ('.css?'.time().'"></link>'."\n");
-echo ('</head>'."\n".'<body><div class="container">');
+echo ('</head>'."\n".'<body><div class="container">'."\n");
 $html_out = "";
 
 read_config_file();
-$html_out .= '<div class="mainoptions">';
+$html_out .= '<div class="mainoptions">'."\n";
 display_options();
 $html_out .= '<hr>';
 display_feeds();
-$html_out .= '</div>';
+$html_out .= '</div>'."\n";
 if(isset($_GET['mode'])) {
 	parse_options();
 	unset($config_values);
