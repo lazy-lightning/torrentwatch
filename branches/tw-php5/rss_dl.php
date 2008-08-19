@@ -1,21 +1,13 @@
 #!/mnt/syb8634/server/php5-cgi -qd register_argc_argv=1
 <?php
-		ini_set('include_path', '.:/share/.torrents');
 		ini_set("precision", 4);
     
-		// This is our RSS parser.
-		// Found at http://lastrss.oslab.net/
-		require_once('lastRSS.php');
-		// This is our Atom parser
-		// Found at http://www.the-art-of-web.com/php/atom/
-		require_once('atomparser.php');
-
 		// These are our extra functions
 		require_once('rss_dl_utils.php');
-    
+
 		// DEFAULT CONFIG -
+
 		$config_values;
-		$config_file = '/share/.torrents/rss_dl.config';
 		$test_run = 0;
 		$verbosity = 0;
 
@@ -119,10 +111,13 @@
 			_default('Watch Dir', "/share/.torrents");
 			_default('Download Dir', "/share/Video");
 			_default('Cache Dir', "/share/.torrents");
-			_default('Use wget', "1");
+			_default('Save Torrents', "0");
+			_default('Use wget', "0");
 			_default('Run Torrentwatch', "1");
 			_default('Cron', "/etc/cron.hourly");
 			_default('Client', "btpd");
+			_default('AutoStart', "1");
+			_default('Verify Episode', "0");
 			write_config_file();
 		}
 
@@ -134,12 +129,11 @@
 				exit(1);
 			}
 			$cron = $config_values['Settings']['Cron'];
-			$i = $config_values['Global']['Install'];
 			// Check if we are already in the cron.hourly file
 			// $return = 0 : already in the file
 			// $return > 0 : not in file
 			exec("/bin/cat $cron | /bin/grep -q rss_dl.php", $output, $return);
-			switch($i) {
+			switch($config_values['Global']['Install']) {
 				case 1:
 					// install hook
 					if($return == 0) {
@@ -160,130 +154,12 @@
 					}
 					break;
 				default:
-					_debug("Unknown option $i passed to setup_cron_hook()\n",0);
+					_debug("Unknown option ".$config_values['Setings']['Install']." passed to setup_cron_hook()\n",0);
 					exit(1);
 			}
 			exit(0);
 		}
 
-		function feed_callback($group, $key) {
-			global $config_values;
-			if($key == "Settings" or $key == "Global")
-				return;
-			_debug("\t\t$key\n",0);
-			if(!isset($config_values[$key]['xxOPTIONSxx']['Type']))
-				$config_values[$key]['xxOPTIONSxx']['Type'] = guess_feedtype($key);
-			switch($config_values[$key]['xxOPTIONSxx']['Type']) {
-				case 'RSS':
-					parse_one_rss($key);
-					break;
-				case 'Atom':
-					parse_one_atom($key);
-					break;
-				default:
-					_debug("Unknown Feed $key\n");
-					break;
-			}
-		}
-
-		function check_for_torrent($item, $key, $rs) {
-			global $matched;
-			if($key == "xxOPTIONSxx")
-				return;
-			if(preg_match('/'.strtolower($item).'/', strtolower($rs['title'])) && preg_match('/'.strtolower($key).'/', strtolower($rs['title']))) {
-				_debug('Match found for '.$rs['title']."\t");
-				if($link = get_torrent_link($rs)) 
-					fetch_torrent($rs['title'], $link);
-				else {
-					_debug("Unable to find URL for ".$rs['title']."\n");
-					$matched = -1;
-				}
-			}
-		}
-
-		function parse_one_rss($key) {
-			global $config_values, $matched;
-			$rss = new lastRSS;
-			$rss->stripHTML = True;
-			$rss->cache_time = 50*60;
-			if(isset($config_values['Settings']['Cache Dir']))
-				$rss->cache_dir = $config_values['Settings']['Cache Dir'];
-			if($rs = $rss->get($key)) {
-				if(isset($config_values['Global']['HTMLOutput']))
-					show_feed_html($rs);
-				$alt = 'alt';
-				foreach($rs['items'] as $item) {
-					$matched = 0;
-					array_walk($config_values[$key], 'check_for_torrent', $item);
-					if($matched == 0) {
-						_Debug("No match for $item[title]\n", 2);
-					}
-					if(isset($config_values['Global']['HTMLOutput'])) {
-						show_torrent_html($item, $key, $alt);
-					}
-					
-					if($alt=='alt') {
-						$alt='';
-					} else {
-						$alt='alt';
-					}
-				}
-				unset($item);
-			} else {
-				_debug("Failed to open rss feed: $key\n",0);
-			}
-		}
-    
-		function parse_one_atom($key) {
-			global $config_values, $matched;
-
-
-			if(isset($config_values['Settings']['Cache Dir']))
-				$atom_parser = new myAtomParser($key, $config_values['Settings']['Cache Dir']);
-			else
-				$atom_parser = new myAtomParser($key);
-
-			if($atom = $atom_parser->getRawOutput()) {
-				$atom = array_change_key_case_ext($atom, ARRAY_KEY_LOWERCASE);
-				if(isset($config_values['Global']['HTMLOutput']))
-					show_feed_html($atom['feed']);
-				$alt='alt';
-				
-				foreach($atom['feed']['entry'] as $item) {
-					$matched = 0;
-					array_walk($config_values[$key], 'check_for_torrent', $item);
-					if($matched == 0) {
-						_debug("No match for ".$item['title']."\n");
-					}
-					if(isset($config_values['Global']['HTMLOutput'])) {
-						show_torrent_html($item, $key, $alt);
-					}
-	
-					if($alt=='alt') {
-						$alt='';
-					} else {
-						$alt='alt';
-					}
-					unset($item);
-				}
-			} else {
-				_debug("Failed to parse atom feed: $atomfile \n");
-			}
-		}
-
-	function feeds_perform_matching() {
-		global $config_values;
-		if(isset($config_values['Global']['HTMLOutput']))
-			setup_rss_list_html();
-
-		_debug("Fetching Feeds ...\n");
-		array_walk($config_values, 'feed_callback');
-		write_config_file();
-
-		if(isset($config_values['Global']['HTMLOutput']))
-			finish_rss_list_html();
-	}
-//
 //
 // Begin Main Function
 //
@@ -305,7 +181,8 @@
 		exit;
 	}
 
-	feeds_perform_matching();
+	load_feeds($config_values['Feeds']);
+	feeds_perform_matching($config_values['Feeds']);
 
 	if($config_values['Settings']['Run Torrentwatch'] and !$test_run) {
 		update_btcli();

@@ -1,5 +1,9 @@
 <?php
 		require_once("class.bdecode.php"); 
+		require_once("lastRSS.php");
+		require_once("atomparser.php");
+		require_once("rss_dl.functions.php");
+
 		global $config_values;
 		$config_values['Global'] = array();
 		$config_file = '/share/.torrents/rss_dl.config';
@@ -80,6 +84,7 @@
 
 		// This function is from
 		// http://www.codewalkers.com/c/a/Miscellaneous/Configuration-File-Processing-with-PHP/2/
+		// It has been modified to support multidimensional arrays
 		function read_config_file() {
 			global $config_file;
 			global $config_values;
@@ -95,15 +100,16 @@
 						$line = trim($line, "]");
 						$group = trim($line);
 					} else {
-						$pieces = explode("=", $line, 3);
+						$pieces = explode("=", $line, 2);
 						$pieces[0] = trim($pieces[0] , "\"");
 						$pieces[1] = trim($pieces[1] , "\"");
 						$option = trim($pieces[0]);
 						$value = trim($pieces[1]);
 						if(ereg("\[\]$", $option)) {
 							$option = substr($option, 0, strlen($option)-2);
-							if(isset($pieces[2])) {
-								$config_values[$group][$option][$value] = trim($pieces[2]);
+							$pieces = explode("=>", $value, 2);
+							if(isset($pieces[1])) {
+								$config_values[$group][$option][trim($pieces[0])] = trim($pieces[1]);
 							} else
 								$config_values[$group][$option][] = $value;
 						} else
@@ -552,9 +558,9 @@ function transmission_rpc($request) {
 }
 
 // $filename MUST be a local file ending in .torrent	
-function client_add_torrent($filename, $dest) {
+function client_add_torrent($filename, $dest, $fav = NULL) {
 	global $config_values, $hit;
-
+	$autostart = $config_values['Settings']['AutoStart'];
 	$hit = 1;
 	
 	if(!($tor = file_get_contents($filename))) {
@@ -566,7 +572,13 @@ function client_add_torrent($filename, $dest) {
 		_debug("Couldn't parse torrent: $filename\n", 0);
 		return FALSE;
 	}
-	if(isset($config_values['Settings']['Deep Directories'])) {
+	if(isset($fav))
+		$autostart = $fav['AutoStart'];
+	if(!isset($dest))
+		$dest = $config_values['Settings']['Download Dir'];
+	if(isset($fav) && $fav['Save In'] != 'Default') 
+			$dest = $fav['Save In'];
+	else if(isset($config_values['Settings']['Deep Directories'])) {
 		switch($config_values['Settings']['Deep Directories']) {
 			case '0':
 				break;
@@ -598,10 +610,12 @@ function client_add_torrent($filename, $dest) {
 
 		$tmpname = tmpnam("","torrentwatch");
 		file_put_contents($tmpname, $tor);
+		if($autostart == 0)
+			$btcli_add .= " -N";
 		exec("$btcli_exec $btcli_add \"$dest\" \"$tmpname\"", $output, $return);
 		unlink($tmpname);
 	} else if($config_values['Settings']['Client'] == "transmission") {
-		$request = array('method' => 'torrent-add', 'arguments' => array('download-dir' => $dest, 'metainfo' => base64_encode($tor)));
+		$request = array('method' => 'torrent-add', 'arguments' => array('download-dir' => $dest, 'metainfo' => base64_encode($tor)), 'paused' => $autostart ? 0 : 1);
 		$responce = transmission_rpc($request);
 		if(isset($responce['result']) AND ($responce['result'] == 'success' or $responce['result'] == 'duplicate torrent'))
 			$return = 0;
