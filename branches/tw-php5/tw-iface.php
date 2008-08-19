@@ -215,12 +215,12 @@ function display_favorites() {
 		$html_out .= '</form><div class="clear"></div></div>'."\n";
 	}
 	unset($item);
-	$html_out .= '<div class=Favorite">'."\n";
-	$html_out .= '<form action=tw-iface.php">'."\n";
-	$html_out .= '<input type="hidden" mode="addfavorite">'."\n";
+	$html_out .= '<div class="Favorite">'."\n";
+	$html_out .= '<form action="tw-iface.cgi">'."\n";
+	$html_out .= '<input type="hidden" name="mode" value="updatefavorite">'."\n";
 	$html_out .= '<div class="FavName">'."\n";
-	$html_out .= '<input type=text" name="name" value="New Favorite"><br>'."\n";
-	$html_out .= '[ <input type="submit" value="Add"> ]</div>'."\n";
+	$html_out .= '<input type="text" name="name" value="New Favorite"><br>'."\n";
+	$html_out .= '[ <input type="submit" name="button" value="Add"> ]</div>'."\n";
 	$item = array('Save In' => 'Default');
 	display_favorites_info($item);
 	$html_out .= '</div><div class="clear"></form></div>'."\n";

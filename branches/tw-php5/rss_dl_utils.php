@@ -661,13 +661,16 @@ function update_favorite() {
 function add_favorite() {
 	global $config_values;
 	$i = 0;
-
+	echo "add_favorite()";
 	if(isset($_GET['idx'])) {
 		$idx = $_GET['idx'];
-	} else	{
+	} else if(isset($_GET['name']))	{
+		echo "New Favorite";
 		$config_values['Favorites'][]['Name'] = $_GET['name'];
 		$idx = end(array_keys($config_values['Favorites']));
-	}
+		echo " idx: $idx<br>";
+	} else
+		return;
 	$list = array("filter"    => "Filter", 
 	              "not"       => "Not",
 	              "savein"    => "Save In",
@@ -676,11 +679,8 @@ function add_favorite() {
 	              "quality"   => "Quality",
 	              "autostart" => "AutoStart");
 	foreach($list as $key => $data) {
-		if(!isset($_GET[$key])) {
-			unset($config_values['Favorites'][$idx]);
-			return;
-		}
-		$config_values['Favorites'][$idx][$data] = $_GET[$key]; 
+		if(isset($_GET[$key]))
+			$config_values['Favorites'][$idx][$data] = urldecode($_GET[$key]);
 	}
 	write_config_file();
 }
