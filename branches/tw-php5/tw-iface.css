@@ -29,7 +29,7 @@ body {
 	height: 16px; 
 	width: 16px;
 	text-indent: -9999em;
-	
+	bottom: 0;
 }
 
 .del {
@@ -38,7 +38,7 @@ body {
 	height: 16px;
 	width: 16px;
 	text-indent: -9999em;
-	
+	bottom: 0;
 }
 
 .clear { clear: both; }
@@ -75,38 +75,36 @@ div.mainoptions,div.Feeds {
 div.Favorite {
 	float: left;
 	clear: left;
-	border-bottom: 1px solid gray;
+	border: 1px solid gray;
 	padding: 5px;
-	width: 95%;
-}
-
-div.FavName {
-	float: left;
-	width: 160px;
-	text-align: center;
-	border-right: 1px solid gray;
-}
-
-div.FavName input#newfav {
-	width: 140px;
+	margin: 5px;
+	width: 180px;
 }
 
 div.FavInfo {
 	display: none;
-	padding-left: 10px;
-	width: 520px;
+	border: 1px solid gray;
+	padding: 15px;
+	margin: 5px;
+	width: 500px;
 	float: right;
 }
 
-div.FavInfo#favorite_new {
-	display: block;
-}
-
-div.FavInfo input, div.FavInfo select {
+div.FavInfo input, 
+div.FavInfo select {
 	position: relative;
 	bottom: 22px;
 	float: right;
 	width: 85%;
+}
+
+div.FavInfo input.add,
+div.FavInfo input.del {
+	width: 16px;
+	left: 400px;
+	margin: 5px;
+	bottom: 0px;
+	float: none;
 }
 
 div.feedlist {
@@ -152,6 +150,12 @@ div.feedcurrent {
 
 div.rss_debug {
 	display: none;
+}
+
+div.timer {
+	font-size: 8pt;
+	text-align: right;
+	margin-right: 5px;
 }
 
 div.torrentlist {
@@ -200,7 +204,9 @@ tr.rss {
 }
 
 /* Menu Styles */
-.mainoptions ul,.Feeds ul {
+.mainoptions ul,
+.Feeds ul,
+.Favorite ul {
 	list-style: none;
 	margin: 0;
 	padding: 0;
@@ -247,7 +253,14 @@ tr.rss {
 	background: url(images/rss.png) no-repeat left center;
 	height: 20px;
 	line-height: 20px;
-	margin-bottom: 0;
+	margin-bottom: 5px;
+	padding-left: 24px;
+}
+
+.favorite li {
+	background: url(images/favorites.png) no-repeat left center;
+	height: 20px;
+	line-height: 20px;
 	margin-bottom: 5px;
 	padding-left: 24px;
 }

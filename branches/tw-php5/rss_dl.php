@@ -108,9 +108,9 @@
 				unset($config_values['Settings']['Torrent Dir']);
 			}
 			// Sensible Defaults 
-			_default('Watch Dir', "/share/.torrents");
-			_default('Download Dir', "/share/Video");
-			_default('Cache Dir', "/share/.torrents");
+			_default('Watch Dir', "/share/.torrents/");
+			_default('Download Dir', "/share/Video/");
+			_default('Cache Dir', "/share/.torrents/rss_cache/");
 			_default('Save Torrents', "0");
 			_default('Use wget', "0");
 			_default('Run Torrentwatch', "1");
@@ -118,6 +118,7 @@
 			_default('Client', "btpd");
 			_default('AutoStart', "1");
 			_default('Verify Episode', "0");
+			_default('History', "/share/.torrents/rss_dl.history");
 			write_config_file();
 		}
 

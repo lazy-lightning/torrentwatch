@@ -174,7 +174,11 @@ function display_global_config() {
 
 function display_favorites_info($item, $key) {
 	global $config_values, $html_out;
-	$html_out .= '<div class="FavInfo" id="favorite_'.$key.'">'."\n";
+	$style = "";
+	$html_out .= '<div class="FavInfo" id="favorite_'.$key.'" '.$style.'>'."\n";
+	$html_out .= '<form action="tw-iface.cgi">'."\n";
+	$html_out .= '<input type="hidden" name="mode" value="updatefavorite">'."\n";
+	$html_out .= '<input type="hidden" name="idx" value="'.$key.'">'."\n";
 	$html_out .= 'Filter: ';
 	$html_out .= '<input type="text" name="filter" value="'.$item['Filter'].'"><br>'."\n";
 	$html_out .= 'Not:';
@@ -195,33 +199,29 @@ function display_favorites_info($item, $key) {
 	$html_out .= 'Quality: ';
 	$html_out .= '<input type="text" name="quality" value="'.$item['Quality'].'"><br>'."\n";
 	$html_out .= 'AutoStart: ';
-	$html_out .= '<input type="text" name="autostart" value="'.$item['AutoStart'].'"><br></div>'."\n";
+	$html_out .= '<input type="text" name="autostart" value="'.$item['AutoStart'].'">'."\n";
+	$html_out .= '<input type="submit" class="add" name="button" value="Update">'."\n";
+	$html_out .= '<input type="submit" class="del" name="button" value="Delete"></form></div>'."\n";
+	// Display the fav that was just updated
+	if(isset($_GET['idx']) && $_GET['idx'] == $key) {
+		$html_out .= "<script type='text/javascript'>";
+		$html_out .= 'toggleLayer("favorite_'.$_GET['idx'].'");</script>';
+	}
 }
 function display_favorites() {
 	global $config_values, $html_out;
 
 	$html_out .= '<div class="Favorites">';
+	$html_out .= '<div class="Favorite"><ul>';
 	foreach($config_values['Favorites'] as $key => $item) {
-		$html_out .= "<div class='Favorite'>\n";
-		$html_out .= '<form action="tw-iface.cgi">'."\n";
-		$html_out .= '<input type="hidden" name="mode" value="updatefavorite">'."\n";
-		$html_out .= '<input type="hidden" name="idx" value="'.$key.'">'."\n";
-		$html_out .= '<div class="FavName"><a href="javascript:toggleLayer(favorite_'.$key.')">'.$item['Name'].'</a><br>'."\n";
-		$html_out .= '[ <input type="submit" class="add" name="button" value="Update"> - '."\n";
-		$html_out .= '<input type="submit" class="del" name="button" value="Delete"> ]</div>'."\n";
-		display_favorites_info($item, $key);
-		$html_out .= '</form><div class="clear"></div></div>'."\n";
+		$html_out .= '<li><a href="javascript:toggleLayer('."'".'favorite_'.$key."'".')">'.$item['Name'].'</a></li>'."\n";
 	}
-	unset($item);
-	$html_out .= '<div class="Favorite">'."\n";
-	$html_out .= '<form action="tw-iface.cgi">'."\n";
-	$html_out .= '<input type="hidden" name="mode" value="updatefavorite">'."\n";
-	$html_out .= '<div class="FavName">'."\n";
-	$html_out .= '<input type="text" name="name" id="newfav" value="New Favorite"><br>'."\n";
-	$html_out .= '[ <input type="submit" class="add" name="button" value="Add"> ]</div>'."\n";
+	$html_out .= '<li><a href="javascript:toggleLayer(favorite_new)">New Favorite</a></li>'."\n";
+	$html_out .= '</ul></div>';
+	array_walk($config_values['Favorites'], 'display_favorites_info');
 	$item = array('Save In' => 'Default', 'AutoStart' => $config_values['Settings']['AutoStart']);
 	display_favorites_info($item, "new");
-	$html_out .= '</div><div class="clear"></form></div>'."\n";
+	$html_out .= '<div class="clear"></div>'."\n";
 	$html_out .= '</div>'."\n";
 }
 
@@ -260,15 +260,17 @@ function display_options() {
 // MAIN Function
 //
 //
+timer_init();
 ?>
 <html><head>
 <title>Torrentwatch Configuration Interface</title>
 <script type="text/javascript">
-// Function from http://www.netlobo.com/div_hiding.html
+// Inspiration from http://www.netlobo.com/div_hiding.html
+var last;
 function toggleLayer( whichLayer )
 {
   var elem, vis;
-  if ( whichLayer.tagName ) // Added by erik, sometimes ff 3.0.1 passes a reference to the div
+  if ( whichLayer.tagName ) // sometimes ff 3.0.1 passes a reference to the div directly
     elem = whichLayer;
   else if( document.getElementById ) // this is the way the standards work
     elem = document.getElementById( whichLayer );
@@ -277,10 +279,10 @@ function toggleLayer( whichLayer )
   else if( document.layers ) // this is the way nn4 works
     elem = document.layers[whichLayer];
   vis = elem.style;
-  // if the style.display value is blank we try to figure it out here
-  if(vis.display==''&&elem.offsetWidth!=undefined&&elem.offsetHeight!=undefined)
-    vis.display = (elem.offsetWidth!=0&&elem.offsetHeight!=0)?'block':'none';
-  vis.display = (vis.display==''||vis.display=='block')?'none':'block';
+	if(last)
+	  last.style.display = 'none';
+	vis.display = 'block';
+	last = elem;
 }
 </script>
 <meta http-equiv='expires' content='0'>
@@ -306,7 +308,9 @@ if(isset($_GET['mode'])) {
 display_favorites();
 
 
-$html_out .= "<div class='clear'></div>\n</div></body></html>\n";
+$html_out .= "<div class='clear'></div>\n<div class='timer'>Page Took ";
+$time_used = sprintf("%1.4f", timer_get_time());
+$html_out .= $time_used."s to load</div></div></body></html>\n";
 
 echo $html_out;
 

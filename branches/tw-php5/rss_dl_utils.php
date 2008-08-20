@@ -224,6 +224,11 @@
 				$cache_file = $config_values['Settings']['Cache Dir'] . '/rss_dl_' . filename_encode($title);
 				touch($cache_file);
 			}
+			// Also add to history file
+			$history = unserialize(file_get_contents($config_values['Settings']['History']));
+			$history[] = array('Title' => $title, 'Date' => date("m.d.y g:i a"));
+			file_put_contents($config_values['Settings']['History'], serialize($history));
+				
 		}
 
 		/*
@@ -640,6 +645,7 @@ function add_favorite() {
 	} else if(isset($_GET['name']))	{
 		$config_values['Favorites'][]['Name'] = $_GET['name'];
 		$idx = end(array_keys($config_values['Favorites']));
+		$_GET['idx'] = $idx; // So display_favorite_info() can see it
 	} else
 		return;
 	$list = array("filter"    => "Filter", 
