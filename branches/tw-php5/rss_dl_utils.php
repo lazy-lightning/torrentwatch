@@ -559,13 +559,13 @@ function client_add_torrent($filename, $dest, $fav = NULL) {
 		$btcli_connect='-d /opt/sybhttpd/localhost.drives/HARD_DISK/.btpd/';
 		$btcli_exec="$btcli $btcli_connect";
 
-		$tmpname = tmpnam("","torrentwatch");
+		$tmpname = tempnam("","torrentwatch");
 		file_put_contents($tmpname, $tor);
 		if($autostart == 0)
 			$btcli_add .= " -N";
 		exec("$btcli_exec $btcli_add \"$dest\" \"$tmpname\"", $output, $return);
 		unlink($tmpname);
-	} else if($config_values['Settings']['Client'] == "transmission") {
+	} else if($config_values['Settings']['Client'] == "transmission1.32") {
 		// transmission dies with bad folder if it doesn't end in a /
 		if(substr($dest, strlen($dest)-1, 1) != '/')
 			$dest .= '/';
@@ -577,6 +577,16 @@ function client_add_torrent($filename, $dest, $fav = NULL) {
 			$return = 1;
 			print_r($responce);
 		}
+	} else if($config_values['Settings']['Client'] == "transmission1.22") {
+		$trans_remote = '/mnt/syb8634/bin/transmission-remote';
+		$trans_connect = '-g /share/.transmission/';
+		$trans_exec = "$trans_remote $trans_connect";
+		$trans_add = '-a';
+
+		$tmpname = tempnam("","torrentwatch");
+		file_put_contents($tmpname, $tor);
+		exec("$trans_exec $trans_add \"$tmpname\"", $output, $return);
+		unlink($tmpname);
 	} else {
 		_debug("Invalid Torrent Client: ".$config_values['Settings']['Client']."\n",0);
 		exit(1);

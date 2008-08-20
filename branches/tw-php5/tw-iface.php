@@ -71,7 +71,7 @@ function parse_options() {
 				$exit = False;
 				break;
 			case 'dltorrent':
-				client_add_torrent(trim(urldecode($_GET['link'])));
+				client_add_torrent(trim(urldecode($_GET['link'])), $config_values['Settings']['Download Dir']);
 				$exit = False;
 				break;
 			default:
@@ -109,20 +109,25 @@ function display_global_config() {
 	$html_out .= 'Torrent Client:';
 	$html_out .= '<SELECT name="client">';
 	$btpd = "";
-	$trans = "";
+	$trans122 = "";
+	$trans132 = "";
 	switch($config_values['Settings']['Client']) {
 		case 'btpd':
 			$btpd = 'selected="selected"';
 			break;
-		case 'transmission':
-			$trans = 'selected="selected"';
+		case 'transmission1.22':
+			$trans122 = 'selected="selected"';
 			break;
+		case 'transmission1.32':
+			$trans132 = 'selected="selected"';
 		default:
 			// Shouldn't happen
 			break;
 	}
 	$html_out .= '<option value="btpd" '.$btpd.'>BTPD</option>';
-	$html_out .= '<option value="transmission" '.$trans.'>Transmission</option></Select><br>';
+	$html_out .= '<option value="transmission1.22" '.$trans122.'>Transmission 1.22</option>';
+	$html_out .= '<option value="transmission1.32" '.$trans132.'>Transmission 1.32</option></Select><br>';
+
 	$html_out .= 'Download Directory:';
 	$html_out .= '<input type="text" name="downdir" value='.$config_values['Settings']['Download Dir'].'><br>';
 	$html_out .= 'Watch Directory:';
@@ -250,8 +255,10 @@ function display_options() {
 		else
 			$html_out .= 'popcorn';
 		$html_out .= '":8883/torrent/bt.cgi>BitTorrent WebUI</a></li>';
-	} else if($config_values['Settings']['Client'] == "transmission")
+	} else if($config_values['Settings']['Client'] == "transmission1.32")
 		$html_out .= '<li id="webui"><a href="http://popcorn:9091/transmission/web/">Transmission</a></li>';
+	else if($config_values['Settings']['Client'] == "transmission1.22")
+		$html_out .= '<li id="webui"><a href="http://popcorn:8077/">Clutch</a></li>';
 	$html_out .= '</ul>'."\n";
 }
 
