@@ -70,18 +70,6 @@
 			}
 		}
 
-		function fetch_http($url, $destfile) {
-			global $config_values;  
-			_debug("fetch_http(): url: $url dest: $destfile\n",3);
-			/* Some rss feeds give bad urls, fix that here */
-			$url = str_replace('&amp;', '&', $url);
-			if ($config_values['Settings']['Use wget']) {
-				exec('wget -q -O - '.escapeshellarg($url).' > '.escapeshellarg($destfile));
-			} else {
-				file_put_contents($destfile, file_get_contents($url));
-			}
-		}
-
 		// This function is from
 		// http://www.codewalkers.com/c/a/Miscellaneous/Configuration-File-Processing-with-PHP/2/
 		// It has been modified to support multidimensional arrays
@@ -244,6 +232,7 @@
 		 */
 		function check_cache_episode($title) {
 			global $config_values, $matched;
+			$matched = 2;
 			// Dont skip a proper/repack
 			if(preg_match('/proper|repack/i', $title))
 				return 1;
@@ -277,20 +266,24 @@
 		 */
 		function check_cache($title)
 		{
-			global $config_values;
+			global $config_values, $matched;
 
 			if (isset($config_values['Settings']['Cache Dir'])) {
 				$cache_file = $config_values['Settings']['Cache Dir'] . '/rss_dl_' . filename_encode($title);
 				if (!file_exists($cache_file)) {
-					if($config_values['Settings']['Verify Episode'])
+					if($config_values['Settings']['Verify Episode']) {
 						return check_cache_episode($title);
-					else
+					} else {
+						$matched = 2;
 						return 1;
+					}
 				} else {
+					$matched = 1;
 					return 0;
 				}
 			} else {
 				// No Cache, Always download
+				$matched = 2;
 				return 1;
 			}
 		}
@@ -308,43 +301,6 @@
 			}
 		}
 
-		function fetch_torrent($title, $link) {
-			global $test_run, $matched, $config_values;
-			$matched = 1;
-			$title = filename_encode($title);
-			$destdir = $config_values['Settings']['Watch Dir'];
-			if(check_cache($title)) {
-				$matched = 2;
-				if($test_run) {
-					_debug("Test Run, ignoring.\n");
-					return;
-				}
-				add_cache($title);
-				_debug("Downloading: $link\n");
-				fetch_http($link, $destdir.'/'.$title.'.torrent');
-			} else {
-				if($matched == 3)
-					_debug("Duplicate Episode, ignoring.\n");
-				else
-					_debug("Cache hit, ignoring.\n");
-			}
-		}
-
-		function update_btcli()
-		{
-			global $config_values, $hit;
-			$hit = 0;
-			check_for_torrents($config_values['Settings']['Watch Dir'], $config_values['Settings']['Download Dir']);
-			if(!$hit)
-				_debug("No New Torrents to add\n", 0);
-			return;
-
-		}
-
-		function my_urlencode($string) {
-			return urlencode($string);
-		}
- 
 		function microtime_float() {
 			list($usec, $sec) = explode(" ", microtime());
 			return ((float)$usec + (float)$sec);
@@ -423,7 +379,7 @@
 		function show_torrent_html($item, $feed, $alt) {
 			global $html_out, $matched, $test_run;
 
-			$feed = my_urlencode($feed);
+			$feed = urlencode($feed);
 			$html_out .=  "<tr class='item $alt'>\n<td>";
 			$html_out .= "<a href='tw-iface.cgi?mode=matchtitle&rss=$feed&title=".rawurlencode($item['title'])."'>";
 			$html_out .=  "<img src='images/rss.png'>".str_replace('.', '.<wbr>', $item['title']);
@@ -565,7 +521,7 @@ function client_add_torrent($filename, $dest, $fav = NULL) {
 	}
 	if(isset($fav))
 		$autostart = $fav['AutoStart'];
-	if(!isset($dest))
+	if(!isset($dest) or $dest == "")
 		$dest = $config_values['Settings']['Download Dir'];
 	if(isset($fav) && $fav['Save In'] != 'Default') 
 			$dest = $fav['Save In'];
@@ -605,6 +561,9 @@ function client_add_torrent($filename, $dest, $fav = NULL) {
 		exec("$btcli_exec $btcli_add \"$dest\" \"$tmpname\"", $output, $return);
 		unlink($tmpname);
 	} else if($config_values['Settings']['Client'] == "transmission") {
+		// transmission dies with bad folder if it doesn't end in a /
+		if(substr($dest, strlen($dest)-1, 1) != '/')
+			$dest .= '/';
 		$request = array('method' => 'torrent-add', 'arguments' => array('download-dir' => $dest, 'metainfo' => base64_encode($tor)), 'paused' => $autostart ? 0 : 1);
 		$responce = transmission_rpc($request);
 		if(isset($responce['result']) AND ($responce['result'] == 'success' or $responce['result'] == 'duplicate torrent'))
@@ -656,19 +615,31 @@ function update_favorite() {
 			del_favorite();
 			break;
 	}
+	write_config_file();
+}
+
+function update_feed() {
+	if(!isset($_GET['button']))
+		return;
+	switch($_GET['button']) {
+		case 'Add':
+			add_feed();
+			break;
+		case 'Delete':
+			del_feed();
+			break;
+	}
+	write_config_file();
 }
 
 function add_favorite() {
 	global $config_values;
 	$i = 0;
-	echo "add_favorite()";
 	if(isset($_GET['idx'])) {
 		$idx = $_GET['idx'];
 	} else if(isset($_GET['name']))	{
-		echo "New Favorite";
 		$config_values['Favorites'][]['Name'] = $_GET['name'];
 		$idx = end(array_keys($config_values['Favorites']));
-		echo " idx: $idx<br>";
 	} else
 		return;
 	$list = array("filter"    => "Filter", 
@@ -682,23 +653,40 @@ function add_favorite() {
 		if(isset($_GET[$key]))
 			$config_values['Favorites'][$idx][$data] = urldecode($_GET[$key]);
 	}
-	write_config_file();
 }
 
 function del_favorite() {
+	global $config_values;
 	if(isset($_GET['idx']) AND isset($config_values['Favorites'][$_GET['idx']])) {
-		unset($config_values['Favorites'][$_GET['fav']]);
-		write_config_file();
+		unset($config_values['Favorites'][$_GET['idx']]);
 	}
 }
 
+
 function add_feed() {
+	global $config_values;
+	
+	if(isset($_GET['link']) AND ($tmp = guess_feedtype(urldecode($_GET['link']))) != 'Unknown') {
+		$link = urldecode($_GET['link']);
+		$config_values['Feeds'][]['Link'] = $link;
+		$idx = end(array_keys($config_values['Feeds']));
+		$config_values['Feeds'][$idx]['Type'] = $tmp;
+		load_feeds(array(0 => array('Type' => $tmp, 'Link' => $link)));
+		switch($tmp) {
+			case 'RSS':
+				$config_values['Feeds'][$idx]['Name'] = $config_values['Global']['Feeds'][$link]['title'];
+				break;
+			case 'Atom':
+				$config_values['Feeds'][$idx]['Name'] = $config_values['Global']['Feeds'][$link]['Name'];
+				break;
+		}
+	}
 }
 
 function del_feed() {
+	global $config_values;
 	if(isset($_GET['idx']) AND isset($config_values['Feeds'][$_GET['idx']])) {
 		unset($config_values['Feeds'][$_GET['idx']]);
-		write_config_file();
 	}
 }
 ?>

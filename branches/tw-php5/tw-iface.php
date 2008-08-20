@@ -12,13 +12,17 @@ function parse_options() {
 
 	if(isset($_GET['mode'])) {
 		switch($_GET['mode']) {
+			case 'config':
+				display_global_config();
+				break;
 			case 'updatefavorite':
 				update_favorite();
 				$exit = False;
 				break;
-			case 'updaterss':
-				update_rss();
-				$exit = False;
+			case 'updatefeed':
+				update_feed();
+				display_global_config();
+				$exit = True;
 				break;
 			case 'showfeed':
 				echo $html_out;
@@ -37,26 +41,8 @@ function parse_options() {
 			case 'viewlog':
 				$output = file_get_contents('/var/rss_dl.log');
 				break;
-			case 'dlnow':
-				$filler = "\n";
-				$exec = '/share/.torrents/rss_dl.php -v -D -H';
-				break;
 			case 'emptycache':
 				$exec = "rm -f ".$config_values['Settings']['Cache Dir']."/*";
-				$exit = False;
-				break;
-			case 'test':
-				$filler = "\n";
-				$exec = '/share/.torrents/rss_dl.php -v -H -t';
-				break;
-			case 'del':
-				$output = "Removing ".$_GET['key']." = ".$_GET['data']." from ".urldecode($_GET['rss']);
-				update_config_real(RSS_DEL, urldecode($_GET['rss']), $_GET['key'], $_GET['data']);
-				$exit = False;
-				break;
-			case 'add':
-				$output = "Adding ".$_GET['key']." = ".$_GET['data']." to ".urldecode($_GET['rss']);
-				update_config_real(RSS_ADD, urldecode($_GET['rss']), $_GET['key'], $_GET['data']);
 				$exit = False;
 				break;
 			case 'setglobals':
@@ -67,12 +53,19 @@ function parse_options() {
 					$config_values['Settings']['Save Torrents']=(isset($_GET['savetorrents']) ? 1 : 0);
 				$config_values['Settings']['Client']=urldecode($_GET['client']);
 				write_config_file();
-				$exit = False;
+				display_global_config();
+				$exit = True;
 				break;
 			case 'matchtitle':
 				if(($tmp = guess_match(html_entity_decode($_GET['title'])))) {
-					$output = "Adding ".$tmp['key']." = ".$tmp['data']." To ".urldecode($_GET['rss']);
-					update_config_real(RSS_ADD, urldecode($_GET['rss']), $tmp['key'], $tmp['data']);
+					$_GET['name'] = $tmp['key'];
+					$_GET['filter'] = $tmp['key'];
+					$_GET['quality'] = $tmp['data'];
+					$_GET['feed'] = $_GET['rss'];
+					$_GET['button'] = 'Add';
+					$_GET['savein'] = 'Default';
+					$_GET['autostart'] = $config_values['Settings']['AutoStart'];
+					update_favorite();
 				} else
 					$output = "Could not generate Match\n";
 				$exit = False;
@@ -104,19 +97,17 @@ function parse_options() {
 	return;
 }
 
-function display_global_settings() {
+function display_global_config() {
 	global $config_values, $html_out;
 
-	$html_out .= "\n";	
-	$html_out .= '<tr><td colspan=2>&nbsp;</td></tr>';
+	$html_out .= '<div class="configuration"><div class="settings">'."\n";	
+	// Settings
 	$html_out .= '<form action="tw-iface.cgi"><input type="hidden" name="mode" value="setglobals">';
-	$html_out .= '<tr><td colspan=2 style="text-align: center;">Global Settings ';
+	$html_out .= 'Global Settings ';
 /*	$html_out .= '<input type="image" src="images/add.png" name="optional"></td></tr>'."\n"; */
-	$html_out .= '<input class="add" type="submit" value=""></td>'; 
-
-	$html_out .= '<tr>';
-	$html_out .= '<td style="text-align: right;">Torrent Client:</td>';
-	$html_out .= '<td><SELECT name="client">';
+	$html_out .= '<input class="add" type="submit" value=""><br>'; 
+	$html_out .= 'Torrent Client:';
+	$html_out .= '<SELECT name="client">';
 	$btpd = "";
 	$trans = "";
 	switch($config_values['Settings']['Client']) {
@@ -131,25 +122,17 @@ function display_global_settings() {
 			break;
 	}
 	$html_out .= '<option value="btpd" '.$btpd.'>BTPD</option>';
-	$html_out .= '<option value="transmission" '.$trans.'>Transmission</option></Select></td>';
-	$html_out .= '</td></tr>'."\n";
-
-	$html_out .= '<tr>';
-	$html_out .= '<td style="text-align: right;">Download Directory:</td>';
-	$html_out .= '<td><input type="text" name="downdir" value='.$config_values['Settings']['Download Dir'].'></td>';
-	$html_out .= '</td></tr>'."\n";
-	$html_out .= '<tr><td style="text-align: right;">Watch Directory:</td>';
-	$html_out .= '<td><input type="text" name="watchdir" value='.$config_values['Settings']['Watch Dir'].'></td>';
-	$html_out .= '</td></tr>'."\n";
-
-
-	$html_out .= '<tr><td style="text-align: right;">Save .torrent:</td>';
-	$html_out .= '<td><input type="checkbox" name="savetorrents" value=1 ';
+	$html_out .= '<option value="transmission" '.$trans.'>Transmission</option></Select><br>';
+	$html_out .= 'Download Directory:';
+	$html_out .= '<input type="text" name="downdir" value='.$config_values['Settings']['Download Dir'].'><br>';
+	$html_out .= 'Watch Directory:';
+	$html_out .= '<input type="text" name="watchdir" value='.$config_values['Settings']['Watch Dir'].'><br>';
+	$html_out .= 'Save .torrent:';
+	$html_out .= '<input type="checkbox" name="savetorrents" value=1 ';
 	if($config_values['Settings']['Save Torrents'] == 1)
 		$html_out .= 'checked=1';
-	$html_out .= '></td></tr>'."\n";
-
-	$html_out .= '<tr><td style="text-align: right;">Deep Directories:</td>';
+	$html_out .= '><br>'."\n";
+	$html_out .= 'Deep Directories:';
 	$tmp1 = $tmp2 = $tmp3 = "";
 	switch($config_values['Settings']['Deep Directories']) {
 		case 'Full':
@@ -162,24 +145,39 @@ function display_global_settings() {
 			$tmp3 = 'selected="selected"';
 			break;
 	}
-	$html_out .= '<td><select name="deepdir">';
+	$html_out .= '<select name="deepdir">';
 	$html_out .= '<option value="Full" '.$tmp1.'>Full Name</option>';
 	$html_out .= '<option value="Title" '.$tmp2.'>Show Title</option>';
-	$html_out .= '<option value="0" '.$tmp3.'>Off</option></select></td></tr>';
+	$html_out .= '<option value="0" '.$tmp3.'>Off</option></select><br>';
 
-	$html_out .= '<tr><td style="text-align: right;">Verify Episodes:</td>';
-	$html_out .= '<td><input type="checkbox" name="verifyepisodes" value=1 ';
+	$html_out .= 'Verify Episodes:';
+	$html_out .= '<input type="checkbox" name="verifyepisodes" value=1 ';
 	if($config_values['Settings']['Verify Episode'] == 1)
 		$html_out .= 'checked=1';
-	$html_out .= '></td></tr></form>'."\n";
+	$html_out .= '<br></form></div>'."\n";
+
+	// Feeds
+	$html_out .= '<div class="feedconfig">'."\n";
+	foreach($config_values['Feeds'] as $key => $feed) {
+		$html_out .= '<div class="feeditem">'."\n";
+		$html_out .= '<form action="tw-iface.cgi" class="feedform"><input type="hidden" name="mode" value="updatefeed">'."\n";
+		$html_out .= '<input type="hidden" name="idx" value="'.$key.'">';
+		$html_out .= '<input class="del" type="submit" name="button" value="Delete">'."\n";
+	  $html_out .= $feed['Name'].': '.$feed['Link'].'</form></div>'."\n";
+	}
+	$html_out .= '<div class="feeditem">'."\n";
+	$html_out .= '<form action="tw-iface.cgi" class="feedform"><input type="hidden" name="mode" value="updatefeed">'."\n";
+	$html_out .= '<input type="submit" class="add" name="button" value="Add">New Feed: <input type="text" name="link">'."\n";
+	$html_out .= '</form></div></div></div>'."\n";
 
 }
 
-function display_favorites_info($item) {
+function display_favorites_info($item, $key) {
 	global $config_values, $html_out;
-	$html_out .= '<div class="FavInfo">Filter: '."\n";
+	$html_out .= '<div class="FavInfo" id="favorite_'.$key.'">'."\n";
+	$html_out .= 'Filter: ';
 	$html_out .= '<input type="text" name="filter" value="'.$item['Filter'].'"><br>'."\n";
-	$html_out .= 'Not: ';
+	$html_out .= 'Not:';
 	$html_out .= '<input type="text" name="not" value="'.$item['Not'].'"><br>'."\n";
 	$html_out .= 'Save In: ';
 	$html_out .= '<input type="text" name="savein" value="'.$item['Save In'].'"><br>'."\n";
@@ -193,7 +191,7 @@ function display_favorites_info($item) {
 			$html_out .= ' selected="selected"';
 		$html_out .= '>'.$feed['Name'].'</option>'."\n";
 	}
-	$html_out .= '</select>'."\n";
+	$html_out .= '</select><br>'."\n";
 	$html_out .= 'Quality: ';
 	$html_out .= '<input type="text" name="quality" value="'.$item['Quality'].'"><br>'."\n";
 	$html_out .= 'AutoStart: ';
@@ -204,14 +202,14 @@ function display_favorites() {
 
 	$html_out .= '<div class="Favorites">';
 	foreach($config_values['Favorites'] as $key => $item) {
-		$html_out .= '<div class="Favorite">'."\n";
+		$html_out .= "<div class='Favorite'>\n";
 		$html_out .= '<form action="tw-iface.cgi">'."\n";
 		$html_out .= '<input type="hidden" name="mode" value="updatefavorite">'."\n";
 		$html_out .= '<input type="hidden" name="idx" value="'.$key.'">'."\n";
-		$html_out .= '<div class="FavName">'.$item['Name'].'<br>'."\n";
-		$html_out .= '[ <input type="submit" name="button" value="Update"> - '."\n";
-		$html_out .= '<input type="submit" name="button" value="Delete"> ]</div>'."\n";
-		display_favorites_info($item);
+		$html_out .= '<div class="FavName"><a href="javascript:toggleLayer(favorite_'.$key.')">'.$item['Name'].'</a><br>'."\n";
+		$html_out .= '[ <input type="submit" class="add" name="button" value="Update"> - '."\n";
+		$html_out .= '<input type="submit" class="del" name="button" value="Delete"> ]</div>'."\n";
+		display_favorites_info($item, $key);
 		$html_out .= '</form><div class="clear"></div></div>'."\n";
 	}
 	unset($item);
@@ -219,10 +217,10 @@ function display_favorites() {
 	$html_out .= '<form action="tw-iface.cgi">'."\n";
 	$html_out .= '<input type="hidden" name="mode" value="updatefavorite">'."\n";
 	$html_out .= '<div class="FavName">'."\n";
-	$html_out .= '<input type="text" name="name" value="New Favorite"><br>'."\n";
-	$html_out .= '[ <input type="submit" name="button" value="Add"> ]</div>'."\n";
-	$item = array('Save In' => 'Default');
-	display_favorites_info($item);
+	$html_out .= '<input type="text" name="name" id="newfav" value="New Favorite"><br>'."\n";
+	$html_out .= '[ <input type="submit" class="add" name="button" value="Add"> ]</div>'."\n";
+	$item = array('Save In' => 'Default', 'AutoStart' => $config_values['Settings']['AutoStart']);
+	display_favorites_info($item, "new");
 	$html_out .= '</div><div class="clear"></form></div>'."\n";
 	$html_out .= '</div>'."\n";
 }
@@ -262,9 +260,31 @@ function display_options() {
 // MAIN Function
 //
 //
-
-echo ("<html><head><title>Torrentwatch Configuration Interface</title>\n");
-echo ("<meta http-equiv='expires' content='0'>\n");
+?>
+<html><head>
+<title>Torrentwatch Configuration Interface</title>
+<script type="text/javascript">
+// Function from http://www.netlobo.com/div_hiding.html
+function toggleLayer( whichLayer )
+{
+  var elem, vis;
+  if ( whichLayer.tagName ) // Added by erik, sometimes ff 3.0.1 passes a reference to the div
+    elem = whichLayer;
+  else if( document.getElementById ) // this is the way the standards work
+    elem = document.getElementById( whichLayer );
+  else if( document.all ) // this is the way old msie versions work
+      elem = document.all[whichLayer];
+  else if( document.layers ) // this is the way nn4 works
+    elem = document.layers[whichLayer];
+  vis = elem.style;
+  // if the style.display value is blank we try to figure it out here
+  if(vis.display==''&&elem.offsetWidth!=undefined&&elem.offsetHeight!=undefined)
+    vis.display = (elem.offsetWidth!=0&&elem.offsetHeight!=0)?'block':'none';
+  vis.display = (vis.display==''||vis.display=='block')?'none':'block';
+}
+</script>
+<meta http-equiv='expires' content='0'>
+<?php
 echo ('<link rel="Stylesheet" type="text/css" href="tw-iface');
 if($_SERVER["REMOTE_ADDR"] == '127.0.0.1')
 	echo ('.local');

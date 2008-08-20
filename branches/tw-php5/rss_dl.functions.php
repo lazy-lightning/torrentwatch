@@ -6,13 +6,17 @@
 			$title = strtolower($rs['title']);
 			if(($item['Feed'] == 'All' || $item['Feed'] == $opts['URL']) &&
 			   preg_match('/'.strtolower($item['Filter']).'/', $title) &&
-			   !preg_match('/'.strtolower($item['Not']).'/', $title)) {
-				_debug('Match found for '.$rs['title']."\t");
-				if($link = get_torrent_link($rs)){
-					client_add_torrent($link, NULL, $item);
-				} else {
-					_debug("Unable to find URL for ".$rs['title']."\n");
-					$matched = -1;
+			   ($item['Not'] == "" OR !preg_match('/'.strtolower($item['Not']).'/', $title)) &&
+				 ($item['Quality'] == 'All' OR preg_match('/'.strtolower($item['Quality']).'/', $title))) {
+				_debug('Match found for '.$rs['title']."\n");
+				if(check_cache($rs['title'])) {
+					add_cache($rs['title']);
+					if($link = get_torrent_link($rs)) {
+						client_add_torrent($link, NULL, $item);
+					} else {
+						_debug("Unable to find URL for ".$rs['title']."\n");
+						$matched = -1;
+					}
 				}
 			}
 		}
@@ -103,7 +107,7 @@
 		global $config_values;
 		if(isset($config_values['Global']['HTMLOutput']))
 			setup_rss_list_html();
-
+		cache_setup();
 		foreach($feeds as $feed) {
 			switch($feed['Type']) {
 				case 'RSS':

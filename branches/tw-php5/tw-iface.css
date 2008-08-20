@@ -43,8 +43,6 @@ body {
 
 .clear { clear: both; }
 
-p { white-space: pre; }
-
 a, a:visited {
 	color: #0072cf;
 	text-decoration: none;
@@ -76,14 +74,32 @@ div.mainoptions,div.Feeds {
 
 div.Favorite {
 	float: left;
-	border-bottom: 2px solid gray;
+	clear: left;
+	border-bottom: 1px solid gray;
 	padding: 5px;
+	width: 95%;
 }
 
 div.FavName {
 	float: left;
-	width: 200px;
+	width: 160px;
 	text-align: center;
+	border-right: 1px solid gray;
+}
+
+div.FavName input#newfav {
+	width: 140px;
+}
+
+div.FavInfo {
+	display: none;
+	padding-left: 10px;
+	width: 520px;
+	float: right;
+}
+
+div.FavInfo#favorite_new {
+	display: block;
 }
 
 div.FavInfo input, div.FavInfo select {
@@ -91,13 +107,6 @@ div.FavInfo input, div.FavInfo select {
 	bottom: 22px;
 	float: right;
 	width: 85%;
-}
-
-div.FavInfo {
-	border-left: 1px solid gray;
-	padding-left: 10px;
-	width: 520px;
-	float: right;
 }
 
 div.feedlist {
@@ -112,9 +121,6 @@ div.feedlist {
 
 div.feedlist img {
 	border: 1px solid white;
-	display: inline;
-	margin: 1px 3px -8px 1px;
-	width: 20px;
 }
 
 div.feedlist a {
@@ -135,8 +141,7 @@ div.Favorites {
 }
 
 div.feeditem {
-	display: inline;
-	margin: 4px;
+	margin: 1px;
 }
 
 div.feedcurrent {
@@ -239,10 +244,14 @@ tr.rss {
 }
 
 .mainoptions li#feed {
-	background: url(images/del.png) no-repeat left center;
+	background: url(images/rss.png) no-repeat left center;
 	height: 20px;
 	line-height: 20px;
 	margin-bottom: 0;
 	margin-bottom: 5px;
 	padding-left: 24px;
+}
+
+.feedform {
+	margin: 1px;
 }

@@ -185,9 +185,13 @@
 	feeds_perform_matching($config_values['Feeds']);
 
 	if($config_values['Settings']['Run Torrentwatch'] and !$test_run) {
-		update_btcli();
+		global $hit;
+		$hit = 0;
+		check_for_torrents($config_values['Settings']['Watch Dir'], $config_values['Settings']['Download Dir']);
+		if(!$hit)
+			_debug("No New Torrents to add\n", 0);
 	} else {
-		_debug("Skipping BTCLI Update\n");
+		_debug("Skipping Watch Folder\n");
 	}
 
 	_debug(timer_get_time()."s\n",0);
