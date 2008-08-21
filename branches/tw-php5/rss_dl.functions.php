@@ -11,7 +11,7 @@
 				_debug('Match found for '.$rs['title']."\n");
 				if(check_cache($rs['title'])) {
 					if($test_run)
-						continue;
+						return;
 					add_cache($rs['title']);
 					if($link = get_torrent_link($rs)) {
 						client_add_torrent($link, NULL, $item);

@@ -9,19 +9,17 @@ require_once('rss_dl_utils.php');
 function parse_options() {
 	global $html_out, $config_values;
 	$filler = "<br>";
-	$exit = True;
 
 	if(isset($_GET['mode'])) {
 		switch($_GET['mode']) {
 			case 'updatefavorite':
 				update_favorite();
-				$exit = False;
 				break;
 			case 'updatefeed':
 				update_feed();
-				$exit = False;
 				break;
 			case 'showfeed':
+				break; // Need to remove all occurances of $exit = TRUE;
 				echo $html_out;
 				$html_out = "";
 				$config_values['Global']['HTMLOutput']= 1;
@@ -34,10 +32,10 @@ function parse_options() {
 					feeds_perform_matching($feed);
 				}
 				unset($config_values['Global']['HTMLOutput']);
+				$exit = TRUE;
 				break;	
 			case 'emptycache':
 				$exec = "rm -f ".$config_values['Settings']['Cache Dir']."/*";
-				$exit = False;
 				break;
 			case 'setglobals':
 				$config_values['Settings']['Download Dir']=urldecode($_GET['downdir']);
@@ -47,7 +45,6 @@ function parse_options() {
 					$config_values['Settings']['Save Torrents']=(isset($_GET['savetorrents']) ? 1 : 0);
 				$config_values['Settings']['Client']=urldecode($_GET['client']);
 				write_config_file();
-				$exit = False;
 				break;
 			case 'matchtitle':
 				if(($tmp = guess_match(html_entity_decode($_GET['title'])))) {
@@ -61,11 +58,9 @@ function parse_options() {
 					update_favorite();
 				} else
 					$output = "Could not generate Match\n";
-				$exit = False;
 				break;
 			case 'dltorrent':
 				client_add_torrent(trim(urldecode($_GET['link'])), $config_values['Settings']['Download Dir']);
-				$exit = False;
 				break;
 			default:
 				$output = "Bad Paramaters passed to tw-iface.php";
@@ -81,10 +76,6 @@ function parse_options() {
 		$html_out .= str_replace("\n", "<br>", "<div class='execoutput'>$output</div>");
 		echo $html_out;
 		$html_out = "";
-	}
-	if($exit) {
-		close_html();	
-		exit(0);
 	}
 	return;
 }
@@ -203,14 +194,15 @@ function display_favorites_info($item, $key) {
 	$html_out .= '<input type="submit" class="del" name="button" value="Delete"></form></div>'."\n";
 	// Display the fav that was just updated
 	if(isset($_GET['idx']) && $_GET['idx'] == $key) {
-		// $html_out .= "<script type='text/javascript'>";
-		// $html_out .= 'toggleLayer("favorite_'.$_GET['idx'].'");</script>';
+		$html_out .= "<script type='text/javascript'>";
+		$html_out .= 'toggleFav("favorite_'.$_GET['idx'].'");</script>';
 	}
 }
 function display_favorites() {
 	global $config_values, $html_out;
-	if(isset($_GET['mode']) && $_GET['mode'] == 'updatefavorite')
-		$html_out .= '<script type="text/javascript>toggleMenu(\'favorites\');</script>';
+	if(isset($_GET['mode']) && 
+	  ($_GET['mode'] == 'updatefavorite' || isset($_GET['idx'])))
+		$html_out .= '<script type="text/javascript">toggleMenu(\'favorites\');</script>';
 	$html_out .= '<div class="Favorites" id="favorites">';
 	$html_out .= '<div class="Favorite"><ul>';
 	foreach($config_values['Favorites'] as $key => $item) {
@@ -292,8 +284,8 @@ var last_fav;
 function toggleFav( whichLayer )
 {
 	if(last_fav)
-		toggleLayer(last_fav)
-	toggleLayer(whichLayer);
+		hideLayer(last_fav)
+	showLayer(whichLayer);
 	last_fav = whichLayer;
 }
 
@@ -335,6 +327,16 @@ function hideLayer( whichLayer ) {
     elem = document.layers[whichLayer];
   elem.style.display = 'none';
 }
+function showLayer( whichLayer ) {
+  var elem, vis;
+  if( document.getElementById ) // this is the way the standards work
+    elem = document.getElementById( whichLayer );
+  else if( document.all ) // this is the way old msie versions work
+      elem = document.all[whichLayer];
+  else if( document.layers ) // this is the way nn4 works
+    elem = document.layers[whichLayer];
+  elem.style.display = 'block';
+}
 </script>
 <meta http-equiv='expires' content='0'>
 <?php
@@ -346,19 +348,20 @@ echo ('</head>'."\n".'<body><div class="container">'."\n");
 $html_out = "";
 
 read_config_file();
-// Hidden DIV's
-display_global_config();
-display_history();
-display_favorites();
 
 $html_out .= '<div class="mainoptions">'."\n";
 display_options();
 $html_out .= '<hr>';
-display_feeds();
+// display_feeds(); 
 $html_out .= '</div>'."\n";
 if(isset($_GET['mode'])) {
 	parse_options();
 }
+
+// Hidden DIV's
+display_global_config();
+display_history();
+display_favorites();
 
 echo $html_out;
 $html_out = "";

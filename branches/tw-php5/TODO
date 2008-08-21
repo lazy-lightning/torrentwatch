@@ -1,1 +1,3 @@
 Hidden Divs need OK/Cancel buttons
+Centered Hidden divs display wrong in IE
+mode = showfeed needs work in tw-iface.php, until then display_feeds() commented out

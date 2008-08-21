@@ -670,6 +670,8 @@ function add_favorite() {
 	foreach($list as $key => $data) {
 		if(isset($_GET[$key]))
 			$config_values['Favorites'][$idx][$data] = urldecode($_GET[$key]);
+		else
+			$config_values['Favorites'][$idx][$data] = "";
 	}
 }
 
