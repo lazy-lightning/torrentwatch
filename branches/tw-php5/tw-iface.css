@@ -53,6 +53,30 @@ a img {
 	border: none;
 }
 
+div.configuration,
+div.history {
+	position: absolute;
+	top: 10%;
+	right: 30%;
+	left: 30%;
+	display: none;
+	background: lightBlue;
+	border: 3px solid black;
+	padding: 20px;
+}
+
+div.Favorites {
+	position: absolute;
+	top: 10%;
+	left: 15%;
+	right: 15%;
+	display: none;
+	background: lightBlue;
+	border: 3px solid black;
+	padding: 20px;
+	width: 770px;
+}
+
 div.container {
 	background-color: #ddd;
 	border: 1px solid gray;
@@ -126,9 +150,7 @@ div.feedlist a {
 	text-decoration: none;
 }
 
-div.execoutput,
-div.configuration,
-div.Favorites {
+div.execoutput {
 	background: white;
 	border: 1px solid gray;
 	float: left;

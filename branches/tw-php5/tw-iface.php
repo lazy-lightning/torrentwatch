@@ -12,17 +12,13 @@ function parse_options() {
 
 	if(isset($_GET['mode'])) {
 		switch($_GET['mode']) {
-			case 'config':
-				display_global_config();
-				break;
 			case 'updatefavorite':
 				update_favorite();
 				$exit = False;
 				break;
 			case 'updatefeed':
 				update_feed();
-				display_global_config();
-				$exit = True;
+				$exit = False;
 				break;
 			case 'showfeed':
 				echo $html_out;
@@ -38,9 +34,6 @@ function parse_options() {
 				}
 				unset($config_values['Global']['HTMLOutput']);
 				break;	
-			case 'viewlog':
-				$output = file_get_contents('/var/rss_dl.log');
-				break;
 			case 'emptycache':
 				$exec = "rm -f ".$config_values['Settings']['Cache Dir']."/*";
 				$exit = False;
@@ -53,8 +46,7 @@ function parse_options() {
 					$config_values['Settings']['Save Torrents']=(isset($_GET['savetorrents']) ? 1 : 0);
 				$config_values['Settings']['Client']=urldecode($_GET['client']);
 				write_config_file();
-				display_global_config();
-				$exit = True;
+				$exit = False;
 				break;
 			case 'matchtitle':
 				if(($tmp = guess_match(html_entity_decode($_GET['title'])))) {
@@ -90,8 +82,7 @@ function parse_options() {
 		$html_out = "";
 	}
 	if($exit) {
-		$html_out .= "<div class='clear'></div>\n</div></body></html>\n";  
-		echo($html_out);
+		close_html();	
 		exit(0);
 	}
 	return;
@@ -100,11 +91,13 @@ function parse_options() {
 function display_global_config() {
 	global $config_values, $html_out;
 
-	$html_out .= '<div class="configuration"><div class="settings">'."\n";	
+	if(isset($_GET['mode']) && 
+	  ($_GET['mode'] == 'setglobals' || $_GET['mode'] == 'updatefeed'))
+		$html_out .= '<script type="text/javascript">toggleMenu(\"configuration\");</script>';
+	$html_out .= '<div class="configuration" id="configuration"><div class="settings">'."\n";	
 	// Settings
 	$html_out .= '<form action="tw-iface.cgi"><input type="hidden" name="mode" value="setglobals">';
 	$html_out .= 'Global Settings ';
-/*	$html_out .= '<input type="image" src="images/add.png" name="optional"></td></tr>'."\n"; */
 	$html_out .= '<input class="add" type="submit" value=""><br>'; 
 	$html_out .= 'Torrent Client:';
 	$html_out .= '<SELECT name="client">';
@@ -209,19 +202,20 @@ function display_favorites_info($item, $key) {
 	$html_out .= '<input type="submit" class="del" name="button" value="Delete"></form></div>'."\n";
 	// Display the fav that was just updated
 	if(isset($_GET['idx']) && $_GET['idx'] == $key) {
-		$html_out .= "<script type='text/javascript'>";
-		$html_out .= 'toggleLayer("favorite_'.$_GET['idx'].'");</script>';
+		// $html_out .= "<script type='text/javascript'>";
+		// $html_out .= 'toggleLayer("favorite_'.$_GET['idx'].'");</script>';
 	}
 }
 function display_favorites() {
 	global $config_values, $html_out;
-
-	$html_out .= '<div class="Favorites">';
+	if(isset($_GET['mode']) && $_GET['mode'] == 'updatefavorite')
+		$html_out .= '<script type="text/javascript>toggleMenu(\'favorites\');</script>';
+	$html_out .= '<div class="Favorites" id="favorites">';
 	$html_out .= '<div class="Favorite"><ul>';
 	foreach($config_values['Favorites'] as $key => $item) {
-		$html_out .= '<li><a href="javascript:toggleLayer('."'".'favorite_'.$key."'".')">'.$item['Name'].'</a></li>'."\n";
+		$html_out .= '<li><a href="javascript:toggleFav('."'".'favorite_'.$key."'".')">'.$item['Name'].'</a></li>'."\n";
 	}
-	$html_out .= '<li><a href="javascript:toggleLayer(favorite_new)">New Favorite</a></li>'."\n";
+	$html_out .= '<li><a href="javascript:toggleFav(favorite_new)">New Favorite</a></li>'."\n";
 	$html_out .= '</ul></div>';
 	array_walk($config_values['Favorites'], 'display_favorites_info');
 	$item = array('Save In' => 'Default', 'AutoStart' => $config_values['Settings']['AutoStart']);
@@ -244,9 +238,9 @@ function display_feeds() {
 function display_options() {
 	global $html_out, $config_values;
 	$html_out .= '<ul>'."\n";
-	$html_out .= '<li id="favorites"><a href="tw-iface.cgi">Favorites</a></li>';
-	$html_out .= '<li id="config"><a href="tw-iface.cgi?mode=config">Configure</a></li>';
-	$html_out .= '<li id="view"><a href="tw-iface.cgi?mode=viewlog">View log</a></li>';
+	$html_out .= '<li id="favorites"><a href="javascript:toggleMenu(\'favorites\')">Favorites</a></li>';
+	$html_out .= '<li id="config"><a href="javascript:toggleMenu(\'configuration\')">Configure</a></li>';
+	$html_out .= '<li id="view"><a href="javascript:toggleMenu(\'history\')">View History</a></li>';
 	$html_out .= '<li id="empty"><a href="tw-iface.cgi?mode=emptycache">Empty Cache</a></li>';
 	if($config_values['Settings']['Client'] == "btpd") {
 		$html_out .= '<li id="webui"><a href=http://"';
@@ -262,6 +256,26 @@ function display_options() {
 	$html_out .= '</ul>'."\n";
 }
 
+function display_history() {
+	global $html_out, $config_values;
+	$history = unserialize(file_get_contents($config_values['Settings']['History']));
+
+	$html_out .= '<div class="history" id="history"><ul>'."\n";
+	
+	foreach($history as $item) {
+		$html_out .= '<li>'.$item['Date'].' - '.$item['Title'].'</li>';
+	}
+	$html_out .= '</ul></div>';
+}
+
+function close_html() {
+	global $html_out;
+	$html_out .= "<div class='clear'></div>\n<div class='timer'>Page Took ";
+	$time_used = sprintf("%1.4f", timer_get_time());
+	$html_out .= $time_used."s to load</div></div></body></html>\n";
+	echo $html_out;
+	$html_out = "";
+}
 //
 //
 // MAIN Function
@@ -273,23 +287,52 @@ timer_init();
 <title>Torrentwatch Configuration Interface</title>
 <script type="text/javascript">
 // Inspiration from http://www.netlobo.com/div_hiding.html
-var last;
+var last_fav;
+function toggleFav( whichLayer )
+{
+	if(last_fav)
+		toggleLayer(last_fav)
+	toggleLayer(whichLayer);
+	last_fav = whichLayer;
+}
+
+var last_menu;
+function toggleMenu( whichLayer )
+{
+	if(last_menu && last_menu != whichLayer) {
+		hideLayer(last_menu);
+	}
+	toggleLayer(whichLayer);
+	last_menu = whichLayer;
+}
+
 function toggleLayer( whichLayer )
 {
   var elem, vis;
-  if ( whichLayer.tagName ) // sometimes ff 3.0.1 passes a reference to the div directly
-    elem = whichLayer;
-  else if( document.getElementById ) // this is the way the standards work
+  if( document.getElementById ) // this is the way the standards work
     elem = document.getElementById( whichLayer );
   else if( document.all ) // this is the way old msie versions work
       elem = document.all[whichLayer];
   else if( document.layers ) // this is the way nn4 works
     elem = document.layers[whichLayer];
   vis = elem.style;
-	if(last)
-	  last.style.display = 'none';
-	vis.display = 'block';
-	last = elem;
+  // if the style.display value is blank we try to figure it out here
+  if(vis.display==''&&elem.offsetWidth!=undefined&&elem.offsetHeight!=undefined)
+    vis.display = (elem.offsetWidth!=0&&elem.offsetHeight!=0)?'block':'none';
+  vis.display = (vis.display==''||vis.display=='block')?'none':'block';
+	if(whichLayer=='favorites') // Also display the first fav 
+		toggleFav(elem.childNodes[1].id);
+}
+
+function hideLayer( whichLayer ) {
+  var elem, vis;
+  if( document.getElementById ) // this is the way the standards work
+    elem = document.getElementById( whichLayer );
+  else if( document.all ) // this is the way old msie versions work
+      elem = document.all[whichLayer];
+  else if( document.layers ) // this is the way nn4 works
+    elem = document.layers[whichLayer];
+  elem.style.display = 'none';
 }
 </script>
 <meta http-equiv='expires' content='0'>
@@ -302,6 +345,11 @@ echo ('</head>'."\n".'<body><div class="container">'."\n");
 $html_out = "";
 
 read_config_file();
+// Hidden DIV's
+display_global_config();
+display_history();
+display_favorites();
+
 $html_out .= '<div class="mainoptions">'."\n";
 display_options();
 $html_out .= '<hr>';
@@ -309,17 +357,17 @@ display_feeds();
 $html_out .= '</div>'."\n";
 if(isset($_GET['mode'])) {
 	parse_options();
-	unset($config_values);
-	read_config_file();
 }
-display_favorites();
-
-
-$html_out .= "<div class='clear'></div>\n<div class='timer'>Page Took ";
-$time_used = sprintf("%1.4f", timer_get_time());
-$html_out .= $time_used."s to load</div></div></body></html>\n";
 
 echo $html_out;
+$html_out = "";
+
+$config_values['Global']['HTMLOutput']= 1;
+load_feeds($config_values['Feeds']);
+feeds_perform_matching($config_values['Feeds']);
+unset($config_values['Global']['HTMLOutput']);
+
+close_html();
 
 exit(0);
 
