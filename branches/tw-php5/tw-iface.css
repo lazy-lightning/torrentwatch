@@ -56,20 +56,25 @@ a img {
 div.configuration,
 div.history {
 	position: absolute;
-	top: 10%;
-	right: 30%;
-	left: 30%;
+	top: 50px;
+	margin-left: auto;
+	margin-right: auto;
+	right: 0;
+	left: 0;
 	display: none;
 	background: lightBlue;
 	border: 3px solid black;
 	padding: 20px;
+	width: 400px;
 }
 
 div.Favorites {
 	position: absolute;
-	top: 10%;
-	left: 15%;
-	right: 15%;
+	top: 50px;
+	margin-left: auto;
+	margin-right: auto;
+	left: 0;
+	right: 0;
 	display: none;
 	background: lightBlue;
 	border: 3px solid black;

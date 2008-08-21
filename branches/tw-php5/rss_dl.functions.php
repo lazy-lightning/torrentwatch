@@ -1,7 +1,7 @@
 <?php
 
 		function check_for_torrent($item, $key, $opts) {
-			global $matched;
+			global $matched, $test_run;
 			$rs = $opts['Obj'];
 			$title = strtolower($rs['title']);
 			if(($item['Feed'] == 'All' || $item['Feed'] == $opts['URL']) &&
@@ -10,6 +10,8 @@
 				 ($item['Quality'] == 'All' OR preg_match('/'.strtolower($item['Quality']).'/', $title))) {
 				_debug('Match found for '.$rs['title']."\n");
 				if(check_cache($rs['title'])) {
+					if($test_run)
+						continue;
 					add_cache($rs['title']);
 					if($link = get_torrent_link($rs)) {
 						client_add_torrent($link, NULL, $item);

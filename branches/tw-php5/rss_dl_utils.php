@@ -619,12 +619,14 @@ function check_for_torrents($directory, $dest) {
 }
 
 function update_favorite() {
+	global $test_run;
 	if(!isset($_GET['button']))
 		return;
 	switch($_GET['button']) {
 		case 'Add':
 		Case 'Update':
 			add_favorite();
+			$test_run = TRUE;
 			break;
 		case 'Delete':
 			del_favorite();

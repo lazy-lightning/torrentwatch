@@ -3,6 +3,7 @@
 
 ini_set('include_path', '.:/share/.torrents');
 $config_file = '/share/.torrents/rss_dl.config';
+$test_run = 0;
 
 require_once('rss_dl_utils.php');
 function parse_options() {
