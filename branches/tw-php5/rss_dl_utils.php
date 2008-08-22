@@ -72,7 +72,8 @@
 
 		// This function is from
 		// http://www.codewalkers.com/c/a/Miscellaneous/Configuration-File-Processing-with-PHP/2/
-		// It has been modified to support multidimensional arrays
+		// It has been modified to support multidimensional arrays in the form of
+		// group[] = key => data as equivilent of group[key] => data
 		function read_config_file() {
 			global $config_file;
 			global $config_values;
@@ -124,14 +125,14 @@
 				$config_out .= "\n\n";
 			}
 
-			function key_callback($group, $key, $subkey = "") {
+			function key_callback($group, $key, $subkey = NULL) {
 				global $config_values, $config_out;
 				if(is_array($group)) {
 					array_walk($group, 'key_callback', $key.'[]');
 				} else {
-					if($subkey != "" ) {
-						if(!is_numeric($key)) {
-						$group = "$key => $group";
+					if($subkey) {
+						if(!is_numeric($key)) {  // What does this do?
+							$group = "$key => $group";
 						}
 						$key = $subkey;
 					}
@@ -170,7 +171,6 @@
 			$history = unserialize(file_get_contents($config_values['Settings']['History']));
 			$history[] = array('Title' => $title, 'Date' => date("m.d.y g:i a"));
 			file_put_contents($config_values['Settings']['History'], serialize($history));
-				
 		}
 
 		/*
@@ -195,7 +195,7 @@
 					if(!(substr($file, 7, strlen($guess['key'])) == $guess['key']))
 						continue;
 					$cacheguess = guess_match(substr($file, 7));
-					if($guess['episode'] == $cacheguess['episode']) {
+					if($cacheguess != false && $guess['episode'] == $cacheguess['episode']) {
 						_debug("Full Episode Match, ignoring\n",2);
 						$matched = 3;
 						return 0;
@@ -216,7 +216,7 @@
 			global $config_values, $matched;
 
 			if (isset($config_values['Settings']['Cache Dir'])) {
-				$cache_file = $config_values['Settings']['Cache Dir'] . '/rss_dl_' . filename_encode($title);
+				$cache_file = $config_values['Settings']['Cache Dir'].'/rss_dl_'.filename_encode($title);
 				if (!file_exists($cache_file)) {
 					if($config_values['Settings']['Verify Episode']) {
 						return check_cache_episode($title);
@@ -317,11 +317,6 @@
 			$html_header .="</div>\n";
 			$html_out .=  "</table></div>\n";
 		}
-		function finish_html() {
-			global $html_header,$html_out,$html_footer;
-			$html_footer .= "</p></div>\n";
-			echo $html_header.$html_out.$html_footer;
-		}
 		
 		function show_torrent_html($item, $feed, $alt) {
 			global $html_out, $matched, $test_run;
@@ -340,11 +335,11 @@
 				$html_out .=  "<td>".str_replace('.', '.<wbr>', $item['description'])."</td>\n";
 				$html_out .=  "<td>".date("M j h:ia", strtotime($item['pubDate']))."</td>\n";
 			}
-			$html_out .= '<td><a href="tw-iface.cgi?mode=dltorrent&title='.urlencode($item['title']).'&link=';
+			$html_out .= '<td><a href="tw-iface.cgi?mode=dltorrent&link=';
 			$html_out .= urlencode(get_torrent_link($item)).'">';
 			switch($matched) {
 				case 1:
-					$html_out .= "<b>Cache Hit</b></td>";
+					$html_out .= "<b>Cache Hit</b>";
 					break;
 				case 2:
 					if($test_run)
@@ -365,137 +360,106 @@
 			$html_out .= "</a></td></tr>\n";
 		}
 
-function show_feed_html($rss) {
-	global $html_header, $html_out;
-	
-	$html_out .= "<tr class='header'><td><br />&nbsp;</td></tr>\n";
-	$html_out .= "<tr class='rss'><th class='feedname' colspan='4'><a name='".$rss['title']."'></a>";
-	$html_out .= $rss['title']."</td></tr>";
-	$html_out .= "<tr class='header'>\n";
-	$html_out .= "<th width='200'>Title</th>";
-	$html_out .= "<th>Description</th>";
-	$html_out .= "<th width='100'>Pub. Date</th>";
-	$html_out .= "<th width='80' style='text-align: center;'>Status</th>\n</tr>\n";
-	$html_header .= "<div class='feeditem'><a href='#".$rss['title']."'><img src='images/rss.png'>".$rss['title']."</a></div>\n";
-}
-function btcli_html($output) {
-	global $html_header;
-	$tmp = "<div class='btcli'>\n";
-	$tmp .= implode('<br />', $output);
-	$tmp .= "</div>\n";
-	$html_header = $tmp.$html_header;
-}
-
-function guess_feedtype($feedurl) {
-	global $config_values;
-	$content = file($feedurl);
-	for($i = 0;$i < count($content);$i++) {
-		if(preg_match('/<feed xml/', $content[$i], $regs))
-			return 'Atom';
-		else if (preg_match('/<rss/', $content[$i], $regs))
-			return 'RSS';
-	}
-	return "Unknown";
-}
-
-function guess_atom_torrent($summary) {
-	$wc = '[\/\:\w\.\+\?\&\=\%\;]+';
-	// Detects: A HREF=\"http://someplace/with/torrent/in/the/name\"
-	if(preg_match('/A HREF=\\\"(http'.$wc.'torrent'.$wc.')\\\"/', $summary, $regs)) {
-		_debug("guess_atom_torrent: $regs[1]\n",2);
-		return $regs[1];
-	} else {
-		_debug("guess_atom_torrent: failed\n",2);
-	}
-	return FALSE;
-}
-
-// Makes a name fit for use as a filename
-function filename_encode($filename) {
-	return preg_replace("/\?|\/|\\|\+|\=|\>|\<|\,|\"|\*|\|/", "_", $filename);
-}
-
-function transmission_get_settings() {
-	return json_decode(file_get_contents('/share/.transmission/settings.json'), TRUE);
-}
-
-function transmission_rpc($request) {
-	$request = json_encode($request);
-	$URI = "/transmission/rpc";
-	$Host = "localhost";
-	$ReqHeader =
-	"POST $URI HTTP/1.1\r\n".
-	"Host: $Host\r\n".
-	"Connection: Close\r\n".
-	"Content-Type: application/json\r\n\r\n".
-	"$request\r\n\r\n";
-
-	$socket = fsockopen($Host, 9091, $errno, $errstr);
-	if (!$socket) {
-		return array("errno" => $errno, "errstr" => $errstr);
+	function show_feed_html($rss) {
+		global $html_header, $html_out;
+		
+		$html_out .= "<tr class='header'><td><br />&nbsp;</td></tr>\n";
+		$html_out .= "<tr class='rss'><th class='feedname' colspan='4'><a name='".$rss['title']."'></a>";
+		$html_out .= $rss['title']."</td></tr>";
+		$html_out .= "<tr class='header'>\n";
+		$html_out .= "<th width='200'>Title</th>";
+		$html_out .= "<th>Description</th>";
+		$html_out .= "<th width='100'>Pub. Date</th>";
+		$html_out .= "<th width='80' style='text-align: center;'>Status</th>\n</tr>\n";
+		$html_header .= "<div class='feeditem'><a href='#".$rss['title']."'><img src='images/rss.png'>".$rss['title']."</a></div>\n";
 	}
 
-	$idx = 0;
-	$skip = 1;
-	$raw = "";
-	fputs($socket, $ReqHeader);
-	while(!feof($socket)) {
-		$responce[$idx] = fgets($socket, 128);
-		if($skip == 1 && ereg("^{", $responce[$idx]))
-			$skip = 0;
-		if(!$skip)
-			$raw .= $responce[$idx];
-		$idx++;
-	}
-	fclose($socket);
-	return json_decode($raw, TRUE);
-}
-
-// $filename MUST be a local file ending in .torrent	
-function client_add_torrent($filename, $dest, $fav = NULL) {
-	global $config_values, $hit;
-	$autostart = $config_values['Settings']['AutoStart'];
-	$hit = 1;
-	
-	if(!($tor = file_get_contents($filename))) {
-		_debug("Couldn't open torrent: $filename\n",0);
-		return FALSE;
-	}
-	$tor_info = new BDecode("", $tor);
-	if(!($tor_name = $tor_info->{'result'}['info']['name'])) {
-		_debug("Couldn't parse torrent: $filename\n", 0);
-		return FALSE;
-	}
-	if(isset($fav))
-		$autostart = $fav['AutoStart'];
-	if(!isset($dest) or $dest == "")
-		$dest = $config_values['Settings']['Download Dir'];
-	if(isset($fav) && $fav['Save In'] != 'Default') 
-			$dest = $fav['Save In'];
-	else if(isset($config_values['Settings']['Deep Directories'])) {
-		switch($config_values['Settings']['Deep Directories']) {
-			case '0':
-				break;
-			case 'Title':
-				$guess = guess_match($tor_name, TRUE);
-				if(isset($guess['key'])) {
-					$dest = "$dest/".$guess['key'];
-					break;
-				}
-				_debug("Deep Directories: Couldn't match $tor_name Reverting to Full\n", 1);
-			case 'Full':
-			default:
-				$dest = "$dest/".$tor_name;
-				break;
+	function guess_feedtype($feedurl) {
+		global $config_values;
+		$content = file($feedurl);
+		for($i = 0;$i < count($content);$i++) {
+			if(preg_match('/<feed xml/', $content[$i], $regs))
+				return 'Atom';
+			else if (preg_match('/<rss/', $content[$i], $regs))
+				return 'RSS';
 		}
-		_debug("Deep Directorys, change dest to $dest\n", 1);
+		return "Unknown";
 	}
-	if(!file_exists($dest) or !is_dir($dest)) {
-		if(file_exists($dest))
-			unlink($dest);
-		mkdir($dest, 777, TRUE);
+
+	function guess_atom_torrent($summary) {
+		$wc = '[\/\:\w\.\+\?\&\=\%\;]+';
+		// Detects: A HREF=\"http://someplace/with/torrent/in/the/name\"
+		if(preg_match('/A HREF=\\\"(http'.$wc.'torrent'.$wc.')\\\"/', $summary, $regs)) {
+			_debug("guess_atom_torrent: $regs[1]\n",2);
+			return $regs[1];
+		} else {
+			_debug("guess_atom_torrent: failed\n",2);
+		}
+		return FALSE;
 	}
-	if($config_values['Settings']['Client'] == "btpd") {
+
+	// Makes a name fit for use as a filename
+	function filename_encode($filename) {
+		return preg_replace("/\?|\/|\\|\+|\=|\>|\<|\,|\"|\*|\|/", "_", $filename);
+	}
+
+	// UNUSED
+	function transmission_get_settings() {
+		return json_decode(file_get_contents('/share/.transmission/settings.json'), TRUE);
+	}
+
+	function transmission_rpc($request) {
+		$request = json_encode($request);
+		$URI = "/transmission/rpc";
+		$Host = "localhost";
+		$Port = 9091;
+		$ReqHeader =
+		"POST $URI HTTP/1.1\r\n".
+		"Host: $Host\r\n".
+		"Connection: Close\r\n".
+		"Content-Type: application/json\r\n\r\n".
+		"$request\r\n\r\n";
+	
+		$socket = fsockopen($Host, $Port, $errno, $errstr);
+		if (!$socket) {
+			return array("errno" => $errno, "errstr" => $errstr);
+		}
+	
+		$idx = 0;
+		$skip = 1;
+		$raw = "";
+		fputs($socket, $ReqHeader);
+		while(!feof($socket)) {
+			$responce[$idx] = fgets($socket, 128);
+			if($skip == 1 && ereg("^{", $responce[$idx]))
+				$skip = 0;
+			if(!$skip)
+				$raw .= $responce[$idx];
+			$idx++;
+		}
+		fclose($socket);
+		return json_decode($raw, TRUE);
+	}
+
+	function get_deep_dir() {
+			switch($config_values['Settings']['Deep Directories']) {
+				case '0':
+					break;
+				case 'Title':
+					$guess = guess_match($tor_name, TRUE);
+					if(isset($guess['key'])) {
+						$dest = "$dest/".$guess['key'];
+						break;
+					}
+					_debug("Deep Directories: Couldn't match $tor_name Reverting to Full\n", 1);
+				case 'Full':
+				default:
+					$dest = "$dest/".$tor_name;
+					break;
+			}
+	}
+
+	function btpd_add_torrent($tor, $dest, $autostart) {
 		$btcli = '/mnt/syb8634/bin/btcli';
 		$btcli_add = 'add -d';
 		$btcli_connect='-d /opt/sybhttpd/localhost.drives/HARD_DISK/.btpd/';
@@ -507,19 +471,11 @@ function client_add_torrent($filename, $dest, $fav = NULL) {
 			$btcli_add .= " -N";
 		exec("$btcli_exec $btcli_add \"$dest\" \"$tmpname\"", $output, $return);
 		unlink($tmpname);
-	} else if($config_values['Settings']['Client'] == "transmission1.32") {
-		// transmission dies with bad folder if it doesn't end in a /
-		if(substr($dest, strlen($dest)-1, 1) != '/')
-			$dest .= '/';
-		$request = array('method' => 'torrent-add', 'arguments' => array('download-dir' => $dest, 'metainfo' => base64_encode($tor)), 'paused' => $autostart ? 0 : 1);
-		$responce = transmission_rpc($request);
-		if(isset($responce['result']) AND ($responce['result'] == 'success' or $responce['result'] == 'duplicate torrent'))
-			$return = 0;
-		else {
-			$return = 1;
-			print_r($responce);
-		}
-	} else if($config_values['Settings']['Client'] == "transmission1.22") {
+		return $return;
+	}
+
+	function transmission122_add_torrent($tor, $dest, $autostart) {
+		// This should still work for the 13x series, although -g has been reassigned and might confuse 
 		$trans_remote = '/mnt/syb8634/bin/transmission-remote';
 		$trans_connect = '-g /share/.transmission/';
 		$trans_exec = "$trans_remote $trans_connect";
@@ -529,126 +485,177 @@ function client_add_torrent($filename, $dest, $fav = NULL) {
 		file_put_contents($tmpname, $tor);
 		exec("$trans_exec $trans_add \"$tmpname\"", $output, $return);
 		unlink($tmpname);
-	} else {
-		_debug("Invalid Torrent Client: ".$config_values['Settings']['Client']."\n",0);
-		exit(1);
+		return $return;
 	}
-	if($return == 0)
-		_debug("Starting: $tor_name in $dest\n",0);
-	else 
-		_debug("Failed Starting: $tor_name  Return code $return\n",0);
-	if(isset($config_values['Global']['HTMLOutput']))
-		if($return == 0)
-			echo("Starting: $tor_name in $dest<br>\n");
-		else
-			echo("Failed Starting $tor_name  Return code $return<br>\n");
-	if($config_values['Settings']['Save Torrents'])
-		file_put_contents("$dest/$tor_name.torrent", $tor);
-	return ($return ? 0 : 1);
-}
 
-function check_for_torrents($directory, $dest) {
-	if($handle = opendir($directory)) {
-		while(false !== ($file = readdir($handle))) {
-			if(preg_match('/\.torrent$/', $file) && client_add_torrent("$directory/$file", $dest))
-					unlink("$directory/$file");
+	function transmission13x_add_torrent($tor, $dest, $autostart) {
+		// transmission dies with bad folder if it doesn't end in a /
+		if(substr($dest, strlen($dest)-1, 1) != '/')
+			$dest .= '/';
+		$request = array('method' => 'torrent-add', 'arguments' => array('download-dir' => $dest, 'metainfo' => base64_encode($tor)), 'paused' => $autostart ? 0 : 1);
+		$responce = transmission_rpc($request);
+		if(isset($responce['result']) AND ($responce['result'] == 'success' or $responce['result'] == 'duplicate torrent'))
+			return 0;
+		else {
+			_debug(print_r($responce));
+			return 1;
 		}
-		closedir($handle);
-	} else {
-		_debug("check_for_torrents: Couldn't read Directory: $directory\n", 0);
-		exit(1);
 	}
-}
 
-function update_favorite() {
-	global $test_run;
-	if(!isset($_GET['button']))
-		return;
-	switch($_GET['button']) {
-		case 'Add':
-		Case 'Update':
-			add_favorite();
-			$test_run = TRUE;
-			break;
-		case 'Delete':
-			del_favorite();
-			break;
-	}
-	write_config_file();
-}
-
-function update_feed() {
-	if(!isset($_GET['button']))
-		return;
-	switch($_GET['button']) {
-		case 'Add':
-			add_feed();
-			break;
-		case 'Delete':
-			del_feed();
-			break;
-	}
-	write_config_file();
-}
-
-function add_favorite() {
-	global $config_values;
-	$i = 0;
-	if(isset($_GET['idx'])) {
-		$idx = $_GET['idx'];
-	} else if(isset($_GET['name']))	{
-		$config_values['Favorites'][]['Name'] = $_GET['name'];
-		$idx = end(array_keys($config_values['Favorites']));
-		$_GET['idx'] = $idx; // So display_favorite_info() can see it
-	} else
-		return;
-	$list = array("filter"    => "Filter", 
-	              "not"       => "Not",
-	              "savein"    => "Save In",
-	              "episodes"  => "Episodes",
-	              "feed"      => "Feed",
-	              "quality"   => "Quality",
-	              "autostart" => "AutoStart");
-	foreach($list as $key => $data) {
-		if(isset($_GET[$key]))
-			$config_values['Favorites'][$idx][$data] = urldecode($_GET[$key]);
-		else
-			$config_values['Favorites'][$idx][$data] = "";
-	}
-}
-
-function del_favorite() {
-	global $config_values;
-	if(isset($_GET['idx']) AND isset($config_values['Favorites'][$_GET['idx']])) {
-		unset($config_values['Favorites'][$_GET['idx']]);
-	}
-}
-
-
-function add_feed() {
-	global $config_values;
+	function client_add_torrent($filename, $dest, $fav = NULL) {
+		global $config_values, $hit;
+		$autostart = $config_values['Settings']['AutoStart'];
+		$hit = 1;
 	
-	if(isset($_GET['link']) AND ($tmp = guess_feedtype(urldecode($_GET['link']))) != 'Unknown') {
-		$link = urldecode($_GET['link']);
-		$config_values['Feeds'][]['Link'] = $link;
-		$idx = end(array_keys($config_values['Feeds']));
-		$config_values['Feeds'][$idx]['Type'] = $tmp;
-		load_feeds(array(0 => array('Type' => $tmp, 'Link' => $link)));
-		switch($tmp) {
-			case 'RSS':
-				$config_values['Feeds'][$idx]['Name'] = $config_values['Global']['Feeds'][$link]['title'];
-				break;
-			case 'Atom':
-				$config_values['Feeds'][$idx]['Name'] = $config_values['Global']['Feeds'][$link]['Name'];
-				break;
+		if(!($tor = file_get_contents($filename))) {
+			_debug("Couldn't open torrent: $filename\n",0);
+			return FALSE;
+		}
+		$tor_info = new BDecode("", $tor);
+		if(!($tor_name = $tor_info->{'result'}['info']['name'])) {
+			_debug("Couldn't parse torrent: $filename\n", 0);
+			return FALSE;
+		}
+		if(isset($fav))
+			$autostart = $fav['AutoStart'];
+		if(!isset($dest) or $dest == "")
+			$dest = $config_values['Settings']['Download Dir'];
+		if(isset($fav) && $fav['Save In'] != 'Default') 
+				$dest = $fav['Save In'];
+		else if(isset($config_values['Settings']['Deep Directories'])) {
+			$dest = get_deep_dir();
+			_debug("Deep Directorys, change dest to $dest\n", 1);
+		}
+		if(!file_exists($dest) or !is_dir($dest)) {
+			unlink($dest);
+			mkdir($dest, 777, TRUE);
+		}
+		if($config_values['Settings']['Client'] == "btpd") {
+			btpd_add_torrent($tor, $dest);
+		} else if($config_values['Settings']['Client'] == "transmission1.3x") {
+			transmission13x_add_torrent($tor, $dest, $autostart);
+		} else if($config_values['Settings']['Client'] == "transmission1.22") {
+			transmission122_add_torrent($tor, $dest, $autostart);
+		} else {
+			_debug("Invalid Torrent Client: ".$config_values['Settings']['Client']."\n",0);
+			exit(1);
+		}
+		if($return == 0)
+			_debug("Starting: $tor_name in $dest\n",0);
+		else 
+			_debug("Failed Starting: $tor_name  Return code $return\n",0);
+		if(isset($config_values['Global']['HTMLOutput']))
+			if($return == 0)
+				echo("Starting: $tor_name in $dest<br>\n");
+			else
+				echo("Failed Starting $tor_name  Return code $return<br>\n");
+		if($config_values['Settings']['Save Torrents'])
+			file_put_contents("$dest/$tor_name.torrent", $tor);
+		return ($return ? 0 : 1);
+	}	
+
+	function check_for_torrents($directory, $dest) {
+		if($handle = opendir($directory)) {
+			while(false !== ($file = readdir($handle))) {
+				if(preg_match('/\.torrent$/', $file) && client_add_torrent("$directory/$file", $dest))
+						unlink("$directory/$file");
+			}
+			closedir($handle);
+		} else {
+			_debug("check_for_torrents: Couldn't read Directory: $directory\n", 0);
+			exit(1);
 		}
 	}
-}
-
-function del_feed() {
-	global $config_values;
-	if(isset($_GET['idx']) AND isset($config_values['Feeds'][$_GET['idx']])) {
-		unset($config_values['Feeds'][$_GET['idx']]);
+	
+	function update_favorite() {
+		global $test_run;
+		if(!isset($_GET['button']))
+			return;
+		switch($_GET['button']) {
+			case 'Add':
+			Case 'Update':
+				add_favorite();
+				$test_run = TRUE;
+				break;
+			case 'Delete':
+				del_favorite();
+				break;
+		}
+		write_config_file();
 	}
-}
+	
+	function update_feed() {
+		if(!isset($_GET['button']))
+			return;
+		switch($_GET['button']) {
+			case 'Add':
+				add_feed();
+				break;
+			case 'Delete':
+				del_feed();
+				break;
+		}
+		write_config_file();
+	}
+	
+	function add_favorite() {
+		global $config_values;
+		$i = 0;
+		if(isset($_GET['idx'])) {
+			$idx = $_GET['idx'];
+			} else if(isset($_GET['name']))	{
+			$config_values['Favorites'][]['Name'] = $_GET['name'];
+			$idx = end(array_keys($config_values['Favorites']));
+			$_GET['idx'] = $idx; // So display_favorite_info() can see it
+		} else
+			return; // Bad form data
+		$list = array("filter"    => "Filter", 
+		              "not"       => "Not",
+		              "savein"    => "Save In",
+		              "episodes"  => "Episodes",
+		              "feed"      => "Feed",
+		              "quality"   => "Quality",
+		              "autostart" => "AutoStart");
+		foreach($list as $key => $data) {
+			if(isset($_GET[$key]))
+				$config_values['Favorites'][$idx][$data] = urldecode($_GET[$key]);
+			else
+				$config_values['Favorites'][$idx][$data] = "";
+		}
+	}
+	
+	function del_favorite() {
+		global $config_values;
+		if(isset($_GET['idx']) AND isset($config_values['Favorites'][$_GET['idx']])) {
+			unset($config_values['Favorites'][$_GET['idx']]);
+		}
+	}
+	
+	
+	function add_feed() {
+		global $config_values;
+		
+		if(isset($_GET['link']) AND ($tmp = guess_feedtype(urldecode($_GET['link']))) != 'Unknown') {
+			$link = urldecode($_GET['link']);
+			$config_values['Feeds'][]['Link'] = $link;
+			$idx = end(array_keys($config_values['Feeds']));
+			$config_values['Feeds'][$idx]['Type'] = $tmp;
+			load_feeds(array(0 => array('Type' => $tmp, 'Link' => $link)));
+			switch($tmp) {
+				case 'RSS':
+					$config_values['Feeds'][$idx]['Name'] = $config_values['Global']['Feeds'][$link]['title'];
+					break;
+				case 'Atom':
+					$config_values['Feeds'][$idx]['Name'] = $config_values['Global']['Feeds'][$link]['Name'];
+					break;
+			}
+		}
+	}
+
+	function del_feed() {
+		global $config_values;
+		if(isset($_GET['idx']) AND isset($config_values['Feeds'][$_GET['idx']])) {
+			unset($config_values['Feeds'][$_GET['idx']]);
+		}
+	}
 ?>

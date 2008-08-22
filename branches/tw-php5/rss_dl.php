@@ -13,21 +13,21 @@
 
 		function usage() {
 			global $argv;
-			_debug( "$argv[0] <options> - Download torrents from RSS feeds\n",0);
+			_debug( "$argv[0] <options> - CLI Interface to Torrent Watch\n",0);
 			_debug( "           -c <dir> : Enable Cache\n",0);
 			_debug( "           -C : Disable Cache\n",0);
 			_debug( "           -d : Dont run torrentwatch.php (fetch .torrent only)\n",0);
 			_debug( "           -D : Run torrentwatch.php (fetch .torrent and begin DL)\n",0);
 			_debug( "           -f <file> : cron file to hook\n",0);
 			_debug( "           -h : show this help\n",0);
-			_debug( "           -H : Output HTML\n",0);
 			_debug( "           -i : install cron hook and setup default config\n",0);
 			_debug( "           -nv: not verbose (default)\n",0);
 			_debug( "           -q : quiet (no output)\n",0);
 			_debug( "           -u : uninstall cron hook\n",0);
 			_debug( "           -v : verbose output\n",0);
 			_debug( "           -vv: verbose output(even more)\n",0);
-			_debug( " Note: When using -a or -r it must be the last option\n\n",0);
+			_debug( " Note: When using -a or -r it must be the last option\n",0);
+			_debug("        This interface only writes to the config file when using the -i option\n",0);
 		}
 
 		function parse_args() {
@@ -54,9 +54,6 @@
 					case '-h':
 						usage();
 						exit(1);
-					case '-H':
-						$config_values['Global']['HTMLOutput'] = 1;
-						break;
 					case '-i':
 						$config_values['Global']['Install'] = 1;
 						break;
@@ -188,9 +185,5 @@
 	}
 
 	_debug(timer_get_time()."s\n",0);
-
-	if(isset($config_values['Global']['HTMLOutput'])) {
-		finish_html();
-	}
 
 ?>
