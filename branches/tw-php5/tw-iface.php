@@ -104,14 +104,16 @@ function display_global_config() {
 			$trans122 = 'selected="selected"';
 			break;
 		case 'transmission1.32':
+		case 'transmission1.3x':
 			$trans132 = 'selected="selected"';
+			break;
 		default:
 			// Shouldn't happen
 			break;
 	}
 	$html_out .= '<option value="btpd" '.$btpd.'>BTPD</option>';
 	$html_out .= '<option value="transmission1.22" '.$trans122.'>Transmission 1.22</option>';
-	$html_out .= '<option value="transmission1.32" '.$trans132.'>Transmission 1.32</option></Select><br>';
+	$html_out .= '<option value="transmission1.3x" '.$trans132.'>Transmission 1.3x</option></Select><br>';
 
 	$html_out .= 'Download Directory:';
 	$html_out .= '<input type="text" name="downdir" value='.$config_values['Settings']['Download Dir'].'><br>';
@@ -208,7 +210,7 @@ function display_favorites() {
 	foreach($config_values['Favorites'] as $key => $item) {
 		$html_out .= '<li><a href="javascript:toggleFav('."'".'favorite_'.$key."'".')">'.$item['Name'].'</a></li>'."\n";
 	}
-	$html_out .= '<li><a href="javascript:toggleFav(favorite_new)">New Favorite</a></li>'."\n";
+	$html_out .= '<li><a href="javascript:toggleFav(\'favorite_new\')">New Favorite</a></li>'."\n";
 	$html_out .= '</ul></div>';
 	array_walk($config_values['Favorites'], 'display_favorites_info');
 	$item = array('Save In' => 'Default', 'AutoStart' => $config_values['Settings']['AutoStart']);
@@ -231,22 +233,28 @@ function display_feeds() {
 function display_options() {
 	global $html_out, $config_values;
 	$html_out .= '<ul>'."\n";
-	$html_out .= '<li id="favorites"><a href="javascript:toggleMenu(\'favorites\')">Favorites</a></li>';
+	$html_out .= '<li id="favoritesMenu"><a href="javascript:toggleMenu(\'favorites\')">Favorites</a></li>';
 	$html_out .= '<li id="config"><a href="javascript:toggleMenu(\'configuration\')">Configure</a></li>';
 	$html_out .= '<li id="view"><a href="javascript:toggleMenu(\'history\')">View History</a></li>';
 	$html_out .= '<li id="empty"><a href="tw-iface.cgi?mode=emptycache">Empty Cache</a></li>';
-	if($config_values['Settings']['Client'] == "btpd") {
-		$html_out .= '<li id="webui"><a href=http://"';
-		if($_SERVER['REMOTE_ADDR'] == "127.0.0.1")
-			$html_out .= '127.0.0.1';
-		else
-			$html_out .= 'popcorn';
-		$html_out .= '":8883/torrent/bt.cgi>BitTorrent WebUI</a></li>';
-	} else if($config_values['Settings']['Client'] == "transmission1.32")
-		$html_out .= '<li id="webui"><a href="http://popcorn:9091/transmission/web/">Transmission</a></li>';
-	else if($config_values['Settings']['Client'] == "transmission1.22")
-		$html_out .= '<li id="webui"><a href="http://popcorn:8077/">Clutch</a></li>';
-	$html_out .= '</ul>'."\n";
+	switch($config_values['Settings']['Client']) {
+		case 'btpd':
+			$html_out .= '<li id="webui"><a href="http://';
+			if($_SERVER['REMOTE_ADDR'] == "127.0.0.1")
+				$html_out .= '127.0.0.1';
+			else
+				$html_out .= 'popcorn';
+			$html_out .= ':8883/torrent/bt.cgi">BitTorrent WebUI</a></li>';
+			break;
+		case 'transmission1.3x':
+		case 'transmission1.32':
+			$html_out .= '<li id="webui"><a href="http://popcorn:9091/transmission/web/">Transmission</a></li>';
+			break;
+		case 'transmission1.22':
+			$html_out .= '<li id="webui"><a href="http://popcorn:8077/">Clutch</a></li>';
+			$html_out .= '</ul>'."\n";
+			break;
+	}
 }
 
 function display_history() {
@@ -349,14 +357,17 @@ $html_out = "";
 
 read_config_file();
 
-$html_out .= '<div class="mainoptions">'."\n";
-display_options();
-$html_out .= '<hr>';
-// display_feeds(); 
-$html_out .= '</div>'."\n";
 if(isset($_GET['mode'])) {
 	parse_options();
 }
+
+// Main Menu
+$html_out .= '<div class="mainoptions">'."\n";
+display_options();
+// $html_out .= '<hr>';
+// display_feeds(); 
+$html_out .= '</div>'."\n";
+
 
 // Hidden DIV's
 display_global_config();
@@ -366,6 +377,7 @@ display_favorites();
 echo $html_out;
 $html_out = "";
 
+// Feeds
 $config_values['Global']['HTMLOutput']= 1;
 load_feeds($config_values['Feeds']);
 feeds_perform_matching($config_values['Feeds']);

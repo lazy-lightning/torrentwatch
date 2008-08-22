@@ -247,7 +247,7 @@ tr.rss {
 }
 
 
-.mainoptions li#favorites {
+.mainoptions li#favoritesMenu {
 	background: url(images/favorites.png) no-repeat left center;
 }
 .mainoptions li#config {

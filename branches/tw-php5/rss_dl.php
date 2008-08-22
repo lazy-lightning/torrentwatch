@@ -81,7 +81,13 @@
 				}
 			}
 		}
-
+		function convert_old_config() {
+			global $config_file, $config_values;
+			unlink($config_file);
+			unset($config_values);
+			copy($config_file.".orig", $config_file);
+			read_config_file();
+		}
 		function setup_default_config() {
 			global $config_values;
 			function _default($a, $b) {
@@ -91,6 +97,11 @@
 				}
 			}
 			read_config_file();
+			// Config file was changed in ver 7.0.0
+			if(!isset($config_values['Settings']['Feeds'])) {
+				// We need to do something here
+				convert_old_config();
+			}
 			// Special case for renamed var in 0.6-6
 			if(isset($config_values['Settings']['Torrent Dir']))  {
 				_default('Watch Dir', $config_values['Settings']['Torrent Dir']);
@@ -101,7 +112,6 @@
 			_default('Download Dir', "/share/Video/");
 			_default('Cache Dir', "/share/.torrents/rss_cache/");
 			_default('Save Torrents', "0");
-			_default('Use wget', "0");
 			_default('Run Torrentwatch', "1");
 			_default('Cron', "/etc/cron.hourly");
 			_default('Client', "btpd");

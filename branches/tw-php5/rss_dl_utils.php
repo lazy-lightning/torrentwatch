@@ -155,7 +155,8 @@
 				_debug("Enabling Cache\n", 2);
 				if(!file_exists($config_values['Settings']['Cache Dir']) ||
 				  	!is_dir($config_values['Settings']['Cache Dir'])) {
-					unlink($config_values['Settings']['Cache Dir']);
+					if(file_exists($config_values['Settings']['Cache Dir']))
+						unlink($config_values['Settings']['Cache Dir']);
 					mkdir($config_values['Settings']['Cache Dir'], 777, TRUE);
 				}
 			}
@@ -530,15 +531,20 @@
 			unlink($dest);
 			mkdir($dest, 777, TRUE);
 		}
-		if($config_values['Settings']['Client'] == "btpd") {
-			btpd_add_torrent($tor, $dest);
-		} else if($config_values['Settings']['Client'] == "transmission1.3x") {
-			transmission13x_add_torrent($tor, $dest, $autostart);
-		} else if($config_values['Settings']['Client'] == "transmission1.22") {
-			transmission122_add_torrent($tor, $dest, $autostart);
-		} else {
-			_debug("Invalid Torrent Client: ".$config_values['Settings']['Client']."\n",0);
-			exit(1);
+		switch($config_values['Settings']['Client']) {
+			case 'btpd':
+				btpd_add_torrent($tor, $dest);
+				break;
+			case 'transmission1.3x':
+			case 'transmission1.32':
+				transmission13x_add_torrent($tor, $dest, $autostart);
+				break;
+			case 'transmission1.22':
+				transmission122_add_torrent($tor, $dest, $autostart);
+				break;
+			default:
+				_debug("Invalid Torrent Client: ".$config_values['Settings']['Client']."\n",0);
+				exit(1);
 		}
 		if($return == 0)
 			_debug("Starting: $tor_name in $dest\n",0);
