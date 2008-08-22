@@ -14,7 +14,6 @@
 		function usage() {
 			global $argv;
 			_debug( "$argv[0] <options> - Download torrents from RSS feeds\n",0);
-			_debug( "           -a <rssurl> <match1> <match2> : Add new torrent match\n",0);
 			_debug( "           -c <dir> : Enable Cache\n",0);
 			_debug( "           -C : Disable Cache\n",0);
 			_debug( "           -d : Dont run torrentwatch.php (fetch .torrent only)\n",0);
@@ -25,7 +24,6 @@
 			_debug( "           -i : install cron hook and setup default config\n",0);
 			_debug( "           -nv: not verbose (default)\n",0);
 			_debug( "           -q : quiet (no output)\n",0);
-			_debug( "           -r <rssurl> <match1> <match2> : Remove torrent match\n",0);
 			_debug( "           -u : uninstall cron hook\n",0);
 			_debug( "           -v : verbose output\n",0);
 			_debug( "           -vv: verbose output(even more)\n",0);
@@ -36,9 +34,6 @@
 			global $config_values, $argc, $argv, $test_run, $verbosity;
 			for($i=1;$i<$argc;$i++) {
 				switch($argv[$i]) {
-					case '-a':
-						update_config(RSS_ADD, $argc, $argv, $i);
-						break;
 					case '-c':
 						$i++;
 						$config_values['Settings']['Cache Dir'] = $argv[$i];
@@ -70,9 +65,6 @@
 						break;
 					case '-q':
 						$verbosity = -1;
-						break;
-					case '-r':
-						update_config(RSS_DEL, $argc, $argv, $i);
 						break;
 					case '-t':
 						$test_run = 1;

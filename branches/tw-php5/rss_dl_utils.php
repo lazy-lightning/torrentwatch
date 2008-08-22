@@ -145,64 +145,6 @@
 			unset($config_out);
 		}
 	  
-		if(!defined('RSS_ADD'))
-			define('RSS_ADD', 1);
-		if(!defined('RSS_DEL'))
-			define('RSS_DEL', 2);
-		function update_config($type, $argc, $argv, $pos) {
-			global $config_values;
-			if($pos+4 != $argc) {
-				_debug("Wrong number of arguments for update_config()\n",0);
-				//_debug("type: $type argc:$argc pos:$pos argv:".implode(" ",$argv)."\n");
-				exit(1);
-			}
-			$rss = $argv[$pos+1];
-			$key = $argv[$pos+2];
-			$data = $argv[$pos+3];
-			exit(update_config_real($type, $rss, $key, $data) ? 0 : 1);
-		}
-		function update_config_real($type, $rss, $key, $data) {
-			global $config_values;
-			switch($type) {
-				case RSS_ADD:
-					if(!isset($config_values[$rss])) // New Feed
-						$config_values[$rss]['xxOPTIONSxx']['Type'] = guess_feedtype($rss);
-					if(isset($config_values[$rss][$key])) {
-						_debug("$rss already has a match for $key.  Try a different key value.\n");
-						return FALSE;
-					}
-					$config_values[$rss][$key] = $data;
-					_debug("Match for $key $data added to $rss\n");
-					break;
-				case RSS_DEL:
-					if(isset($config_values[$rss]) && strcmp($config_values[$rss][$key], $data) == 0) {
-						unset($config_values[$rss][$key]);
-						_debug("Match for $key = $data removed from $rss\n");
-						$tmp = isset($config_values[$rss]['xxOPTIONSxx']) ? 1 : 0;
-						if(count($config_values[$rss]) == $tmp) {
-							unset($config_values[$rss]);
-							_debug("$rss has no more Matches, Removing.\n",2);
-						}
-					} else {
-						_debug("No matching key/data pair to remove\n");
-						_debug("feed: $rss key: $key data: $data\n");
-						if(!isset($config_values[$rss]))
-							_debug("No rss set\n");
-						else if(!isset($config_values[$rss][$key]))
-							_debug("Key not set\n");
-						else if(strcmp($config_values[$rss][$key], $data) != 0)
-							_debug("Data doesn't match\ndata: \"".$config_values[$rss][$key]."\" != \"$data\"\n");
-						return FALSE;
-					}
-					break;
-				default:
-					_debug("Bad Type sent to update_config()\n", 0);
-					return FALSE;
-			}
-			write_config_file();
-			return TRUE;
-		}
-
 		function cache_setup()
 		{
 			global $config_values, $test_run;
