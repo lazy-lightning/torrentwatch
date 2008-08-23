@@ -161,7 +161,7 @@ class lastRSS {
 				if ($temp != '') $result[$channeltag] = $temp; // Set only if not empty
 			}
 			// If date_format is specified and lastBuildDate is valid
-			if ($this->date_format != '' && ($timestamp = strtotime($result['lastBuildDate'])) !==-1) {
+			if ($this->date_format != '' && isset($result['lastBuildDate']) && ($timestamp = strtotime($result['lastBuildDate'])) !==-1) {
 						// convert lastBuildDate to specified date format
 						$result['lastBuildDate'] = date($this->date_format, $timestamp);
 			}

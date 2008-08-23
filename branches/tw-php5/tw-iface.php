@@ -54,7 +54,7 @@ function parse_options() {
 					$_GET['feed'] = $_GET['rss'];
 					$_GET['button'] = 'Add';
 					$_GET['savein'] = 'Default';
-					$_GET['autostart'] = $config_values['Settings']['AutoStart'];
+					$_GET['autostart'] = 'Default';
 					update_favorite();
 				} else
 					$output = "Could not generate Match\n";
@@ -171,6 +171,8 @@ function display_favorites_info($item, $key) {
 	$html_out .= '<form action="tw-iface.cgi">'."\n";
 	$html_out .= '<input type="hidden" name="mode" value="updatefavorite">'."\n";
 	$html_out .= '<input type="hidden" name="idx" value="'.$key.'">'."\n";
+	$html_out .= 'Name: ';
+	$html_out .= '<input type="text" name="name" value="'.$item['Name'].'"><br>'."\n";
 	$html_out .= 'Filter: ';
 	$html_out .= '<input type="text" name="filter" value="'.$item['Filter'].'"><br>'."\n";
 	$html_out .= 'Not:';
@@ -202,9 +204,6 @@ function display_favorites_info($item, $key) {
 }
 function display_favorites() {
 	global $config_values, $html_out;
-	if(isset($_GET['mode']) && 
-	  ($_GET['mode'] == 'updatefavorite' || isset($_GET['idx'])))
-		$html_out .= '<script type="text/javascript">toggleMenu(\'favorites\');</script>';
 	$html_out .= '<div class="Favorites" id="favorites">';
 	$html_out .= '<div class="Favorite"><ul>';
 	foreach($config_values['Favorites'] as $key => $item) {
@@ -257,23 +256,56 @@ function display_options() {
 	}
 }
 
+function cmp_history($a, $b) {
+	if($a['Date'] == $b['Date'])
+		return 0;
+	return (strtotime($a['Date']) < strtotime($b['Date'])) ? -1 : 1;
+}
+
 function display_history() {
 	global $html_out, $config_values;
 	$history = unserialize(file_get_contents($config_values['Settings']['History']));
 
 	$html_out .= '<div class="history" id="history"><ul>'."\n";
-	
+	$html_tmp = '';
 	foreach($history as $item) {
-		$html_out .= '<li>'.$item['Date'].' - '.$item['Title'].'</li>';
+		// add <wbr> tags at dots to help wordwrap
+		$item['Title'] = str_replace(".", ".<wbr>", $item['Title']);
+		// History is written to file in reverse order
+		$html_tmp = '<li>'.$item['Date'].' - '.$item['Title'].'</li>'.$html_tmp;
 	}
+	$html_out .= $html_tmp;
 	$html_out .= '</ul></div>';
 }
 
-function close_html() {
+function set_default_div() {
 	global $html_out;
+	
+	if(!isset($_GET['mode']))
+		return;
+	$html_out .= '<script type="text/javascript">';
+	switch($_GET['mode']) {
+		case 'updatefavorite':
+		case 'matchtitle':
+			$html_out .= 'toggleMenu(\'favorites\');';
+			if($_GET['button'] != 'Delete')
+				$html_out .= 'toggleFav(\'favorite_'.$_GET['idx'].'\');';
+			break;
+		case 'updatefeed':
+		case 'setglobals':
+			$html_out .= 'toggleMenu(\'configuration\');';
+			break;
+	}
+	$html_out .= '</script>';
+}
+
+function close_html() {
+	global $html_out, $debug_output;
 	$html_out .= "<div class='clear'></div>\n<div class='timer'>Page Took ";
 	$time_used = sprintf("%1.4f", timer_get_time());
-	$html_out .= $time_used."s to load</div></div></body></html>\n";
+	$html_out .= $time_used."s to load</div></div>";
+	$html_out .= "<div class='rss_debug'>$debug_output</div>";
+	$html_out .= "</body></html>\n";
 	echo $html_out;
 	$html_out = "";
 }
@@ -373,6 +405,7 @@ $html_out .= '</div>'."\n";
 display_global_config();
 display_history();
 display_favorites();
+set_default_div();
 
 echo $html_out;
 $html_out = "";

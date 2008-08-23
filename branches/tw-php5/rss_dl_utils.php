@@ -61,10 +61,10 @@
 		}
 
 		function _debug($string, $lvl = 1) {
-			global $config_values, $verbosity, $html_footer;
+			global $config_values, $verbosity, $debug_output;
 			if($verbosity >= $lvl) {
 				if(isset($config_values['Global']['HTMLOutput']))
-					$html_footer .= $string;
+					$debug_output .= $string;
 				else
 					echo($string);
 			}
@@ -145,7 +145,14 @@
 			file_put_contents($config_file, $config_out);
 			unset($config_out);
 		}
-	  
+	 
+		function add_history($title) { 
+			global $config_values;
+			$history = unserialize(file_get_contents($config_values['Settings']['History']));
+			$history[] = array('Title' => $title, 'Date' => date("m.d.y g:i a"));
+			file_put_contents($config_values['Settings']['History'], serialize($history));
+		}
+
 		function cache_setup()
 		{
 			global $config_values, $test_run;
@@ -168,10 +175,6 @@
 				$cache_file = $config_values['Settings']['Cache Dir'] . '/rss_dl_' . filename_encode($title);
 				touch($cache_file);
 			}
-			// Also add to history file
-			$history = unserialize(file_get_contents($config_values['Settings']['History']));
-			$history[] = array('Title' => $title, 'Date' => date("m.d.y g:i a"));
-			file_put_contents($config_values['Settings']['History'], serialize($history));
 		}
 
 		/*
@@ -308,13 +311,12 @@
 		}
 
 		function setup_rss_list_html() {
-			global $html_out, $html_header, $html_footer;
+			global $html_out, $html_header;
 			$html_header = "<div class=feedlist>\n";
-			$html_footer = "<div class=rss_debug><p>\n";
 			$html_out =  "<div class=torrentlist><table>\n";
 		}
 		function finish_rss_list_html() {
-			global $html_out, $html_header, $html_footer;
+			global $html_out, $html_header;
 			$html_header .="</div>\n";
 			$html_out .=  "</table></div>\n";
 		}
@@ -334,7 +336,10 @@
 				$html_out .="<td>".$item['published']."</td>\n";
 			} else { // RSS
 				$html_out .=  "<td>".str_replace('.', '.<wbr>', $item['description'])."</td>\n";
-				$html_out .=  "<td>".date("M j h:ia", strtotime($item['pubDate']))."</td>\n";
+				if(isset($item['pubDate']))
+					$html_out .=  "<td>".$item['pubDate']."</td>\n";
+				else
+					$html_out .= "<td>Not Specified</td>\n";
 			}
 			$html_out .= '<td><a href="tw-iface.cgi?mode=dltorrent&link=';
 			$html_out .= urlencode(get_torrent_link($item)).'">';
@@ -442,7 +447,8 @@
 		return json_decode($raw, TRUE);
 	}
 
-	function get_deep_dir() {
+	function get_deep_dir($tor_name) {
+			global $config_values;
 			switch($config_values['Settings']['Deep Directories']) {
 				case '0':
 					break;
@@ -458,6 +464,7 @@
 					$dest = "$dest/".$tor_name;
 					break;
 			}
+			return $dest;
 	}
 
 	function btpd_add_torrent($tor, $dest, $autostart) {
@@ -506,6 +513,8 @@
 	function client_add_torrent($filename, $dest, $fav = NULL) {
 		global $config_values, $hit;
 		$autostart = $config_values['Settings']['AutoStart'];
+		if(!$hit && isset($config_values['Global']['HTMLOutput']))
+			echo("Starting new torrents<br>");
 		$hit = 1;
 	
 		if(!($tor = file_get_contents($filename))) {
@@ -517,46 +526,52 @@
 			_debug("Couldn't parse torrent: $filename\n", 0);
 			return FALSE;
 		}
-		if(isset($fav))
+		if(isset($fav) && $fav['AutoStart'] != 'Default')
 			$autostart = $fav['AutoStart'];
-		if(!isset($dest) or $dest == "")
+		if(!isset($dest)) {
 			$dest = $config_values['Settings']['Download Dir'];
-		if(isset($fav) && $fav['Save In'] != 'Default') 
-				$dest = $fav['Save In'];
-		else if(isset($config_values['Settings']['Deep Directories'])) {
-			$dest = get_deep_dir();
+		}
+		if(isset($fav) && $fav['Save In'] != 'Default') {
+			$dest = $fav['Save In'];
+		} else if($config_values['Settings']['Deep Directories']) {
+			$dest = get_deep_dir($tor_name);
 			_debug("Deep Directorys, change dest to $dest\n", 1);
 		}
 		if(!file_exists($dest) or !is_dir($dest)) {
-			unlink($dest);
+			if(file_exists($dest))
+				unlink($dest);
 			mkdir($dest, 777, TRUE);
 		}
 		switch($config_values['Settings']['Client']) {
 			case 'btpd':
-				btpd_add_torrent($tor, $dest);
+				$return = btpd_add_torrent($tor, $dest);
 				break;
 			case 'transmission1.3x':
 			case 'transmission1.32':
-				transmission13x_add_torrent($tor, $dest, $autostart);
+				$return = transmission13x_add_torrent($tor, $dest, $autostart);
 				break;
 			case 'transmission1.22':
-				transmission122_add_torrent($tor, $dest, $autostart);
+				$return = transmission122_add_torrent($tor, $dest, $autostart);
+				// Doesn't support setting dest, so here change dest to transmissons
+				$tr_state = new BDecode('/share/.transmission/daemon/state');
+				$dest = $tr_state->{'result'}['default-directory'];
 				break;
 			default:
 				_debug("Invalid Torrent Client: ".$config_values['Settings']['Client']."\n",0);
 				exit(1);
 		}
-		if($return == 0)
+		if($return == 0) {
+			add_history($tor_name);
 			_debug("Starting: $tor_name in $dest\n",0);
-		else 
-			_debug("Failed Starting: $tor_name  Return code $return\n",0);
-		if(isset($config_values['Global']['HTMLOutput']))
-			if($return == 0)
+			if(isset($config_values['Global']['HTMLOutput']))
 				echo("Starting: $tor_name in $dest<br>\n");
-			else
-				echo("Failed Starting $tor_name  Return code $return<br>\n");
-		if($config_values['Settings']['Save Torrents'])
-			file_put_contents("$dest/$tor_name.torrent", $tor);
+			if($config_values['Settings']['Save Torrents'])
+				file_put_contents("$dest/$tor_name.torrent", $tor);
+		} else {
+			_debug("Failed Starting: $tor_name  Return code $return\n",0);
+			if(isset($config_values['Global']['HTMLOutput']))
+				echo("Failed Starting: $tor_name  Return code $return<br>\n");
+		}
 		return ($return ? 0 : 1);
 	}	
 
@@ -607,15 +622,16 @@
 	function add_favorite() {
 		global $config_values;
 		$i = 0;
-		if(isset($_GET['idx'])) {
+		if(isset($_GET['idx']) && $_GET['idx'] != 'new') {
 			$idx = $_GET['idx'];
-			} else if(isset($_GET['name']))	{
+		} else if(isset($_GET['name']))	{
 			$config_values['Favorites'][]['Name'] = $_GET['name'];
 			$idx = end(array_keys($config_values['Favorites']));
 			$_GET['idx'] = $idx; // So display_favorite_info() can see it
 		} else
 			return; // Bad form data
-		$list = array("filter"    => "Filter", 
+		$list = array("name"      => "Name",
+									"filter"    => "Filter", 
 		              "not"       => "Not",
 		              "savein"    => "Save In",
 		              "episodes"  => "Episodes",

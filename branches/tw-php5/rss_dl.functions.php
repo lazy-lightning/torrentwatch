@@ -28,6 +28,8 @@
 			$rss = new lastRSS;
 			$rss->stripHTML = True;
 			$rss->cache_time = 50*60;
+			$rss->date_format = 'M j h:ia';
+
 			if(isset($config_values['Settings']['Cache Dir']))
 				$rss->cache_dir = $config_values['Settings']['Cache Dir'];
 			if(!$config_values['Global']['Feeds'][$feed['Link']] = $rss->get($feed['Link']))
@@ -60,10 +62,12 @@
 			if(isset($config_values['Global']['HTMLOutput']))
 				show_feed_html($rs);
 			$alt = 'alt';
+			// echo(print_r($rs));
 			foreach($rs['items'] as $item) {
 				$matched = 0;
-				array_walk($config_values['Favorites'], 'check_for_torrent', 
-				           array('Obj' =>$item, 'URL' => $rs['URL']));
+				if(isset($config_values['Favorites']))
+					array_walk($config_values['Favorites'], 'check_for_torrent', 
+				             array('Obj' =>$item, 'URL' => $rs['URL']));
 				if($matched == 0) {
 					_Debug("No match for $item[title]\n", 2);
 				}
@@ -88,7 +92,8 @@
 			
 			foreach($atom['feed']['entry'] as $item) {
 				$matched = 0;
-				array_walk($config_values[$key], 'check_for_torrent', $item);
+				array_walk($config_values['Favorites'], 'check_for_torrent', 
+				           array('Obj' =>$item, 'URL' => $atom['URL']));
 				if($matched == 0) {
 					_debug("No match for ".$item['title']."\n");
 				}

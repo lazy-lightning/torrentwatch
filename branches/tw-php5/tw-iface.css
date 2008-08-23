@@ -65,7 +65,12 @@ div.history {
 	background: lightBlue;
 	border: 3px solid black;
 	padding: 20px;
+}
+div.configuration {
 	width: 400px;
+}
+div.history {
+	width: 770px;
 }
 
 div.Favorites {
