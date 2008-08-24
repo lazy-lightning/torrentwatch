@@ -2,7 +2,7 @@ Name: Torrent Watch
 Description: Watch folder and RSS Downloader for torrents on the 
                Networked Media Tank Platform
 
-Torrent Watch is available under the GNU General Public License v2. The complete
+Torrent Watch is available under the GNU General Public License v2 except where noted. The complete
 text of this license can be found in the file LICENSE
 
 Main logic by Erik Bernhardson
@@ -11,6 +11,8 @@ Initial debugging and test cases by DigiMuse
 CGI installer routine from the telnetd installer by lundman http://www.lundman.net/
 Icons, by David Vignoni, are from Nuvola-1.0 available under the LGPL http://icon-king.com/
 Backgrounds and CSS Layout are borrowed from Clutch http://www.clutchbt.com/
+javascript function changecss() by Shawn Olsen http://www.shawnolson.net/
+javascript div hiding inspiration and toggleLayer() by lobo235 http://www.netlobo.com/
 
 
 
