@@ -3,3 +3,4 @@ Centered Hidden divs display wrong in IE
 mode = showfeed needs work in tw-iface.php, until then display_feeds() commented out
 remove image tag from show_torrent_html()
 lastRSS still writes to the cache with bad fetch
+Dont start any torrents for a favorite with no filter

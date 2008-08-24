@@ -313,7 +313,7 @@
 		function setup_rss_list_html() {
 			global $html_out, $html_header;
 			$html_header = "<div class=feedlist>\n";
-			$html_out =  "<div class=torrentlist><table>\n";
+			$html_out =  "<div id='torrentlist_container'><table>\n";
 		}
 		function finish_rss_list_html() {
 			global $html_out, $html_header;
@@ -325,23 +325,17 @@
 			global $html_out, $matched, $test_run;
 
 			$feed = urlencode($feed);
-			$html_out .=  "<tr class='item $alt'>\n<td>";
+			$html_out .= "<li class='torrent $alt match_$matched'><div class='torrent_name'>";
 			$html_out .= "<a href='tw-iface.cgi?mode=matchtitle&rss=$feed&title=".rawurlencode($item['title'])."'>";
-			$html_out .=  "<img src='images/rss.png'>".str_replace('.', '.<wbr>', $item['title']);
-			$html_out .= "</a>";
-			$html_out .=  "</td>\n";
-			if(isset($item['id'])) { // ATOM
-				$html_out .= "<td>".strip_tags($item['summary'])."</td>\n";
-				//$html_out .= "<td>".date("M j h:ia", strtotime($item['published']))."</td>\n";
-				$html_out .="<td>".$item['published']."</td>\n";
-			} else { // RSS
-				$html_out .=  "<td>".str_replace('.', '.<wbr>', $item['description'])."</td>\n";
-				if(isset($item['pubDate']))
-					$html_out .=  "<td>".$item['pubDate']."</td>\n";
-				else
-					$html_out .= "<td>Not Specified</td>\n";
-			}
-			$html_out .= '<td><a href="tw-iface.cgi?mode=dltorrent&link=';
+			$html_out .= $item['title']."</a></div>\n";
+			$html_out .= "<div class='torrent_pubDate'>";
+			if(isset($item['pubDate']))
+				$html_out .=  $item['pubDate'];
+			else
+				$html_out .= "Not Specified";
+			$html_out .= "</div>\n";
+/*
+			$html_out .= '<div class="torrent_status"><a href="tw-iface.cgi?mode=dltorrent&link=';
 			$html_out .= urlencode(get_torrent_link($item)).'">';
 			switch($matched) {
 				case 1:
@@ -363,21 +357,20 @@
 					$html_out .= "No Match";
 					break;
 			}	
-			$html_out .= "</a></td></tr>\n";
+			$html_out .= "</a></div>"; */
+			$html_out .= "</li>\n";
 		}
 
-	function show_feed_html($rss) {
-		global $html_header, $html_out;
-		
-		$html_out .= "<tr class='header'><td><br />&nbsp;</td></tr>\n";
-		$html_out .= "<tr class='rss'><th class='feedname' colspan='4'><a name='".$rss['title']."'></a>";
-		$html_out .= $rss['title']."</td></tr>";
-		$html_out .= "<tr class='header'>\n";
-		$html_out .= "<th width='200'>Title</th>";
-		$html_out .= "<th>Description</th>";
-		$html_out .= "<th width='100'>Pub. Date</th>";
-		$html_out .= "<th width='80' style='text-align: center;'>Status</th>\n</tr>\n";
-		$html_header .= "<div class='feeditem'><a href='#".$rss['title']."'><img src='images/rss.png'>".$rss['title']."</a></div>\n";
+	function show_feed_html($rss, $idx) {
+		global $html_out;
+	
+		$html_out .= "<div class='feed' id='feed_$idx'><ul id='torrentlist' class='torrentlist'>";
+		$html_out .= "<li class='header'>".$rss['title']."</li>\n";
+	}
+
+	function close_feed_html() {
+		global $html_out;
+		$html_out .= '</ul></div>';
 	}
 
 	function guess_feedtype($feedurl) {
@@ -544,7 +537,7 @@
 		}
 		switch($config_values['Settings']['Client']) {
 			case 'btpd':
-				$return = btpd_add_torrent($tor, $dest);
+				$return = btpd_add_torrent($tor, $dest, $autostart);
 				break;
 			case 'transmission1.3x':
 			case 'transmission1.32':

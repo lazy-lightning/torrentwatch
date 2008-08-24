@@ -232,10 +232,13 @@ function display_feeds() {
 function display_options() {
 	global $html_out, $config_values;
 	$html_out .= '<ul>'."\n";
-	$html_out .= '<li id="favoritesMenu"><a href="javascript:toggleMenu(\'favorites\')">Favorites</a></li>';
-	$html_out .= '<li id="config"><a href="javascript:toggleMenu(\'configuration\')">Configure</a></li>';
-	$html_out .= '<li id="view"><a href="javascript:toggleMenu(\'history\')">View History</a></li>';
+	$html_out .= '<li id="favoritesMenu"><a href="javascript:toggleMenu(\'favorites\');">Favorites</a></li>';
+	$html_out .= '<li id="config"><a href="javascript:toggleMenu(\'configuration\');">Configure</a></li>';
+	$html_out .= '<li class="divider">&nbsp</li>';
+	$html_out .= '<li id="view"><a href="javascript:toggleMenu(\'history\');">View History</a></li>';
+	$html_out .= '<li id="divider">&nbsp</li>';
 	$html_out .= '<li id="empty"><a href="tw-iface.cgi?mode=emptycache">Empty Cache</a></li>';
+	$html_out .= '<li id="inspector"><a href="javascript:toggleMenu(\'inspector\');">Inspector</a></li>';
 	switch($config_values['Settings']['Client']) {
 		case 'btpd':
 			$html_out .= '<li id="webui"><a href="http://';
@@ -278,6 +281,15 @@ function display_history() {
 	$html_out .= '</ul></div>';
 }
 
+function display_filter_bar() {
+	global $html_out;
+	$html_out .= '<div id="filterbar"><ul>';
+	$html_out .= '<li><a href="javascript:filterFeeds(\'All\');">All</a></li>';
+	$html_out .= '<li><a href="javascript:filterFeeds(\'Matching\');">Matching</a></li>';
+	$html_out .= '<li><a href="javascript:filterFeeds(\'Downloaded\');">Downloaded</a></li>';
+	$html_out .= '</ul></div>'."\n";
+}
+
 function set_default_div() {
 	global $html_out;
 	
@@ -303,7 +315,7 @@ function close_html() {
 	global $html_out, $debug_output;
 	$html_out .= "<div class='clear'></div>\n<div class='timer'>Page Took ";
 	$time_used = sprintf("%1.4f", timer_get_time());
-	$html_out .= $time_used."s to load</div></div>";
+	$html_out .= $time_used."s to load</div>";
 	$html_out .= "<div class='rss_debug'>$debug_output</div>";
 	$html_out .= "</body></html>\n";
 	echo $html_out;
@@ -317,9 +329,62 @@ function close_html() {
 timer_init();
 ?>
 <html><head>
-<title>Torrentwatch Configuration Interface</title>
+<title>Torrentwatch</title>
 <script type="text/javascript">
+// Function by Shawn Olsen
+function changecss(theClass,element,value) {
+	//Last Updated on May 21, 2008
+	//documentation for this script at
+	//http://www.shawnolson.net/a/503/altering-css-class-attributes-with-javascript.html
+	var cssRules;
+	if (document.all) {
+		cssRules = 'rules';
+	}
+	else if (document.getElementById) {
+		cssRules = 'cssRules';
+	}
+	var added = false;
+	for (var S = 0; S < document.styleSheets.length; S++){
+		for (var R = 0; R < document.styleSheets[S][cssRules].length; R++) {
+			if (document.styleSheets[S][cssRules][R].selectorText == theClass) {
+				if(document.styleSheets[S][cssRules][R].style[element]){
+					document.styleSheets[S][cssRules][R].style[element] = value;
+					added=true;
+					break;
+				}
+			}
+		}
+	}
+}
+
+function filterFeeds( filterType )
+{
+	switch(filterType) {
+		case 'All':
+			changecss('ul.torrentlist li.torrent.match_0', 'display', 'block');
+			changecss('ul.torrentlist li.torrent.match_1', 'display', 'block');
+			changecss('ul.torrentlist li.torrent.match_2', 'display', 'block');
+			changecss('ul.torrentlist li.torrent.match_3', 'display', 'block');
+			break;
+		case 'Matching':
+			changecss('ul.torrentlist li.torrent.match_0', 'display', 'none');
+			changecss('ul.torrentlist li.torrent.match_1', 'display', 'block');
+			changecss('ul.torrentlist li.torrent.match_2', 'display', 'block');
+			changecss('ul.torrentlist li.torrent.match_3', 'display', 'block');
+			break;
+		case 'Downloaded':
+			changecss('ul.torrentlist li.torrent.match_0', 'display', 'none');
+			changecss('ul.torrentlist li.torrent.match_1', 'display', 'block');
+			changecss('ul.torrentlist li.torrent.match_2', 'display', 'none');
+			changecss('ul.torrentlist li.torrent.match_3', 'display', 'none');
+			break;
+	}
+}
+
+		
+			
 // Inspiration from http://www.netlobo.com/div_hiding.html
+
 var last_fav;
 function toggleFav( whichLayer )
 {
@@ -384,7 +449,7 @@ echo ('<link rel="Stylesheet" type="text/css" href="tw-iface');
 if($_SERVER["REMOTE_ADDR"] == '127.0.0.1')
 	echo ('.local');
 echo ('.css?'.time().'"></link>'."\n");
-echo ('</head>'."\n".'<body><div class="container">'."\n");
+echo ('</head>'."\n".'<body>'."\n");
 $html_out = "";
 
 read_config_file();
@@ -403,6 +468,7 @@ $html_out .= '</div>'."\n";
 
 // Hidden DIV's
 display_global_config();
+display_filter_bar();
 display_history();
 display_favorites();
 set_default_div();

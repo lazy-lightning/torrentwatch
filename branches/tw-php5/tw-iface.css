@@ -8,13 +8,284 @@
 	License: GNU General Public License v2
 */
 
+/* Modifications by Erik Bernhardson
+ * inspired by Clutch
+ */
+
+/*-----------------
+ *
+ * G L O B A L
+ *
+ * ---------------*/
+
+html {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	}
+
 body {
-	background-color: #ddd;
-	color: #000;
-	font-family: Helvetica, Verdana, Arial, sans-serif;
-	font-size: 12pt;
-	margin: 10px;
+	font: 62.5% "lucida grande", Tahoma, Verdana, Arial, Helvetica, sans-serif;
+	color: #323232 !important;
+	background: #FFF;
+	text-align: center;
+	margin:0 0 30px;
+	overflow: hidden;
+	}
+
+img {
+	border: none;
+	}
+
+input[type=text] {
+	border: 1px solid #787878;
+	}
+
+/*-----------------
+ *
+ * T O P   M E N U
+ *
+ * ----------------*/
+div.mainoptions {
+	width: 100%;
+	height: 75px;
+	margin: 0;
+	background: transparent url('images/menu_bg.gif') repeat-x;
+	border-bottom: 1px solid #979797;
+	position: fixed;
+	left: 0;
+	right: 0;
+	top: 0;
+	z-index: 2;
+	}
+
+div.mainoptions ul {
+	width: 100%;
+	height: 50px;
+	margin: 0;
+	padding: 0;
+	text-align: left;
+	}
+
+div.mainoptions ul li {
+	list-style-type: none;
+	list-style-image: none;
+	float: left;
+	padding: 0;
+	margin: 15px 0 0 0;
+	vertical-align: middle;
+	height: 50px;
+	}
+
+div.mainoptions ul li#inspector,
+div.mainoptions ul li#webui {
+	float: right;
+	}
+
+div.mainoptions ul li#inspector {
+	margin: 15px 10px 0 0;
+	}
+
+div.mainoptions ul li a {
+	color: #030303;
+	font-size: 1.1em;
+	text-decoration: none;
+	padding: 36px 10px 0 10px;
+	display: block;
+	margin: 0;
+	}
+
+div.mainoptions ul li#favoritesMenu a {
+	background: url(images/nuvola_bookmark.png) no-repeat 19px 0;
 }
+div.mainoptions ul li#config a {
+	background: url(images/nuvola_configure.png) no-repeat 19px 0;
+}
+
+div.mainoptions ul li#view a {
+	background: url(images/nuvola_history.png) no-repeat 26px 0;
+}
+
+div.mainoptions ul li#empty a {
+	background: url(images/remove.png) no-repeat 32px 0;
+}
+
+div.mainoptions ul li#empty a:active {
+	background: url('images/remove_on.png') no-repeat 32px 0;
+	}
+
+div.mainoptions ul li#webui a {
+	background: url(images/webui.png) no-repeat center 16px;
+}
+
+div.mainoptions ul li#inspector a {
+	background: url('images/info.png') no-repeat 18px 0;
+	}
+
+div.mainoptions ul li#inspector a:active {
+	background: url('images/info_on.png') no-repeat 18px 0;
+	}
+
+div.mainoptions ul li.divider {
+	background: transparent url('images/menu_divider.png') no-repeat top right;
+	margin: 17px 0 0 0;
+	}
+
+/*-----------------
+ *
+ * F I L T E R   B A R
+ *
+ * ---------------*/
+
+div#filterbar {
+	margin: 0;
+	height: 24px;
+	background: #C0C8D6 url('images/filter_bar_bg.png') repeat-x;
+	border-bottom: 1px solid #979797;
+	position: fixed;
+	left: 0;
+	right: 0px;
+	top: 76px;
+	z-index: 2;
+	}
+
+div#filterbar ul {
+	height: 17px;
+	margin: 0;
+	padding: 0;
+	text-align: left;
+	display: inline;
+	}
+
+div#filterbar ul li {
+	list-style-type: none;
+	list-style-image: none;
+	float: left;
+	padding: 0;
+	margin: 4px 2px 0 5px;
+	vertical-align: middle;
+	height: 17px;
+	}
+
+div#filterbar ul li a {
+	font-size: 1.2em;
+	color: #4E4E4F;
+	text-decoration: none;
+	font-weight: bold;
+	padding: 0 7px 0 7px;
+	margin: 0;
+	height: 17px;
+	display: block;
+	}
+
+div#filterbar ul li:hover {
+	background: transparent url('images/filter_hover_left.png') no-repeat top left;
+	}
+
+div#filterbar ul li:hover a {
+	background: transparent url('images/filter_hover_right.png') no-repeat top right;
+	color: #fff !important;
+	}
+
+div#filterbar ul li.selected {
+	background: transparent url('images/filter_selected_left.png') no-repeat top left;
+	}
+
+div#filterbar ul li.selected a {
+	background: transparent url('images/graphics/filter_selected_right.png') no-repeat top right;
+	color: #fff !important;
+	}
+
+/*--------------------------
+ *
+ * T O R R E N T   L I S T
+ *
+ * ------------------------*/
+div#torrentlist_container {
+	position: fixed;
+	top: 101px;
+	bottom: 10px;
+	right: 0px;
+	left: 0px;
+	padding: 0px;
+	margin: 0px;
+	overflow: auto;
+}
+
+ul.torrentlist {
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	text-align: left;
+}
+
+ul.torrentlist li {
+	list-style-type: none;
+	list-style-image: none;
+	clear: both;
+	display: block;
+	padding: 0;
+	margin: 0;
+	vertical-align: middle;
+	-moz-user-select: none;
+	}
+
+ul.torrentlist li.header {
+	font-size: 18pt;
+	text-align: center;
+	}
+
+ul.torrentlist li.header,
+ul.torrentlist li.torrent {
+	border-bottom: 1px solid #ccc;
+	padding: 3px 16px 3px 10px;
+	margin: 0 !important;
+	}
+
+ul.torrentlist li.torrent {
+	height: 22px;
+	padding-left: 28px;
+	}
+
+ul.torrentlist li.torrent.match_0 {
+	background: transparent url('images/nuvola_ledred.png') no-repeat 3px center;
+	display: block;
+	}
+
+ul.torrentlist li.torrent.match_1,
+ul.torrentlist li.torrent.match_2 {
+	background: transparent url('images/nuvola_ledgreen.png') no-repeat 3px center;
+	display: block;
+	}
+
+ul.torrentlist li.torrent.match_3 {
+	background: transparent url('images/nuvola_ledyellow.png') no-repeat 3px center;
+	display: block;
+	}
+
+ul.torrentlist li.torrent.alt {
+	background-color: #EDF3FE;
+	}
+
+ul.torrentlist li.torrent.selected {
+	background-color: #3875D7;
+	color: #FFF;
+	}
+
+div.torrent_name {
+	float: left;
+	}
+
+div.torrent_pubDate,
+div.torrent_status {
+	float: right;
+}	
+
+/*-----------------
+ *
+ * O L D   C S S   S T U F F
+ *
+ * ----------------*/
 
 .alt { background: #afdbff; }
 
@@ -43,67 +314,29 @@ body {
 
 .clear { clear: both; }
 
-a, a:visited {
-	color: #0072cf;
-	text-decoration: none;
-}
-
-a img {
-	text-decoration: none;
-	border: none;
-}
-
 div.configuration,
-div.history {
-	position: absolute;
-	top: 50px;
-	margin-left: auto;
-	margin-right: auto;
-	right: 0;
-	left: 0;
-	display: none;
-	background: lightBlue;
-	border: 3px solid black;
-	padding: 20px;
-}
-div.configuration {
-	width: 400px;
-}
-div.history {
-	width: 770px;
-}
-
+div.history,
 div.Favorites {
 	position: absolute;
 	top: 50px;
 	margin-left: auto;
 	margin-right: auto;
-	left: 0;
 	right: 0;
+	left: 0;
 	display: none;
 	background: lightBlue;
 	border: 3px solid black;
 	padding: 20px;
+	z-index: 3;
+}
+
+div.configuration {
+	width: 400px;
+}
+
+div.history,
+div.Favorites {
 	width: 770px;
-}
-
-div.container {
-	background-color: #ddd;
-	border: 1px solid gray;
-	line-height: 150%;
-	margin: 0px auto;
-	padding: 10px;
-	width: 940px;
-}
-
-div.mainoptions,div.Feeds {
-	background: white;
-	border: 1px solid gray;
-	float: left;
-	font-size: 10pt;
-	padding: 12px;
-	width: 126px;
-	clear: left;
 }
 
 div.Favorite {
@@ -126,9 +359,6 @@ div.FavInfo {
 
 div.FavInfo input, 
 div.FavInfo select {
-	position: relative;
-	bottom: 22px;
-	float: right;
 	width: 85%;
 }
 
@@ -138,7 +368,6 @@ div.FavInfo input.del {
 	left: 400px;
 	margin: 5px;
 	bottom: 0px;
-	float: none;
 }
 
 div.feedlist {
@@ -190,26 +419,6 @@ div.timer {
 	margin-right: 5px;
 }
 
-div.torrentlist {
-	display: inline;
-	width: 100%;
-}
-
-div.torrentlist table {
-	background-color: white;
-	border: 1px solid black;
-	border-spacing: 0px;
-	margin: 0px;
-}
-
-div.torrentlist img {
-	margin: 0px 3px -3px 0px;
-	width: 12px;
-}
-
-div.torrentlist tr:hover { background: lightgray; }
-div.torrentlist th:hover,
-div.torrentlist tr.header:hover { background: white; }
 
 div.btcli {
 	background: white;
@@ -236,58 +445,12 @@ tr.rss {
 }
 
 /* Menu Styles */
-.mainoptions ul,
-.Feeds ul,
 .Favorite ul {
 	list-style: none;
 	margin: 0;
 	padding: 0;
 }
 
-.mainoptions li {
-	height: 20px;
-	line-height: 20px;
-	margin-bottom: 5px;
-	padding-left: 24px;
-}
-
-
-.mainoptions li#favoritesMenu {
-	background: url(images/favorites.png) no-repeat left center;
-}
-.mainoptions li#config {
-	background: url(images/config.png) no-repeat left center;
-}
-.mainoptions li#test {
-	background: url(images/test.png) no-repeat left center;
-}
-
-.mainoptions li#view {
-	background: url(images/view.png) no-repeat left center;
-}
-
-.mainoptions li#empty {
-	background: url(images/empty.png) no-repeat left center;
-}
-
-.mainoptions li#dl {
-	background: url(images/dl.png) no-repeat left center;
-}
-
-.mainoptions li#webui {
-	background: url(images/webui.png) no-repeat left center;
-	height: 20px;
-	line-height: 20px;
-	margin-bottom: 0;
-}
-
-.mainoptions li#feed {
-	background: url(images/rss.png) no-repeat left center;
-	height: 20px;
-	line-height: 20px;
-	margin-bottom: 5px;
-	padding-left: 24px;
-}
 
 .favorite li {
 	background: url(images/favorites.png) no-repeat left center;

@@ -57,10 +57,10 @@
 			return;
 		}
 
-		function rss_perform_matching($rs) {
+		function rss_perform_matching($rs, $idx) {
 			global $config_values, $matched;
 			if(isset($config_values['Global']['HTMLOutput']))
-				show_feed_html($rs);
+				show_feed_html($rs, $idx);
 			$alt = 'alt';
 			// echo(print_r($rs));
 			foreach($rs['items'] as $item) {
@@ -81,13 +81,15 @@
 					$alt='alt';
 				}
 			}
+			if(isset($config_values['Global']['HTMLOutput']))
+				close_feed_html();
 			unset($item);
 		}
-		function atom_perform_matching($atom) {
+		function atom_perform_matching($atom, $idx) {
 			global $config_values, $matched;
 			$atom  = array_change_key_case_ext($atom, ARRAY_KEY_LOWERCASE);
 			if(isset($config_values['Global']['HTMLOutput']))
-				show_feed_html($atom['feed']);
+				show_feed_html($atom['feed'], $idx);
 			$alt='alt';
 			
 			foreach($atom['feed']['entry'] as $item) {
@@ -115,13 +117,13 @@
 		if(isset($config_values['Global']['HTMLOutput']))
 			setup_rss_list_html();
 		cache_setup();
-		foreach($feeds as $feed) {
+		foreach($feeds as $key => $feed) {
 			switch($feed['Type']) {
 				case 'RSS':
-					rss_perform_matching($config_values['Global']['Feeds'][$feed['Link']]);
+					rss_perform_matching($config_values['Global']['Feeds'][$feed['Link']], $key);
 					break;
 				case 'Atom':
-					atom_perform_matching($config_values['Global']['Feeds'][$feed['Link']]);
+					atom_perform_matching($config_values['Global']['Feeds'][$feed['Link']], $key);
 					break;
 				default:
 					_debug("Unknown Feed. Feed: ".$feed['Link']."Type: ".$feed['Type']."\n",0);
