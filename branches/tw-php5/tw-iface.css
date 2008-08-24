@@ -192,7 +192,7 @@ div#filterbar ul li.selected {
 	}
 
 div#filterbar ul li.selected a {
-	background: transparent url('images/graphics/filter_selected_right.png') no-repeat top right;
+	background: transparent url('images/filter_selected_right.png') no-repeat top right;
 	color: #fff !important;
 	}
 

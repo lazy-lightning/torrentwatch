@@ -187,24 +187,12 @@ install_harddisk()
 	chmod a+x $DEST/torrentwatch.php
 	chmod a+x $DEST/tw-iface.php
 
-	# Link our configuration script to the HARD_DRIVE
-	# Necessary because the PCH web server wont let us access hidden folders like .torrents
-	if [ ! -h $IFACE_DEST/tw-iface.cgi ]; then
-		rm $IFACE_DEST/tw-iface.cgi
-		ln -s $DEST/tw-iface.php $IFACE_DEST/tw-iface.cgi
+	# Link our hidden directory to a non-hidden directory.  This is so the NMT media
+  # browser doesn't show an extra folder
+	if [ -h /share/torrentwatch ]; then
+		rm /share/torrentwatch
+		ln -s $DEST /share/torrentwatch
 	fi
-	if [ ! -h $IFACE_DEST/tw-iface.local.css ]; then
-		rm $IFACE_DEST/tw-iface.local.css
-		ln -s $DEST/tw-iface.local.css $IFACE_DEST/tw-iface.local.css
-	fi
-	if [ ! -h $IFACE_DEST/tw-iface.css ]; then
-		rm $IFACE_DEST/tw-iface.css
-		ln -s $DEST/tw-iface.css $IFACE_DEST/tw-iface.css
-	fi
-	# Move the image files where they need to be for the interface
-	mkdir -p $IMAGE_DEST
-	mv $DEST/images/* $IMAGE_DEST
-	rmdir $DEST/images
 
 	# Anti-clobber routine for the config script
 	if [ ! -f $DEST/rss_dl.config ];then
@@ -225,7 +213,7 @@ install_harddisk()
 	echo "Success..<br>"
 
 	echo 'Please procede to the';
-	echo '<a href="http://localhost.drives:8883/HARD_DISK/tw-iface.cgi">Configuration Interface</a>.<br>'
+	echo '<a href="http://localhost.drives:8883/HARD_DISK/torrentwatch/tw-iface.cgi">Configuration Interface</a>.<br>'
   # Remove the tarball
 	rm -f "$INSTA"
 

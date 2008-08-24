@@ -212,7 +212,14 @@ function display_favorites() {
 	$html_out .= '<li><a href="javascript:toggleFav(\'favorite_new\')">New Favorite</a></li>'."\n";
 	$html_out .= '</ul></div>';
 	array_walk($config_values['Favorites'], 'display_favorites_info');
-	$item = array('Save In' => 'Default', 'AutoStart' => $config_values['Settings']['AutoStart']);
+	$item = array('Name' => '', 
+	              'Filter' => '', 
+	              'Not' => '', 
+	              'Save In' => 'Default',
+	              'Episodes' => '', 
+	              'Feed' => '', 
+	              'Quality' => '',
+	              'AutoStart' => $config_values['Settings']['AutoStart']);
 	display_favorites_info($item, "new");
 	$html_out .= '<div class="clear"></div>'."\n";
 	$html_out .= '</div>'."\n";
@@ -284,9 +291,9 @@ function display_history() {
 function display_filter_bar() {
 	global $html_out;
 	$html_out .= '<div id="filterbar"><ul>';
-	$html_out .= '<li><a href="javascript:filterFeeds(\'All\');">All</a></li>';
-	$html_out .= '<li><a href="javascript:filterFeeds(\'Matching\');">Matching</a></li>';
-	$html_out .= '<li><a href="javascript:filterFeeds(\'Downloaded\');">Downloaded</a></li>';
+	$html_out .= '<li id="filter_all"><a href="javascript:filterFeeds(\'all\');">All</a></li>';
+	$html_out .= '<li id="filter_matching"><a href="javascript:filterFeeds(\'matching\');">Matching</a></li>';
+	$html_out .= '<li id="filter_downloaded"><a href="javascript:filterFeeds(\'downloaded\');">Downloaded</a></li>';
 	$html_out .= '</ul></div>'."\n";
 }
 
@@ -359,20 +366,28 @@ function changecss(theClass,element,value) {
 
 function filterFeeds( filterType )
 {
+	var elem;
+	elem = document.getElementById('filter_'+filterType);
+	for ( var i in elem.parentNode.childNodes )
+	{
+		elem.parentNode.childNodes[i].className = ''
+	}
+	elem.className = 'selected';
+
 	switch(filterType) {
-		case 'All':
+		case 'all':
 			changecss('ul.torrentlist li.torrent.match_0', 'display', 'block');
 			changecss('ul.torrentlist li.torrent.match_1', 'display', 'block');
 			changecss('ul.torrentlist li.torrent.match_2', 'display', 'block');
 			changecss('ul.torrentlist li.torrent.match_3', 'display', 'block');
 			break;
-		case 'Matching':
+		case 'matching':
 			changecss('ul.torrentlist li.torrent.match_0', 'display', 'none');
 			changecss('ul.torrentlist li.torrent.match_1', 'display', 'block');
 			changecss('ul.torrentlist li.torrent.match_2', 'display', 'block');
 			changecss('ul.torrentlist li.torrent.match_3', 'display', 'block');
 			break;
-		case 'Downloaded':
+		case 'downloaded':
 			changecss('ul.torrentlist li.torrent.match_0', 'display', 'none');
 			changecss('ul.torrentlist li.torrent.match_1', 'display', 'block');
 			changecss('ul.torrentlist li.torrent.match_2', 'display', 'none');
