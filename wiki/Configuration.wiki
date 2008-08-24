@@ -1,5 +1,8 @@
-#summary How to Configure Torrent Watch
+#summary How to Configure Torrent Watch 0.6.X
 #labels Phase-Deploy,Featured
+
+Note this information is for 0.6.X Series.  Documentation for 0.7.X is still to be written.
+
 ==Feeds==
 ===Adding a Feed===
   * To add a feed, type the url in the centered box under "New RSS Feed" at the bottom
