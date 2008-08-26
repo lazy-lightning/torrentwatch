@@ -84,12 +84,12 @@ function display_global_config() {
 	global $config_values, $html_out;
 
 	$html_out .= '<div class="dialog_window" id="configuration">'."\n";	
-	// Settings
-	$html_out .= '<form action="tw-iface.cgi"><input type="hidden" name="mode" value="setglobals">';
-	$html_out .= '<h2 class="dialog_heading">Global Settings';
-	$html_out .= '<input class="add" type="submit" value=""></h2>'; 
-	$html_out .= '<div class="config_torrentclient"><label class="item">Torrent Client:</label>';
-	$html_out .= '<SELECT name="client">';
+	$html_out .= '<h2 class="dialog heading">Configuration</h2>';
+	$html_out .= '<form action="tw-iface.cgi" id="config_form"><input type="hidden" name="mode" value="setglobals">';
+	$html_out .= '<div class="config_torrentclient">';
+	$html_out .= '<label class="category">Client Settings</label>';
+	$html_out .= '<label class="item">Torrent Client:</label>';
+	$html_out .= '<select name="client">';
 	$btpd = "";
 	$trans122 = "";
 	$trans132 = "";
@@ -110,17 +110,21 @@ function display_global_config() {
 	}
 	$html_out .= '<option value="btpd" '.$btpd.'>BTPD</option>';
 	$html_out .= '<option value="transmission1.22" '.$trans122.'>Transmission 1.22</option>';
-	$html_out .= '<option value="transmission1.3x" '.$trans132.'>Transmission 1.3x</option></Select></div>';
+	$html_out .= '<option value="transmission1.3x" '.$trans132.'>Transmission 1.3x</option></select></div>';
 
 	$html_out .= '<div class="config_downloaddir"><label class="item">Download Directory:</label>';
 	$html_out .= '<input type="text" name="downdir" value='.$config_values['Settings']['Download Dir'].'></div>';
-	$html_out .= '<div class="config_watchdir"><label class="item">Watch Directory:</label>';
+	$html_out .= '<div class="config_watchdir">';
+	$html_out .= '<label class="category">Torrent Settings</label>';
+	$html_out .= '<label class="item">Watch Directory:</label>';
 	$html_out .= '<input type="text" name="watchdir" value='.$config_values['Settings']['Watch Dir'].'></div>';
-	$html_out .= '<div class="config_savetorrent"><label class="item">Save .torrent:</label>';
+
+	$html_out .= '<div class="config_savetorrent">';
 	$html_out .= '<input type="checkbox" name="savetorrents" value=1 ';
 	if($config_values['Settings']['Save Torrents'] == 1)
 		$html_out .= 'checked=1';
-	$html_out .= '></div>'."\n";
+	$html_out .= '><label class="item">Save .torrent</label></div>';
+
 	$html_out .= '<div class="config_deepdir"><label class="item">Deep Directories:</label>';
 	$tmp1 = $tmp2 = $tmp3 = "";
 	switch($config_values['Settings']['Deep Directories']) {
@@ -139,13 +143,21 @@ function display_global_config() {
 	$html_out .= '<option value="Title" '.$tmp2.'>Show Title</option>';
 	$html_out .= '<option value="0" '.$tmp3.'>Off</option></select></div>';
 
-	$html_out .= '<div class="config_verifyepisodes"><label class="item">Verify Episodes:</label>';
+	$html_out .= '<div class="config_verifyepisodes"><label class="category">Favorites Settings</label>';
+
 	$html_out .= '<input type="checkbox" name="verifyepisodes" value=1 ';
 	if($config_values['Settings']['Verify Episode'] == 1)
 		$html_out .= 'checked=1';
-	$html_out .= '</div></div></form>'."\n";
+	$html_out .= '><label class="item">Verify Episodes</label>';
+	$html_out .= '</div>';
+	$html_out .= '<a href="javascript:submitform(\'config_form\')">Save</a>';
+	$html_out .= '<a href="javascript:toggleMenu(\'configuration\')">Close</a>';
+	$html_out .= '<a href="javascript:toggleMenu(\'feeds\')">Feeds</a>';
+	$html_out .= '</form></div>'."\n";
 
 	// Feeds
+	$html_out .= '<div class="dialog_window" id="feeds">';
+	$html_out .= '<label class="Category">Feeds</label>';
 	foreach($config_values['Feeds'] as $key => $feed) {
 		$html_out .= '<div class="feeditem">'."\n";
 		$html_out .= '<form action="tw-iface.cgi" class="feedform"><input type="hidden" name="mode" value="updatefeed">'."\n";
@@ -157,6 +169,8 @@ function display_global_config() {
 	$html_out .= '<form action="tw-iface.cgi" class="feedform"><input type="hidden" name="mode" value="updatefeed">'."\n";
 	$html_out .= '<input type="submit" class="add" name="button" value="Add">';
 	$html_out .= '<label class="item">New Feed:</label><input type="text" name="link">'."\n";
+	$html_out .= '<a href="javascript:toggleMenu(\'feeds\')">Close</a>';
+	$html_out .= '<a href="javascript:toggleMenu(\'configuration\')">Back</a>';
 	$html_out .= '</form></div></div>'."\n";
 
 }
@@ -168,17 +182,17 @@ function display_favorites_info($item, $key) {
 	$html_out .= '<form action="tw-iface.cgi">'."\n";
 	$html_out .= '<input type="hidden" name="mode" value="updatefavorite">'."\n";
 	$html_out .= '<input type="hidden" name="idx" value="'.$key.'">'."\n";
-	$html_out .= 'Name: ';
-	$html_out .= '<input type="text" name="name" value="'.$item['Name'].'"><br>'."\n";
-	$html_out .= 'Filter: ';
-	$html_out .= '<input type="text" name="filter" value="'.$item['Filter'].'"><br>'."\n";
-	$html_out .= 'Not:';
-	$html_out .= '<input type="text" name="not" value="'.$item['Not'].'"><br>'."\n";
-	$html_out .= 'Save In: ';
-	$html_out .= '<input type="text" name="savein" value="'.$item['Save In'].'"><br>'."\n";
-	$html_out .= 'Episodes: ';
-	$html_out .= '<input type="text" name="episodes" value="'.$item['Episodes'].'"><br>'."\n";
-	$html_out .= 'Feed: <select name="feed">'."\n";
+	$html_out .= '<div class="favorite_name"><label class="item">Name:</label>';
+	$html_out .= '<input type="text" name="name" value="'.$item['Name'].'"></div>'."\n";
+	$html_out .= '<div class="favorite_filter"><label class="item">Filter:</label>';
+	$html_out .= '<input type="text" name="filter" value="'.$item['Filter'].'"></div>'."\n";
+	$html_out .= '<div class="favorite_not"><label class="item">Not:</label>';
+	$html_out .= '<input type="text" name="not" value="'.$item['Not'].'"></div>'."\n";
+	$html_out .= '<div class="favorite_savein"><label class="item">Save In:</label>';
+	$html_out .= '<input type="text" name="savein" value="'.$item['Save In'].'"></div>'."\n";
+	$html_out .= '<div class="favorite_episodes"><label class="item">Episodes:</label>';
+	$html_out .= '<input type="text" name="episodes" value="'.$item['Episodes'].'"></div>'."\n";
+	$html_out .= '<div class="favorite_feed"><label class="item">Feed:</label><select name="feed">'."\n";
 	$html_out .= '<option value="all">All</option>'."\n";
 	foreach($config_values['Feeds'] as $feed) {
 		$html_out .= '<option value="'.urlencode($feed['Link']).'"';
@@ -186,11 +200,11 @@ function display_favorites_info($item, $key) {
 			$html_out .= ' selected="selected"';
 		$html_out .= '>'.$feed['Name'].'</option>'."\n";
 	}
-	$html_out .= '</select><br>'."\n";
-	$html_out .= 'Quality: ';
-	$html_out .= '<input type="text" name="quality" value="'.$item['Quality'].'"><br>'."\n";
-	$html_out .= 'AutoStart: ';
-	$html_out .= '<input type="text" name="autostart" value="'.$item['AutoStart'].'">'."\n";
+	$html_out .= '</select></div>'."\n";
+	$html_out .= '<div class="favorite_quality"><label class="item">Quality:</label>';
+	$html_out .= '<input type="text" name="quality" value="'.$item['Quality'].'"></div>'."\n";
+	$html_out .= '<div class="favorite_autostart"><label class="item">AutoStart:</label>';
+	$html_out .= '<input type="text" name="autostart" value="'.$item['AutoStart'].'"></div>'."\n";
 	$html_out .= '<input type="submit" class="add" name="button" value="Update">'."\n";
 	$html_out .= '<input type="submit" class="del" name="button" value="Delete"></form></div>'."\n";
 	// Display the fav that was just updated
@@ -199,9 +213,10 @@ function display_favorites_info($item, $key) {
 		$html_out .= 'toggleFav("favorite_'.$_GET['idx'].'");</script>';
 	}
 }
+
 function display_favorites() {
 	global $config_values, $html_out;
-	$html_out .= '<div class="Favorites" id="favorites">';
+	$html_out .= '<div class="dialog_window" id="favorites">';
 	$html_out .= '<div class="Favorite"><ul>';
 	foreach($config_values['Favorites'] as $key => $item) {
 		$html_out .= '<li><a href="javascript:toggleFav('."'".'favorite_'.$key."'".')">'.$item['Name'].'</a></li>'."\n";
@@ -222,19 +237,9 @@ function display_favorites() {
 	$html_out .= '</div>'."\n";
 }
 
-function display_feeds() {
-	global $config_values, $html_out;
-	$html_out .= '<ul>'."\n";
-	$html_out .= '<li id="feed"><a href="tw-iface.cgi?mode=showfeed&feed=all">All</a></li>';
-	foreach($config_values['Feeds'] as $key => $item) {
-		$html_out .= '<li id="feed"><a href="tw-iface.cgi?mode=showfeed&feed='.$key.'">';;
-		$html_out .= $item['Name'].'</a></li>';
-	}
-	$html_out .= '</ul>'."\n";
-}
-
 function display_options() {
 	global $html_out, $config_values;
+	$html_out .= '<div class="mainoptions" id="mainoptions">'."\n";
 	$html_out .= '<ul>'."\n";
 	$html_out .= '<li id="favoritesMenu"><a href="javascript:toggleMenu(\'favorites\');">Favorites</a></li>';
 	$html_out .= '<li id="config"><a href="javascript:toggleMenu(\'configuration\');">Configure</a></li>';
@@ -258,22 +263,17 @@ function display_options() {
 			break;
 		case 'transmission1.22':
 			$html_out .= '<li id="webui"><a href="http://popcorn:8077/">Clutch</a></li>';
-			$html_out .= '</ul>'."\n";
 			break;
 	}
-}
-
-function cmp_history($a, $b) {
-	if($a['Date'] == $b['Date'])
-		return 0;
-	return (strtotime($a['Date']) < strtotime($b['Date'])) ? -1 : 1;
+	$html_out .= '</ul>'."\n";
+	$html_out .= '</div>'."\n";
 }
 
 function display_history() {
 	global $html_out, $config_values;
 	$history = unserialize(file_get_contents($config_values['Settings']['History']));
 
-	$html_out .= '<div class="history" id="history"><ul>'."\n";
+	$html_out .= '<div class="dialog_window" id="history"><ul>'."\n";
 	$html_tmp = '';
 	foreach($history as $item) {
 		// add <wbr> tags at dots to help wordwrap
@@ -336,6 +336,12 @@ timer_init();
 <title>Torrentwatch</title>
 <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
 <script type="text/javascript">
+
+function submitform ( whichForm )
+{
+	document.getElementById(whichForm).submit();
+}
+
 // Function by Shawn Olsen
 function changecss(theClass,element,value) {
 	//Last Updated on May 21, 2008
@@ -491,16 +497,12 @@ if(isset($_GET['mode'])) {
 }
 
 // Main Menu
-$html_out .= '<div class="mainoptions">'."\n";
 display_options();
-// $html_out .= '<hr>';
-// display_feeds(); 
-$html_out .= '</div>'."\n";
+display_filter_bar();
 
 
 // Hidden DIV's
 display_global_config();
-display_filter_bar();
 display_history();
 display_favorites();
 set_default_div();

@@ -302,8 +302,9 @@ div.dialog_window {
 	opacity: .95;
 	border: 1px solid #B5B5B5;
 	text-align: left;
-	top: 80px;
+	top: 30px;
 	width: 410px;
+	padding: 5px;
 	}
 
 div.dialog_window label {
@@ -322,7 +323,11 @@ div.dialog_window label.category {
 div.dialog_window label.item {
 	margin: 0 5px 0 20px;
 	float: left;
-	width: 110px;
+	}
+
+div.dialog_window label.suffix {
+	margin: 0 5px 0 10px;
+	float: left;
 	}
 
 div.dialog_window h2.dialog_heading {
@@ -331,25 +336,53 @@ div.dialog_window h2.dialog_heading {
 	width: 305px;
 	}
 
-div.config_torrentclient, div.config_downloaddir,
-div.config_watchdir, div.config_savetorrent,
-div.config_savetorrent, div.config_deepdir,
-div.config_verifyepisodes {
+div.dialog_window input,
+div.dialog_window select {
+	float: left;
+	}
+
+
+/* Configuration Window */
+div.dialog_window#configuration a,
+div.dialog_window#feeds a {
+	display: block;
+	float: right;
+	margin: 5px 10px 0 0;
+	padding: 5px;
+	background-color: #EEE;
+	border: 1px solid #787878;
+	width: 50px;
+	text-align: center;
+	font-weight: bold;
+	text-decoration: none;
+	color: #323232;
+	clear: left;
+	}
+
+div.config_torrentclient label.item,
+div.config_downloaddir label.item,
+div.config_watchdir label.item, 
+div.config_deepdir label.item {
+	width: 100px;
 	clear: left;
 	padding-right: 10px;
 	}
 
-div.dialog_window input[type=text] {
+div.config_savetorrent label.item,
+div.config_verifyepisodes label.item {
+	margin: 0 5px 0 0;
+	}
+
+div.dialog_window#configuration input[type=text] {
 	width: 261px;
 	}
 
-div.dialog_window input {
-	float: left;
+div.dialog_window#configuration input[type=checkbox] {
+	margin: 4px 5px 0 22px;
+	clear: left;
 	}
 
-/* Configuration Window */
-div.dialog_window#configuration {
-	}
+
 
 div.feeditem label.item {
 	white-space: nowrap;
@@ -364,6 +397,31 @@ div.feeditem label.item {
 div.dialog_window#favorites {
 	}
 
+div.FavInfo {
+	display: none;
+	border: 1px solid gray;
+	padding: 5px;
+	margin: 5px;
+	width: 400px;
+	float: right;
+}
+
+div.favorite_name label.item,
+div.favorite_filter label.item,
+div.favorite_not label.item,
+div.favorite_savein label.item,
+div.favorite_episodes label.item,
+div.favorite_feed label.item,
+div.favorite_quality label.item,
+div.favorite_autostart label.item {
+	clear: left;
+	width: 50px;
+	padding-right: 10px;
+}
+
+div.FavInfo input[type=text] {
+	width: 261px;
+	}
 /* History Dialog */
 div.dialog_window#history {
 	}
@@ -401,29 +459,9 @@ div.dialog_window#history {
 
 .clear { clear: both; }
 
-div.configuration,
 div.history,
-div.Favorites {
-	position: absolute;
-	top: 50px;
-	margin-left: auto;
-	margin-right: auto;
-	right: 0;
-	left: 0;
-	display: none;
-	background: lightBlue;
-	border: 3px solid black;
-	padding: 20px;
-	z-index: 3;
-}
-
-div.configuration {
-	width: 400px;
-}
-
-div.history,
-div.Favorites {
-	width: 770px;
+div.dialog_window#favorites {
+	width: 625px;
 }
 
 div.Favorite {
@@ -435,19 +473,6 @@ div.Favorite {
 	width: 180px;
 }
 
-div.FavInfo {
-	display: none;
-	border: 1px solid gray;
-	padding: 15px;
-	margin: 5px;
-	width: 500px;
-	float: right;
-}
-
-div.FavInfo input, 
-div.FavInfo select {
-	width: 85%;
-}
 
 div.FavInfo input.add,
 div.FavInfo input.del {
@@ -476,16 +501,6 @@ div.feedlist a {
 	text-decoration: none;
 }
 
-div.execoutput {
-	background: white;
-	border: 1px solid gray;
-	float: left;
-	font-size: 10pt;
-	margin-left: 15px;
-	padding: 12px;
-	width: 745px;
-}
-
 div.feeditem {
 	clear: both;
 	margin: 1px;
@@ -505,6 +520,8 @@ div.timer {
 	font-size: 8pt;
 	text-align: right;
 	margin-right: 5px;
+	bottom: 0;
+	right: 0;
 }
 
 
