@@ -313,12 +313,12 @@
 		function setup_rss_list_html() {
 			global $html_out, $html_header;
 			$html_header = "<div class=feedlist>\n";
-			$html_out =  "<div id='torrentlist_container'><table>\n";
+			$html_out =  "<div id='torrentlist_container'>\n";
 		}
 		function finish_rss_list_html() {
 			global $html_out, $html_header;
 			$html_header .="</div>\n";
-			$html_out .=  "</table></div>\n";
+			$html_out .=  "</div>\n";
 		}
 		
 		function show_torrent_html($item, $feed, $alt) {
@@ -503,14 +503,25 @@
 		}
 	}
 
-	function client_add_torrent($filename, $dest, $fav = NULL) {
+	function client_add_torrent($filename, $dest, $fav = NULL, $feed = NULL) {
 		global $config_values, $hit;
 		$autostart = $config_values['Settings']['AutoStart'];
 		if(!$hit && isset($config_values['Global']['HTMLOutput']))
 			echo("Starting new torrents<br>");
 		$hit = 1;
-	
-		if(!($tor = file_get_contents($filename))) {
+
+		$stream_opts = array('http' =>array('method' => 'GET'));
+		// Support for private trackers using cookies
+		if($feed != NULL && ($cookies = stristr($feed, '&:COOKIE:'))) {
+			$cookies = substr($cookies, 9);
+			$cookies = explode('&', $cookies);
+			$stream_opts['http']['header'] = "Cookie: ";
+			foreach($cookies as $cookie) {
+				$stream_opts['http']['header'] .= " $cookie;";
+			}
+		}
+		$context = stream_context_create($stream_opts);
+		if(!($tor = file_get_contents($filename, FALSE, $context))) {
 			_debug("Couldn't open torrent: $filename\n",0);
 			return FALSE;
 		}

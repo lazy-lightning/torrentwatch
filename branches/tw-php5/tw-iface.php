@@ -337,6 +337,7 @@ timer_init();
 ?>
 <html><head>
 <title>Torrentwatch</title>
+<link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
 <script type="text/javascript">
 // Function by Shawn Olsen
 function changecss(theClass,element,value) {
@@ -353,6 +354,7 @@ function changecss(theClass,element,value) {
 	var added = false;
 	for (var S = 0; S < document.styleSheets.length; S++){
 		for (var R = 0; R < document.styleSheets[S][cssRules].length; R++) {
+			//alert(document.styleSheets[S][cssRules][R].selectorText);
 			if (document.styleSheets[S][cssRules][R].selectorText == theClass) {
 				if(document.styleSheets[S][cssRules][R].style[element]){
 					document.styleSheets[S][cssRules][R].style[element] = value;
@@ -376,18 +378,36 @@ function filterFeeds( filterType )
 
 	switch(filterType) {
 		case 'all':
+			// IE7
+			changecss('UL.torrentlist LI.match_0', 'display', 'block');
+			changecss('UL.torrentlist LI.match_1', 'display', 'block');
+			changecss('UL.torrentlist LI.match_2', 'display', 'block');
+			changecss('UL.torrentlist LI.match_3', 'display', 'block');
+			// FF
 			changecss('ul.torrentlist li.torrent.match_0', 'display', 'block');
 			changecss('ul.torrentlist li.torrent.match_1', 'display', 'block');
 			changecss('ul.torrentlist li.torrent.match_2', 'display', 'block');
 			changecss('ul.torrentlist li.torrent.match_3', 'display', 'block');
 			break;
 		case 'matching':
+			// IE7
+			changecss('UL.torrentlist LI.match_0', 'display', 'none');
+			changecss('UL.torrentlist LI.match_1', 'display', 'block');
+			changecss('UL.torrentlist LI.match_2', 'display', 'block');
+			changecss('UL.torrentlist LI.match_3', 'display', 'block');
+			// FF
 			changecss('ul.torrentlist li.torrent.match_0', 'display', 'none');
 			changecss('ul.torrentlist li.torrent.match_1', 'display', 'block');
 			changecss('ul.torrentlist li.torrent.match_2', 'display', 'block');
 			changecss('ul.torrentlist li.torrent.match_3', 'display', 'block');
 			break;
 		case 'downloaded':
+			// IE7
+			changecss('UL.torrentlist LI.match_0', 'display', 'none');
+			changecss('UL.torrentlist LI.match_1', 'display', 'block');
+			changecss('UL.torrentlist LI.match_2', 'display', 'none');
+			changecss('UL.torrentlist LI.match_3', 'display', 'none');
+			// FF
 			changecss('ul.torrentlist li.torrent.match_0', 'display', 'none');
 			changecss('ul.torrentlist li.torrent.match_1', 'display', 'block');
 			changecss('ul.torrentlist li.torrent.match_2', 'display', 'none');

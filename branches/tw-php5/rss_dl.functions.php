@@ -14,7 +14,7 @@
 						return;
 					add_cache($rs['title']);
 					if($link = get_torrent_link($rs)) {
-						client_add_torrent($link, NULL, $item);
+						client_add_torrent($link, NULL, $item, $opts['URL']);
 					} else {
 						_debug("Unable to find URL for ".$rs['title']."\n");
 						$matched = -1;
