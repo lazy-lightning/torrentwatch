@@ -83,15 +83,12 @@ function parse_options() {
 function display_global_config() {
 	global $config_values, $html_out;
 
-	if(isset($_GET['mode']) && 
-	  ($_GET['mode'] == 'setglobals' || $_GET['mode'] == 'updatefeed'))
-		$html_out .= '<script type="text/javascript">toggleMenu(\"configuration\");</script>';
-	$html_out .= '<div class="configuration" id="configuration"><div class="settings">'."\n";	
+	$html_out .= '<div class="dialog_window" id="configuration">'."\n";	
 	// Settings
 	$html_out .= '<form action="tw-iface.cgi"><input type="hidden" name="mode" value="setglobals">';
-	$html_out .= 'Global Settings ';
-	$html_out .= '<input class="add" type="submit" value=""><br>'; 
-	$html_out .= 'Torrent Client:';
+	$html_out .= '<h2 class="dialog_heading">Global Settings';
+	$html_out .= '<input class="add" type="submit" value=""></h2>'; 
+	$html_out .= '<div class="config_torrentclient"><label class="item">Torrent Client:</label>';
 	$html_out .= '<SELECT name="client">';
 	$btpd = "";
 	$trans122 = "";
@@ -113,18 +110,18 @@ function display_global_config() {
 	}
 	$html_out .= '<option value="btpd" '.$btpd.'>BTPD</option>';
 	$html_out .= '<option value="transmission1.22" '.$trans122.'>Transmission 1.22</option>';
-	$html_out .= '<option value="transmission1.3x" '.$trans132.'>Transmission 1.3x</option></Select><br>';
+	$html_out .= '<option value="transmission1.3x" '.$trans132.'>Transmission 1.3x</option></Select></div>';
 
-	$html_out .= 'Download Directory:';
-	$html_out .= '<input type="text" name="downdir" value='.$config_values['Settings']['Download Dir'].'><br>';
-	$html_out .= 'Watch Directory:';
-	$html_out .= '<input type="text" name="watchdir" value='.$config_values['Settings']['Watch Dir'].'><br>';
-	$html_out .= 'Save .torrent:';
+	$html_out .= '<div class="config_downloaddir"><label class="item">Download Directory:</label>';
+	$html_out .= '<input type="text" name="downdir" value='.$config_values['Settings']['Download Dir'].'></div>';
+	$html_out .= '<div class="config_watchdir"><label class="item">Watch Directory:</label>';
+	$html_out .= '<input type="text" name="watchdir" value='.$config_values['Settings']['Watch Dir'].'></div>';
+	$html_out .= '<div class="config_savetorrent"><label class="item">Save .torrent:</label>';
 	$html_out .= '<input type="checkbox" name="savetorrents" value=1 ';
 	if($config_values['Settings']['Save Torrents'] == 1)
 		$html_out .= 'checked=1';
-	$html_out .= '><br>'."\n";
-	$html_out .= 'Deep Directories:';
+	$html_out .= '></div>'."\n";
+	$html_out .= '<div class="config_deepdir"><label class="item">Deep Directories:</label>';
 	$tmp1 = $tmp2 = $tmp3 = "";
 	switch($config_values['Settings']['Deep Directories']) {
 		case 'Full':
@@ -140,27 +137,27 @@ function display_global_config() {
 	$html_out .= '<select name="deepdir">';
 	$html_out .= '<option value="Full" '.$tmp1.'>Full Name</option>';
 	$html_out .= '<option value="Title" '.$tmp2.'>Show Title</option>';
-	$html_out .= '<option value="0" '.$tmp3.'>Off</option></select><br>';
+	$html_out .= '<option value="0" '.$tmp3.'>Off</option></select></div>';
 
-	$html_out .= 'Verify Episodes:';
+	$html_out .= '<div class="config_verifyepisodes"><label class="item">Verify Episodes:</label>';
 	$html_out .= '<input type="checkbox" name="verifyepisodes" value=1 ';
 	if($config_values['Settings']['Verify Episode'] == 1)
 		$html_out .= 'checked=1';
-	$html_out .= '<br></form></div>'."\n";
+	$html_out .= '</div></div></form>'."\n";
 
 	// Feeds
-	$html_out .= '<div class="feedconfig">'."\n";
 	foreach($config_values['Feeds'] as $key => $feed) {
 		$html_out .= '<div class="feeditem">'."\n";
 		$html_out .= '<form action="tw-iface.cgi" class="feedform"><input type="hidden" name="mode" value="updatefeed">'."\n";
 		$html_out .= '<input type="hidden" name="idx" value="'.$key.'">';
 		$html_out .= '<input class="del" type="submit" name="button" value="Delete">'."\n";
-	  $html_out .= $feed['Name'].': '.$feed['Link'].'</form></div>'."\n";
+	  $html_out .= '<label class="item">'.$feed['Name'].': '.$feed['Link'].'</label></form></div>'."\n";
 	}
 	$html_out .= '<div class="feeditem">'."\n";
 	$html_out .= '<form action="tw-iface.cgi" class="feedform"><input type="hidden" name="mode" value="updatefeed">'."\n";
-	$html_out .= '<input type="submit" class="add" name="button" value="Add">New Feed: <input type="text" name="link">'."\n";
-	$html_out .= '</form></div></div></div>'."\n";
+	$html_out .= '<input type="submit" class="add" name="button" value="Add">';
+	$html_out .= '<label class="item">New Feed:</label><input type="text" name="link">'."\n";
+	$html_out .= '</form></div></div>'."\n";
 
 }
 
