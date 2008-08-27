@@ -115,7 +115,7 @@ div.mainoptions ul li#empty a:active {
 	}
 
 div.mainoptions ul li#webui a {
-	background: url(images/webui.png) no-repeat center 16px;
+	background: url(images/webui.png) no-repeat center 0;
 }
 
 div.mainoptions ul li#inspector a {
