@@ -4,10 +4,12 @@
 			global $matched, $test_run;
 			$rs = $opts['Obj'];
 			$title = strtolower($rs['title']);
-			if(($item['Feed'] == 'All' || $item['Feed'] == $opts['URL']) &&
-			   preg_match('/'.strtolower($item['Filter']).'/', $title) &&
+			$guess = guess_match($title);
+			if(($item['Feed'] == 'all' || $item['Feed'] == $opts['URL']) &&
+			   ($item['Filter'] != '' && preg_match('/'.strtolower($item['Filter']).'/', $title)) &&
 			   ($item['Not'] == "" OR !preg_match('/'.strtolower($item['Not']).'/', $title)) &&
-				 ($item['Quality'] == 'All' OR preg_match('/'.strtolower($item['Quality']).'/', $title))) {
+				 ($item['Quality'] == 'All' OR preg_match('/'.strtolower($item['Quality']).'/', $title)) &&
+			   ($item['Episodes'] == '' OR preg_match('/^'.strtolower($item['Episodes']).'$/', $guess['episode'])) ) {
 				_debug('Match found for '.$rs['title']."\n");
 				if(check_cache($rs['title'])) {
 					if($test_run)
@@ -17,7 +19,7 @@
 						client_add_torrent($link, NULL, $item, $opts['URL']);
 					} else {
 						_debug("Unable to find URL for ".$rs['title']."\n");
-						$matched = -1;
+						$matched = "nourl";
 					}
 				}
 			}
@@ -64,11 +66,11 @@
 			$alt = 'alt';
 			// echo(print_r($rs));
 			foreach($rs['items'] as $item) {
-				$matched = 0;
+				$matched = "nomatch";
 				if(isset($config_values['Favorites']))
 					array_walk($config_values['Favorites'], 'check_for_torrent', 
 				             array('Obj' =>$item, 'URL' => $rs['URL']));
-				if($matched == 0) {
+				if($matched == "nomatch") {
 					_Debug("No match for $item[title]\n", 2);
 				}
 				if(isset($config_values['Global']['HTMLOutput'])) {
@@ -93,10 +95,10 @@
 			$alt='alt';
 			
 			foreach($atom['feed']['entry'] as $item) {
-				$matched = 0;
+				$matched = "nomatch";
 				array_walk($config_values['Favorites'], 'check_for_torrent', 
 				           array('Obj' =>$item, 'URL' => $atom['URL']));
-				if($matched == 0) {
+				if($matched == "nomatch") {
 					_debug("No match for ".$item['title']."\n");
 				}
 				if(isset($config_values['Global']['HTMLOutput'])) {

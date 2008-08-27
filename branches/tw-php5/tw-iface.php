@@ -6,7 +6,93 @@ $config_file = '/share/.torrents/rss_dl.config';
 $test_run = 0;
 
 require_once('rss_dl_utils.php');
-function parse_options() {
+
+function parse_options_local() {
+	global $html_out, $config_values;
+	$filler = "<br>";
+	$exit = TRUE;
+
+	if(isset($_GET['mode'])) {
+		switch($_GET['mode']) {
+			case 'updatefavorite':
+				update_favorite();
+				display_favorites();
+				break;
+			case 'updatefeed':
+				update_feed();
+				display_global_config();
+				break;
+			case 'showfeed':
+				echo $html_out;
+				$html_out = "";
+				$config_values['Global']['HTMLOutput']= 1;
+				if($_GET['feed'] == 'all') {
+					load_feeds($config_values['Feeds']);
+					feeds_perform_matching($config_values['Feeds']);
+				} else {
+					$feed[] = $config_values['Feeds'][$_GET['feed']];
+					load_feeds($feed);
+					feeds_perform_matching($feed);
+				}
+				unset($config_values['Global']['HTMLOutput']);
+				break;	
+			case 'emptycache':
+				$exec = "rm -f ".$config_values['Settings']['Cache Dir']."/*";
+				$exit = FALSE;
+				break;
+			case 'setglobals':
+				$config_values['Settings']['Download Dir']=urldecode($_GET['downdir']);
+				$config_values['Settings']['Watch Dir']=urldecode($_GET['watchdir']);
+				$config_values['Settings']['Deep Directories']=urldecode($_GET['deepdir']);
+				$config_values['Settings']['Verify Episode']=(isset($_GET['verifyepisodes']) ? 1 : 0);
+					$config_values['Settings']['Save Torrents']=(isset($_GET['savetorrents']) ? 1 : 0);
+				$config_values['Settings']['Client']=urldecode($_GET['client']);
+				write_config_file();
+				display_global_config();
+				break;
+			case 'matchtitle':
+				if(($tmp = guess_match(html_entity_decode($_GET['title'])))) {
+					$_GET['name'] = $tmp['key'];
+					$_GET['filter'] = $tmp['key'];
+					$_GET['quality'] = $tmp['data'];
+					$_GET['feed'] = $_GET['rss'];
+					$_GET['button'] = 'Add';
+					$_GET['savein'] = 'Default';
+					$_GET['autostart'] = 'Default';
+					update_favorite();
+				} else
+					$output = "Could not generate Match\n";
+				display_favorites();
+				break;
+			case 'dltorrent':
+				client_add_torrent(trim(urldecode($_GET['link'])), $config_values['Settings']['Download Dir']);
+				$exit = FALSE;
+				break;
+			default:
+				$output = "Bad Paramaters passed to tw-iface.php";
+		}
+	}
+
+	if(isset($exec)) {
+		exec($exec, $output);
+		$html_out .= "<div class='execoutput'>".implode($filler, $output)."</div>";
+		echo($html_out);
+		$html_out = "";
+	} else if (isset($output)) {
+		$html_out .= str_replace("\n", "<br>", "<div class='execoutput'>$output</div>");
+		echo $html_out;
+		$html_out = "";
+	}
+
+	if(isset($exit)) {
+		close_html();
+		exit(0);
+	}
+
+	return;
+}
+
+function parse_options_remote() {
 	global $html_out, $config_values;
 	$filler = "<br>";
 
@@ -79,7 +165,6 @@ function parse_options() {
 	}
 	return;
 }
-
 function display_global_config() {
 	global $config_values, $html_out;
 
@@ -206,7 +291,8 @@ function display_favorites_info($item, $key) {
 	$html_out .= '<div class="favorite_autostart"><label class="item">AutoStart:</label>';
 	$html_out .= '<input type="text" name="autostart" value="'.$item['AutoStart'].'"></div>'."\n";
 	$html_out .= '<input type="submit" class="add" name="button" value="Update">'."\n";
-	$html_out .= '<input type="submit" class="del" name="button" value="Delete"></form></div>'."\n";
+	$html_out .= '<input type="submit" class="del" name="button" value="Delete">'."\n";
+	$html_out .= '<a href="javascript:toggleLayer(\'favorites\')">Close</a></form></div>'."\n";
 	// Display the fav that was just updated
 	if(isset($_GET['idx']) && $_GET['idx'] == $key) {
 		$html_out .= "<script type='text/javascript'>";
@@ -282,7 +368,9 @@ function display_history() {
 		$html_tmp = '<li>'.$item['Date'].' - '.$item['Title'].'</li>'.$html_tmp;
 	}
 	$html_out .= $html_tmp;
-	$html_out .= '</ul></div>';
+	$html_out .= '</ul>';
+	$html_out .= '<a href="javascript:toggleMenu(\'history\')">Close</a>';
+	$html_out .= '<a href="tw-iface.cgi?mode=clearhistory">Clear</a></div>';
 }
 
 function display_filter_bar() {
@@ -304,7 +392,7 @@ function set_default_div() {
 		case 'updatefavorite':
 		case 'matchtitle':
 			$html_out .= 'toggleMenu(\'favorites\');';
-			if($_GET['button'] != 'Delete')
+			if(isset($_GET['button']) && $_GET['button'] != 'Delete')
 				$html_out .= 'toggleFav(\'favorite_'.$_GET['idx'].'\');';
 			break;
 		case 'updatefeed':
@@ -335,153 +423,8 @@ timer_init();
 <html><head>
 <title>Torrentwatch</title>
 <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
-<script type="text/javascript">
-
-function submitform ( whichForm )
-{
-	document.getElementById(whichForm).submit();
-}
-
-// Function by Shawn Olsen
-function changecss(theClass,element,value) {
-	//Last Updated on May 21, 2008
-	//documentation for this script at
-	//http://www.shawnolson.net/a/503/altering-css-class-attributes-with-javascript.html
-	var cssRules;
-	if (document.all) {
-		cssRules = 'rules';
-	}
-	else if (document.getElementById) {
-		cssRules = 'cssRules';
-	}
-	var added = false;
-	for (var S = 0; S < document.styleSheets.length; S++){
-		for (var R = 0; R < document.styleSheets[S][cssRules].length; R++) {
-			//alert(document.styleSheets[S][cssRules][R].selectorText);
-			if (document.styleSheets[S][cssRules][R].selectorText == theClass) {
-				if(document.styleSheets[S][cssRules][R].style[element]){
-					document.styleSheets[S][cssRules][R].style[element] = value;
-					added=true;
-					break;
-				}
-			}
-		}
-	}
-}
-
-function filterFeeds( filterType )
-{
-	var elem;
-	elem = document.getElementById('filter_'+filterType);
-	for ( var i in elem.parentNode.childNodes )
-	{
-		elem.parentNode.childNodes[i].className = ''
-	}
-	elem.className = 'selected';
-
-	switch(filterType) {
-		case 'all':
-			// IE7
-			changecss('UL.torrentlist LI.match_0', 'display', 'block');
-			changecss('UL.torrentlist LI.match_1', 'display', 'block');
-			changecss('UL.torrentlist LI.match_2', 'display', 'block');
-			changecss('UL.torrentlist LI.match_3', 'display', 'block');
-			// FF
-			changecss('ul.torrentlist li.torrent.match_0', 'display', 'block');
-			changecss('ul.torrentlist li.torrent.match_1', 'display', 'block');
-			changecss('ul.torrentlist li.torrent.match_2', 'display', 'block');
-			changecss('ul.torrentlist li.torrent.match_3', 'display', 'block');
-			break;
-		case 'matching':
-			// IE7
-			changecss('UL.torrentlist LI.match_0', 'display', 'none');
-			changecss('UL.torrentlist LI.match_1', 'display', 'block');
-			changecss('UL.torrentlist LI.match_2', 'display', 'block');
-			changecss('UL.torrentlist LI.match_3', 'display', 'block');
-			// FF
-			changecss('ul.torrentlist li.torrent.match_0', 'display', 'none');
-			changecss('ul.torrentlist li.torrent.match_1', 'display', 'block');
-			changecss('ul.torrentlist li.torrent.match_2', 'display', 'block');
-			changecss('ul.torrentlist li.torrent.match_3', 'display', 'block');
-			break;
-		case 'downloaded':
-			// IE7
-			changecss('UL.torrentlist LI.match_0', 'display', 'none');
-			changecss('UL.torrentlist LI.match_1', 'display', 'block');
-			changecss('UL.torrentlist LI.match_2', 'display', 'none');
-			changecss('UL.torrentlist LI.match_3', 'display', 'none');
-			// FF
-			changecss('ul.torrentlist li.torrent.match_0', 'display', 'none');
-			changecss('ul.torrentlist li.torrent.match_1', 'display', 'block');
-			changecss('ul.torrentlist li.torrent.match_2', 'display', 'none');
-			changecss('ul.torrentlist li.torrent.match_3', 'display', 'none');
-			break;
-	}
-}
-
-		
-			
-// Inspiration from http://www.netlobo.com/div_hiding.html
-
-var last_fav;
-function toggleFav( whichLayer )
-{
-	if(last_fav)
-		hideLayer(last_fav)
-	showLayer(whichLayer);
-	last_fav = whichLayer;
-}
-
-var last_menu;
-function toggleMenu( whichLayer )
-{
-	if(last_menu && last_menu != whichLayer) {
-		hideLayer(last_menu);
-	}
-	toggleLayer(whichLayer);
-	last_menu = whichLayer;
-}
-
-function toggleLayer( whichLayer )
-{
-  var elem, vis;
-  if( document.getElementById ) // this is the way the standards work
-    elem = document.getElementById( whichLayer );
-  else if( document.all ) // this is the way old msie versions work
-      elem = document.all[whichLayer];
-  else if( document.layers ) // this is the way nn4 works
-    elem = document.layers[whichLayer];
-  vis = elem.style;
-  // if the style.display value is blank we try to figure it out here
-  if(vis.display==''&&elem.offsetWidth!=undefined&&elem.offsetHeight!=undefined)
-    vis.display = (elem.offsetWidth!=0&&elem.offsetHeight!=0)?'block':'none';
-  vis.display = (vis.display==''||vis.display=='block')?'none':'block';
-	if(whichLayer=='favorites') // Also display the first fav 
-		toggleFav(elem.childNodes[1].id);
-}
-
-function hideLayer( whichLayer ) {
-  var elem, vis;
-  if( document.getElementById ) // this is the way the standards work
-    elem = document.getElementById( whichLayer );
-  else if( document.all ) // this is the way old msie versions work
-      elem = document.all[whichLayer];
-  else if( document.layers ) // this is the way nn4 works
-    elem = document.layers[whichLayer];
-  elem.style.display = 'none';
-}
-function showLayer( whichLayer ) {
-  var elem, vis;
-  if( document.getElementById ) // this is the way the standards work
-    elem = document.getElementById( whichLayer );
-  else if( document.all ) // this is the way old msie versions work
-      elem = document.all[whichLayer];
-  else if( document.layers ) // this is the way nn4 works
-    elem = document.layers[whichLayer];
-  elem.style.display = 'block';
-}
-</script>
 <meta http-equiv='expires' content='0'>
+<script type="text/javascript" src="tw-iface.js"></script>
 <?php
 echo ('<link rel="Stylesheet" type="text/css" href="tw-iface');
 if($_SERVER["REMOTE_ADDR"] == '127.0.0.1')
@@ -492,33 +435,43 @@ $html_out = "";
 
 read_config_file();
 
-if(isset($_GET['mode'])) {
-	parse_options();
+//if($_SERVER["REMOTE_ADDR"] == '127.0.0.1') {
+if(FALSE) {
+	// Basic Interface for Syabas Browser
+	// Most of the logic happens in parse_options_local() to send individual pages
+	if(isset($_GET['mode'])) {
+		parse_options_local();
+	}
+	display_options();
+} else {
+	// Clutch Style Interface for PC Browsers
+	if(isset($_GET['mode'])) {
+		parse_options_remote();
+	}
+	
+	// Main Menu
+	display_options();
+	display_filter_bar();
+	
+	
+	// Hidden DIV's
+	display_global_config();
+	display_history();
+	display_favorites();
+	set_default_div();
+	
+	echo $html_out;
+	$html_out = "";
+	
+	// Feeds
+	$config_values['Global']['HTMLOutput']= 1;
+	load_feeds($config_values['Feeds']);
+	feeds_perform_matching($config_values['Feeds']);
+	unset($config_values['Global']['HTMLOutput']);
+	
 }
 
-// Main Menu
-display_options();
-display_filter_bar();
-
-
-// Hidden DIV's
-display_global_config();
-display_history();
-display_favorites();
-set_default_div();
-
-echo $html_out;
-$html_out = "";
-
-// Feeds
-$config_values['Global']['HTMLOutput']= 1;
-load_feeds($config_values['Feeds']);
-feeds_perform_matching($config_values['Feeds']);
-unset($config_values['Global']['HTMLOutput']);
-
 close_html();
-
 exit(0);
-
 php?>
 

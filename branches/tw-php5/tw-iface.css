@@ -247,18 +247,22 @@ ul.torrentlist li.torrent {
 	padding-left: 28px;
 	}
 
-ul.torrentlist li.torrent.match_0 {
+ul.torrentlist li.torrent.match_nomatch {
 	background: transparent url('images/nuvola_ledred.png') no-repeat 3px center;
 	display: block;
 	}
 
-ul.torrentlist li.torrent.match_1,
-ul.torrentlist li.torrent.match_2 {
+ul.torrentlist li.torrent.match_match {
+	background: transparent url('images/nuvola_ledorange.png') no-repeat 3px center;
+	display: block;
+	}
+
+ul.torrentlist li.torrent.match_cachehit {
 	background: transparent url('images/nuvola_ledgreen.png') no-repeat 3px center;
 	display: block;
 	}
 
-ul.torrentlist li.torrent.match_3 {
+ul.torrentlist li.torrent.match_duplicate {
 	background: transparent url('images/nuvola_ledyellow.png') no-repeat 3px center;
 	display: block;
 	}
@@ -342,7 +346,8 @@ div.dialog_window select {
 	}
 
 
-/* Configuration Window */
+div.FavInfo a,
+div.dialog_window#history a,
 div.dialog_window#configuration a,
 div.dialog_window#feeds a {
 	display: block;
@@ -359,11 +364,12 @@ div.dialog_window#feeds a {
 	clear: left;
 	}
 
+/* Configuration Window */
 div.config_torrentclient label.item,
 div.config_downloaddir label.item,
 div.config_watchdir label.item, 
 div.config_deepdir label.item {
-	width: 100px;
+	width: 110px;
 	clear: left;
 	padding-right: 10px;
 	}
@@ -402,7 +408,7 @@ div.FavInfo {
 	border: 1px solid gray;
 	padding: 5px;
 	margin: 5px;
-	width: 400px;
+	width: 350px;
 	float: right;
 }
 
@@ -422,6 +428,22 @@ div.favorite_autostart label.item {
 div.FavInfo input[type=text] {
 	width: 261px;
 	}
+
+div.FavInfo input[type=submit] {
+	color: #323232;
+	background-color: #EEE;
+	border: 1px solid #787878;
+	width: 62px;
+	height: 24px;
+	clear: left;
+	float: right;
+	margin: 5px 10px 0 0;
+	padding: 5px;
+	font: 95% "lucida grande", Tahoma, Verdana, Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	cursor: pointer;
+	}
+
 /* History Dialog */
 div.dialog_window#history {
 	}
@@ -439,6 +461,7 @@ div.dialog_window#history {
 	text-align: center
 }
 
+/*
 .add {
 	background: url(images/add.png) no-repeat; 
 	border: none;
@@ -456,13 +479,19 @@ div.dialog_window#history {
 	text-indent: -9999em;
 	bottom: 0;
 }
+*/
 
 .clear { clear: both; }
 
-div.history,
+div.dialog_window#history,
 div.dialog_window#favorites {
-	width: 625px;
+	width: 575px;
 }
+
+div#history ul li{
+	white-space: nowrap;
+	overflow: hidden;
+	}
 
 div.Favorite {
 	float: left;
@@ -471,16 +500,10 @@ div.Favorite {
 	padding: 5px;
 	margin: 5px;
 	width: 180px;
+	font-size: 120%;
 }
 
 
-div.FavInfo input.add,
-div.FavInfo input.del {
-	width: 16px;
-	left: 400px;
-	margin: 5px;
-	bottom: 0px;
-}
 
 div.feedlist {
 	background-color: white;

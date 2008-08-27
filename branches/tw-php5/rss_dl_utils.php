@@ -183,7 +183,6 @@
 		 */
 		function check_cache_episode($title) {
 			global $config_values, $matched;
-			$matched = 2;
 			// Dont skip a proper/repack
 			if(preg_match('/proper|repack/i', $title))
 				return 1;
@@ -201,7 +200,7 @@
 					$cacheguess = guess_match(substr($file, 7));
 					if($cacheguess != false && $guess['episode'] == $cacheguess['episode']) {
 						_debug("Full Episode Match, ignoring\n",2);
-						$matched = 3;
+						$matched = "duplicate";
 						return 0;
 					}
 				}
@@ -222,19 +221,19 @@
 			if (isset($config_values['Settings']['Cache Dir'])) {
 				$cache_file = $config_values['Settings']['Cache Dir'].'/rss_dl_'.filename_encode($title);
 				if (!file_exists($cache_file)) {
+					$matched = "match";
 					if($config_values['Settings']['Verify Episode']) {
 						return check_cache_episode($title);
 					} else {
-						$matched = 2;
 						return 1;
 					}
 				} else {
-					$matched = 1;
+					$matched = "cachehit";
 					return 0;
 				}
 			} else {
 				// No Cache, Always download
-				$matched = 2;
+				$matched = "match";
 				return 1;
 			}
 		}
@@ -299,13 +298,15 @@
 				}
 			} else
 				return False;
-			if($normalize) {
+			if($normalize == TRUE) {
 				// Convert . and _ to spaces, and trim result
 				$from = "._";
 				$to = "  ";
 				$key_guess = trim(strtr($key_guess, $from, $to));
 				$data_guess = trim(strtr($data_guess, $from, $to));
 				$episode_guess = trim(strtr($episode_guess, $from, $to));
+				// Standardize episode output to SSxEE, strip leading 0
+				$episode_guess = ltrim(preg_replace('/(S(\d+)E(\d+)|(\d+)x(\d+)|(\d)of(\d))/', '\2\4\6x\3\5\7', $episode_guess), '0');
 			}
 			return array("key" => $key_guess, "data" => $data_guess, "episode" => $episode_guess);
 		}
@@ -614,6 +615,7 @@
 			return;
 		switch($_GET['button']) {
 			case 'Add':
+			case 'Update':
 				add_feed();
 				break;
 			case 'Delete':
