@@ -9,6 +9,13 @@
 		$config_file = '/share/.torrents/rss_dl.config';
 		$time = 0;
 
+    // Checks array is a key is set, return value or default
+    function _isset($array, $key, $default = 'Not Specified') {
+      return isset($array[$key]) ? $array[$key] : $default;
+    }
+
+
+
 		// used to ower case all the keys in an array.
 		// From http://us.php.net/manual/en/function.array-change-key-case.php
 		define('ARRAY_KEY_FC_LOWERCASE', 25); //FOO => fOO
@@ -268,7 +275,7 @@
 			/* regexp explanation
 			* 3 main parts
 			* a) /^([^-\(]+)(?:.+)?\b                        * a Matches Name and has an optional match to filter episode title when split with a -
-			* (?:S\d+E\d+|\d+x\d+|\dof\d|[\d -.]{10})   * (b|c|d|e)Matches Episode Number 
+			* (S\d+E\d+|\d+x\d+|\dof\d|[\d -.]{10})   * (b|c|d|e)Matches Episode Number 
 				b) S\d+E\d+        * S12E1
 				c) \d+x\d+         * 1x23
 				d) \dof\d          * 3of5
@@ -285,15 +292,17 @@
 			* ? makes the last grouping optional for a title only match
 			* So the full expression is simply a(b|c|d|e)(f|g|h|i)?
 			*/
-			$reg1='/^([^-\(]+)(?:.+)?\b(S\d+E\d+|\d+x\d+|\dof\d|[\d -.]{10})(?:.* (DVB)|.*[\.\(](\w+-\w+)(?:[ \)]\[*\w+\])?|[ \)]+(?:[ \[]+([^\[\]]*)[\]])+|.*\[([\w.]+)\])?/';
+			$reg1='/^([^-\(]+)(?:.+)?\b(S\d+E\d+|\d+x\d+|\dof\d|[\d -.]{10})(?:.* (DVB)|.*[\.\(](\w+-\w+)(?:[ \)]\[*\w+\])?|[ \)]+(?:[ \[]+([^\[\]]*)[\]])+|.*\[([\w.]+)\])?.*/';
 			if(preg_match($reg1, $title, $regs)) {
 				$episode_guess = trim($regs[2]);
 				$key_guess = str_replace("'", "&#39;", trim($regs[1]));
 				$data_guess = '.*';
-				for($i = 3;$i < 7;$i++) {
-					if(strcmp($regs[$i], '') != 0) {
-						$data_guess = str_replace("'", "&#39;", trim($regs[$i]));
-						break;
+				if(isset($regs[3])) { // The last grouping is optional
+					for($i = 3;$i < 7;$i++) {
+						if($regs[$i] != '') {	
+							$data_guess = str_replace("'", "&#39;", trim($regs[$i]));
+							break;
+						}
 					}
 				}
 			} else
@@ -306,6 +315,7 @@
 				$data_guess = trim(strtr($data_guess, $from, $to));
 				$episode_guess = trim(strtr($episode_guess, $from, $to));
 				// Standardize episode output to SSxEE, strip leading 0
+				// This is (b|c|d) from earlier.  If it is style e there will be no replacement, only strip leading 0
 				$episode_guess = ltrim(preg_replace('/(S(\d+)E(\d+)|(\d+)x(\d+)|(\d)of(\d))/', '\2\4\6x\3\5\7', $episode_guess), '0');
 			}
 			return array("key" => $key_guess, "data" => $data_guess, "episode" => $episode_guess);
@@ -326,16 +336,16 @@
 			global $html_out, $matched, $test_run;
 
 			$feed = urlencode($feed);
-			$html_out .= "<li class='torrent match_$matched $alt' title='".$item['description']."'>";
+			$html_out .= "<li class='torrent match_$matched $alt' title='"._isset($item, 'description')."'>";
 			$html_out .= "<a class='context_link' href='tw-iface.cgi?mode=matchtitle&rss=$feed&title=".rawurlencode($item['title'])."'></a>";
 			$html_out .= "<a class='context_link' href='tw-iface.cgi?mode=dltorrent&link=".rawurlencode(get_torrent_link($item))."'></a>";
 			$html_out .= "<div class='torrent_name'>".$item['title']."</div>";
-			$html_out .= "<div class='torrent_pubDate'>";
-			if(isset($item['pubDate']))
+			$html_out .= "<div class='torrent_pubDate'>"._isset($item, 'pubDate').'</div>';
+/*			if(isset($item['pubDate']))
 				$html_out .=  $item['pubDate'];
 			else
 				$html_out .= "Not Specified";
-			$html_out .= "</div>";
+			$html_out .= "</div>"; */
 			$html_out .= "</li>\n";
 		}
 
