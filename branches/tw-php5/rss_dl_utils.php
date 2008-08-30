@@ -194,7 +194,7 @@
 			// Dont skip a proper/repack
 			if(preg_match('/proper|repack/i', $title))
 				return 1;
-			$guess = guess_match($title);
+			$guess = guess_match($title, TRUE);
 			if($guess == False) {
 				_debug("Unable to guess for $title\n");
 				return 1;
@@ -205,7 +205,7 @@
 						continue;
 					if(!(substr($file, 7, strlen($guess['key'])) == $guess['key']))
 						continue;
-					$cacheguess = guess_match(substr($file, 7));
+					$cacheguess = guess_match(substr($file, 7), TRUE);
 					if($cacheguess != false && $guess['episode'] == $cacheguess['episode']) {
 						_debug("Full Episode Match, ignoring\n",2);
 						$matched = "duplicate";
