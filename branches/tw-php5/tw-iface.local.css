@@ -1,270 +1,36 @@
-/*
-	Name: PCH Torrent RSS Config
-	Description: Stylistic update of the TorrentWatch (http://code.google.com/p/torrentwatch/) config interface.
-	Version: 1.0
-	Author: Keith Solomon
-	Author URI: http://reciprocity.be/
-	
-	License: GNU General Public License v2
-*/
 
-body {
-	background-color: #ddd;
-	color: #000;
-	font-family: Helvetica, Verdana, Arial, sans-serif;
-	font-size: 12pt;
-	margin: 10px;
+#configuration {
+	position: absolute;
+	top: 150;
+	left: 150;
+	width: 500;
+	height: 500;
+	visibility: hidden;
 }
 
-.alt { background: #afdbff; }
-
-.feedlink {
-	border-bottom: 1px solid #000;
-	text-align: center
+#favorites {
+	position: absolute;
+	top: 150;
+	left: 150;
+	width: 500;
+	height: 500;
+	visibility: hidden;
 }
 
-.add {
-	background: url(images/add.png) no-repeat; 
-	border: none;
-	height: 16px; 
-	width: 16px;
-	text-indent: -9999em;
-	bottom: 0;
+#history {
+	position: absolute;
+	top: 150;
+	left: 150;
+	width: 500;
+	height: 500;
+	visibility: hidden;
 }
 
-.del {
-	background: url(images/del.png) no-repeat;
-	border: none;
-	height: 16px;
-	width: 16px;
-	text-indent: -9999em;
-	bottom: 0;
-}
-
-.clear { clear: both; }
-
-a, a:visited {
-	color: #0072cf;
-	text-decoration: none;
-}
-
-a img {
-	text-decoration: none;
-	border: none;
-}
-
-div.container {
-	background-color: #ddd;
-	border: 1px solid gray;
-	line-height: 150%;
-	margin: 0px auto;
-	padding: 10px;
-	width: 940px;
-}
-
-div.mainoptions,div.Feeds {
-	background: white;
-	border: 1px solid gray;
-	float: left;
-	font-size: 10pt;
-	padding: 12px;
-	width: 126px;
-	clear: left;
-}
-
-div.Favorite {
-	float: left;
-	clear: left;
-	border: 1px solid gray;
-	padding: 5px;
-	margin: 5px;
-	width: 180px;
-}
-
-div.FavInfo {
-	display: none;
-	border: 1px solid gray;
-	padding: 15px;
-	margin: 5px;
-	width: 500px;
-	float: right;
-}
-
-div.FavInfo input, 
-div.FavInfo select {
-	position: relative;
-	bottom: 22px;
-	float: right;
-	width: 85%;
-}
-
-div.FavInfo input.add,
-div.FavInfo input.del {
-	width: 16px;
-	left: 400px;
-	margin: 5px;
-	bottom: 0px;
-	float: none;
-}
-
-div.feedlist {
-	background-color: white;
-	border: 1px solid gray;
-	font-size: 8pt;
-	height: 30px;
-	line-height: 30px;
-	margin: 6px auto;
-	width: 745px;
-}
-
-div.feedlist img {
-	border: 1px solid white;
-}
-
-div.feedlist a {
-	color: black;
-	text-decoration: none;
-}
-
-div.execoutput,
-div.configuration,
-div.Favorites {
-	background: white;
-	border: 1px solid gray;
-	float: left;
-	font-size: 10pt;
-	margin-left: 15px;
-	padding: 12px;
-	width: 745px;
-}
-
-div.feeditem {
-	margin: 1px;
-}
-
-div.feedcurrent {
-	border: 1px solid white;
-	margin: 4px;
-	text-decoration: underline;
-}
-
-div.rss_debug {
-	display: none;
-}
-
-div.timer {
-	font-size: 8pt;
-	text-align: right;
-	margin-right: 5px;
-}
-
-div.torrentlist {
-	display: inline;
-	width: 100%;
-}
-
-div.torrentlist table {
-	background-color: white;
-	border: 1px solid black;
-	border-spacing: 0px;
-	margin: 0px;
-}
-
-div.torrentlist img {
-	margin: 0px 3px -3px 0px;
-	width: 12px;
-}
-
-div.torrentlist tr:hover { background: lightgray; }
-div.torrentlist th:hover,
-div.torrentlist tr.header:hover { background: white; }
-
-div.btcli {
-	background: white;
-	border: 1px solid black;
-	margin: 0px;
-}
-
-tr.item {
-	font-size: 8pt;
-	height: 26px;
-}
-
-tr.item td {
-}
-
-tr.item a {
-	color: black;
-	text-decoration: none;
-}
-
-tr.rss {
-	font-size: 12pt;
-	text-align: center;
-}
-
-/* Menu Styles */
-.mainoptions ul,
-.Feeds ul,
-.Favorite ul {
-	list-style: none;
-	margin: 0;
-	padding: 0;
-}
-
-.mainoptions li {
-	height: 20px;
-	line-height: 20px;
-	margin-bottom: 5px;
-	padding-left: 24px;
-}
-
-
-.mainoptions li#favoritesMenu {
-	background: url(images/favorites.png) no-repeat left center;
-}
-.mainoptions li#config {
-	background: url(images/config.png) no-repeat left center;
-}
-.mainoptions li#test {
-	background: url(images/test.png) no-repeat left center;
-}
-
-.mainoptions li#view {
-	background: url(images/view.png) no-repeat left center;
-}
-
-.mainoptions li#empty {
-	background: url(images/empty.png) no-repeat left center;
-}
-
-.mainoptions li#dl {
-	background: url(images/dl.png) no-repeat left center;
-}
-
-.mainoptions li#webui {
-	background: url(images/webui.png) no-repeat left center;
-	height: 20px;
-	line-height: 20px;
-	margin-bottom: 0;
-}
-
-.mainoptions li#feed {
-	background: url(images/rss.png) no-repeat left center;
-	height: 20px;
-	line-height: 20px;
-	margin-bottom: 5px;
-	padding-left: 24px;
-}
-
-.favorite li {
-	background: url(images/favorites.png) no-repeat left center;
-	height: 20px;
-	line-height: 20px;
-	margin-bottom: 5px;
-	padding-left: 24px;
-}
-
-.feedform {
-	margin: 1px;
+#feeds {
+	position: absolute;
+	top: 150;
+	left: 150;
+	width: 500;
+	height: 500;
+	visibility: hidden;
 }

@@ -326,39 +326,16 @@
 			global $html_out, $matched, $test_run;
 
 			$feed = urlencode($feed);
-			$html_out .= "<li class='torrent $alt match_$matched'><div class='torrent_name'>";
-			$html_out .= "<a href='tw-iface.cgi?mode=matchtitle&rss=$feed&title=".rawurlencode($item['title'])."'>";
-			$html_out .= $item['title']."</a></div>\n";
+			$html_out .= "<li class='torrent match_$matched $alt' title='".$item['description']."'>";
+			$html_out .= "<a class='context_link' href='tw-iface.cgi?mode=matchtitle&rss=$feed&title=".rawurlencode($item['title'])."'></a>";
+			$html_out .= "<a class='context_link' href='tw-iface.cgi?mode=dltorrent&link=".rawurlencode(get_torrent_link($item))."'></a>";
+			$html_out .= "<div class='torrent_name'>".$item['title']."</div>";
 			$html_out .= "<div class='torrent_pubDate'>";
 			if(isset($item['pubDate']))
 				$html_out .=  $item['pubDate'];
 			else
 				$html_out .= "Not Specified";
-			$html_out .= "</div>\n";
-/*
-			$html_out .= '<div class="torrent_status"><a href="tw-iface.cgi?mode=dltorrent&link=';
-			$html_out .= urlencode(get_torrent_link($item)).'">';
-			switch($matched) {
-				case 1:
-					$html_out .= "<b>Cache Hit</b>";
-					break;
-				case 2:
-					if($test_run)
-						$html_out .= "<b>Test Match</b>";
-					else
-						$html_out .= "<b>Downloaded</b>";
-					break;
-				case 3:
-					$html_out .= "<b>Duplicate</b>";
-					break;
-				case -1:
-					$html_out .= "<b>No Torrent</b>";
-					break;
-				default:
-					$html_out .= "No Match";
-					break;
-			}	
-			$html_out .= "</a></div>"; */
+			$html_out .= "</div>";
 			$html_out .= "</li>\n";
 		}
 
@@ -486,7 +463,8 @@
 		$tmpname = tempnam("","torrentwatch");
 		file_put_contents($tmpname, $tor);
 		exec("$trans_exec $trans_add \"$tmpname\"", $output, $return);
-		unlink($tmpname);
+		// Sometimes everything gets done, but no torrent gets added.  Perhaps its being unlinked too early?
+		// unlink($tmpname);
 		return $return;
 	}
 
@@ -684,6 +662,16 @@
 		global $config_values;
 		if(isset($_GET['idx']) AND isset($config_values['Feeds'][$_GET['idx']])) {
 			unset($config_values['Feeds'][$_GET['idx']]);
+		}
+	}
+
+	// Return a formatted html link that will call javascript in a normal
+	// browser, and in the funky NMT browser
+	function _jscript($func, $contents) {
+		if($_SERVER["REMOTE_ADDR"] == '127.0.0.1') {
+			return('<a href=# onclick="'.$func.';return false;">'.$contents.'</a>');
+		} else {
+			return('<a href="javascript:'.$func.'">'.$contents.'</a>');
 		}
 	}
 ?>

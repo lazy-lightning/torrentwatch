@@ -187,17 +187,30 @@ install_harddisk()
 	chmod a+x $DEST/torrentwatch.php
 	chmod a+x $DEST/tw-iface.php
 
+	# Remenants of an older version of torrentwatch
+	if [ -h /share/tw-iface.cgi ]; then
+		rm -f /share/tw-iface.cgi /share/tw-iface.local.css /share/tw-iface.css
+	fi
+
 	# Link our hidden directory to a non-hidden directory.  This is so the NMT media
   # browser doesn't show an extra folder
-	if [ -h /share/torrentwatch ]; then
-		rm /share/torrentwatch
+	if [ ! -h /share/torrentwatch ]; then
+		rm -f /share/torrentwatch
 		ln -s $DEST /share/torrentwatch
+	fi
+
+	# NMT wants scripts to be called .cgi
+	if [ ! -h $DEST/tw-iface.cgi ]; then
+		rm -f $DEST/tw-iface.cgi
+		ln -s $DEST/tw-iface.php $DEST/tw-iface.cgi
 	fi
 
 	# Anti-clobber routine for the config script
 	if [ ! -f $DEST/rss_dl.config ];then
 		cp $DEST/rss_dl.config.orig $DEST/rss_dl.config
 	fi
+
+	chown -R nmt.nmt $DEST
 
 	# Check auto starter
 	autostart_setup
@@ -210,7 +223,7 @@ install_harddisk()
 	echo "Installed cron hook from configuration script" >> /var/rss_dl.log
 	${DEST}/${START_SCRIPT} ${SCRIPT_OPTS}
 
-	echo "Success..<br>"
+	echo "Stuccess..<br>"
 
 	echo 'Please procede to the';
 	echo '<a href="http://localhost.drives:8883/HARD_DISK/torrentwatch/tw-iface.cgi">Configuration Interface</a>.<br>'

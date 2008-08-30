@@ -15,15 +15,6 @@ Client = transmission1.22
 [Feeds]
 0[] = Name => tvRSS.net - EZtv
 0[] = Type => RSS
-0[] = Link => http://tvrss.net/feed/legacy/eztv/
+0[] = Link => http://tvrss.net/feed/eztv/
 
-[Favorites]
-0[] = Name => BBC The Story of India
-0[] = Filter => BBC The Story of India
-0[] = Not =>
-0[] = AutoStart => Default
-0[] = Save In => Default
-0[] = Episodes => 
-0[] = Feed => http://tvrss.net/feed/legacy/eztv/
-0[] = Quality => XviD
 

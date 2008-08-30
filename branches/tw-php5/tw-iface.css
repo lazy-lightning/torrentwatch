@@ -150,11 +150,11 @@ div#filterbar {
 	}
 
 div#filterbar ul {
+	width: 100%;
 	height: 17px;
 	margin: 0;
 	padding: 0;
 	text-align: left;
-	display: inline;
 	}
 
 div#filterbar ul li {
@@ -172,11 +172,10 @@ div#filterbar ul li a {
 	color: #4E4E4F;
 	text-decoration: none;
 	font-weight: bold;
-	padding: 0 7px 0 7px;
+	padding: 0 7px 0 7px; 
 	margin: 0;
-	height: 17px;
-	display: block;
 	}
+
 
 div#filterbar ul li:hover {
 	background: transparent url('images/filter_hover_left.png') no-repeat top left;
@@ -196,6 +195,7 @@ div#filterbar ul li.selected a {
 	color: #fff !important;
 	}
 
+
 /*--------------------------
  *
  * T O R R E N T   L I S T
@@ -204,12 +204,18 @@ div#filterbar ul li.selected a {
 div#torrentlist_container {
 	position: fixed;
 	top: 101px;
-	bottom: 10px;
 	right: 0px;
 	left: 0px;
 	padding: 0px;
 	margin: 0px;
 	overflow: auto;
+	bottom: 0px
+}
+
+div.feed {
+	width: 100%;
+	margin: 0;
+	padding: 0;
 }
 
 ul.torrentlist {
@@ -285,6 +291,10 @@ div.torrent_status {
 	float: right;
 }	
 
+a.context_link {
+	display: none;
+}
+
 /*--------------------------
  *
  * D I A L O G S
@@ -296,8 +306,7 @@ div.dialog_window {
 	position: absolute;
 	margin-left: auto;
 	margin-right: auto;
-	left: 0;
-	right: 0;
+	left: 50%;
 	z-index: 3;
 	background-color: #DBDBDB;
 	margin: -3px auto 0 auto;
@@ -308,6 +317,7 @@ div.dialog_window {
 	text-align: left;
 	top: 30px;
 	width: 410px;
+	margin-left: -205px;
 	padding: 5px;
 	}
 
@@ -364,7 +374,7 @@ div.dialog_window#feeds a {
 	clear: left;
 	}
 
-/* Configuration Window */
+/* Configuration Dialog */
 div.config_torrentclient label.item,
 div.config_downloaddir label.item,
 div.config_watchdir label.item, 
@@ -388,8 +398,6 @@ div.dialog_window#configuration input[type=checkbox] {
 	clear: left;
 	}
 
-
-
 div.feeditem label.item {
 	white-space: nowrap;
 	min-width: 95px;
@@ -403,6 +411,32 @@ div.feeditem label.item {
 div.dialog_window#favorites {
 	}
 
+div.Favorite,
+div.FavInfo {
+	height: 235px;
+	}
+
+
+div.Favorite {
+	float: left;
+	clear: left;
+	border: 1px solid gray;
+	padding: 5px;
+	margin: 5px;
+	width: 180px;
+	font-size: 120%;
+	overflow: auto;
+	}
+
+div.Favorite ul li a {
+	text-decoration: none;
+	color: #000000;
+	}
+
+div.Favorite ul li:hover {
+	background-color: #3879D7;
+	}
+
 div.FavInfo {
 	display: none;
 	border: 1px solid gray;
@@ -410,7 +444,7 @@ div.FavInfo {
 	margin: 5px;
 	width: 350px;
 	float: right;
-}
+	}
 
 div.favorite_name label.item,
 div.favorite_filter label.item,
@@ -423,7 +457,7 @@ div.favorite_autostart label.item {
 	clear: left;
 	width: 50px;
 	padding-right: 10px;
-}
+	}
 
 div.FavInfo input[type=text] {
 	width: 261px;
@@ -446,6 +480,46 @@ div.FavInfo input[type=submit] {
 
 /* History Dialog */
 div.dialog_window#history {
+	}
+
+/*--------------------------
+ *
+ * C O N T E X T   M E N U
+ *
+ * ------------------------*/
+
+div.context_menu {
+	display: none;
+	position: absolute;
+	margin: 0px;
+	padding: 0px;
+	border: 1px solid rgb(119, 119, 119);
+	background-color: white;
+	z-index: 500;
+	text-align: left;
+	width: 190px;
+	}
+
+div.context_menu ul {
+	border: medium none;
+	margin: 0px;
+	padding: 5px 0pt;
+	list-style-type: none;
+	list-style-image: none;
+	list-style-position: outside;
+	font-size: 14px;
+}
+
+div.context_menu ul li a {
+	display: block;
+	padding: 0px 10px 2px 20px;
+	color: #000000;
+	text-decoration: none;
+	}
+
+div.context_menu ul li a:hover {
+	background-color: #3879D7;
+	color: #FFFFFF;
 	}
 
 /*-----------------
@@ -486,6 +560,7 @@ div.dialog_window#history {
 div.dialog_window#history,
 div.dialog_window#favorites {
 	width: 575px;
+	margin-left: -288;
 }
 
 div#history ul li{
@@ -493,15 +568,6 @@ div#history ul li{
 	overflow: hidden;
 	}
 
-div.Favorite {
-	float: left;
-	clear: left;
-	border: 1px solid gray;
-	padding: 5px;
-	margin: 5px;
-	width: 180px;
-	font-size: 120%;
-}
 
 
 

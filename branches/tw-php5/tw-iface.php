@@ -235,9 +235,9 @@ function display_global_config() {
 		$html_out .= 'checked=1';
 	$html_out .= '><label class="item">Verify Episodes</label>';
 	$html_out .= '</div>';
-	$html_out .= '<a href="javascript:submitform(\'config_form\')">Save</a>';
-	$html_out .= '<a href="javascript:toggleMenu(\'configuration\')">Close</a>';
-	$html_out .= '<a href="javascript:toggleMenu(\'feeds\')">Feeds</a>';
+	$html_out .= _jscript("submitform('config_form')", 'Save');
+	$html_out .= _jscript("toggleMenu('configuration')", 'Close');
+	$html_out .= _jscript("toggleMenu('feeds')", 'Feeds');
 	$html_out .= '</form></div>'."\n";
 
 	// Feeds
@@ -254,8 +254,8 @@ function display_global_config() {
 	$html_out .= '<form action="tw-iface.cgi" class="feedform"><input type="hidden" name="mode" value="updatefeed">'."\n";
 	$html_out .= '<input type="submit" class="add" name="button" value="Add">';
 	$html_out .= '<label class="item">New Feed:</label><input type="text" name="link">'."\n";
-	$html_out .= '<a href="javascript:toggleMenu(\'feeds\')">Close</a>';
-	$html_out .= '<a href="javascript:toggleMenu(\'configuration\')">Back</a>';
+	$html_out .= _jscript("toggleMenu('feeds')", "Close");
+	$html_out .= _jscript("toggleMenu('configuration')", "Back");
 	$html_out .= '</form></div></div>'."\n";
 
 }
@@ -292,11 +292,11 @@ function display_favorites_info($item, $key) {
 	$html_out .= '<input type="text" name="autostart" value="'.$item['AutoStart'].'"></div>'."\n";
 	$html_out .= '<input type="submit" class="add" name="button" value="Update">'."\n";
 	$html_out .= '<input type="submit" class="del" name="button" value="Delete">'."\n";
-	$html_out .= '<a href="javascript:toggleLayer(\'favorites\')">Close</a></form></div>'."\n";
+	$html_out .= _jscript("toggleMenu('favorites')", "Close").'</form></div>'."\n";
 	// Display the fav that was just updated
 	if(isset($_GET['idx']) && $_GET['idx'] == $key) {
 		$html_out .= "<script type='text/javascript'>";
-		$html_out .= 'toggleFav("favorite_'.$_GET['idx'].'");</script>';
+		$html_out .= 'toggleFav("favorite_'.$_GET['idx'].'");</script>'."\n";
 	}
 }
 
@@ -305,9 +305,9 @@ function display_favorites() {
 	$html_out .= '<div class="dialog_window" id="favorites">';
 	$html_out .= '<div class="Favorite"><ul>';
 	foreach($config_values['Favorites'] as $key => $item) {
-		$html_out .= '<li><a href="javascript:toggleFav('."'".'favorite_'.$key."'".')">'.$item['Name'].'</a></li>'."\n";
+		$html_out .= '<li>'._jscript("toggleFav('favorite_".$key."')", $item['Name']).'</li>'."\n";
 	}
-	$html_out .= '<li><a href="javascript:toggleFav(\'favorite_new\')">New Favorite</a></li>'."\n";
+	$html_out .= '<li>'._jscript("toggleFav('favorite_new')", "New Favorite").'</li>'."\n";
 	$html_out .= '</ul></div>';
 	array_walk($config_values['Favorites'], 'display_favorites_info');
 	$item = array('Name' => '', 
@@ -327,13 +327,13 @@ function display_options() {
 	global $html_out, $config_values;
 	$html_out .= '<div class="mainoptions" id="mainoptions">'."\n";
 	$html_out .= '<ul>'."\n";
-	$html_out .= '<li id="favoritesMenu"><a href="javascript:toggleMenu(\'favorites\');">Favorites</a></li>';
-	$html_out .= '<li id="config"><a href="javascript:toggleMenu(\'configuration\');">Configure</a></li>';
-	$html_out .= '<li class="divider">&nbsp</li>';
-	$html_out .= '<li id="view"><a href="javascript:toggleMenu(\'history\');">View History</a></li>';
-	$html_out .= '<li id="divider">&nbsp</li>';
+	$html_out .= '<li id="favoritesMenu">'._jscript("toggleMenu('favorites')", "Favorites").'</li>';
+	$html_out .= '<li id="config">'._jscript("toggleMenu('configuration')", "Configure").'</li>';
+	$html_out .= '<li class="divider">&nbsp;</li>';
+	$html_out .= '<li id="view">'._jscript("toggleMenu('history')", "View History").'</li>';
+	$html_out .= '<li id="divider">&nbsp;</li>';
 	$html_out .= '<li id="empty"><a href="tw-iface.cgi?mode=emptycache">Empty Cache</a></li>';
-	$html_out .= '<li id="inspector"><a href="javascript:toggleMenu(\'inspector\');">Inspector</a></li>';
+	$html_out .= '<li id="inspector">'._jscript("toggleMenu('inspector')", "Inspector").'</li>';
 	switch($config_values['Settings']['Client']) {
 		case 'btpd':
 			$html_out .= '<li id="webui"><a href="http://';
@@ -362,26 +362,32 @@ function display_history() {
 	$html_out .= '<div class="dialog_window" id="history"><ul>'."\n";
 	$html_tmp = '';
 	foreach($history as $item) {
-		// add <wbr> tags at dots to help wordwrap
-		$item['Title'] = str_replace(".", ".<wbr>", $item['Title']);
 		// History is written to file in reverse order
 		$html_tmp = '<li>'.$item['Date'].' - '.$item['Title'].'</li>'.$html_tmp;
 	}
 	$html_out .= $html_tmp;
 	$html_out .= '</ul>';
-	$html_out .= '<a href="javascript:toggleMenu(\'history\')">Close</a>';
-	$html_out .= '<a href="tw-iface.cgi?mode=clearhistory">Clear</a></div>';
+	$html_out .= _jscript("toggleMenu('history')", "Close");
+	$html_out .= '<a href="tw-iface.cgi?mode=clearhistory">Clear</a></div>'."\n";
 }
 
 function display_filter_bar() {
 	global $html_out;
 	$html_out .= '<div id="filterbar"><ul>';
-	$html_out .= '<li id="filter_all"><a href="javascript:filterFeeds(\'all\');">All</a></li>';
-	$html_out .= '<li id="filter_matching"><a href="javascript:filterFeeds(\'matching\');">Matching</a></li>';
-	$html_out .= '<li id="filter_downloaded"><a href="javascript:filterFeeds(\'downloaded\');">Downloaded</a></li>';
+	$html_out .= '<li id="filter_all">'._jscript("filterFeeds('all')", "All").'</li>';
+	$html_out .= '<li id="filter_matching">'._jscript("filterFeeds('matching')", "Matching").'</li>';
+	$html_out .= '<li id="filter_downloaded">'._jscript("filterFeeds('downloaded')", "Downloaded").'</li>';
 	$html_out .= '</ul></div>'."\n";
 }
 
+function display_context_menu() {
+	global $html_out;
+	$html_out .= '<div class="context_menu" id="CM1"><ul>';
+	$html_out .= '<li>'._jscript('contextAddToFav()', 'Add to Favorites').'</li>';
+	$html_out .= '<li>'._jscript('contextDLNow()', 'Start Downloading').'</li>';
+	$html_out .= '</ul></div>'."\n";
+}
+	
 function set_default_div() {
 	global $html_out;
 	
@@ -400,7 +406,7 @@ function set_default_div() {
 			$html_out .= 'toggleMenu(\'configuration\');';
 			break;
 	}
-	$html_out .= '</script>';
+	$html_out .= '</script>'."\n";
 }
 
 function close_html() {
@@ -420,16 +426,25 @@ function close_html() {
 //
 timer_init();
 ?>
-<html><head>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
 <title>Torrentwatch</title>
 <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
 <meta http-equiv='expires' content='0'>
-<script type="text/javascript" src="tw-iface.js"></script>
 <?php
-echo ('<link rel="Stylesheet" type="text/css" href="tw-iface');
-if($_SERVER["REMOTE_ADDR"] == '127.0.0.1')
-	echo ('.local');
-echo ('.css?'.time().'"></link>'."\n");
+if($_SERVER["REMOTE_ADDR"] == '127.0.0.1') {
+	echo ('<link rel="Stylesheet" type="text/css" href="tw-iface.local.css?'.time().'"></link>');
+	echo ('<script type="text/javascript" src="tw-iface.local.js"></script>');
+} else {
+	echo ('<link rel="Stylesheet" type="text/css" href="tw-iface.css?'.time().'"></link>');
+	echo ('<script type="text/javascript" src="tw-iface.js?'.time().'"></script>');
+	echo ('<script type="text/javascript" src="webtoolkit.contextmenu.js?'.time().'"></script>');
+	echo ('<script type="text/javascript">');
+	echo ('SimpleContextMenu.setup({"preventDefault":false, "preventForms":false});');
+	echo ('SimpleContextMenu.attach("torrent", "CM1");</script>');
+}
+	
 echo ('</head>'."\n".'<body>'."\n");
 $html_out = "";
 
@@ -455,6 +470,7 @@ if(FALSE) {
 	
 	
 	// Hidden DIV's
+	display_context_menu();
 	display_global_config();
 	display_history();
 	display_favorites();
