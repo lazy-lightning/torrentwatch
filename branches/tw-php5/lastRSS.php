@@ -216,7 +216,7 @@ class lastRSS {
 
 					}
 					// Strip HTML tags and other bullshit from DESCRIPTION
-					if ($this->stripHTML && $result['items'][$i]['description'])
+					if ($this->stripHTML && isset($result['items'][$i]['description']))
 						$result['items'][$i]['description'] = strip_tags($this->unhtmlentities(strip_tags($result['items'][$i]['description'])));
 					// Strip HTML tags and other bullshit from TITLE
 					if ($this->stripHTML && $result['items'][$i]['title'])

@@ -473,9 +473,9 @@
 	
 	function add_feed() {
 		global $config_values;
-		
-		if(isset($_GET['link']) AND ($tmp = guess_feedtype(urldecode($_GET['link']))) != 'Unknown') {
-			$link = urldecode($_GET['link']);
+	
+		if(isset($_GET['link']) AND ($tmp = guess_feedtype($_GET['link'])) != 'Unknown') {
+			$link = $_GET['link'];
 			$config_values['Feeds'][]['Link'] = $link;
 			$idx = end(array_keys($config_values['Feeds']));
 			$config_values['Feeds'][$idx]['Type'] = $tmp;
