@@ -84,7 +84,10 @@
 		function convert_old_config() {
 			global $config_file, $config_values;
 			unlink($config_file);
-			unset($config_values);
+			// Reset config_values, saving the global options
+			$global = $config_values['Global'];
+			$config_values = array('Global' => $global);
+
 			copy($config_file.".orig", $config_file);
 			read_config_file();
 		}
@@ -98,8 +101,9 @@
 			}
 			read_config_file();
 			// Config file was changed in ver 7.0.0
-			if(!isset($config_values['Settings']['Feeds'])) {
+			if(!isset($config_values['Feeds'])) {
 				// We need to do something here
+				_debug('Pre 0.7 config file found, purging.',0);
 				convert_old_config();
 			}
 			// Special case for renamed var in 0.6-6
