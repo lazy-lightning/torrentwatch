@@ -155,7 +155,7 @@
 					_debug("Unknown Feed. Feed: ".$feed['Link']."Type: ".$feed['Type']."\n",0);
 					break;
 			}
-			update_progress_bar(20/$count); // Load feeds uses 20%
+			update_progress_bar(20/$count, "Loading ".$feed['Type']." feed from ".$feed['Link']); // Load feeds uses 20%
 		}
 	}
 	

@@ -493,7 +493,7 @@ if(FALSE) {
 	feeds_perform_matching($config_values['Feeds']);
 	unset($config_values['Global']['HTMLOutput']);
 	
-//	hide_progress_bar();
+	hide_progress_bar();
 	set_default_div();
 }
 

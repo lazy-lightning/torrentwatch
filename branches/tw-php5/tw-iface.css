@@ -376,6 +376,7 @@ div.dialog_window#feeds a {
 /* Progress Bar */
 div.dialog_window#progressDiv {
 	height: 26px;
+	top: 150px;
 	overflow: hidden;
 	}
 
@@ -388,6 +389,7 @@ img.percentImage1 {
 div#progressBarText {
 	overflow: hidden;
 	}
+
 /* Configuration Dialog */
 div.config_torrentclient label.item,
 div.config_downloaddir label.item,
