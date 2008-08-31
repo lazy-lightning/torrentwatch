@@ -143,7 +143,10 @@ function parse_options_remote() {
 					$output = "Could not generate Match\n";
 				break;
 			case 'dltorrent':
+				// Dont display full information, this link is loaded in a hidden iframe
 				client_add_torrent(trim(urldecode($_GET['link'])), $config_values['Settings']['Download Dir']);
+				close_html();
+				exit;
 				break;
 			default:
 				$output = "Bad Paramaters passed to tw-iface.php";
@@ -388,6 +391,11 @@ function display_context_menu() {
 	$html_out .= '</ul></div>'."\n";
 }
 	
+function display_hidden_iframe() {
+	global $html_out;
+	$html_out .= '<iframe id="update_frame" src="about:blank" name="update_frame"></iframe>';
+}
+
 function set_default_div() {
 	global $html_out;
 	
@@ -414,8 +422,7 @@ function set_default_div() {
 function close_html() {
 	global $html_out, $debug_output;
 	$html_out .= "<div class='clear'></div>\n<div class='timer'>Page Took ";
-	$time_used = sprintf("%1.4f", timer_get_time());
-	$html_out .= $time_used."s to load</div>";
+	$html_out .= number_format(timer_get_time(), 4)."s to load</div>";
 	$html_out .= "<div class='rss_debug'>$debug_output</div>";
 	$html_out .= "</body></html>\n";
 	echo $html_out;
@@ -482,6 +489,7 @@ if(FALSE) {
 	display_global_config();
 	display_history();
 	display_favorites();
+	display_hidden_iframe();
 	
 	echo $html_out;
 	$html_out = "";

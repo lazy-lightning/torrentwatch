@@ -538,6 +538,25 @@ div.context_menu ul li a:hover {
 	color: #FFFFFF;
 	}
 
+/*--------------------------
+ *
+ * U P D A T E   I F R A M E
+ *
+ * ------------------------*/
+
+iframe#update_frame
+{
+	border: none;
+	display: block;
+	height: 0;
+	left: -1000px;
+	margin: 0
+	padding: 0
+	position: absolute;
+	top: -1000px;
+	width: 0;
+	}
+
 /*-----------------
  *
  * O L D   C S S   S T U F F
