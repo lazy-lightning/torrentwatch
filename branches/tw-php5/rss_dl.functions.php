@@ -1,7 +1,7 @@
 <?php
 
 		function check_for_torrent($item, $key, $opts) {
-			global $matched, $test_run;
+			global $matched, $test_run, $config_values;
 			$rs = $opts['Obj'];
 			$title = strtolower($rs['title']);
 			$guess = guess_match($title);
@@ -16,6 +16,8 @@
 						return;
 					add_cache($rs['title']);
 					if($link = get_torrent_link($rs)) {
+						if(isset($config_values['Global']['HTMLOutput']))
+							update_progress_bar(0, "Starting $title");
 						client_add_torrent($link, NULL, $item, $opts['URL']);
 					} else {
 						_debug("Unable to find URL for ".$rs['title']."\n");
