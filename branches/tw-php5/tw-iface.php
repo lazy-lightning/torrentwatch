@@ -354,16 +354,19 @@ function display_options() {
 
 function display_history() {
 	global $html_out, $config_values;
-	$history = unserialize(file_get_contents($config_values['Settings']['History']));
 
 	$html_out .= '<div class="dialog_window" id="history"><ul>'."\n";
-	$html_tmp = '';
-	foreach($history as $item) {
-		// History is written to file in reverse order
-		$html_tmp = '<li>'.$item['Date'].' - '.$item['Title'].'</li>'.$html_tmp;
+	if(file_exists($config_values['Settings']['History'])) {
+		$history = unserialize(file_get_contents($config_values['Settings']['History']));
+
+		$html_tmp = '';
+		foreach($history as $item) {
+			// History is written to file in reverse order
+			$html_tmp = '<li>'.$item['Date'].' - '.$item['Title'].'</li>'.$html_tmp;
+		}
+		$html_out .= $html_tmp;
+		$html_out .= '</ul>';
 	}
-	$html_out .= $html_tmp;
-	$html_out .= '</ul>';
 	$html_out .= _jscript("toggleMenu('history')", "Close");
 	$html_out .= '<a href="tw-iface.cgi?mode=clearhistory">Clear</a></div>'."\n";
 }

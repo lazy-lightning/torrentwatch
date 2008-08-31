@@ -116,6 +116,11 @@
 				}
 			}
 			fclose($fp);
+			// Create the base arrays if not already
+			if(!isset($config_values['Favorites']))
+				$config_values['Favorites'] = array();
+			if(!isset($config_values['Feeds']))
+				$config_values['Feeds'] = array();
 		}
 	  
 		// I wrote the reverse function of the above, please note if you use any
