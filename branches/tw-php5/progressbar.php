@@ -7,7 +7,7 @@
 function display_progress_bar() {
 	global $html_out;
 	echo '<div class="dialog_window" id="progressDiv">';
-	echo '<script type="text/javascript">showLayer("progressDiv");display("progressBar", 0, 1);</script></div>'."\n";
+	echo '<script type="text/javascript">showLayer("progressDiv");display("progressBar", 0, 1);setText("progressBar", "Loading Torrent Watch");</script></div>'."\n";
 	ob_flush();
 	flush();
 }
@@ -20,10 +20,11 @@ function hide_progress_bar() {
 
 function update_progress_bar($percent, $text = '') {
 	echo '<script type="text/javascript">';
-	echo 'plus("progressBar", '.$percent.');'."\n";
+	if($percent > 0) 
+		echo 'plus("progressBar", '.$percent.');';
 	if($text != '')
 		echo 'setText("progressBar", "'.$text.'");';
-	echo '</script>';
+	echo '</script>'."\n";
 	ob_flush();
 	flush();
 }

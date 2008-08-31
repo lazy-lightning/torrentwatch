@@ -340,14 +340,9 @@
 			$feed = urlencode($feed);
 			$html_out .= "<li class='torrent match_$matched $alt' title='"._isset($item, 'description')."'>";
 			$html_out .= "<a class='context_link' href='tw-iface.cgi?mode=matchtitle&rss=$feed&title=".rawurlencode($item['title'])."'></a>";
-			$html_out .= "<a class='context_link' href='tw-iface.cgi?mode=dltorrent&link=".rawurlencode(get_torrent_link($item))."'></a>";
+			$html_out .= "<a class='context_link' href='tw-iface.cgi?mode=dltorrent&title=".rawurlencode($item['title'])."&link=".rawurlencode(get_torrent_link($item))."'></a>";
 			$html_out .= "<div class='torrent_name'>".$item['title']."</div>";
 			$html_out .= "<div class='torrent_pubDate'>"._isset($item, 'pubDate').'</div>';
-/*			if(isset($item['pubDate']))
-				$html_out .=  $item['pubDate'];
-			else
-				$html_out .= "Not Specified";
-			$html_out .= "</div>"; */
 			$html_out .= "</li>\n";
 		}
 

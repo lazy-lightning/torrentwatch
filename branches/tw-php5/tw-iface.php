@@ -25,7 +25,6 @@ function parse_options_local() {
 			case 'showfeed':
 				echo $html_out;
 				$html_out = "";
-				$config_values['Global']['HTMLOutput']= 1;
 				if($_GET['feed'] == 'all') {
 					load_feeds($config_values['Feeds']);
 					feeds_perform_matching($config_values['Feeds']);
@@ -34,7 +33,6 @@ function parse_options_local() {
 					load_feeds($feed);
 					feeds_perform_matching($feed);
 				}
-				unset($config_values['Global']['HTMLOutput']);
 				break;	
 			case 'emptycache':
 				$exec = "rm -f ".$config_values['Settings']['Cache Dir']."/*";
@@ -65,6 +63,7 @@ function parse_options_local() {
 				display_favorites();
 				break;
 			case 'dltorrent':
+				update_progress_bar(0, 'Starting '.$_GET['title']);
 				client_add_torrent(trim(urldecode($_GET['link'])), $config_values['Settings']['Download Dir']);
 				$exit = FALSE;
 				break;
@@ -108,7 +107,6 @@ function parse_options_remote() {
 				break; // Need to remove all occurances of $exit = TRUE;
 				echo $html_out;
 				$html_out = "";
-				$config_values['Global']['HTMLOutput']= 1;
 				if($_GET['feed'] == 'all') {
 					load_feeds($config_values['Feeds']);
 					feeds_perform_matching($config_values['Feeds']);
@@ -117,7 +115,6 @@ function parse_options_remote() {
 					load_feeds($feed);
 					feeds_perform_matching($feed);
 				}
-				unset($config_values['Global']['HTMLOutput']);
 				$exit = TRUE;
 				break;	
 			case 'emptycache':
@@ -455,6 +452,8 @@ flush();
 
 read_config_file();
 
+$config_values['Global']['HTMLOutput']= 1;
+
 //if($_SERVER["REMOTE_ADDR"] == '127.0.0.1') {
 if(FALSE) {
 	// Basic Interface for Syabas Browser
@@ -465,6 +464,7 @@ if(FALSE) {
 	display_options();
 } else {
 	// Clutch Style Interface for PC Browsers
+	display_progress_bar();
 	if(isset($_GET['mode'])) {
 		parse_options_remote();
 	}
@@ -486,12 +486,9 @@ if(FALSE) {
 	flush();
 
 	// Feeds
-	display_progress_bar();
 
-	$config_values['Global']['HTMLOutput']= 1;
 	load_feeds($config_values['Feeds']);
 	feeds_perform_matching($config_values['Feeds']);
-	unset($config_values['Global']['HTMLOutput']);
 	
 	hide_progress_bar();
 	set_default_div();
