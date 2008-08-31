@@ -195,7 +195,6 @@ div#filterbar ul li.selected a {
 	color: #fff !important;
 	}
 
-
 /*--------------------------
  *
  * T O R R E N T   L I S T
@@ -374,6 +373,21 @@ div.dialog_window#feeds a {
 	clear: left;
 	}
 
+/* Progress Bar */
+div.dialog_window#progressDiv {
+	height: 26px;
+	overflow: hidden;
+	}
+
+img.percentImage1 {
+	background: white url(images/percentImage_back1.png) no-repeat scroll 1px 0;
+	margin: 5px 0 0;
+	padding: 0;
+	}
+
+div#progressBarText {
+	overflow: hidden;
+	}
 /* Configuration Dialog */
 div.config_torrentclient label.item,
 div.config_downloaddir label.item,

@@ -402,6 +402,8 @@ function set_default_div() {
 				$html_out .= 'toggleFav(\'favorite_'.$_GET['idx'].'\');';
 			break;
 		case 'updatefeed':
+			$html_out .= 'toggleMenu(\'feeds\');';
+			break;
 		case 'setglobals':
 			$html_out .= 'toggleMenu(\'configuration\');';
 			break;
@@ -443,10 +445,13 @@ if($_SERVER["REMOTE_ADDR"] == '127.0.0.1') {
 	echo ('<script type="text/javascript">');
 	echo ('SimpleContextMenu.setup({"preventDefault":false, "preventForms":false});');
 	echo ('SimpleContextMenu.attach("torrent", "CM1");</script>');
+	echo ('<script type="text/javascript" src="webappers.com.progress.js?'.time().'"></script>');
 }
 	
 echo ('</head>'."\n".'<body>'."\n");
 $html_out = "";
+ob_flush();
+flush();
 
 read_config_file();
 
@@ -474,17 +479,22 @@ if(FALSE) {
 	display_global_config();
 	display_history();
 	display_favorites();
-	set_default_div();
 	
 	echo $html_out;
 	$html_out = "";
-	
+	ob_flush();
+	flush();
+
 	// Feeds
+	display_progress_bar();
+
 	$config_values['Global']['HTMLOutput']= 1;
 	load_feeds($config_values['Feeds']);
 	feeds_perform_matching($config_values['Feeds']);
 	unset($config_values['Global']['HTMLOutput']);
 	
+//	hide_progress_bar();
+	set_default_div();
 }
 
 close_html();

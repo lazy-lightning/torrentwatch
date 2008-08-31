@@ -61,8 +61,11 @@
 
 		function rss_perform_matching($rs, $idx) {
 			global $config_values, $matched;
-			if(isset($config_values['Global']['HTMLOutput']))
+			$percPerFeed = 80/count($config_values['Feeds']);
+			$percPerItem = $percPerFeed/count($rs['items']);
+			if(isset($config_values['Global']['HTMLOutput'])) {
 				show_feed_html($rs, $idx);
+			}
 			$alt = 'alt';
 			// echo(print_r($rs));
 			foreach($rs['items'] as $item) {
@@ -74,6 +77,7 @@
 					_Debug("No match for $item[title]\n", 2);
 				}
 				if(isset($config_values['Global']['HTMLOutput'])) {
+					update_progress_bar($percPerItem, $item['title']);
 					show_torrent_html($item, $rs['URL'], $alt);
 				}
 				
@@ -138,6 +142,7 @@
 	}
 	
 	function load_feeds($feeds) {
+		$count = count($feeds);
 		foreach($feeds as $feed) {
 			switch($feed['Type']){
 				case 'RSS':
@@ -150,6 +155,7 @@
 					_debug("Unknown Feed. Feed: ".$feed['Link']."Type: ".$feed['Type']."\n",0);
 					break;
 			}
+			update_progress_bar(20/$count); // Load feeds uses 20%
 		}
 	}
 	

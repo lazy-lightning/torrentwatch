@@ -4,6 +4,7 @@
 		require_once("atomparser.php");
 		require_once("rss_dl.functions.php");
 		require_once("tor_client.php");
+		require_once("progressbar.php");
 
 		global $config_values;
 		$config_values['Global'] = array();
