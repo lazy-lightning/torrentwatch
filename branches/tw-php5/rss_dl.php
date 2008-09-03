@@ -197,6 +197,8 @@
 		_debug("Skipping Watch Folder\n");
 	}
 
+	unlink_temp_files();
+
 	_debug(timer_get_time()."s\n",0);
 
 ?>

@@ -507,6 +507,8 @@ if(FALSE) {
 }
 
 close_html();
+unlink_temp_files();
+
 exit(0);
 php?>
 

@@ -16,7 +16,12 @@
       return isset($array[$key]) ? $array[$key] : $default;
     }
 
-
+		function unlink_temp_files() {
+			global $config_values;
+			if(isset($config_values['Global']['Unlink'])) 
+				foreach($config_values['Global']['Unlink'] as $file)
+					unlink($file);
+		}
 
 		// used to ower case all the keys in an array.
 		// From http://us.php.net/manual/en/function.array-change-key-case.php
