@@ -176,7 +176,7 @@ function display_global_config() {
 	$html_out .= '<form target="update_frame" action="tw-iface.cgi" id="config_form"><input type="hidden" name="mode" value="setglobals">';
 	$html_out .= '<div class="config_torrentclient">';
 	$html_out .= '<label class="category">Client Settings</label>';
-	$html_out .= '<label class="item">Torrent Client:</label>';
+	$html_out .= '<label class="item" title="Which torrent client to use">Torrent Client:</label>';
 	$html_out .= '<select name="client">';
 	$btpd = "";
 	$trans122 = "";
@@ -200,20 +200,20 @@ function display_global_config() {
 	$html_out .= '<option value="transmission1.22" '.$trans122.'>Transmission 1.22</option>';
 	$html_out .= '<option value="transmission1.3x" '.$trans132.'>Transmission 1.3x</option></select></div>';
 
-	$html_out .= '<div class="config_downloaddir"><label class="item">Download Directory:</label>';
+	$html_out .= '<div class="config_downloaddir" title="Default directory to start torrents in"><label class="item">Download Directory:</label>';
 	$html_out .= '<input type="text" name="downdir" value='.$config_values['Settings']['Download Dir'].'></div>';
 	$html_out .= '<div class="config_watchdir">';
 	$html_out .= '<label class="category">Torrent Settings</label>';
-	$html_out .= '<label class="item">Watch Directory:</label>';
+	$html_out .= '<label class="item" title="Directory to look for new .torrents">Watch Directory:</label>';
 	$html_out .= '<input type="text" name="watchdir" value='.$config_values['Settings']['Watch Dir'].'></div>';
 
 	$html_out .= '<div class="config_savetorrent">';
 	$html_out .= '<input type="checkbox" name="savetorrents" value=1 ';
 	if($config_values['Settings']['Save Torrents'] == 1)
 		$html_out .= 'checked=1';
-	$html_out .= '><label class="item">Save .torrent</label></div>';
+	$html_out .= '><label class="item" title="Save torrent to download directory">Save .torrent</label></div>';
 
-	$html_out .= '<div class="config_deepdir"><label class="item">Deep Directories:</label>';
+	$html_out .= '<div class="config_deepdir"><label class="item" title="Save downloads in multi-directory structure">Deep Directories:</label>';
 	$tmp1 = $tmp2 = $tmp3 = "";
 	switch($config_values['Settings']['Deep Directories']) {
 		case 'Full':
@@ -231,7 +231,7 @@ function display_global_config() {
 	$html_out .= '<option value="Title" '.$tmp2.'>Show Title</option>';
 	$html_out .= '<option value="0" '.$tmp3.'>Off</option></select></div>';
 
-	$html_out .= '<div class="config_verifyepisodes"><label class="category">Favorites Settings</label>';
+	$html_out .= '<div class="config_verifyepisodes"i title="Try not to download duplicate episodes"><label class="category">Favorites Settings</label>';
 
 	$html_out .= '<input type="checkbox" name="verifyepisodes" value=1 ';
 	if($config_values['Settings']['Verify Episode'] == 1)
@@ -270,17 +270,17 @@ function display_favorites_info($item, $key) {
 	$html_out .= '<form action="tw-iface.cgi">'."\n";
 	$html_out .= '<input type="hidden" name="mode" value="updatefavorite">'."\n";
 	$html_out .= '<input type="hidden" name="idx" value="'.$key.'">'."\n";
-	$html_out .= '<div class="favorite_name"><label class="item">Name:</label>';
+	$html_out .= '<div class="favorite_name"><label class="item" title="Name of the Favorite">Name:</label>';
 	$html_out .= '<input type="text" name="name" value="'.$item['Name'].'"></div>'."\n";
-	$html_out .= '<div class="favorite_filter"><label class="item">Filter:</label>';
+	$html_out .= '<div class="favorite_filter"><label class="item" title="Regexp filter, use .* to match all">Filter:</label>';
 	$html_out .= '<input type="text" name="filter" value="'.$item['Filter'].'"></div>'."\n";
-	$html_out .= '<div class="favorite_not"><label class="item">Not:</label>';
+	$html_out .= '<div class="favorite_not"><label class="item"i title="Regexp Not Filter">Not:</label>';
 	$html_out .= '<input type="text" name="not" value="'.$item['Not'].'"></div>'."\n";
-	$html_out .= '<div class="favorite_savein"><label class="item">Save In:</label>';
+	$html_out .= '<div class="favorite_savein"><label class="item" title="Save Directory or Default">Save In:</label>';
 	$html_out .= '<input type="text" name="savein" value="'.$item['Save In'].'"></div>'."\n";
-	$html_out .= '<div class="favorite_episodes"><label class="item">Episodes:</label>';
+	$html_out .= '<div class="favorite_episodes"><label class="item" title="Regexp Episode filter in form of 2x[1-8]">Episodes:</label>';
 	$html_out .= '<input type="text" name="episodes" value="'.$item['Episodes'].'"></div>'."\n";
-	$html_out .= '<div class="favorite_feed"><label class="item">Feed:</label><select name="feed">'."\n";
+	$html_out .= '<div class="favorite_feed"><label class="item" title="Feed to match against">Feed:</label><select name="feed">'."\n";
 	$html_out .= '<option value="all">All</option>'."\n";
 	foreach($config_values['Feeds'] as $feed) {
 		$html_out .= '<option value="'.urlencode($feed['Link']).'"';
@@ -289,7 +289,7 @@ function display_favorites_info($item, $key) {
 		$html_out .= '>'.$feed['Name'].'</option>'."\n";
 	}
 	$html_out .= '</select></div>'."\n";
-	$html_out .= '<div class="favorite_quality"><label class="item">Quality:</label>';
+	$html_out .= '<div class="favorite_quality"><label class="item" title="Regexp Filter against full title">Quality:</label>';
 	$html_out .= '<input type="text" name="quality" value="'.$item['Quality'].'"></div>'."\n";
 	$html_out .= '<input type="submit" class="add" name="button" value="Update">'."\n";
 	$html_out .= '<input type="submit" class="del" name="button" value="Delete">'."\n";
