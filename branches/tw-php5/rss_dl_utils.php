@@ -150,7 +150,7 @@
 					array_walk($group, 'key_callback', $key.'[]');
 				} else {
 					if($subkey) {
-						if(!is_numeric($key)) {  // What does this do?
+						if(!is_numeric($key)) {  // What does this do
 							$group = "$key => $group";
 						}
 						$key = $subkey;
@@ -197,6 +197,34 @@
 			}
 		}
 
+		function clear_cache_real($file) {
+			global $config_values;
+			$fileglob = $config_values['Settings']['Cache Dir'].'/'.$file;
+			_debug("Clear: $fileglob\n",2);
+			foreach(glob($fileglob) as $fn) {
+				_debug("Removing $fn\n",1);
+				unlink($fn);
+			}
+		}
+
+		function clear_cache() {
+			if(isset($_GET['type'])) {
+				switch($_GET['type']) {
+					case 'feeds':
+						clear_cache_real("rsscache_*");
+						clear_cache_real("atomcache_*");
+						break;
+					case 'torrents':
+						clear_cache_real("rss_dl_*");
+						break;
+					case 'all':
+						clear_cache_real("rss_dl_*");
+						clear_cache_real("rsscache_*");
+						clear_cache_real("atomcache_*");
+						break;
+				}
+			}
+		}
 		/*
 		 * Returns 1 if there is no cache hit(dl now)
 		 * Returns 0 if there is a hit

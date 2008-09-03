@@ -356,6 +356,7 @@ div.dialog_window select {
 
 
 div.FavInfo a,
+div.dialog_window#clear_cache a,
 div.dialog_window#history a,
 div.dialog_window#configuration a,
 div.dialog_window#feeds a {
@@ -421,8 +422,14 @@ div.feeditem label.item {
 	max-width: 350px;
 	overflow: hidden;
 	width: auto;
+	padding: 5px;
+	margin: 5px 0 0 0;
 	}
 
+div.feeditem input[type=text] {
+	width: 220px;
+	margin: 11px 0;
+	}
 
 /* Favorites Dialog */
 div.dialog_window#favorites {
@@ -479,6 +486,7 @@ div.FavInfo input[type=text] {
 	width: 261px;
 	}
 
+div.dialog_window#feeds input[type=submit],
 div.FavInfo input[type=submit] {
 	color: #323232;
 	background-color: #EEE;
@@ -687,6 +695,7 @@ tr.rss {
 	line-height: 20px;
 	margin-bottom: 5px;
 	padding-left: 24px;
+	overflow: hidden;
 }
 
 .feedform {

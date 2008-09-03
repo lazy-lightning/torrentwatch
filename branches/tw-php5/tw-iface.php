@@ -105,8 +105,8 @@ function parse_options() {
 			case 'updatefeed':
 				update_feed();
 				break;
-			case 'emptycache':
-				$exec = "rm -f ".$config_values['Settings']['Cache Dir']."/*";
+			case 'clear_cache':
+				clear_cache();
 				break;
 			case 'setglobals':
 				$config_values['Settings']['Download Dir']=urldecode($_GET['downdir']);
@@ -332,8 +332,7 @@ function display_topmenu() {
 	$html_out .= '<li class="divider">&nbsp;</li>';
 	$html_out .= '<li id="view">'._jscript("toggleMenu('history')", "View History").'</li>';
 	$html_out .= '<li id="divider">&nbsp;</li>';
-	$html_out .= '<li id="empty"><a href="tw-iface.cgi?mode=emptycache">Empty Cache</a></li>';
-	$html_out .= '<li id="inspector">'._jscript("toggleMenu('inspector')", "Inspector").'</li>';
+	$html_out .= '<li id="empty">'._jscript("toggleMenu('clear_cache')", 'Empty Cache').'</li>';
 	switch($config_values['Settings']['Client']) {
 		case 'btpd':
 			$html_out .= '<li id="webui"><a href="http://';
@@ -373,6 +372,17 @@ function display_history() {
 	$html_out .= _jscript("toggleMenu('history')", "Close");
 	$html_out .= _jscript("updateFrameLoad('tw-iface.cgi?mode=clearhistory', 'Clearing Cache');", "Clear");
 	$html_out .= "</div>";
+}
+
+function display_clear_cache() {
+	global $html_out;
+	$html_out .= '<div class="dialog_window" id="clear_cache">'."\n";
+	$html_out .= '<h2 class="dialog heading">Which Cache</h2>';
+	$html_out .= _jscript("toggleMenu('clear_cache')", 'Close');
+	$html_out .= '<a href="tw-iface.cgi?mode=clear_cache&type=feeds">Feeds</a>';
+	$html_out .= '<a href="tw-iface.cgi?mode=clear_cache&type=torrents">Torrents</a>';
+	$html_out .= '<a href="tw-iface.cgi?mode=clear_cache&type=all">All</a>';
+	$html_out .= '</div>'."\n";
 }
 
 function display_filter_bar() {
@@ -490,6 +500,7 @@ if(FALSE) {
 	display_global_config();
 	display_history();
 	display_favorites();
+	display_clear_cache();
 	display_hidden_iframe();
 	
 	echo $html_out;
