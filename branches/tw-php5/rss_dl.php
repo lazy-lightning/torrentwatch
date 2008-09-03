@@ -119,7 +119,6 @@
 			_default('Run Torrentwatch', "1");
 			_default('Cron', "/etc/cron.hourly");
 			_default('Client', "btpd");
-			_default('AutoStart', "1");
 			_default('Verify Episode', "0");
 			_default('History', "/share/.torrents/rss_dl.history");
 			write_config_file();

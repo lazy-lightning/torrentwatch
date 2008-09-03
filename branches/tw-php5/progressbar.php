@@ -13,7 +13,7 @@ function display_progress_bar() {
 }
 
 function hide_progress_bar() {
-	echo '<script type="text/javascript">toggleMenu("progressDiv");</script>'."\n";
+	echo '<script type="text/javascript">hideLayer("progressDiv");</script>'."\n";
 	ob_flush();
 	flush();
 }

@@ -11,6 +11,7 @@
 
   function transmission_rpc($request) {
     $request = json_encode($request);
+		$reqLen = strlen("$request\r\n\r\n");
     $URI = "/transmission/rpc";
     $Host = "localhost";
     $Port = 9091;
@@ -18,6 +19,7 @@
     "POST $URI HTTP/1.1\r\n".
     "Host: $Host\r\n".
     "Connection: Close\r\n".
+		"Content-Length: $reqLen\r\n".
     "Content-Type: application/json\r\n\r\n".
     "$request\r\n\r\n";
 
@@ -62,22 +64,21 @@
       return $dest;
   }
 
-  function btpd_add_torrent($tor, $dest, $autostart) {
+  function btpd_add_torrent($tor, $dest) {
+		global $config_values;
     $btcli = '/mnt/syb8634/bin/btcli';
     $btcli_add = 'add -d';
     $btcli_connect='-d /opt/sybhttpd/localhost.drives/HARD_DISK/.btpd/';
     $btcli_exec="$btcli $btcli_connect";
 
     $tmpname = tempnam("","torrentwatch");
+		$config_values['Global']['Unlink'][] = $tmpname;
     file_put_contents($tmpname, $tor);
-    if($autostart == 0)
-      $btcli_add .= " -N";
     exec("$btcli_exec $btcli_add \"$dest\" \"$tmpname\"", $output, $return);
-    unlink($tmpname);
     return $return;
   }
 
-  function transmission122_add_torrent($tor, $dest, $autostart) {
+  function transmission122_add_torrent($tor, $dest) {
     // This should still work for the 13x series, although -g has been reassigned and might confuse
     $trans_remote = '/mnt/syb8634/bin/transmission-remote';
     $trans_connect = '-g /share/.transmission/';
@@ -85,18 +86,17 @@
     $trans_add = '-a';
 
     $tmpname = tempnam("","torrentwatch");
+		$config_values['Global']['Unlink'][] = $tmpname;
     file_put_contents($tmpname, $tor);
     exec("$trans_exec $trans_add \"$tmpname\"", $output, $return);
-    // Sometimes everything gets done, but no torrent gets added.  Perhaps its being unlinked too early?
-    // unlink($tmpname);
     return $return;
   }
 
-  function transmission13x_add_torrent($tor, $dest, $autostart) {
+  function transmission13x_add_torrent($tor, $dest) {
     // transmission dies with bad folder if it doesn't end in a /
     if(substr($dest, strlen($dest)-1, 1) != '/')
       $dest .= '/';
-    $request = array('method' => 'torrent-add', 'arguments' => array('download-dir' => $dest, 'metainfo' => base64_encode($tor)), 'paused' => $autostart ? 0 : 1);
+    $request = array('method' => 'torrent-add', 'arguments' => array('download-dir' => $dest, 'metainfo' => base64_encode($tor)));
     $responce = transmission_rpc($request);
     if(isset($responce['result']) AND ($responce['result'] == 'success' or $responce['result'] == 'duplicate torrent'))
       return 0;
@@ -108,9 +108,6 @@
 
   function client_add_torrent($filename, $dest, $fav = NULL, $feed = NULL) {
     global $config_values, $hit;
-    $autostart = $config_values['Settings']['AutoStart'];
-    if(!$hit && isset($config_values['Global']['HTMLOutput']))
-      echo("Starting new torrents<br>");
     $hit = 1;
 
     $stream_opts = array('http' =>array('method' => 'GET'));
@@ -133,8 +130,6 @@
       _debug("Couldn't parse torrent: $filename\n", 0);
       return FALSE;
     }
-    if(isset($fav) && $fav['AutoStart'] != 'Default')
-      $autostart = $fav['AutoStart'];
     if(!isset($dest)) {
       $dest = $config_values['Settings']['Download Dir'];
     }
@@ -151,14 +146,14 @@
     }
     switch($config_values['Settings']['Client']) {
       case 'btpd':
-        $return = btpd_add_torrent($tor, $dest, $autostart);
+        $return = btpd_add_torrent($tor, $dest);
         break;
       case 'transmission1.3x':
       case 'transmission1.32':
-        $return = transmission13x_add_torrent($tor, $dest, $autostart);
+        $return = transmission13x_add_torrent($tor, $dest);
         break;
       case 'transmission1.22':
-        $return = transmission122_add_torrent($tor, $dest, $autostart);
+        $return = transmission122_add_torrent($tor, $dest);
         // Doesn't support setting dest, so here change dest to transmissons
         $tr_state = new BDecode('/share/.transmission/daemon/state');
         $dest = $tr_state->{'result'}['default-directory'];
@@ -176,8 +171,6 @@
         file_put_contents("$dest/$tor_name.torrent", $tor);
     } else {
       _debug("Failed Starting: $tor_name  Return code $return\n",0);
-      if(isset($config_values['Global']['HTMLOutput']))
-        echo("Failed Starting: $tor_name  Return code $return<br>\n");
     }
     return ($return ? 0 : 1);
   }

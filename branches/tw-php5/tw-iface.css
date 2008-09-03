@@ -378,6 +378,7 @@ div.dialog_window#progressDiv {
 	height: 26px;
 	top: 150px;
 	overflow: hidden;
+	z-index: 5;
 	}
 
 img.percentImage1 {
@@ -468,8 +469,7 @@ div.favorite_not label.item,
 div.favorite_savein label.item,
 div.favorite_episodes label.item,
 div.favorite_feed label.item,
-div.favorite_quality label.item,
-div.favorite_autostart label.item {
+div.favorite_quality label.item {
 	clear: left;
 	width: 50px;
 	padding-right: 10px;
@@ -550,8 +550,8 @@ iframe#update_frame
 	display: block;
 	height: 0;
 	left: -1000px;
-	margin: 0
-	padding: 0
+	margin: 0;
+	padding: 0;
 	position: absolute;
 	top: -1000px;
 	width: 0;

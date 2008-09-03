@@ -7,7 +7,9 @@ $test_run = 0;
 
 require_once('rss_dl_utils.php');
 
-function parse_options_local() {
+// Custom parsing for nmt browser
+// Doesn't do anything special yet
+function parse_options_localhost() {
 	global $html_out, $config_values;
 	$filler = "<br>";
 	$exit = TRUE;
@@ -47,6 +49,7 @@ function parse_options_local() {
 				$config_values['Settings']['Client']=urldecode($_GET['client']);
 				write_config_file();
 				display_global_config();
+				
 				break;
 			case 'matchtitle':
 				if(($tmp = guess_match(html_entity_decode($_GET['title'])))) {
@@ -56,7 +59,6 @@ function parse_options_local() {
 					$_GET['feed'] = $_GET['rss'];
 					$_GET['button'] = 'Add';
 					$_GET['savein'] = 'Default';
-					$_GET['autostart'] = 'Default';
 					update_favorite();
 				} else
 					$output = "Could not generate Match\n";
@@ -91,7 +93,7 @@ function parse_options_local() {
 	return;
 }
 
-function parse_options_remote() {
+function parse_options() {
 	global $html_out, $config_values;
 	$filler = "<br>";
 
@@ -103,20 +105,6 @@ function parse_options_remote() {
 			case 'updatefeed':
 				update_feed();
 				break;
-			case 'showfeed':
-				break; // Need to remove all occurances of $exit = TRUE;
-				echo $html_out;
-				$html_out = "";
-				if($_GET['feed'] == 'all') {
-					load_feeds($config_values['Feeds']);
-					feeds_perform_matching($config_values['Feeds']);
-				} else {
-					$feed[] = $config_values['Feeds'][$_GET['feed']];
-					load_feeds($feed);
-					feeds_perform_matching($feed);
-				}
-				$exit = TRUE;
-				break;	
 			case 'emptycache':
 				$exec = "rm -f ".$config_values['Settings']['Cache Dir']."/*";
 				break;
@@ -128,6 +116,11 @@ function parse_options_remote() {
 					$config_values['Settings']['Save Torrents']=(isset($_GET['savetorrents']) ? 1 : 0);
 				$config_values['Settings']['Client']=urldecode($_GET['client']);
 				write_config_file();
+				// This is always called in a hidden frame, so display new config and exit
+				display_global_config();
+				$html_out .= '<script type="text/javascript">updateFrameCopyDiv("configuration");updateFrameFinished();</script>';
+				close_html();
+				exit(0);
 				break;
 			case 'matchtitle':
 				if(($tmp = guess_match(html_entity_decode($_GET['title'])))) {
@@ -137,7 +130,6 @@ function parse_options_remote() {
 					$_GET['feed'] = $_GET['rss'];
 					$_GET['button'] = 'Add';
 					$_GET['savein'] = 'Default';
-					$_GET['autostart'] = 'Default';
 					update_favorite();
 				} else
 					$output = "Could not generate Match\n";
@@ -145,8 +137,19 @@ function parse_options_remote() {
 			case 'dltorrent':
 				// Dont display full information, this link is loaded in a hidden iframe
 				client_add_torrent(trim(urldecode($_GET['link'])), $config_values['Settings']['Download Dir']);
+				display_history();
+				$html_out .= "<script type='text/javascript'>updateFrameCopyDiv('history');updateFrameFinished();</script>";
 				close_html();
-				exit;
+				exit(0);
+				break;
+			case 'clearhistory':
+				// Called in hidden div
+				if(file_exists($config_values['Settings']['History']))
+					unlink($config_values['Settings']['History']);
+				display_history();
+				$html_out .= '<script type="text/javascript">updateFrameCopyDiv("history");updateFrameFinished();</script>';
+				close_html();
+				exit(0);
 				break;
 			default:
 				$output = "Bad Paramaters passed to tw-iface.php";
@@ -170,7 +173,7 @@ function display_global_config() {
 
 	$html_out .= '<div class="dialog_window" id="configuration">'."\n";	
 	$html_out .= '<h2 class="dialog heading">Configuration</h2>';
-	$html_out .= '<form action="tw-iface.cgi" id="config_form"><input type="hidden" name="mode" value="setglobals">';
+	$html_out .= '<form target="update_frame" action="tw-iface.cgi" id="config_form"><input type="hidden" name="mode" value="setglobals">';
 	$html_out .= '<div class="config_torrentclient">';
 	$html_out .= '<label class="category">Client Settings</label>';
 	$html_out .= '<label class="item">Torrent Client:</label>';
@@ -235,7 +238,7 @@ function display_global_config() {
 		$html_out .= 'checked=1';
 	$html_out .= '><label class="item">Verify Episodes</label>';
 	$html_out .= '</div>';
-	$html_out .= _jscript("submitform('config_form')", 'Save');
+	$html_out .= _jscript("showLayer('progressDiv');setProgress('progressBar',50);setText('progressBar', 'Saving');submitform('config_form')", 'Save');
 	$html_out .= _jscript("toggleMenu('configuration')", 'Close');
 	$html_out .= _jscript("toggleMenu('feeds')", 'Feeds');
 	$html_out .= '</form></div>'."\n";
@@ -288,8 +291,6 @@ function display_favorites_info($item, $key) {
 	$html_out .= '</select></div>'."\n";
 	$html_out .= '<div class="favorite_quality"><label class="item">Quality:</label>';
 	$html_out .= '<input type="text" name="quality" value="'.$item['Quality'].'"></div>'."\n";
-	$html_out .= '<div class="favorite_autostart"><label class="item">AutoStart:</label>';
-	$html_out .= '<input type="text" name="autostart" value="'.$item['AutoStart'].'"></div>'."\n";
 	$html_out .= '<input type="submit" class="add" name="button" value="Update">'."\n";
 	$html_out .= '<input type="submit" class="del" name="button" value="Delete">'."\n";
 	$html_out .= _jscript("toggleMenu('favorites')", "Close").'</form></div>'."\n";
@@ -316,14 +317,13 @@ function display_favorites() {
 	              'Save In' => 'Default',
 	              'Episodes' => '', 
 	              'Feed' => '', 
-	              'Quality' => '',
-	              'AutoStart' => $config_values['Settings']['AutoStart']);
+	              'Quality' => '');
 	display_favorites_info($item, "new");
 	$html_out .= '<div class="clear"></div>'."\n";
 	$html_out .= '</div>'."\n";
 }
 
-function display_options() {
+function display_topmenu() {
 	global $html_out, $config_values;
 	$html_out .= '<div class="mainoptions" id="mainoptions">'."\n";
 	$html_out .= '<ul>'."\n";
@@ -371,7 +371,8 @@ function display_history() {
 		$html_out .= '</ul>';
 	}
 	$html_out .= _jscript("toggleMenu('history')", "Close");
-	$html_out .= '<a href="tw-iface.cgi?mode=clearhistory">Clear</a></div>'."\n";
+	$html_out .= _jscript("updateFrameLoad('tw-iface.cgi?mode=clearhistory', 'Clearing Cache');", "Clear");
+	$html_out .= "</div>";
 }
 
 function display_filter_bar() {
@@ -469,18 +470,18 @@ if(FALSE) {
 	// Basic Interface for Syabas Browser
 	// Most of the logic happens in parse_options_local() to send individual pages
 	if(isset($_GET['mode'])) {
-		parse_options_local();
+		parse_options_localhost();
 	}
-	display_options();
+	display_topmenu();
 } else {
 	// Clutch Style Interface for PC Browsers
 	display_progress_bar();
 	if(isset($_GET['mode'])) {
-		parse_options_remote();
+		parse_options();
 	}
 	
 	// Main Menu
-	display_options();
+	display_topmenu();
 	display_filter_bar();
 	
 	

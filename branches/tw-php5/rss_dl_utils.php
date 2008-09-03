@@ -162,7 +162,8 @@
 	 
 		function add_history($title) { 
 			global $config_values;
-			$history = unserialize(file_get_contents($config_values['Settings']['History']));
+			if(file_exists($config_values['Settings']['History']))
+				$history = unserialize(file_get_contents($config_values['Settings']['History']));
 			$history[] = array('Title' => $title, 'Date' => date("m.d.y g:i a"));
 			file_put_contents($config_values['Settings']['History'], serialize($history));
 		}
@@ -454,8 +455,7 @@
 		              "savein"    => "Save In",
 		              "episodes"  => "Episodes",
 		              "feed"      => "Feed",
-		              "quality"   => "Quality",
-		              "autostart" => "AutoStart");
+		              "quality"   => "Quality");
 		foreach($list as $key => $data) {
 			if(isset($_GET[$key]))
 				$config_values['Favorites'][$idx][$data] = urldecode($_GET[$key]);
