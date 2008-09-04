@@ -238,7 +238,7 @@ function display_global_config() {
 		$html_out .= 'checked=1';
 	$html_out .= '><label class="item">Verify Episodes</label>';
 	$html_out .= '</div>';
-	$html_out .= _jscript("showLayer('progressDiv');setProgress('progressBar',50);setText('progressBar', 'Saving');submitform('config_form')", 'Save');
+	$html_out .= _jscript("saveConfig()", 'Save');
 	$html_out .= _jscript("toggleMenu('configuration')", 'Close');
 	$html_out .= _jscript("toggleMenu('feeds')", 'Feeds');
 	$html_out .= '</form></div>'."\n";
@@ -370,7 +370,7 @@ function display_history() {
 		$html_out .= '</ul>';
 	}
 	$html_out .= _jscript("toggleMenu('history')", "Close");
-	$html_out .= _jscript("updateFrameLoad('index.cgi?mode=clearhistory', 'Clearing Cache');", "Clear");
+	$html_out .= _jscript("updateFrameLoad('index.cgi?mode=clearhistory', 'Clearing History');", "Clear");
 	$html_out .= "</div>";
 }
 

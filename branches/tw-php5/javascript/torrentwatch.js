@@ -1,7 +1,14 @@
+// Buttons
 
-// Called to copy updated global configuration from hidden iframe
-// Not really neccessary, 
+function saveConfig() {
+	toggleMenu('configuration');
+	showLayer('progressDiv');
+	setProgres('pogressBar', 50);
+	setText('progressBar', 'Saving Config');
+	submitForm('config_form');
+}
 
+// Update Frame Utils
 function updateFrameLoad( url, progressText) {
 	setProgress('progressBar', 50);
 	setText('progressBar', progressText);
