@@ -180,7 +180,7 @@
 	// Hooks for auto-run from the cron.hourly script
 	if(isset($config_values['Global']['Install'])) {
 		if($config_values['Global']['Install'] == 1) {
-			symlink("/share/.torrents/", "/opt/sybhttpd/default/torrentwatch/");
+			symlink("/share/.torrents", "/opt/sybhttpd/default/torrentwatch");
 			setup_default_config();
 		}
 		setup_cron_hook($config_values['Global']['Install'], $config_values['Settings']['Cron']);

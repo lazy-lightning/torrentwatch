@@ -1,10 +1,13 @@
 <?php
-		require_once("class.bdecode.php"); 
-		require_once("lastRSS.php");
 		require_once("atomparser.php");
-		require_once("rss_dl.functions.php");
-		require_once("tor_client.php");
+		require_once("cache.php");
+		require_once("class.bdecode.php"); 
+		require_once("config.php");
+		require_once("feeds.php");
+		require_once("html.php");
+		require_once("lastRSS.php");
 		require_once("progressbar.php");
+		require_once("tor_client.php");
 
 		global $config_values;
 		$config_values['Global'] = array();
@@ -84,206 +87,12 @@
 			}
 		}
 
-		// This function is from
-		// http://www.codewalkers.com/c/a/Miscellaneous/Configuration-File-Processing-with-PHP/2/
-		// It has been modified to support multidimensional arrays in the form of
-		// group[] = key => data as equivilent of group[key] => data
-		function read_config_file() {
-			global $config_file;
-			global $config_values;
-			$comment = ";";
-			$group = "NONE";
-			$fp = fopen($config_file, "r");
-
-			while (!feof($fp)) {
-				$line = trim(fgets($fp));
-				if ($line && !ereg("^$comment", $line)) {
-					if (ereg("^\[", $line) && ereg("\]$", $line)) {
-						$line = trim($line,"[");
-						$line = trim($line, "]");
-						$group = trim($line);
-					} else {
-						$pieces = explode("=", $line, 2);
-						$pieces[0] = trim($pieces[0] , "\"");
-						$pieces[1] = trim($pieces[1] , "\"");
-						$option = trim($pieces[0]);
-						$value = trim($pieces[1]);
-						if(ereg("\[\]$", $option)) {
-							$option = substr($option, 0, strlen($option)-2);
-							$pieces = explode("=>", $value, 2);
-							if(isset($pieces[1])) {
-								$config_values[$group][$option][trim($pieces[0])] = trim($pieces[1]);
-							} else
-								$config_values[$group][$option][] = $value;
-						} else
-							$config_values[$group][$option] = $value;
-					}
-				}
-			}
-			fclose($fp);
-			// Create the base arrays if not already
-			if(!isset($config_values['Favorites']))
-				$config_values['Favorites'] = array();
-			if(!isset($config_values['Feeds']))
-				$config_values['Feeds'] = array();
-		}
-	  
-		// I wrote the reverse function of the above, please note if you use any
-		// command line options those will be written as well
-		function write_config_file() {
-			global $config_values, $config_file, $config_out;
-			_debug("Preparing to write config file to $config_file\n");
-
-			$config_out = ";;\n;; rss_dl.php config file\n;;\n\n";
-			function group_callback($group, $key) {
-				global $config_values, $config_out;
-				if($key == 'Global')
-					return;
-				$config_out .= "[$key]\n";
-				array_walk($config_values[$key], 'key_callback');
-				$config_out .= "\n\n";
-			}
-
-			function key_callback($group, $key, $subkey = NULL) {
-				global $config_values, $config_out;
-				if(is_array($group)) {
-					array_walk($group, 'key_callback', $key.'[]');
-				} else {
-					if($subkey) {
-						if(!is_numeric($key)) {  // What does this do
-							$group = "$key => $group";
-						}
-						$key = $subkey;
-					}
-					$config_out .= "$key = $group\n";
-				}
-			}
-			array_walk($config_values, 'group_callback');
-			_debug("Finalized Config\n");
-			_debug($config_out,2);
-			file_put_contents($config_file, $config_out);
-			unset($config_out);
-		}
-	 
 		function add_history($title) { 
 			global $config_values;
 			if(file_exists($config_values['Settings']['History']))
 				$history = unserialize(file_get_contents($config_values['Settings']['History']));
 			$history[] = array('Title' => $title, 'Date' => date("m.d.y g:i a"));
 			file_put_contents($config_values['Settings']['History'], serialize($history));
-		}
-
-		function cache_setup()
-		{
-			global $config_values, $test_run;
-			if($test_run)
-				return;
-			if(isset($config_values['Settings']['Cache Dir'])) {
-				_debug("Enabling Cache\n", 2);
-				if(!file_exists($config_values['Settings']['Cache Dir']) ||
-				  	!is_dir($config_values['Settings']['Cache Dir'])) {
-					if(file_exists($config_values['Settings']['Cache Dir']))
-						unlink($config_values['Settings']['Cache Dir']);
-					mkdir($config_values['Settings']['Cache Dir'], 777, TRUE);
-				}
-			}
-		}
-
-		function add_cache($title) {
-			global $config_values;
-			if (isset($config_values['Settings']['Cache Dir'])) {
-				$cache_file = $config_values['Settings']['Cache Dir'] . '/rss_dl_' . filename_encode($title);
-				touch($cache_file);
-			}
-		}
-
-		function clear_cache_real($file) {
-			global $config_values;
-			$fileglob = $config_values['Settings']['Cache Dir'].'/'.$file;
-			_debug("Clear: $fileglob\n",2);
-			foreach(glob($fileglob) as $fn) {
-				_debug("Removing $fn\n",1);
-				unlink($fn);
-			}
-		}
-
-		function clear_cache() {
-			if(isset($_GET['type'])) {
-				switch($_GET['type']) {
-					case 'feeds':
-						clear_cache_real("rsscache_*");
-						clear_cache_real("atomcache_*");
-						break;
-					case 'torrents':
-						clear_cache_real("rss_dl_*");
-						break;
-					case 'all':
-						clear_cache_real("rss_dl_*");
-						clear_cache_real("rsscache_*");
-						clear_cache_real("atomcache_*");
-						break;
-				}
-			}
-		}
-		/*
-		 * Returns 1 if there is no cache hit(dl now)
-		 * Returns 0 if there is a hit
-		 */
-		function check_cache_episode($title) {
-			global $config_values, $matched;
-			// Dont skip a proper/repack
-			if(preg_match('/proper|repack/i', $title))
-				return 1;
-			$guess = guess_match($title, TRUE);
-			if($guess == False) {
-				_debug("Unable to guess for $title\n");
-				return 1;
-			}
-			if($handle = opendir($config_values['Settings']['Cache Dir'])) {
-				while(false !== ($file = readdir($handle))) {
-					if(!(substr($file, 0,7) == "rss_dl_"))
-						continue;
-					if(!(substr($file, 7, strlen($guess['key'])) == $guess['key']))
-						continue;
-					$cacheguess = guess_match(substr($file, 7), TRUE);
-					if($cacheguess != false && $guess['episode'] == $cacheguess['episode']) {
-						_debug("Full Episode Match, ignoring\n",2);
-						$matched = "duplicate";
-						return 0;
-					}
-				}
-			} else {
-				_debug("Unable to open ".$config_values['Settings']['Cache Dir']."\n");
-			}
-			return 1;
-		}
-
-
-		/* Returns 1 if there is no cache hit(dl now)
-		 * Returns 0 if there is a hit
-		 */
-		function check_cache($title)
-		{
-			global $config_values, $matched;
-
-			if (isset($config_values['Settings']['Cache Dir'])) {
-				$cache_file = $config_values['Settings']['Cache Dir'].'/rss_dl_'.filename_encode($title);
-				if (!file_exists($cache_file)) {
-					$matched = "match";
-					if($config_values['Settings']['Verify Episode']) {
-						return check_cache_episode($title);
-					} else {
-						return 1;
-					}
-				} else {
-					$matched = "cachehit";
-					return 0;
-				}
-			} else {
-				// No Cache, Always download
-				$matched = "match";
-				return 1;
-			}
 		}
 
 		function get_torrent_link($rs) {
@@ -362,41 +171,6 @@
 			return array("key" => $key_guess, "data" => $data_guess, "episode" => $episode_guess);
 		}
 
-		function setup_rss_list_html() {
-			global $html_out, $html_header;
-			$html_header = "<div class=feedlist>\n";
-			$html_out =  "<div id='torrentlist_container'>\n";
-		}
-		function finish_rss_list_html() {
-			global $html_out, $html_header;
-			$html_header .="</div>\n";
-			$html_out .=  "</div>\n";
-		}
-		
-		function show_torrent_html($item, $feed, $alt) {
-			global $html_out, $matched, $test_run;
-
-			$feed = urlencode($feed);
-			$html_out .= "<li class='torrent match_$matched $alt' title='"._isset($item, 'description')."'>";
-			$html_out .= "<a class='context_link' href='tw-iface.cgi?mode=matchtitle&rss=$feed&title=".rawurlencode($item['title'])."'></a>";
-			$html_out .= "<a class='context_link' href='tw-iface.cgi?mode=dltorrent&title=".rawurlencode($item['title'])."&link=".rawurlencode(get_torrent_link($item))."'></a>";
-			$html_out .= "<div class='torrent_name'>".$item['title']."</div>";
-			$html_out .= "<div class='torrent_pubDate'>"._isset($item, 'pubDate').'</div>';
-			$html_out .= "</li>\n";
-		}
-
-	function show_feed_html($rss, $idx) {
-		global $html_out;
-	
-		$html_out .= "<div class='feed' id='feed_$idx'><ul id='torrentlist' class='torrentlist'>";
-		$html_out .= "<li class='header'>".$rss['title']."</li>\n";
-	}
-
-	function close_feed_html() {
-		global $html_out;
-		$html_out .= '</ul></div>';
-	}
-
 	function guess_feedtype($feedurl) {
 		global $config_values;
 		$content = file($feedurl);
@@ -439,106 +213,4 @@
 		}
 	}
 	
-	function update_favorite() {
-		global $test_run;
-		if(!isset($_GET['button']))
-			return;
-		switch($_GET['button']) {
-			case 'Add':
-			Case 'Update':
-				add_favorite();
-				$test_run = TRUE;
-				break;
-			case 'Delete':
-				del_favorite();
-				break;
-		}
-		write_config_file();
-	}
-	
-	function update_feed() {
-		if(!isset($_GET['button']))
-			return;
-		switch($_GET['button']) {
-			case 'Add':
-			case 'Update':
-				add_feed();
-				break;
-			case 'Delete':
-				del_feed();
-				break;
-		}
-		write_config_file();
-	}
-	
-	function add_favorite() {
-		global $config_values;
-		$i = 0;
-		if(isset($_GET['idx']) && $_GET['idx'] != 'new') {
-			$idx = $_GET['idx'];
-		} else if(isset($_GET['name']))	{
-			$config_values['Favorites'][]['Name'] = $_GET['name'];
-			$idx = end(array_keys($config_values['Favorites']));
-			$_GET['idx'] = $idx; // So display_favorite_info() can see it
-		} else
-			return; // Bad form data
-		$list = array("name"      => "Name",
-									"filter"    => "Filter", 
-		              "not"       => "Not",
-		              "savein"    => "Save In",
-		              "episodes"  => "Episodes",
-		              "feed"      => "Feed",
-		              "quality"   => "Quality");
-		foreach($list as $key => $data) {
-			if(isset($_GET[$key]))
-				$config_values['Favorites'][$idx][$data] = urldecode($_GET[$key]);
-			else
-				$config_values['Favorites'][$idx][$data] = "";
-		}
-	}
-	
-	function del_favorite() {
-		global $config_values;
-		if(isset($_GET['idx']) AND isset($config_values['Favorites'][$_GET['idx']])) {
-			unset($config_values['Favorites'][$_GET['idx']]);
-		}
-	}
-	
-	
-	function add_feed() {
-		global $config_values;
-	
-		if(isset($_GET['link']) AND ($tmp = guess_feedtype($_GET['link'])) != 'Unknown') {
-			$link = $_GET['link'];
-			$config_values['Feeds'][]['Link'] = $link;
-			$idx = end(array_keys($config_values['Feeds']));
-			$config_values['Feeds'][$idx]['Type'] = $tmp;
-			load_feeds(array(0 => array('Type' => $tmp, 'Link' => $link)));
-			switch($tmp) {
-				case 'RSS':
-					$config_values['Feeds'][$idx]['Name'] = $config_values['Global']['Feeds'][$link]['title'];
-					break;
-				case 'Atom':
-					$config_values['Feeds'][$idx]['Name'] = $config_values['Global']['Feeds'][$link]['Name'];
-					break;
-			}
-		}
-	}
-
-	function del_feed() {
-		global $config_values;
-		if(isset($_GET['idx']) AND isset($config_values['Feeds'][$_GET['idx']])) {
-			unset($config_values['Feeds'][$_GET['idx']]);
-		}
-	}
-
-	// Return a formatted html link that will call javascript in a normal
-	// browser, and in the funky NMT browser
-	function _jscript($func, $contents) {
-		if($_SERVER["REMOTE_ADDR"] == '127.0.0.1') {
-			return('<a href=# onclick="'.$func.';return false;">'.$contents.'</a>');
-		} else {
-			return('<a href="javascript:'.$func.'">'.$contents.'</a>');
-		}
-	}
 ?>
