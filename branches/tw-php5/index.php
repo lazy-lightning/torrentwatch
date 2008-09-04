@@ -1,7 +1,7 @@
 #!/mnt/syb8634/server/php5-cgi
 <?php
 
-ini_set('include_path', '.:/share/.torrents');
+ini_set('include_path', '.:/share/.torrents/php');
 $config_file = '/share/.torrents/rss_dl.config';
 $test_run = 0;
 
@@ -70,7 +70,7 @@ function parse_options_localhost() {
 				$exit = FALSE;
 				break;
 			default:
-				$output = "Bad Paramaters passed to tw-iface.php";
+				$output = "Bad Paramaters passed to index.cgi";
 		}
 	}
 
@@ -152,7 +152,7 @@ function parse_options() {
 				exit(0);
 				break;
 			default:
-				$output = "Bad Paramaters passed to tw-iface.php";
+				$output = "Bad Paramaters passed to index.cgi";
 		}
 	}
 
@@ -173,7 +173,7 @@ function display_global_config() {
 
 	$html_out .= '<div class="dialog_window" id="configuration">'."\n";	
 	$html_out .= '<h2 class="dialog heading">Configuration</h2>';
-	$html_out .= '<form target="update_frame" action="tw-iface.cgi" id="config_form"><input type="hidden" name="mode" value="setglobals">';
+	$html_out .= '<form target="update_frame" action="index.cgi" id="config_form"><input type="hidden" name="mode" value="setglobals">';
 	$html_out .= '<div class="config_torrentclient">';
 	$html_out .= '<label class="category">Client Settings</label>';
 	$html_out .= '<label class="item" title="Which torrent client to use">Torrent Client:</label>';
@@ -248,13 +248,13 @@ function display_global_config() {
 	$html_out .= '<label class="Category">Feeds</label>';
 	foreach($config_values['Feeds'] as $key => $feed) {
 		$html_out .= '<div class="feeditem">'."\n";
-		$html_out .= '<form action="tw-iface.cgi" class="feedform"><input type="hidden" name="mode" value="updatefeed">'."\n";
+		$html_out .= '<form action="index.cgi" class="feedform"><input type="hidden" name="mode" value="updatefeed">'."\n";
 		$html_out .= '<input type="hidden" name="idx" value="'.$key.'">';
 		$html_out .= '<input class="del" type="submit" name="button" value="Delete">'."\n";
 	  $html_out .= '<label class="item">'.$feed['Name'].': '.$feed['Link'].'</label></form></div>'."\n";
 	}
 	$html_out .= '<div class="feeditem">'."\n";
-	$html_out .= '<form action="tw-iface.cgi" class="feedform"><input type="hidden" name="mode" value="updatefeed">'."\n";
+	$html_out .= '<form action="index.cgi" class="feedform"><input type="hidden" name="mode" value="updatefeed">'."\n";
 	$html_out .= '<input type="submit" class="add" name="button" value="Add">';
 	$html_out .= '<label class="item">New Feed:</label><input type="text" name="link">'."\n";
 	$html_out .= _jscript("toggleMenu('feeds')", "Close");
@@ -267,7 +267,7 @@ function display_favorites_info($item, $key) {
 	global $config_values, $html_out;
 	$style = "";
 	$html_out .= '<div class="FavInfo" id="favorite_'.$key.'" '.$style.'>'."\n";
-	$html_out .= '<form action="tw-iface.cgi">'."\n";
+	$html_out .= '<form action="index.cgi">'."\n";
 	$html_out .= '<input type="hidden" name="mode" value="updatefavorite">'."\n";
 	$html_out .= '<input type="hidden" name="idx" value="'.$key.'">'."\n";
 	$html_out .= '<div class="favorite_name"><label class="item" title="Name of the Favorite">Name:</label>';
@@ -370,7 +370,7 @@ function display_history() {
 		$html_out .= '</ul>';
 	}
 	$html_out .= _jscript("toggleMenu('history')", "Close");
-	$html_out .= _jscript("updateFrameLoad('tw-iface.cgi?mode=clearhistory', 'Clearing Cache');", "Clear");
+	$html_out .= _jscript("updateFrameLoad('index.cgi?mode=clearhistory', 'Clearing Cache');", "Clear");
 	$html_out .= "</div>";
 }
 
@@ -379,9 +379,9 @@ function display_clear_cache() {
 	$html_out .= '<div class="dialog_window" id="clear_cache">'."\n";
 	$html_out .= '<h2 class="dialog heading">Which Cache</h2>';
 	$html_out .= _jscript("toggleMenu('clear_cache')", 'Close');
-	$html_out .= '<a href="tw-iface.cgi?mode=clear_cache&type=feeds">Feeds</a>';
-	$html_out .= '<a href="tw-iface.cgi?mode=clear_cache&type=torrents">Torrents</a>';
-	$html_out .= '<a href="tw-iface.cgi?mode=clear_cache&type=all">All</a>';
+	$html_out .= '<a href="index.cgi?mode=clear_cache&type=feeds">Feeds</a>';
+	$html_out .= '<a href="index.cgi?mode=clear_cache&type=torrents">Torrents</a>';
+	$html_out .= '<a href="index.cgi?mode=clear_cache&type=all">All</a>';
 	$html_out .= '</div>'."\n";
 }
 
@@ -454,16 +454,16 @@ timer_init();
 <meta http-equiv='expires' content='0'>
 <?php
 if($_SERVER["REMOTE_ADDR"] == '127.0.0.1') {
-	echo ('<link rel="Stylesheet" type="text/css" href="tw-iface.local.css?'.time().'"></link>');
-	echo ('<script type="text/javascript" src="tw-iface.local.js"></script>');
+	echo ('<link rel="Stylesheet" type="text/css" href="css/torrentwatch.local.css?'.time().'"></link>');
+	echo ('<script type="text/javascript" src="javascript/torrentwatch.local.js"></script>');
 } else {
-	echo ('<link rel="Stylesheet" type="text/css" href="tw-iface.css?'.time().'"></link>');
-	echo ('<script type="text/javascript" src="tw-iface.js?'.time().'"></script>');
-	echo ('<script type="text/javascript" src="webtoolkit.contextmenu.js?'.time().'"></script>');
+	echo ('<link rel="Stylesheet" type="text/css" href="css/torrentwatch.css?'.time().'"></link>');
+	echo ('<script type="text/javascript" src="javascript/torrentwatch.js?'.time().'"></script>');
+	echo ('<script type="text/javascript" src="javascript/webtoolkit.contextmenu.js?'.time().'"></script>');
 	echo ('<script type="text/javascript">');
 	echo ('SimpleContextMenu.setup({"preventDefault":false, "preventForms":false});');
 	echo ('SimpleContextMenu.attach("torrent", "CM1");</script>');
-	echo ('<script type="text/javascript" src="webappers.com.progress.js?'.time().'"></script>');
+	echo ('<script type="text/javascript" src="javascript/webappers.com.progress.js?'.time().'"></script>');
 }
 	
 echo ('</head>'."\n".'<body>'."\n");

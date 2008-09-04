@@ -50,7 +50,7 @@ div.mainoptions {
 	width: 100%;
 	height: 75px;
 	margin: 0;
-	background: transparent url('images/menu_bg.gif') repeat-x;
+	background: transparent url('../images/menu_bg.gif') repeat-x;
 	border-bottom: 1px solid #979797;
 	position: fixed;
 	left: 0;
@@ -96,38 +96,38 @@ div.mainoptions ul li a {
 	}
 
 div.mainoptions ul li#favoritesMenu a {
-	background: url(images/nuvola_bookmark.png) no-repeat 19px 0;
+	background: url(../images/nuvola_bookmark.png) no-repeat 19px 0;
 }
 div.mainoptions ul li#config a {
-	background: url(images/nuvola_configure.png) no-repeat 19px 0;
+	background: url(../images/nuvola_configure.png) no-repeat 19px 0;
 }
 
 div.mainoptions ul li#view a {
-	background: url(images/nuvola_history.png) no-repeat 26px 0;
+	background: url(../images/nuvola_history.png) no-repeat 26px 0;
 }
 
 div.mainoptions ul li#empty a {
-	background: url(images/remove.png) no-repeat 32px 0;
+	background: url(../images/remove.png) no-repeat 32px 0;
 }
 
 div.mainoptions ul li#empty a:active {
-	background: url('images/remove_on.png') no-repeat 32px 0;
+	background: url('../images/remove_on.png') no-repeat 32px 0;
 	}
 
 div.mainoptions ul li#webui a {
-	background: url(images/webui.png) no-repeat center 0;
+	background: url(../images/webui.png) no-repeat center 0;
 }
 
 div.mainoptions ul li#inspector a {
-	background: url('images/info.png') no-repeat 18px 0;
+	background: url('../images/info.png') no-repeat 18px 0;
 	}
 
 div.mainoptions ul li#inspector a:active {
-	background: url('images/info_on.png') no-repeat 18px 0;
+	background: url('../images/info_on.png') no-repeat 18px 0;
 	}
 
 div.mainoptions ul li.divider {
-	background: transparent url('images/menu_divider.png') no-repeat top right;
+	background: transparent url('../images/menu_divider.png') no-repeat top right;
 	margin: 17px 0 0 0;
 	}
 
@@ -140,7 +140,7 @@ div.mainoptions ul li.divider {
 div#filterbar {
 	margin: 0;
 	height: 24px;
-	background: #C0C8D6 url('images/filter_bar_bg.png') repeat-x;
+	background: #C0C8D6 url('../images/filter_bar_bg.png') repeat-x;
 	border-bottom: 1px solid #979797;
 	position: fixed;
 	left: 0;
@@ -178,20 +178,20 @@ div#filterbar ul li a {
 
 
 div#filterbar ul li:hover {
-	background: transparent url('images/filter_hover_left.png') no-repeat top left;
+	background: transparent url('../images/filter_hover_left.png') no-repeat top left;
 	}
 
 div#filterbar ul li:hover a {
-	background: transparent url('images/filter_hover_right.png') no-repeat top right;
+	background: transparent url('../images/filter_hover_right.png') no-repeat top right;
 	color: #fff !important;
 	}
 
 div#filterbar ul li.selected {
-	background: transparent url('images/filter_selected_left.png') no-repeat top left;
+	background: transparent url('../images/filter_selected_left.png') no-repeat top left;
 	}
 
 div#filterbar ul li.selected a {
-	background: transparent url('images/filter_selected_right.png') no-repeat top right;
+	background: transparent url('../images/filter_selected_right.png') no-repeat top right;
 	color: #fff !important;
 	}
 
@@ -253,22 +253,22 @@ ul.torrentlist li.torrent {
 	}
 
 ul.torrentlist li.torrent.match_nomatch {
-	background: transparent url('images/nuvola_ledred.png') no-repeat 3px center;
+	background: transparent url('../images/nuvola_ledred.png') no-repeat 3px center;
 	display: block;
 	}
 
 ul.torrentlist li.torrent.match_match {
-	background: transparent url('images/nuvola_ledorange.png') no-repeat 3px center;
+	background: transparent url('../images/nuvola_ledorange.png') no-repeat 3px center;
 	display: block;
 	}
 
 ul.torrentlist li.torrent.match_cachehit {
-	background: transparent url('images/nuvola_ledgreen.png') no-repeat 3px center;
+	background: transparent url('../images/nuvola_ledgreen.png') no-repeat 3px center;
 	display: block;
 	}
 
 ul.torrentlist li.torrent.match_duplicate {
-	background: transparent url('images/nuvola_ledyellow.png') no-repeat 3px center;
+	background: transparent url('../images/nuvola_ledyellow.png') no-repeat 3px center;
 	display: block;
 	}
 
@@ -383,7 +383,7 @@ div.dialog_window#progressDiv {
 	}
 
 img.percentImage1 {
-	background: white url(images/percentImage_back1.png) no-repeat scroll 1px 0;
+	background: white url(../images/percentImage_back1.png) no-repeat scroll 1px 0;
 	margin: 5px 0 0;
 	padding: 0;
 	}
@@ -580,7 +580,7 @@ iframe#update_frame
 
 /*
 .add {
-	background: url(images/add.png) no-repeat; 
+	background: url(../images/add.png) no-repeat; 
 	border: none;
 	height: 16px; 
 	width: 16px;
@@ -589,7 +589,7 @@ iframe#update_frame
 }
 
 .del {
-	background: url(images/del.png) no-repeat;
+	background: url(../images/del.png) no-repeat;
 	border: none;
 	height: 16px;
 	width: 16px;
@@ -690,7 +690,7 @@ tr.rss {
 
 
 .favorite li {
-	background: url(images/favorites.png) no-repeat left center;
+	background: url(../images/favorites.png) no-repeat left center;
 	height: 20px;
 	line-height: 20px;
 	margin-bottom: 5px;
