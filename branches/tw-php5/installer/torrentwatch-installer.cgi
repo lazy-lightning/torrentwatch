@@ -29,19 +29,20 @@ exename=`echo $pwd | sed 's#.*/\([^/]*\)$#\1#g'`
 
 
 # Defines used for this version
+NAME="torrentwatch"
+CONFIG="rss_dl.config"
+WEB_SCRIPT='index.cgi'
+WEB="/opt/sybhttpd/default/"
+
+# Script Defines
 INSTALL="/opt/sybhttpd/localhost.drives/$urlpwd/tw.scripts.tar"
 DEST="/opt/sybhttpd/localhost.drives/HARD_DISK/.torrents"
 USBDIR="/opt/sybhttpd/localhost.drives/$urlpwd"
 STARTER="/opt/sybhttpd/localhost.drives/HARD_DISK/start_app.sh"
-# This is where our php interface script will be linked to
-# cannot be in a hidden directory like .torrents
-IFACE_DEST="/share/"
-IMAGE_DEST="/share/images/"
 
 # Script to install into the autostarter
 START_SCRIPT='rss_dl.php'
-SCRIPT_OPTS='-i'
-
+START_SCRIPT_OPTS='-i'
 
 ###############################################################
 # Define the functions we will call.
@@ -90,7 +91,7 @@ autostart_add()
 		  echo "$line" >> /tmp/.starter.tmp
 		  if [ x"$line" == x"$MARKER" ]; then
 			  # echo "cd ${DEST}/ && ./telnetd -l /bin/sh &" >> /tmp/.starter
-			  echo "${DEST}/${START_SCRIPT} ${SCRIPT_OPTS}" >> /tmp/.starter.tmp
+			  echo "${DEST}/${START_SCRIPT} ${START_SCRIPT_OPTS}" >> /tmp/.starter.tmp
 		  fi
 		done
 		cat < /tmp/.starter.tmp > "$STARTER"
@@ -184,30 +185,16 @@ install_harddisk()
 	echo "Configuring installed files.<br>"
 	# Verify our new program in executable
 	chmod a+x $DEST/$START_SCRIPT
-	chmod a+x $DEST/torrentwatch.php
-	chmod a+x $DEST/tw-iface.php
+	chmod a+x $DEST/$WEB_SCRIPT
 
 	# Remenants of an older version of torrentwatch
 	if [ -h /share/tw-iface.cgi ]; then
 		rm -f /share/tw-iface.cgi /share/tw-iface.local.css /share/tw-iface.css
 	fi
 
-	# Link our hidden directory to a non-hidden directory.  This is so the NMT media
-  # browser doesn't show an extra folder
-	if [ ! -h /share/torrentwatch ]; then
-		rm -f /share/torrentwatch
-		ln -s $DEST /share/torrentwatch
-	fi
-
-	# NMT wants scripts to be called .cgi
-	if [ ! -h $DEST/tw-iface.cgi ]; then
-		rm -f $DEST/tw-iface.cgi
-		ln -s $DEST/tw-iface.php $DEST/tw-iface.cgi
-	fi
-
 	# Anti-clobber routine for the config script
-	if [ ! -f $DEST/rss_dl.config ];then
-		cp $DEST/rss_dl.config.orig $DEST/rss_dl.config
+	if [ ! -f $DEST/$CONFIG ];then
+		cp $DEST/$CONFIG.orig $DEST/$CONFIG
 	fi
 
 	chown -R nmt.nmt $DEST
@@ -221,7 +208,7 @@ install_harddisk()
 	# Run the script, since the autostart wont be running until reboot
 	date >> /var/rss_dl.log
 	echo "Installed cron hook from configuration script" >> /var/rss_dl.log
-	${DEST}/${START_SCRIPT} ${SCRIPT_OPTS}
+	${DEST}/${START_SCRIPT} ${START_SCRIPT_OPTS}
 
 	echo "Stuccess..<br>"
 

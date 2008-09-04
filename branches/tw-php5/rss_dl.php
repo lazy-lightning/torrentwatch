@@ -1,5 +1,6 @@
 #!/mnt/syb8634/server/php5-cgi -qd register_argc_argv=1
 <?php
+		ini_set('include_path', '.:/share/.torrents/php');
 		ini_set("precision", 4);
     
 		// These are our extra functions
@@ -178,8 +179,10 @@
 
 	// Hooks for auto-run from the cron.hourly script
 	if(isset($config_values['Global']['Install'])) {
-		if($config_values['Global']['Install'] == 1)
+		if($config_values['Global']['Install'] == 1) {
+			symlink("/share/.torrents/", "/opt/sybhttpd/default/torrentwatch/");
 			setup_default_config();
+		}
 		setup_cron_hook($config_values['Global']['Install'], $config_values['Settings']['Cron']);
 		exit;
 	}
