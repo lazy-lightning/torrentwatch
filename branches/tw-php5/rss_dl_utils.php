@@ -316,10 +316,10 @@
 			/* regexp explanation
 			* 3 main parts
 			* a) /^([^-\(]+)(?:.+)?\b                        * a Matches Name and has an optional match to filter episode title when split with a -
-			* (S\d+E\d+|\d+x\d+|\dof\d|[\d -.]{10})   * (b|c|d|e)Matches Episode Number 
+			* (S\d+E\d+|\d+x\d+|\d+of\d+|[\d -.]{10})   * (b|c|d|e)Matches Episode Number 
 				b) S\d+E\d+        * S12E1
 				c) \d+x\d+         * 1x23
-				d) \dof\d          * 3of5
+				d) \d+of\d+          * 3of5
 				e) [\d -.]{10}     * 2008-03-23 or 07.23.2008 or .20082306. etc.
 			* (?:.* (DVB)|.*[\.\(](\w+-\w+)(?:[ \)]\[*\w+\])?|[ \)]+(?:[ \[]+([^\[\]]*)[\]])+|.*\[([\w.]+)\])?  * (f|g|h|i)? Matches release group/rip type
 				f) .* (DVB)                                  * Title ends in " DVB" catches a style with no delimiters
@@ -333,7 +333,7 @@
 			* ? makes the last grouping optional for a title only match
 			* So the full expression is simply a(b|c|d|e)(f|g|h|i)?
 			*/
-			$reg1='/^([^-\(]+)(?:.+)?\b(S\d+E\d+|\d+x\d+|\dof\d|[\d -.]{10})(?:.* (DVB)|.*[\.\(](\w+-\w+)(?:[ \)]\[*\w+\])?|[ \)]+(?:[ \[]+([^\[\]]*)[\]])+|.*\[([\w.]+)\])?.*/';
+			$reg1='/^([^-\(]+)(?:.+)?\b(S\d+E\d+|\d+x\d+|\d+of\d+|[\d -.]{10})(?:.* (DVB)|.*[\.\(](\w+-\w+)(?:[ \)]\[*\w+\])?|[ \)]+(?:[ \[]+([^\[\]]*)[\]])+|.*\[([\w.]+)\])?.*/';
 			if(preg_match($reg1, $title, $regs)) {
 				$episode_guess = trim($regs[2]);
 				$key_guess = str_replace("'", "&#39;", trim($regs[1]));
@@ -357,7 +357,7 @@
 				$episode_guess = trim(strtr($episode_guess, $from, $to));
 				// Standardize episode output to SSxEE, strip leading 0
 				// This is (b|c|d) from earlier.  If it is style e there will be no replacement, only strip leading 0
-				$episode_guess = ltrim(preg_replace('/(S(\d+)E(\d+)|(\d+)x(\d+)|(\d)of(\d))/', '\2\4\6x\3\5\7', $episode_guess), '0');
+				$episode_guess = ltrim(preg_replace('/(S(\d+)E(\d+)|(\d+)x(\d+)|(\d+)of(\d+))/', '\2\4\6x\3\5\7', $episode_guess), '0');
 			}
 			return array("key" => $key_guess, "data" => $data_guess, "episode" => $episode_guess);
 		}

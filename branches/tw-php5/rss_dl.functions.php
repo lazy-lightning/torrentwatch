@@ -144,8 +144,11 @@
 	}
 	
 	function load_feeds($feeds) {
+		global $config_values;
 		$count = count($feeds);
 		foreach($feeds as $feed) {
+			if(isset($config_values['Global']['HTMLOutput']))
+				update_progress_bar(10/$count, "Loading ".$feed['Type']." feed from ".$feed['Link']); // Load feeds uses 10%
 			switch($feed['Type']){
 				case 'RSS':
 					parse_one_rss($feed);
@@ -157,7 +160,6 @@
 					_debug("Unknown Feed. Feed: ".$feed['Link']."Type: ".$feed['Type']."\n",0);
 					break;
 			}
-			update_progress_bar(20/$count, "Loading ".$feed['Type']." feed from ".$feed['Link']); // Load feeds uses 20%
 		}
 	}
 	

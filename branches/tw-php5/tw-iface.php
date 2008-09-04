@@ -493,26 +493,30 @@ if(FALSE) {
 	// Main Menu
 	display_topmenu();
 	display_filter_bar();
+	echo $html_out;
+	$html_out = "";
+	update_progress_bar(5, 'Loading Torrentwatch');
 	
 	
 	// Hidden DIV's
 	display_context_menu();
 	display_global_config();
-	display_history();
 	display_favorites();
 	display_clear_cache();
 	display_hidden_iframe();
 	
 	echo $html_out;
 	$html_out = "";
-	ob_flush();
-	flush();
+	update_progress_bar(5, 'Preparing Feeds');
 
 	// Feeds
 
 	load_feeds($config_values['Feeds']);
 	feeds_perform_matching($config_values['Feeds']);
-	
+
+	// Comes later incase we just added a torrent	
+	display_history();
+
 	hide_progress_bar();
 	set_default_div();
 }
