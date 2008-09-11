@@ -114,7 +114,7 @@
 		}
 		function timer_init() {
 			global $time_start;
-			$time_start = microtime_float();
+			return $time_start = microtime_float();
 		}
 		function timer_get_time() {
 			global $time_start;
@@ -122,39 +122,45 @@
 		}
 
 		function guess_match($title, $normalize = FALSE) { 
-			/* regexp explanation
-			* 3 main parts
-			* a) /^([^-\(]+)(?:.+)?\b												* a Matches Name and has an optional match to filter episode title when split with a -
-			* (S\d+E\d+|\d+x\d+|\d+of\d+|[\d -.]{10})	 * (b|c|d|e)Matches Episode Number 
-				b) S\d+E\d+				* S12E1
-				c) \d+x\d+				 * 1x23
-				d) \d+of\d+					* 3of5
-				e) [\d -.]{10}		 * 2008-03-23 or 07.23.2008 or .20082306. etc.
-			* (?:.* (DVB)|.*[\.\(](\w+-\w+)(?:[ \)]\[*\w+\])?|[ \)]+(?:[ \[]+([^\[\]]*)[\]])+|.*\[([\w.]+)\])?	* (f|g|h|i)? Matches release group/rip type
-				f) .* (DVB)																	* Title ends in " DVB" catches a style with no delimiters
-				g) .*[\.\(](\w+-\w+)(?:[ \)]\[*\w+\])?			 * Matches Rip-Group at end of title with optional [XxX] ignored afterwards: XviD-XXxxXX
-					1) .*[\.\(](\w+-\w+)		 * Moves to end and Matches Rip-Group with . or ( directly before
-					2)(?:[ \)]\[*\w+\])?		 * Optinal [XxX] preceded by ' ' or )
-				h) [ \)]+(?:[ \[]+([^\[\]]*)[\]])+					 * Matches [rip - group] right after the episode #: [XviD - XXxxXX] preceded by " " or )
-				i) .*\[([\w.]+)\]														* matches a title with a name(possibly with a .) inside a [] at the end as last case: [XXxx.XXX]
-			* | means or
-			* () groups the or statements
-			* ? makes the last grouping optional for a title only match
-			* So the full expression is simply a(b|c|d|e)(f|g|h|i)?
-			*/
-			$reg1='/^([^-\(]+)(?:.+)?\b(S\d+E\d+|\d+x\d+|\d+of\d+|[\d -.]{10})(?:.* (DVB)|.*[\.\(](\w+-\w+)(?:[ \)]\[*\w+\])?|[ \)]+(?:[ \[]+([^\[\]]*)[\]])+|.*\[([\w.]+)\])?.*/';
+			// Main regexp
+			$reg1 ='/^';
+			// Series Title 
+			$reg1.='([^-\(]+)'; // string not including - or (
+			$reg1.='(?:.+)?'; // optinally followed by a title, length is determined by the episode match
+			// Episode 
+			$reg1.='\b(';  // must be a word boundry before the episode
+			$reg1.='S\d+E\d+'.'|';  // S12E1
+			$reg1.='\d+x\d+' .'|';  // 1x23
+			$reg1.='\d+of\d+'.'|';  // 03of18
+			$reg1.='[\d -.]{10}';   // 2008-03-23 or 07.23.2008 or .20082306. etc
+			$reg1.=')/';
+			// skip any info before quality
+			// Quality
+			$quality ='/(DVB'  .'|';
+			$quality.='DSRIP'  .'|';
+			$quality.='DVBRip' .'|';
+			$quality.='DVDR'   .'|';
+			$quality.='DVDRip' .'|';
+			$quality.='DVDScr' .'|';
+			$quality.='HR.HDTV'.'|';
+			$quality.='HDTV'   .'|';
+			$quality.='HR.PDTV'.'|';
+			$quality.='PDTV'   .'|';
+			$quality.='SatRip' .'|';
+			$quality.='SVCD'   .'|';
+			$quality.='TVRip'  .'|';
+			$quality.='WebRip' .'|';
+			$quality.='720p'   .'|';
+			$quality.='1080i'  .'|';
+			$quality.='1080p)/i';
+			// any random info after match
 			if(preg_match($reg1, $title, $regs)) {
 				$episode_guess = trim($regs[2]);
 				$key_guess = str_replace("'", "&#39;", trim($regs[1]));
-				$data_guess = '.*';
-				if(isset($regs[3])) { // The last grouping is optional
-					for($i = 3;$i < 7;$i++) {
-						if($regs[$i] != '') {	
-							$data_guess = str_replace("'", "&#39;", trim($regs[$i]));
-							break;
-						}
-					}
-				}
+				if(preg_match($quality, $title, $qregs))
+					$data_guess = str_replace("'", "&#39;", trim($qregs[1]));
+				else
+					$data_guess = '.*';
 			} else
 				return False;
 			if($normalize == TRUE) {
