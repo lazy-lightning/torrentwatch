@@ -80,7 +80,7 @@
          **************************************************************************/
         function __destruct() {
             unset($this->content);
-            unset($this->result);
+						unset($this->result);
         }
 
 

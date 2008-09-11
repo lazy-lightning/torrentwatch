@@ -14,10 +14,10 @@
 		$config_file = '/share/.torrents/rss_dl.config';
 		$time = 0;
 
-    // Checks array is a key is set, return value or default
-    function _isset($array, $key, $default = 'Not Specified') {
-      return isset($array[$key]) ? $array[$key] : $default;
-    }
+		// Checks array is a key is set, return value or default
+		function _isset($array, $key, $default = 'Not Specified') {
+			return isset($array[$key]) ? $array[$key] : $default;
+		}
 
 		function unlink_temp_files() {
 			global $config_values;
@@ -29,23 +29,23 @@
 		// used to ower case all the keys in an array.
 		// From http://us.php.net/manual/en/function.array-change-key-case.php
 		define('ARRAY_KEY_FC_LOWERCASE', 25); //FOO => fOO
-	  define('ARRAY_KEY_FC_UPPERCASE', 20); //foo => Foo
-	  define('ARRAY_KEY_UPPERCASE', 15); //foo => FOO
-	  define('ARRAY_KEY_LOWERCASE', 10); //FOO => foo
-	  define('ARRAY_KEY_USE_MULTIBYTE', true); //use mutlibyte functions
+		define('ARRAY_KEY_FC_UPPERCASE', 20); //foo => Foo
+		define('ARRAY_KEY_UPPERCASE', 15); //foo => FOO
+		define('ARRAY_KEY_LOWERCASE', 10); //FOO => foo
+		define('ARRAY_KEY_USE_MULTIBYTE', true); //use mutlibyte functions
 	 
-	  /**
-	  * change the case of array-keys
-	  *
-	  * use: array_change_key_case_ext(array('foo' => 1, 'bar' => 2), ARRAY_KEY_UPPERCASE);
-	  * result: array('FOO' => 1, 'BAR' => 2)
-	  *
-	  * @param    array
-	  * @param    int
-	  * @return     array
-	  */
+		/**
+		* change the case of array-keys
+		*
+		* use: array_change_key_case_ext(array('foo' => 1, 'bar' => 2), ARRAY_KEY_UPPERCASE);
+		* result: array('FOO' => 1, 'BAR' => 2)
+		*
+		* @param		array
+		* @param		int
+		* @return		 array
+		*/
 		function array_change_key_case_ext($array, $case = ARRAY_KEY_LOWERCASE) {
-			$newArray = array();   
+			$newArray = array();	 
 			//for more speed define the runtime created functions in the global namespac
 			//get function
 			$function = 'strToUpper'; //default
@@ -58,7 +58,7 @@
 					else 
 						$function = 'lcfirst';
 					break;
-				//first-char-to-uppercase               
+				//first-char-to-uppercase							 
 				case 20:
 					$function = 'ucfirst';
 					break;
@@ -103,7 +103,7 @@
 					return guess_atom_torrent($rs['summary']);
 			} else if(isset($rs['enclosure'])) { // RSS Enclosure
 				return $rs['enclosure']['url'];
-			} else {  // Standard RSS
+			} else {	// Standard RSS
 				return $rs['link'];
 			}
 		}
@@ -124,19 +124,19 @@
 		function guess_match($title, $normalize = FALSE) { 
 			/* regexp explanation
 			* 3 main parts
-			* a) /^([^-\(]+)(?:.+)?\b                        * a Matches Name and has an optional match to filter episode title when split with a -
-			* (S\d+E\d+|\d+x\d+|\d+of\d+|[\d -.]{10})   * (b|c|d|e)Matches Episode Number 
-				b) S\d+E\d+        * S12E1
-				c) \d+x\d+         * 1x23
-				d) \d+of\d+          * 3of5
-				e) [\d -.]{10}     * 2008-03-23 or 07.23.2008 or .20082306. etc.
-			* (?:.* (DVB)|.*[\.\(](\w+-\w+)(?:[ \)]\[*\w+\])?|[ \)]+(?:[ \[]+([^\[\]]*)[\]])+|.*\[([\w.]+)\])?  * (f|g|h|i)? Matches release group/rip type
-				f) .* (DVB)                                  * Title ends in " DVB" catches a style with no delimiters
-				g) .*[\.\(](\w+-\w+)(?:[ \)]\[*\w+\])?       * Matches Rip-Group at end of title with optional [XxX] ignored afterwards: XviD-XXxxXX
-					1) .*[\.\(](\w+-\w+)     * Moves to end and Matches Rip-Group with . or ( directly before
-					2)(?:[ \)]\[*\w+\])?     * Optinal [XxX] preceded by ' ' or )
-				h) [ \)]+(?:[ \[]+([^\[\]]*)[\]])+           * Matches [rip - group] right after the episode #: [XviD - XXxxXX] preceded by " " or )
-				i) .*\[([\w.]+)\]                            * matches a title with a name(possibly with a .) inside a [] at the end as last case: [XXxx.XXX]
+			* a) /^([^-\(]+)(?:.+)?\b												* a Matches Name and has an optional match to filter episode title when split with a -
+			* (S\d+E\d+|\d+x\d+|\d+of\d+|[\d -.]{10})	 * (b|c|d|e)Matches Episode Number 
+				b) S\d+E\d+				* S12E1
+				c) \d+x\d+				 * 1x23
+				d) \d+of\d+					* 3of5
+				e) [\d -.]{10}		 * 2008-03-23 or 07.23.2008 or .20082306. etc.
+			* (?:.* (DVB)|.*[\.\(](\w+-\w+)(?:[ \)]\[*\w+\])?|[ \)]+(?:[ \[]+([^\[\]]*)[\]])+|.*\[([\w.]+)\])?	* (f|g|h|i)? Matches release group/rip type
+				f) .* (DVB)																	* Title ends in " DVB" catches a style with no delimiters
+				g) .*[\.\(](\w+-\w+)(?:[ \)]\[*\w+\])?			 * Matches Rip-Group at end of title with optional [XxX] ignored afterwards: XviD-XXxxXX
+					1) .*[\.\(](\w+-\w+)		 * Moves to end and Matches Rip-Group with . or ( directly before
+					2)(?:[ \)]\[*\w+\])?		 * Optinal [XxX] preceded by ' ' or )
+				h) [ \)]+(?:[ \[]+([^\[\]]*)[\]])+					 * Matches [rip - group] right after the episode #: [XviD - XXxxXX] preceded by " " or )
+				i) .*\[([\w.]+)\]														* matches a title with a name(possibly with a .) inside a [] at the end as last case: [XXxx.XXX]
 			* | means or
 			* () groups the or statements
 			* ? makes the last grouping optional for a title only match
@@ -160,12 +160,12 @@
 			if($normalize == TRUE) {
 				// Convert . and _ to spaces, and trim result
 				$from = "._";
-				$to = "  ";
+				$to = "	";
 				$key_guess = trim(strtr($key_guess, $from, $to));
 				$data_guess = trim(strtr($data_guess, $from, $to));
 				$episode_guess = trim(strtr($episode_guess, $from, $to));
 				// Standardize episode output to SSxEE, strip leading 0
-				// This is (b|c|d) from earlier.  If it is style e there will be no replacement, only strip leading 0
+				// This is (b|c|d) from earlier.	If it is style e there will be no replacement, only strip leading 0
 				$episode_guess = ltrim(preg_replace('/(S(\d+)E(\d+)|(\d+)x(\d+)|(\d+)of(\d+))/', '\2\4\6x\3\5\7', $episode_guess), '0');
 			}
 			return array("key" => $key_guess, "data" => $data_guess, "episode" => $episode_guess);

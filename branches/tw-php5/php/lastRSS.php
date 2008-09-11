@@ -205,11 +205,11 @@ class lastRSS {
 							preg_match_all( '/([^\s"=]+)="([^"]*?)"/' , $temp2, $attr, PREG_SET_ORDER);
 							$result['items'][$i][$itemtag] = array();
 							if ($temp != '') $result['items'][$i][$itemtag]['value'] = $temp;
-						  	foreach($attr as $a) { 
+								foreach($attr as $a) { 
 								$result['items'][$i][$itemtag][$a[1]] = $a[2];
-						  	}
+								}
 						} else {
-						  if ($temp != '') $result['items'][$i][$itemtag] = $temp; // Set only if not empty
+							if ($temp != '') $result['items'][$i][$itemtag] = $temp; // Set only if not empty
 						}
 						/** end rss attribute changes **/
 

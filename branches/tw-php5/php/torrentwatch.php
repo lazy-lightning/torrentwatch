@@ -7,7 +7,7 @@ function usage() {
 	global $argv;
 	echo "$argv[0] - Torrent Watch Folder\n";
 	echo "Valid Options\n";
-	echo "  check     - check for new torrents\n\n";
+	echo "	check		 - check for new torrents\n\n";
 }
 
 function parse_options() {
