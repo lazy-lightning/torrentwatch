@@ -1,7 +1,8 @@
 #!/bin/sh
 
+EXE_FILES="index.cgi rss_dl.php"
 DOC_FILES="changelog CREDITS LICENSE TODO rss_dl.config.orig"
-RELEASE_FILES="$DOC_FILES css/ images/ javascript/ php/"
+RELEASE_FILES="$EXE_FILES $DOC_FILES css/ images/ javascript/ php/"
 RELEASE=torrentwatch-dev-$1
 
 rm -rf release
