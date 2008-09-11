@@ -7,19 +7,19 @@
 			$guess = guess_match($title);
 			if(($item['Feed'] == 'all' || $item['Feed'] == $opts['URL']) &&
 			   ($item['Filter'] != '' && preg_match('/'.strtolower($item['Filter']).'/', $title)) &&
-			   ($item['Not'] == "" OR !preg_match('/'.strtolower($item['Not']).'/', $title)) &&
+			   ($item['Not'] == '' OR !preg_match('/'.strtolower($item['Not']).'/', $title)) &&
 				 ($item['Quality'] == 'All' OR preg_match('/'.strtolower($item['Quality']).'/', $title)) &&
 			   ($item['Episodes'] == '' OR preg_match('/^'.strtolower($item['Episodes']).'$/', $guess['episode'])) ) {
 				_debug('Match found for '.$rs['title']."\n");
 				if(check_cache($rs['title'])) {
 					if($test_run)
 						return;
-					add_cache($rs['title']);
 					if($link = get_torrent_link($rs)) {
 						if(isset($config_values['Global']['HTMLOutput']))
 							update_progress_bar(0, "Starting $title");
-						client_add_torrent($link, NULL, $item, $opts['URL']);
-					} else {
+						if(client_add_torrent($link, NULL, $item, $opts['URL']))
+							add_cache($rs['title']);
+					} else {                     
 						_debug("Unable to find URL for ".$rs['title']."\n");
 						$matched = "nourl";
 					}
