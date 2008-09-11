@@ -43,7 +43,7 @@ input[type=text] {
 
 /*-----------------
  *
- * T O P   M E N U
+ * T O P	 M E N U
  *
  * ----------------*/
 div.mainoptions {
@@ -133,7 +133,7 @@ div.mainoptions ul li.divider {
 
 /*-----------------
  *
- * F I L T E R   B A R
+ * F I L T E R	 B A R
  *
  * ---------------*/
 
@@ -197,7 +197,7 @@ div#filterbar ul li.selected a {
 
 /*--------------------------
  *
- * T O R R E N T   L I S T
+ * T O R R E N T	 L I S T
  *
  * ------------------------*/
 div#torrentlist_container {
@@ -508,7 +508,7 @@ div.dialog_window#history {
 
 /*--------------------------
  *
- * C O N T E X T   M E N U
+ * C O N T E X T	 M E N U
  *
  * ------------------------*/
 
@@ -548,7 +548,7 @@ div.context_menu ul li a:hover {
 
 /*--------------------------
  *
- * U P D A T E   I F R A M E
+ * U P D A T E	 I F R A M E
  *
  * ------------------------*/
 
@@ -567,7 +567,7 @@ iframe#update_frame
 
 /*-----------------
  *
- * O L D   C S S   S T U F F
+ * O L D	 C S S	 S T U F F
  *
  * ----------------*/
 

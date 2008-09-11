@@ -32,7 +32,6 @@ exename=`echo $pwd | sed 's#.*/\([^/]*\)$#\1#g'`
 NAME="torrentwatch"
 CONFIG="rss_dl.config"
 WEB_SCRIPT='index.cgi'
-WEB="/opt/sybhttpd/default/"
 
 # Script Defines
 INSTALL="/opt/sybhttpd/localhost.drives/$urlpwd/tw.scripts.tar"
@@ -54,12 +53,12 @@ FTPSERVER="/mnt/syb8634/etc/ftpserver.sh"
 # Send the closing HTML
 end_html() 
 { 
-  cat <<EOF
+	cat <<EOF
 </h2>
 </body>
 </html>
 EOF
-  
+	
 }
 
 
@@ -67,44 +66,43 @@ EOF
 check_has_hdd()
 {
 
-  /bin/mount | /bin/grep -q /opt/sybhttpd/localhost.drives/HARD_DISK
-  if [ $? != 0 ]; then
-    echo "Sorry, but you do not appear to have HARD_DISK mounted<br>" 
-    end_html
-    exit 0
-  fi
+	/bin/mount | /bin/grep -q /opt/sybhttpd/localhost.drives/HARD_DISK
+	if [ $? != 0 ]; then
+		echo "Sorry, but you do not appear to have HARD_DISK mounted<br>" 
+		end_html
+		exit 0
+	fi
 
 }
 
 autostart_add()
-{   
-    /bin/cat "$STARTER" | /bin/grep -q "$START_SCRIPT"
-    if [ $? == 0 ]; then
+{	 
+	/bin/cat "$STARTER" | /bin/grep -q "$START_SCRIPT"
+	if [ $? == 0 ]; then
 		echo "$START_SCRIPT already set to start on boot, skipping <br>"
-    else
+	else
 		echo "Adding $START_SCRIPT to community agreed startup script.<br>"
 		
 		rm -f /tmp/.starter.tmp
 		IFS=""
 		cat "$STARTER" | while read line 
 		do
-		  echo "$line" >> /tmp/.starter.tmp
-		  if [ x"$line" == x"$MARKER" ]; then
-			  # echo "cd ${DEST}/ && ./telnetd -l /bin/sh &" >> /tmp/.starter
-			  echo "${DEST}/${START_SCRIPT} ${START_SCRIPT_OPTS}" >> /tmp/.starter.tmp
-		  fi
+			echo "$line" >> /tmp/.starter.tmp
+			if [ x"$line" == x"$MARKER" ]; then
+				# echo "cd ${DEST}/ && ./telnetd -l /bin/sh &" >> /tmp/.starter
+				echo "${DEST}/${START_SCRIPT} ${START_SCRIPT_OPTS}" >> /tmp/.starter.tmp
+			fi
 		done
 		cat < /tmp/.starter.tmp > "$STARTER"
 		chmod 755 "$STARTER"
 		rm -f /tmp/.starter.tmp
-    fi
-
+	fi
 }
 
 autostart_setup()
 {
 
-  # Insert code here to make it auto-start
+	# Insert code here to make it auto-start
 	if [ -f "$STARTER" ]; then
 		echo "Found user community agreed on startup file...<br>"
 	else
@@ -115,14 +113,17 @@ autostart_setup()
 #!/bin/sh
 #
 
+PATH=\$PATH:/share/bin
+HOME=/share/
+
 $MARKER
 
 exit 0
 EOF
 		chmod 755 "$STARTER"
-     fi
+	fi
 
-		# Check if it is already called from ftpserver.sh
+	# Check if it is already called from ftpserver.sh
 	grep -q "$STARTER" "$FTPSERVER"
 	if [ $? != 0 ]; then
 		echo "Installer starter<br>"
@@ -132,12 +133,12 @@ EOF
 		rm -f /tmp/.ftpserver.tmp /tmp/.found
 		IFS=""
 		cat "$FTPSERVER" | while read line
-		  do
-		  echo "$line" >> /tmp/.ftpserver.tmp
-		  if [ x"$line" == x"start() {" ]; then
-			  echo "      $STARTER &" >> /tmp/.ftpserver.tmp
-			  touch /tmp/.found
-		  fi
+			do
+			echo "$line" >> /tmp/.ftpserver.tmp
+			if [ x"$line" == x"start() {" ]; then
+				echo "			$STARTER &" >> /tmp/.ftpserver.tmp
+				touch /tmp/.found
+			fi
 		done
 		
 		if [ -f /tmp/.found ]; then
@@ -158,7 +159,7 @@ install_harddisk()
 	set -- $INSTALL
 	INSTA="$1"
 
- # We expect to find tarball next to this script.
+	# We expect to find tarball next to this script.
 	if [ ! -f "$INSTA" ]; then
 		echo "Unable to read<br>"
 		echo "$INSTALL<br>"
@@ -169,7 +170,7 @@ install_harddisk()
 	fi
 
 	echo "Installing to HARD_DISK...<br>"
-  # We make sure that HARD_DISK/.torrents
+	# We make sure that HARD_DISK/.torrents
 	mkdir -p "$DEST"
 	chmod 777 "$DEST"
 	
@@ -213,8 +214,8 @@ install_harddisk()
 	echo "Stuccess..<br>"
 
 	echo 'Please procede to the';
-	echo '<a href="http://localhost.drives:8883/HARD_DISK/torrentwatch/tw-iface.cgi">Configuration Interface</a>.<br>'
-  # Remove the tarball
+	echo '<a href="http://popcorn:8883/torrentwatch/index.cgi">Configuration Interface</a>.<br>'
+	# Remove the tarball
 	rm -f "$INSTA"
 
 	exit 0;
@@ -235,8 +236,8 @@ install_harddisk()
 
 # check if we were run without arguments, if so display "menu"
 case "$1" in
-  install)
-      install_harddisk;;
+	install)
+		install_harddisk;;
 esac
 
 

@@ -3,7 +3,7 @@
 function saveConfig() {
 	toggleMenu('configuration');
 	showLayer('progressDiv');
-	setProgres('pogressBar', 50);
+	setProgress('progressBar', 50);
 	setText('progressBar', 'Saving Config');
 	submitForm('config_form');
 }
@@ -40,7 +40,7 @@ function contextDLNow()
 }
 
 
-function submitform ( whichForm )
+function submitForm ( whichForm )
 {
 	document.getElementById(whichForm).submit();
 }
@@ -84,7 +84,7 @@ function markTorrentAlt()
 {
 	var alt = 0;
 	var elem = document.getElementById('torrentlist_container');
-	for(  var F in elem.childNodes ) {
+	for(	var F in elem.childNodes ) {
 		if ( elem.childNodes[F].className == 'feed' ) {
 			for ( var T in elem.childNodes[F].firstChild.childNodes ) {
 				var torrent = elem.childNodes[F].firstChild.childNodes[T];
@@ -169,39 +169,39 @@ function toggleMenu( whichLayer )
 
 function toggleLayer( whichLayer )
 {
-  var elem, vis;
-  if( document.getElementById ) // this is the way the standards work
-    elem = document.getElementById( whichLayer );
-  else if( document.all ) // this is the way old msie versions work
-      elem = document.all[whichLayer];
-  else if( document.layers ) // this is the way nn4 works
-    elem = document.layers[whichLayer];
-  vis = elem.style;
-  // if the style.display value is blank we try to figure it out here
-  if(vis.display==''&&elem.offsetWidth!=undefined&&elem.offsetHeight!=undefined)
-    vis.display = (elem.offsetWidth!=0&&elem.offsetHeight!=0)?'block':'none';
-  vis.display = (vis.display==''||vis.display=='block')?'none':'block';
+	var elem, vis;
+	if( document.getElementById ) // this is the way the standards work
+		elem = document.getElementById( whichLayer );
+	else if( document.all ) // this is the way old msie versions work
+			elem = document.all[whichLayer];
+	else if( document.layers ) // this is the way nn4 works
+		elem = document.layers[whichLayer];
+	vis = elem.style;
+	// if the style.display value is blank we try to figure it out here
+	if(vis.display==''&&elem.offsetWidth!=undefined&&elem.offsetHeight!=undefined)
+		vis.display = (elem.offsetWidth!=0&&elem.offsetHeight!=0)?'block':'none';
+	vis.display = (vis.display==''||vis.display=='block')?'none':'block';
 	if(whichLayer=='favorites') // Also display the first fav 
 		toggleFav(elem.childNodes[1].id);
 }
 
 function hideLayer( whichLayer ) {
-  var elem, vis;
-  if( document.getElementById ) // this is the way the standards work
-    elem = document.getElementById( whichLayer );
-  else if( document.all ) // this is the way old msie versions work
-      elem = document.all[whichLayer];
-  else if( document.layers ) // this is the way nn4 works
-    elem = document.layers[whichLayer];
-  elem.style.display = 'none';
+	var elem, vis;
+	if( document.getElementById ) // this is the way the standards work
+		elem = document.getElementById( whichLayer );
+	else if( document.all ) // this is the way old msie versions work
+			elem = document.all[whichLayer];
+	else if( document.layers ) // this is the way nn4 works
+		elem = document.layers[whichLayer];
+	elem.style.display = 'none';
 }
 function showLayer( whichLayer ) {
-  var elem, vis;
-  if( document.getElementById ) // this is the way the standards work
-    elem = document.getElementById( whichLayer );
-  else if( document.all ) // this is the way old msie versions work
-      elem = document.all[whichLayer];
-  else if( document.layers ) // this is the way nn4 works
-    elem = document.layers[whichLayer];
-  elem.style.display = 'block';
+	var elem, vis;
+	if( document.getElementById ) // this is the way the standards work
+		elem = document.getElementById( whichLayer );
+	else if( document.all ) // this is the way old msie versions work
+			elem = document.all[whichLayer];
+	else if( document.layers ) // this is the way nn4 works
+		elem = document.layers[whichLayer];
+	elem.style.display = 'block';
 }

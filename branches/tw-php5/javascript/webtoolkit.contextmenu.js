@@ -1,7 +1,7 @@
 /**
 *
-*  Simple Context Menu
-*  http://www.webtoolkit.info/
+*	Simple Context Menu
+*	http://www.webtoolkit.info/
 *
 **/
 
