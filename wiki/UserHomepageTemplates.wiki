@@ -24,7 +24,7 @@ The variables name must be enclosed with ${} and it must be in all capital lette
     * ${USB_B_LINK}
     * ${USB_B1_LINK}
   * ${HD_LINK_ALL} - Direct link to filebrowser displaying all media types(movies, photos, music, web pages) at the same time
-    * Same available options as previous, just append _ALL
+    * Same available options as previous, just append `_ALL`
     * http://localhost.drives:8883/HARD_DISK/?filter=0
 
 *What variables does the item table builder add to the page template?*
