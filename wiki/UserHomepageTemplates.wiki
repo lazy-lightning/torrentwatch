@@ -39,8 +39,8 @@ The variables name must be enclosed with ${} and it must be in all capital lette
   * ${ITEM_NAME} - Name of this item
   * ${ITEM_LINK} - The destination URL of this item
   * ${ITEM_ALT} - info to be placed in the anchor tags alt=, this will be displayed when info is pushed
-  * ${COUNT} - In the item template, COUNT is the current item number, with 1 being at 
-  * ${LINKNUM} - The current items number, with 1 being at the begining of the current pagethe begining of the item list
+  * ${COUNT} - In the item template, COUNT is the current item number, with 1 being at the begining of the item list
+  * ${LINKNUM} - The current items number, with 1 being at the begining of the current page
   * ${FIRSTLINK} - If this item is the begining of a row, this will be set to the contents of FIRST_LINK_DATA from the .config file.  This usually is set to onkeyleftset='linkname' to direct the link focus from the table to a specific link
 
 *What other variables can i use?*
