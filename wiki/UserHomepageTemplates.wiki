@@ -28,6 +28,8 @@ The variables name must be enclosed with ${} and it must be in all capital lette
     * http://localhost.drives:8883/HARD_DISK/?filter=0
 
 *What variables does the item table builder add to the page template?*
+  * ${HTML_ITEMS_TABLE} - This is the table that you told start.cgi to build in your .config
+  * ${HTML_PAGING} - The paging table, which is the up and down page links
   * ${COUNT} - The number of items across all pages
   * ${STARTITEM} - The number of the first item on this page
   * ${ENDITEM} - The number of the last item on this page
