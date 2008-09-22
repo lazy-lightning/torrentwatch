@@ -48,7 +48,7 @@ One of the primary features of start.cgi that allows it to mimic the nmt interfa
 
   * DATESTR="%h:%M %p"
 
-Datestr uses the same formatting as the unix date command(http://www.google.com/search?q=man+date)  Through this you can set the format of the ${DATE} variable
+Datestr uses the same formatting as the unix date command([http://www.networkedmediatank.com/showthread.php?tid=6874&pid=70440#pid70440 garps post] [http://www.google.com/search?q=man+date date manual page])  Through this you can set the format of the ${DATE} variable
 
 *What variables are required with the item table builder?*
 
