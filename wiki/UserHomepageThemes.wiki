@@ -52,6 +52,9 @@ Datestr uses the same formatting as the unix date command(http://www.google.com/
 
 *What variables are required with the item table builder?*
 
+  * BUILD_ITEM_TABLE=1
+
+This variables tells start.cgi that we want to use the item builder.  It must be equal to 1 or the rest of these variables will be ignored.
 
 -------------------
   * ITEM_TABLE_FUNC="show_item_table"
