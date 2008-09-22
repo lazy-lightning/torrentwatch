@@ -105,9 +105,11 @@ This variable controls which items will be put in the table. Different items mus
   * web_services     - Items for saved web services links
   * poweroff         - Item for stopping active services, then powering down
   * reboot           - Item for stopping active services, then rebooting
+----------
 
---------------------------
-User defined items in the item list
+*What variables are optional with the table builder*
+
+  * User defined items in the item list
 
 You can also put any word you want in the DISPLAY_LIST, and start.cgi will attempt to run a function of the same name.  To define a function use the following template, replacing funcname with your chosen name.  You can have multiple items from the same function by repeating the if statement.  This function should be placed at the bottom of the relevant .config file.  You can also define multiple functions with different names.
 {{{
@@ -137,5 +139,9 @@ funcname() {
 }}}
 Just fill in the data after each ITEM_ variable.
 ---------------------------
+  * DISPLAY_RANDOM_HD=1
+
+If you set this variable equal to 1, when outputting the hard_disk item 3 additional items will be included.  These 3 items will randomly play from the Video, Music, or Photo directory of the NMT HD.
+
 
 tbw - to be written
