@@ -16,6 +16,7 @@
     * updating clock from erik bernhardson
   * new script openshared.cgi, like play.cgi but for html files
     * Intended to mount a shared drive before loading the jukebox
+    * http://127.0.0.1:8883/openshared.cgi?share=mysharename&destpath=/path/on/share/file.html
   * added multiple language support for the item table builder
     * if your PCH uses a different language, please see the readme in the .user_homepage/lang directory.  
   * when changing theme, will now also show theme-*.zip files in the root of mounted drives, and install them when chosen
