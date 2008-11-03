@@ -476,14 +476,15 @@ div.favorite_not label.item,
 div.favorite_savein label.item,
 div.favorite_episodes label.item,
 div.favorite_feed label.item,
+div.favorite_seedratio label.item,
 div.favorite_quality label.item {
 	clear: left;
-	width: 50px;
+	width: 70px;
 	padding-right: 10px;
 	}
 
 div.FavInfo input[type=text] {
-	width: 261px;
+	width: 241px;
 	}
 
 div.dialog_window#feeds input[type=submit],

@@ -92,11 +92,13 @@
 		return $return;
 	}
 
-	function transmission13x_add_torrent($tor, $dest) {
+	function transmission13x_add_torrent($tor, $dest, $seedRatio = -1) {
 		// transmission dies with bad folder if it doesn't end in a /
 		if(substr($dest, strlen($dest)-1, 1) != '/')
 			$dest .= '/';
 		$request = array('method' => 'torrent-add', 'arguments' => array('download-dir' => $dest, 'metainfo' => base64_encode($tor)));
+		if($seedRatio != "" & $seedRatio >= 0)
+			$request['arguments']['ratio-limit'] = $seedRatio;
 		$responce = transmission_rpc($request);
 		if(isset($responce['result']) AND ($responce['result'] == 'success' or $responce['result'] == 'duplicate torrent'))
 			return 0;
@@ -150,7 +152,7 @@
 				break;
 			case 'transmission1.3x':
 			case 'transmission1.32':
-				$return = transmission13x_add_torrent($tor, $dest);
+				$return = transmission13x_add_torrent($tor, $dest, _isset($fav, 'seedRatio', -1));
 				break;
 			case 'transmission1.22':
 				$return = transmission122_add_torrent($tor, $dest);

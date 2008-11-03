@@ -125,11 +125,12 @@
 			return; // Bad form data
 		$list = array("name"			=> "Name",
 									"filter"		=> "Filter",
-									"not"			 => "Not",
+									"not"			  => "Not",
 									"savein"		=> "Save In",
 									"episodes"	=> "Episodes",
 									"feed"			=> "Feed",
-									"quality"	 => "Quality");
+									"quality"	  => "Quality",
+									"seedratio" => "seedRatio");
 		foreach($list as $key => $data) {
 			if(isset($_GET[$key]))
 				$config_values['Favorites'][$idx][$data] = urldecode($_GET[$key]);

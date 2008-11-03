@@ -116,9 +116,11 @@
 			global $time_start;
 			return $time_start = microtime_float();
 		}
-		function timer_get_time() {
+		function timer_get_time($time = NULL) {
 			global $time_start;
-			return (microtime_float() - $time_start);
+			if($time == NULL)
+				$time = $time_start;
+			return (microtime_float() - $time);
 		}
 
 		function guess_match($title, $normalize = FALSE) { 

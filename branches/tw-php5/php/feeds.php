@@ -1,15 +1,34 @@
 <?php
 
-		function check_for_torrent($item, $key, $opts) {
+		function check_for_torrent(&$item, $key, $opts) {
 			global $matched, $test_run, $config_values;
+
 			$rs = $opts['Obj'];
 			$title = strtolower($rs['title']);
+			global $func_timer;
+			$timer = timer_init();
 			$guess = guess_match($title);
-			if(($item['Feed'] == 'all' || $item['Feed'] == $opts['URL']) &&
-			   ($item['Filter'] != '' && preg_match('/'.strtolower($item['Filter']).'/', $title)) &&
-			   ($item['Not'] == '' OR !preg_match('/'.strtolower($item['Not']).'/', $title)) &&
-				 ($item['Quality'] == 'All' OR preg_match('/'.strtolower($item['Quality']).'/', $title)) &&
-			   ($item['Episodes'] == '' OR preg_match('/^'.strtolower($item['Episodes']).'$/', $guess['episode'])) ) {
+			$func_timer += timer_get_time($timer);
+			switch(_isset($config_values['Settings'], 'MatchStyle')) {
+				case 'simple':	
+					$hit= (($item['Feed'] == 'all' || $item['Feed'] == $opts['URL']) &&
+					 ($item['Filter'] != '' && strpos(strtolower($item['Filter']), $title)) &&
+					 ($item['Not'] == '' OR !strpos(strtolower($item['Not']), $title)) &&
+					 ($item['Quality'] == 'All' OR strpos(strtolower($item['Quality']), $title)) &&
+					 ($item['Episodes'] == '' OR preg_match('/^'.strtolower($item['Episodes']).'$/', $guess['episode'])) );
+					break;
+				case 'glob':
+					$hit = FALSE;
+					break;
+				default:
+					$hit = (($item['Feed'] == 'all' || $item['Feed'] == $opts['URL']) &&
+				   ($item['Filter'] != '' && preg_match('/'.strtolower($item['Filter']).'/', $title)) &&
+				   ($item['Not'] == '' OR !preg_match('/'.strtolower($item['Not']).'/', $title)) &&
+					 ($item['Quality'] == 'All' OR preg_match('/'.strtolower($item['Quality']).'/', $title)) &&
+				   ($item['Episodes'] == '' OR preg_match('/^'.strtolower($item['Episodes']).'$/', $guess['episode'])) );
+					break;
+			}
+			if($hit) {
 				_debug('Match found for '.$rs['title']."\n");
 				if(check_cache($rs['title'])) {
 					if($test_run)

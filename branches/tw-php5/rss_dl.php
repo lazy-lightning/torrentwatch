@@ -11,6 +11,7 @@
 		$config_values;
 		$test_run = 0;
 		$verbosity = 0;
+		$func_timer = 0;
 
 		function usage() {
 			global $argv;
@@ -170,7 +171,7 @@
 //
 //
 
-	timer_init();
+	$main_timer = timer_init();
 	read_config_file();
 	if(isset($config_values['Settings']['Verbose']))
 		$verbosity = $config_values['Settings']['Verbose'];
@@ -203,6 +204,7 @@
 
 	unlink_temp_files();
 
-	_debug(timer_get_time()."s\n",0);
+	_debug($func_timer."s\n",0);
 
+	_debug(timer_get_time($main_timer)."s\n",0);
 ?>

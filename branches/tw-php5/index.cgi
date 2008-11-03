@@ -59,6 +59,7 @@ function parse_options_localhost() {
 					$_GET['feed'] = $_GET['rss'];
 					$_GET['button'] = 'Add';
 					$_GET['savein'] = 'Default';
+					$_GET['seedratio'] = '-1';
 					update_favorite();
 				} else
 					$output = "Could not generate Match\n";
@@ -130,6 +131,7 @@ function parse_options() {
 					$_GET['feed'] = $_GET['rss'];
 					$_GET['button'] = 'Add';
 					$_GET['savein'] = 'Default';
+					$_GET['seedratio'] = '-1';
 					update_favorite();
 				} else
 					$output = "Could not generate Match\n";
@@ -291,6 +293,8 @@ function display_favorites_info($item, $key) {
 	$html_out .= '</select></div>'."\n";
 	$html_out .= '<div class="favorite_quality"><label class="item" title="Regexp Filter against full title">Quality:</label>';
 	$html_out .= '<input type="text" name="quality" value="'.$item['Quality'].'"></div>'."\n";
+	$html_out .= '<div class="favorite_seedratio"><label class="item" title="Maximum seeding ratio, set to -1 to disable">Seed Ratio:</label>';
+	$html_out .= '<input type="text" name="seedratio" value="'._isset($item, 'seedRatio', '-1').'"></div>'."\n";
 	$html_out .= '<input type="submit" class="add" name="button" value="Update">'."\n";
 	$html_out .= '<input type="submit" class="del" name="button" value="Delete">'."\n";
 	$html_out .= _jscript("toggleMenu('favorites')", "Close").'</form></div>'."\n";
@@ -431,9 +435,9 @@ function set_default_div() {
 }
 
 function close_html() {
-	global $html_out, $debug_output;
+	global $html_out, $debug_output, $main_timer;
 	$html_out .= "<div class='clear'></div>\n<div class='timer'>Page Took ";
-	$html_out .= number_format(timer_get_time(), 4)."s to load</div>";
+	$html_out .= number_format(timer_get_time($main_timer), 4)."s to load</div>";
 	$html_out .= "<div class='rss_debug'>$debug_output</div>";
 	$html_out .= "</body></html>\n";
 	echo $html_out;
@@ -444,7 +448,7 @@ function close_html() {
 // MAIN Function
 //
 //
-timer_init();
+$main_timer = timer_init();
 ?>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
