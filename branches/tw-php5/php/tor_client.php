@@ -108,6 +108,12 @@
 		}
 	}
 
+	function nzb_add_torrent($tor, $dest) {
+		// this isn't actually torrents, but news files
+		// Not implemented yet
+		return 1;
+	}
+
 	function client_add_torrent($filename, $dest, $fav = NULL, $feed = NULL) {
 		global $config_values, $hit;
 		$hit = 1;
@@ -127,11 +133,16 @@
 			_debug("Couldn't open torrent: $filename\n",0);
 			return FALSE;
 		}
-		$tor_info = new BDecode("", $tor);
-		if(!($tor_name = $tor_info->{'result'}['info']['name'])) {
-			_debug("Couldn't parse torrent: $filename\n", 0);
-			return FALSE;
+		if($config_values['Settings']['Client'] == 'nzb') {
+			$tor_name = "NZB"; // Bad hack, but we have no current way to get info from nzb
+		} else {
+			$tor_info = new BDecode("", $tor);
+			if(!($tor_name = $tor_info->{'result'}['info']['name'])) {
+				_debug("Couldn't parse torrent: $filename\n", 0);
+				return FALSE;
+			}
 		}
+
 		if(!isset($dest)) {
 			$dest = $config_values['Settings']['Download Dir'];
 		}
@@ -159,6 +170,9 @@
 				// Doesn't support setting dest, so here change dest to transmissons
 				$tr_state = new BDecode('/share/.transmission/daemon/state');
 				$dest = $tr_state->{'result'}['default-directory'];
+				break;
+			case 'nzb':
+				$return = nzb_add_torrent($tor, $dest);
 				break;
 			default:
 				_debug("Invalid Torrent Client: ".$config_values['Settings']['Client']."\n",0);

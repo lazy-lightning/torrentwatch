@@ -80,6 +80,16 @@
 			unset($config_out);
 		}
 
+	function update_global_config() {
+    $config_values['Settings']['Download Dir']=urldecode($_GET['downdir']);
+    $config_values['Settings']['Watch Dir']=urldecode($_GET['watchdir']);
+    $config_values['Settings']['Deep Directories']=urldecode($_GET['deepdir']);
+    $config_values['Settings']['Verify Episode']=(isset($_GET['verifyepisodes']) ? 1 : 0);
+    $config_values['Settings']['Save Torrents']=(isset($_GET['savetorrents']) ? 1 : 0);
+    $config_values['Settings']['Client']=urldecode($_GET['client']);
+		return;
+	}
+				
 	function update_favorite() {
 		global $test_run;
 		if(!isset($_GET['button']))
