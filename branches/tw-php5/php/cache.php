@@ -16,7 +16,9 @@
 	  }
 
 	  function add_cache($title) {
-	    global $config_values;
+	    global $config_values, $test_run;
+			if($test_run)
+				return;
 	    if (isset($config_values['Settings']['Cache Dir'])) {
 	      $cache_file = $config_values['Settings']['Cache Dir'] . '/rss_dl_' . filename_encode($title);
 	      touch($cache_file);
@@ -26,9 +28,9 @@
 	  function clear_cache_real($file) {
 	    global $config_values;
 	    $fileglob = $config_values['Settings']['Cache Dir'].'/'.$file;
-	    _debug("Clear: $fileglob\n",2);
+	    _debug("Clear: $fileglob\n",1);
 	    foreach(glob($fileglob) as $fn) {
-	      _debug("Removing $fn\n",1);
+	      _debug("Removing $fn\n",2);
 	      unlink($fn);
 	    }
 	  }

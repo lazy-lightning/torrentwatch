@@ -20,6 +20,7 @@
 				case 'glob':
 					$hit = FALSE;
 					break;
+				case 'regexp':
 				default:
 					$hit = (($item['Feed'] == 'all' || $item['Feed'] == $opts['URL']) &&
 				   ($item['Filter'] != '' && preg_match('/'.strtolower($item['Filter']).'/', $title)) &&

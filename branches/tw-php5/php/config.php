@@ -65,7 +65,7 @@
 					array_walk($group, 'key_callback', $key.'[]');
 				} else {
 					if($subkey) {
-						if(!is_numeric($key)) {	// What does this do
+						if(!is_numeric($key)) {	// What does this do?
 							$group = "$key => $group";
 						}
 						$key = $subkey;

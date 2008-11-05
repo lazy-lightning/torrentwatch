@@ -1,6 +1,8 @@
 #!/mnt/syb8634/server/php5-cgi -qd register_argc_argv=1
 <?php
 
+//  This script is depreciated.
+
 require_once('rss_dl_utils.php');
 
 function usage() {

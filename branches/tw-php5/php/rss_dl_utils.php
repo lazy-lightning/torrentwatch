@@ -26,7 +26,7 @@
 					unlink($file);
 		}
 
-		// used to ower case all the keys in an array.
+		// used to lower case all the keys in an array.
 		// From http://us.php.net/manual/en/function.array-change-key-case.php
 		define('ARRAY_KEY_FC_LOWERCASE', 25); //FOO => fOO
 		define('ARRAY_KEY_FC_UPPERCASE', 20); //foo => Foo
@@ -136,7 +136,7 @@
 			$reg1.='\d+of\d+'.'|';  // 03of18
 			$reg1.='[\d -.]{10}';   // 2008-03-23 or 07.23.2008 or .20082306. etc
 			$reg1.=')/';
-			// skip any info before quality
+
 			// Quality
 			$quality ='/(DVB'  .'|';
 			$quality.='DSRIP'  .'|';
@@ -155,7 +155,7 @@
 			$quality.='720p'   .'|';
 			$quality.='1080i'  .'|';
 			$quality.='1080p)/i';
-			// any random info after match
+
 			if(preg_match($reg1, $title, $regs)) {
 				$episode_guess = trim($regs[2]);
 				$key_guess = str_replace("'", "&#39;", trim($regs[1]));
