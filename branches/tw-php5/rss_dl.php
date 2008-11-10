@@ -28,8 +28,7 @@
 			_debug( "           -u : uninstall cron hook\n",0);
 			_debug( "           -v : verbose output\n",0);
 			_debug( "           -vv: verbose output(even more)\n",0);
-			_debug( " Note: When using -a or -r it must be the last option\n",0);
-			_debug("        This interface only writes to the config file when using the -i option\n",0);
+			_debug( "    Note: This interface only writes to the config file when using the -i option\n",0);
 		}
 
 		function parse_args() {
@@ -182,7 +181,12 @@
 	// Hooks for auto-run from the cron.hourly script
 	if(isset($config_values['Global']['Install'])) {
 		if($config_values['Global']['Install'] == 1) {
-			symlink("/share/.torrents", "/opt/sybhttpd/default/torrentwatch");
+			if(!is_link("/opt/sybhttpd/default/torrentwatch")) {
+				if(file_exists("/opt/sybhttpd/default/torrentwatch")) {
+					unlink("/opt/sybhttpd/default/torrentwatch");
+				}
+				symlink("/share/.torrents", "/opt/sybhttpd/default/torrentwatch");
+			}
 			setup_default_config();
 		}
 		setup_cron_hook($config_values['Global']['Install'], $config_values['Settings']['Cron']);
@@ -197,7 +201,7 @@
 		$hit = 0;
 		check_for_torrents($config_values['Settings']['Watch Dir'], $config_values['Settings']['Download Dir']);
 		if(!$hit)
-			_debug("No New Torrents to add\n", 0);
+			_debug("No New Torrents to add from watch folder\n", 0);
 	} else {
 		_debug("Skipping Watch Folder\n");
 	}

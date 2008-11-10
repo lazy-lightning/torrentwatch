@@ -1,14 +1,23 @@
 <?php
+   function get_torrent_link($rs) {
+      if(isset($rs['id'])) { // Atom
+        if(stristr($rs['id'], 'torrent')) // torrent link in id
+          return $rs['id'];
+        else // torrent hidden in summary
+          return guess_atom_torrent($rs['summary']);
+      } else if(isset($rs['enclosure'])) { // RSS Enclosure
+        return $rs['enclosure']['url'];
+      } else {  // Standard RSS
+        return $rs['link'];
+      }
+    }
 
 		function check_for_torrent(&$item, $key, $opts) {
 			global $matched, $test_run, $config_values;
 
 			$rs = $opts['Obj'];
 			$title = strtolower($rs['title']);
-			global $func_timer;
-			$timer = timer_init();
 			$guess = guess_match($title);
-			$func_timer += timer_get_time($timer);
 			switch(_isset($config_values['Settings'], 'MatchStyle')) {
 				case 'simple':	
 					$hit= (($item['Feed'] == 'all' || $item['Feed'] == $opts['URL']) &&
@@ -18,7 +27,11 @@
 					 ($item['Episodes'] == '' OR preg_match('/^'.strtolower($item['Episodes']).'$/', $guess['episode'])) );
 					break;
 				case 'glob':
-					$hit = FALSE;
+					$hit= (($item['Feed'] == 'all' || $item['Feed'] == $opts['URL']) &&
+					 ($item['Filter'] != '' && fnmatch(strtolower($item['Filter']), $title)) &&
+					 ($item['Not'] == '' OR !fnmatch(strtolower($item['Not']), $title)) &&
+					 ($item['Quality'] == 'All' OR fnmatch(strtolower($item['Quality']), $title)) &&
+					 ($item['Episodes'] == '' OR preg_match('/^'.strtolower($item['Episodes']).'$/', $guess['episode'])) );
 					break;
 				case 'regexp':
 				default:
@@ -37,7 +50,10 @@
 					if($link = get_torrent_link($rs)) {
 						if(isset($config_values['Global']['HTMLOutput']))
 							update_progress_bar(0, "Starting $title");
-						if(client_add_torrent($link, NULL, $item, $opts['URL']))
+						if($config_values['Settings']['Client'] == 'nzb') {
+							if(client_add_nzb($link, $item, $opts['URL']))
+								add_cache($rs['title']);
+						} else if(client_add_torrent($link, NULL, $item, $opts['URL']))
 							add_cache($rs['title']);
 					} else {                     
 						_debug("Unable to find URL for ".$rs['title']."\n");

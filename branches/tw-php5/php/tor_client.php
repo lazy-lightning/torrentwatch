@@ -108,12 +108,39 @@
 		}
 	}
 
-	function nzb_add_torrent($tor, $dest) {
+	function nzbget_add_nzb($tor, $dest) {
 		// this isn't actually torrents, but news files
-		// Not implemented yet
-		return 1;
+		return $return;
 	}
 
+	function client_add_nzb($filename, $fav = NULL, $feed = NULL) {
+		global $config_values, $hit;
+		$hit = 1;
+
+		if(!($nzb = file_get_contents($filename))) {
+			_debug("Couldn't open nzb: $filename\n",0);
+			return FALSE;
+		}
+		$nzb_exec = "/mnt/syb8634/bin/nzbget";
+		$nzb_connect = "-c /share/.nzbget/nzbget.conf";
+
+		$tmpname = tempnam("","torrentwatch");
+		$config_values['Global']['Unlink'][] = $tmpname;
+		file_put_contents($tmpnam, $nzb);
+		$nzb_append = "-A '$tmpnam'";
+
+		exec("$nzb_exec $nzb_connect $nzb_append", $output, $return);
+		if($return == 0) {
+			add_history($tor_name);
+			_debug("Starting: $tor_name in $dest\n",0);
+			if(isset($config_values['Global']['HTMLOutput']))
+				echo("Starting: $tor_name in $dest<br>\n");
+		} else {
+			_debug("Failed Starting: $tor_name	Return code $return\n",0);
+		}
+		return ($return ? 0 : 1);
+	}
+		
 	function client_add_torrent($filename, $dest, $fav = NULL, $feed = NULL) {
 		global $config_values, $hit;
 		$hit = 1;
@@ -133,14 +160,10 @@
 			_debug("Couldn't open torrent: $filename\n",0);
 			return FALSE;
 		}
-		if($config_values['Settings']['Client'] == 'nzb') {
-			$tor_name = "NZB"; // Bad hack, but we have no current way to get info from nzb
-		} else {
-			$tor_info = new BDecode("", $tor);
-			if(!($tor_name = $tor_info->{'result'}['info']['name'])) {
-				_debug("Couldn't parse torrent: $filename\n", 0);
-				return FALSE;
-			}
+		$tor_info = new BDecode("", $tor);
+		if(!($tor_name = $tor_info->{'result'}['info']['name'])) {
+			_debug("Couldn't parse torrent: $filename\n", 0);
+			return FALSE;
 		}
 
 		if(!isset($dest)) {
@@ -170,9 +193,6 @@
 				// Doesn't support setting dest, so here change dest to transmissons
 				$tr_state = new BDecode('/share/.transmission/daemon/state');
 				$dest = $tr_state->{'result'}['default-directory'];
-				break;
-			case 'nzb':
-				$return = nzb_add_torrent($tor, $dest);
 				break;
 			default:
 				_debug("Invalid Torrent Client: ".$config_values['Settings']['Client']."\n",0);

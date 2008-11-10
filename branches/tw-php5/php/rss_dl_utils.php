@@ -26,6 +26,15 @@
 					unlink($file);
 		}
 
+		if (!function_exists('fnmatch')) {
+        function fnmatch($pattern, $string) {
+            return @preg_match(
+                '/^' . strtr(addcslashes($pattern, '/\\.+^$(){}=!<>|'),
+                array('*' => '.*', '?' => '.?', '[' => '\[', ']' => '\]')) . '$/i', $string
+            );
+        }
+    }
+
 		// used to lower case all the keys in an array.
 		// From http://us.php.net/manual/en/function.array-change-key-case.php
 		define('ARRAY_KEY_FC_LOWERCASE', 25); //FOO => fOO
@@ -93,19 +102,6 @@
 				$history = unserialize(file_get_contents($config_values['Settings']['History']));
 			$history[] = array('Title' => $title, 'Date' => date("m.d.y g:i a"));
 			file_put_contents($config_values['Settings']['History'], serialize($history));
-		}
-
-		function get_torrent_link($rs) {
-			if(isset($rs['id'])) { // Atom
-				if(stristr($rs['id'], 'torrent')) // torrent link in id
-					return $rs['id'];
-				else // torrent hidden in summary
-					return guess_atom_torrent($rs['summary']);
-			} else if(isset($rs['enclosure'])) { // RSS Enclosure
-				return $rs['enclosure']['url'];
-			} else {	// Standard RSS
-				return $rs['link'];
-			}
 		}
 
 		function microtime_float() {

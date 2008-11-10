@@ -82,9 +82,9 @@ div.mainoptions ul li#webui {
 	float: right;
 	}
 
-div.mainoptions ul li#inspector {
-	margin: 15px 10px 0 0;
-	}
+div.mainoptions ul li#refresh a {
+	background: url(../images/nuvola_refresh.png) no-repeat 19px 0;
+}
 
 div.mainoptions ul li a {
 	color: #030303;
@@ -396,6 +396,7 @@ div#progressBarText {
 div.config_torrentclient label.item,
 div.config_downloaddir label.item,
 div.config_watchdir label.item, 
+div.config_matchstyle label.item,
 div.config_deepdir label.item {
 	width: 110px;
 	clear: left;
