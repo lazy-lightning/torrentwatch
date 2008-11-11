@@ -11,5 +11,7 @@ mkdir -p release
 cp installer/* release
 tar -cf release/tw.scripts.tar --exclude-vcs $RELEASE_FILES
 
-zip -r $RELEASE.zip release/*
+if [ x"$1" != x"" ]; then
+	zip -r $RELEASE.zip release/*
+fi
 

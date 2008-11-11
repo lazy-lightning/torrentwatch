@@ -1,12 +1,10 @@
 #!/mnt/syb8634/server/php5-cgi -qd register_argc_argv=1
 <?php
-		ini_set('include_path', '.:/share/.torrents/php');
+		ini_set('include_path', '.:'.dirname(realpath($argv[0])).'/php');
 		ini_set("precision", 4);
     
 		// These are our extra functions
 		require_once('rss_dl_utils.php');
-
-		// DEFAULT CONFIG -
 
 		$config_values;
 		$test_run = 0;
@@ -93,7 +91,7 @@
 			read_config_file();
 		}
 		function setup_default_config() {
-			global $config_values;
+			global $config_values, $argv;
 			function _default($a, $b) {
 				global $config_values;
 				if(!isset($config_values['Settings'][$a])) {
@@ -113,21 +111,24 @@
 				unset($config_values['Settings']['Torrent Dir']);
 			}
 			// Sensible Defaults 
-			_default('Watch Dir', "/share/.torrents/");
-			_default('Download Dir', "/share/Video/");
-			_default('Cache Dir', "/share/.torrents/rss_cache/");
+			$basedir = platform_getInstallRoot();
+			_default('Watch Dir', $basedir);
+			_default('Download Dir', platform_getDownloadDir());
+			_default('Cache Dir', $basedir."/rss_cache/");
 			_default('Save Torrents', "0");
 			_default('Run Torrentwatch', "1");
 			_default('Cron', "/etc/cron.hourly");
 			_default('Client', "btpd");
 			_default('Verify Episode', "0");
 			_default('Deep Directories', "0");
-			_default('History', "/share/.torrents/rss_dl.history");
+			_default('History', $basedir."/rss_dl.history");
+			_default('MatchStyle',"regexp");
 			write_config_file();
 		}
 
 		function setup_cron_hook() {
-			global $config_values;
+			global $config_values, $argv;
+
 			_debug("Preparing to modify cron hook ...\n");
 			if(!(isset($config_values['Settings']['Cron']) || !file_exists($config_values['Settings']['Cron']))) {
 				_debug("No Cron file Selected\n",0);
@@ -144,7 +145,7 @@
 					if($return == 0) {
 						_debug("Cron hook already installed in $cron\n");
 					} else {
-						file_put_contents($cron, "/share/.torrents/rss_dl.php -D >> /var/rss_dl.log\n", FILE_APPEND);
+						file_put_contents($cron, $argv[0]." -D >> /var/rss_dl.log\n", FILE_APPEND);
 						_debug("Cron hook installed to $cron\n",0);
 					}
 					break;
@@ -181,12 +182,16 @@
 	// Hooks for auto-run from the cron.hourly script
 	if(isset($config_values['Global']['Install'])) {
 		if($config_values['Global']['Install'] == 1) {
-			if(!is_link("/opt/sybhttpd/default/torrentwatch")) {
-				if(file_exists("/opt/sybhttpd/default/torrentwatch")) {
-					unlink("/opt/sybhttpd/default/torrentwatch");
+			$source = realpath($argv[0]);
+			$dest = platform_getWebRoot()."/torrentwatch";
+
+			if(!is_link($dest)) {
+				if(file_exists($deset)) {
+					unlink($dest);
 				}
-				symlink("/share/.torrents", "/opt/sybhttpd/default/torrentwatch");
+				symlink($source, $dest);
 			}
+
 			setup_default_config();
 		}
 		setup_cron_hook($config_values['Global']['Install'], $config_values['Settings']['Cron']);

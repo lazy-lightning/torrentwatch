@@ -1,99 +1,10 @@
 #!/mnt/syb8634/server/php5-cgi
 <?php
 
-ini_set('include_path', '.:/share/.torrents/php');
-$config_file = '/share/.torrents/rss_dl.config';
+ini_set('include_path', '.:./php');
 $test_run = 0;
 
 require_once('rss_dl_utils.php');
-
-// Custom parsing for nmt browser
-// Doesn't do anything special yet
-function parse_options_localhost() {
-	global $html_out, $config_values;
-	$filler = "<br>";
-	$exit = TRUE;
-
-	if(isset($_GET['mode'])) {
-		switch($_GET['mode']) {
-			case 'updatefavorite':
-				update_favorite();
-				display_favorites();
-				break;
-			case 'updatefeed':
-				update_feed();
-				display_global_config();
-				break;
-			case 'showfeed':
-				echo $html_out;
-				$html_out = "";
-				if($_GET['feed'] == 'all') {
-					load_feeds($config_values['Feeds']);
-					feeds_perform_matching($config_values['Feeds']);
-				} else {
-					$feed[] = $config_values['Feeds'][$_GET['feed']];
-					load_feeds($feed);
-					feeds_perform_matching($feed);
-				}
-				break;	
-			case 'emptycache':
-				$exec = "rm -f ".$config_values['Settings']['Cache Dir']."/*";
-				$exit = FALSE;
-				break;
-			case 'setglobals':
-				$config_values['Settings']['Download Dir']=urldecode($_GET['downdir']);
-				$config_values['Settings']['Watch Dir']=urldecode($_GET['watchdir']);
-				$config_values['Settings']['Deep Directories']=urldecode($_GET['deepdir']);
-				$config_values['Settings']['Verify Episode']=(isset($_GET['verifyepisodes']) ? 1 : 0);
-					$config_values['Settings']['Save Torrents']=(isset($_GET['savetorrents']) ? 1 : 0);
-				$config_values['Settings']['Client']=urldecode($_GET['client']);
-				$config_values['Settings']['Client']=urldecode($_GET['matchstyle']);
-				write_config_file();
-				display_global_config();
-				
-				break;
-			case 'matchtitle':
-				if(($tmp = guess_match(html_entity_decode($_GET['title'])))) {
-					$_GET['name'] = $tmp['key'];
-					$_GET['filter'] = $tmp['key'];
-					$_GET['quality'] = $tmp['data'];
-					$_GET['feed'] = $_GET['rss'];
-					$_GET['button'] = 'Add';
-					$_GET['savein'] = 'Default';
-					$_GET['seedratio'] = '-1';
-					update_favorite();
-				} else
-					$output = "Could not generate Match\n";
-				display_favorites();
-				break;
-			case 'dltorrent':
-				update_progress_bar(0, 'Starting '.$_GET['title']);
-				client_add_torrent(trim(urldecode($_GET['link'])), $config_values['Settings']['Download Dir']);
-				$exit = FALSE;
-				break;
-			default:
-				$output = "Bad Paramaters passed to index.cgi";
-		}
-	}
-
-	if(isset($exec)) {
-		exec($exec, $output);
-		$html_out .= "<div class='execoutput'>".implode($filler, $output)."</div>";
-		echo($html_out);
-		$html_out = "";
-	} else if (isset($output)) {
-		$html_out .= str_replace("\n", "<br>", "<div class='execoutput'>$output</div>");
-		echo $html_out;
-		$html_out = "";
-	}
-
-	if(isset($exit)) {
-		close_html();
-		exit(0);
-	}
-
-	return;
-}
 
 // This function parses commands sent from a PC browser
 function parse_options() {
@@ -124,6 +35,8 @@ function parse_options() {
 				if(($tmp = guess_match(html_entity_decode($_GET['title'])))) {
 					$_GET['name'] = $tmp['key'];
 					$_GET['filter'] = $tmp['key'];
+					if($config_values['Settings']['MatchStyle'] == "glob")
+						$_GET['filter'] .= '*';
 					$_GET['quality'] = $tmp['data'];
 					$_GET['feed'] = $_GET['rss'];
 					$_GET['button'] = 'Add';
@@ -167,16 +80,17 @@ function parse_options() {
 	}
 	return;
 }
+
 function display_global_config() {
 	global $config_values, $html_out;
 
-	$html_out .= '<div class="dialog_window" id="configuration">'."\n";	
-	$html_out .= '<h2 class="dialog heading">Configuration</h2>';
-	$html_out .= '<form target="update_frame" action="index.cgi" id="config_form"><input type="hidden" name="mode" value="setglobals">';
-	$html_out .= '<div class="config_torrentclient">';
-	$html_out .= '<label class="category">Client Settings</label>';
-	$html_out .= '<label class="item" title="Which torrent client to use">Torrent Client:</label>';
-	$html_out .= '<select name="client">';
+	$html_out .= '<div class="dialog_window" id="configuration">'."\n".
+	 '<h2 class="dialog heading">Configuration</h2>'.
+	 '<form target="update_frame" action="index.cgi" id="config_form"><input type="hidden" name="mode" value="setglobals">'.
+	 '<div class="config_torrentclient">'.
+	 '<label class="category">Client Settings</label>'.
+	 '<label class="item" title="Which torrent client to use">Torrent Client:</label>'.
+	 '<select name="client">';
 	$nzb=$trans122=$trans132=$btpd="";
 	switch($config_values['Settings']['Client']) {
 		case 'btpd':
@@ -196,25 +110,24 @@ function display_global_config() {
 			// Shouldn't happen
 			break;
 	}
-	$html_out .= '<option value="btpd" '.$btpd.'>BTPD</option>';
-	$html_out .= '<option value="transmission1.22" '.$trans122.'>Transmission 1.22</option>';
-	$html_out .= '<option value="transmission1.3x" '.$trans132.'>Transmission &gt;= 1.30</option>';
-	$html_out .= '<option value="nzb" '.$nzb.'>NZB</option></select></div>';
+	$html_out .= '<option value="btpd" '.$btpd.'>BTPD</option>'.
+	 '<option value="transmission1.22" '.$trans122.'>Transmission 1.22</option>'.
+	 '<option value="transmission1.3x" '.$trans132.'>Transmission &gt;= 1.30</option>'.
+	 '<option value="nzb" '.$nzb.'>NZB</option></select></div>'.
 
-	$html_out .= '<div class="config_downloaddir" title="Default directory to start torrents in"><label class="item">Download Directory:</label>';
-	$html_out .= '<input type="text" name="downdir" value='.$config_values['Settings']['Download Dir'].'></div>';
-	$html_out .= '<div class="config_watchdir">';
-	$html_out .= '<label class="category">Torrent Settings</label>';
-	$html_out .= '<label class="item" title="Directory to look for new .torrents">Watch Directory:</label>';
-	$html_out .= '<input type="text" name="watchdir" value='.$config_values['Settings']['Watch Dir'].'></div>';
+	 '<div class="config_downloaddir" title="Default directory to start torrents in"><label class="item">Download Directory:</label>'.
+	 '<input type="text" name="downdir" value='.$config_values['Settings']['Download Dir'].'></div>'.
+	 '<div class="config_watchdir">'.
+	 '<label class="category">Torrent Settings</label>'.
+	 '<label class="item" title="Directory to look for new .torrents">Watch Directory:</label>'.
+	 '<input type="text" name="watchdir" value='.$config_values['Settings']['Watch Dir'].'></div>'.
 
-	$html_out .= '<div class="config_savetorrent">';
-	$html_out .= '<input type="checkbox" name="savetorrents" value=1 ';
+	 '<div class="config_savetorrent">'.
+	 '<input type="checkbox" name="savetorrents" value=1 ';
 	if($config_values['Settings']['Save Torrents'] == 1)
 		$html_out .= 'checked=1';
-	$html_out .= '><label class="item" title="Save torrent to download directory">Save .torrent</label></div>';
-
-	$html_out .= '<div class="config_deepdir"><label class="item" title="Save downloads in multi-directory structure">Deep Directories:</label>';
+	$html_out .= '><label class="item" title="Save torrent to download directory">Save .torrent</label></div>'.
+	 '<div class="config_deepdir"><label class="item" title="Save downloads in multi-directory structure">Deep Directories:</label>'.
 	$tmp1 = $tmp2 = $tmp3 = "";
 	switch($config_values['Settings']['Deep Directories']) {
 		case 'Full': $tmp1 = 'selected="selected"';break;
@@ -222,15 +135,15 @@ function display_global_config() {
 		default:$tmp3 = 'selected="selected"';break;
 	}
 	$html_out .= '<select name="deepdir">'.
-	             '<option value="Full" '.$tmp1.'>Full Name</option>'.
-	             '<option value="Title" '.$tmp2.'>Show Title</option>'.
-	             '<option value="0" '.$tmp3.'>Off</option></select></div>'.
+	 '<option value="Full" '.$tmp1.'>Full Name</option>'.
+	 '<option value="Title" '.$tmp2.'>Show Title</option>'.
+	 '<option value="0" '.$tmp3.'>Off</option></select></div>'.
 
-	             '<div class="config_verifyepisodes" '.
-	             'title="Try not to download duplicate episodes">'.
-	             '<label class="category">Favorites Settings</label>'.
+	 '<div class="config_verifyepisodes" '.
+	 'title="Try not to download duplicate episodes">'.
+	 '<label class="category">Favorites Settings</label>'.
 
-	             '<input type="checkbox" name="verifyepisodes" value=1 ';
+	 '<input type="checkbox" name="verifyepisodes" value=1 ';
 	if($config_values['Settings']['Verify Episode'] == 1)
 		$html_out .= 'checked=1';
 
@@ -243,19 +156,19 @@ function display_global_config() {
 	}
 
 	$html_out .= '><label class="item">Verify Episodes</label></div>'.
-	             '<div class="config_matchstyle">'.
-	             '<label class="item" title="Type of filter to use">Matching Style:</label>'.
-	             '<select name="matchstyle"><option value="regexp" '.$tmp1.'>RegExp</option>'.
-	             '<option value="glob" '.$tmp2.'>Glob</option>'.
-	             '<option value="simple" '.$tmp3.'>Simple</option></select></div>'.
-	             _jscript("saveConfig()", 'Save').
-	             _jscript("toggleMenu('configuration')", 'Close').
-	             _jscript("toggleMenu('feeds')", 'Feeds').
-	             '</form></div>'."\n";
+	 '<div class="config_matchstyle">'.
+	 '<label class="item" title="Type of filter to use">Matching Style:</label>'.
+	 '<select name="matchstyle"><option value="regexp" '.$tmp1.'>RegExp</option>'.
+	 '<option value="glob" '.$tmp2.'>Glob</option>'.
+	 '<option value="simple" '.$tmp3.'>Simple</option></select></div>'.
+	 _jscript("saveConfig()", 'Save').
+	 _jscript("toggleMenu('configuration')", 'Close').
+	 _jscript("toggleMenu('feeds')", 'Feeds').
+	 '</form></div>'."\n";
 
 	// Feeds
 	$html_out .= '<div class="dialog_window" id="feeds">'.
-	             '<label class="Category">Feeds</label>';
+	 '<label class="Category">Feeds</label>';
 	foreach($config_values['Feeds'] as $key => $feed) {
 		$html_out .= '<div class="feeditem">'."\n".
 			'<form action="index.cgi" class="feedform">'.
@@ -278,47 +191,47 @@ function display_global_config() {
 function display_favorites_info($item, $key) {
 	global $config_values, $html_out;
 	$style = "";
-	$html_out .= '<div class="FavInfo" id="favorite_'.$key.'" '.$style.'>'."\n";
-	$html_out .= '<form action="index.cgi">'."\n";
-	$html_out .= '<input type="hidden" name="mode" value="updatefavorite">'."\n";
-	$html_out .= '<input type="hidden" name="idx" value="'.$key.'">'."\n";
-	$html_out .= '<div class="favorite_name"><label class="item" title="Name of the Favorite">Name:</label>';
-	$html_out .= '<input type="text" name="name" value="'.$item['Name'].'"></div>'."\n";
-	$html_out .= '<div class="favorite_filter"><label class="item" title="Regexp filter, use .* to match all">Filter:</label>';
-	$html_out .= '<input type="text" name="filter" value="'.$item['Filter'].'"></div>'."\n";
-	$html_out .= '<div class="favorite_not"><label class="item" title="Regexp Not Filter">Not:</label>';
-	$html_out .= '<input type="text" name="not" value="'.$item['Not'].'"></div>'."\n";
-	$html_out .= '<div class="favorite_savein"><label class="item" title="Save Directory or Default">Save In:</label>';
-	$html_out .= '<input type="text" name="savein" value="'.$item['Save In'].'"></div>'."\n";
-	$html_out .= '<div class="favorite_episodes"><label class="item" title="Regexp Episode filter in form of 2x[1-8]">Episodes:</label>';
-	$html_out .= '<input type="text" name="episodes" value="'.$item['Episodes'].'"></div>'."\n";
-	$html_out .= '<div class="favorite_feed"><label class="item" title="Feed to match against">Feed:</label><select name="feed">'."\n";
-	$html_out .= '<option value="all">All</option>'."\n";
+	$html_out .= '<div class="FavInfo" id="favorite_'.$key.'" '.$style.'>'."\n".
+	 '<form action="index.cgi">'."\n".
+	 '<input type="hidden" name="mode" value="updatefavorite">'."\n".
+	 '<input type="hidden" name="idx" value="'.$key.'">'."\n".
+	 '<div class="favorite_name"><label class="item" title="Name of the Favorite">Name:</label>'.
+	 '<input type="text" name="name" value="'.$item['Name'].'"></div>'."\n".
+	 '<div class="favorite_filter"><label class="item" title="Regexp filter, use .* to match all">Filter:</label>'.
+	 '<input type="text" name="filter" value="'.$item['Filter'].'"></div>'."\n".
+	 '<div class="favorite_not"><label class="item" title="Regexp Not Filter">Not:</label>'.
+	 '<input type="text" name="not" value="'.$item['Not'].'"></div>'."\n".
+	 '<div class="favorite_savein"><label class="item" title="Save Directory or Default">Save In:</label>'.
+	 '<input type="text" name="savein" value="'.$item['Save In'].'"></div>'."\n".
+	 '<div class="favorite_episodes"><label class="item" title="Regexp Episode filter in form of 2x[1-8]">Episodes:</label>'.
+	 '<input type="text" name="episodes" value="'.$item['Episodes'].'"></div>'."\n".
+	 '<div class="favorite_feed"><label class="item" title="Feed to match against">Feed:</label><select name="feed">'."\n".
+	 '<option value="all">All</option>'."\n";
 	foreach($config_values['Feeds'] as $feed) {
 		$html_out .= '<option value="'.urlencode($feed['Link']).'"';
 		if($feed['Link'] == $item['Feed'])
 			$html_out .= ' selected="selected"';
 		$html_out .= '>'.$feed['Name'].'</option>'."\n";
 	}
-	$html_out .= '</select></div>'."\n";
-	$html_out .= '<div class="favorite_quality"><label class="item" title="Regexp Filter against full title">Quality:</label>';
-	$html_out .= '<input type="text" name="quality" value="'.$item['Quality'].'"></div>'."\n";
-	$html_out .= '<div class="favorite_seedratio"><label class="item" title="Maximum seeding ratio, set to -1 to disable">Seed Ratio:</label>';
-	$html_out .= '<input type="text" name="seedratio" value="'._isset($item, 'seedRatio', '-1').'"></div>'."\n";
-	$html_out .= '<input type="submit" class="add" name="button" value="Update">'."\n";
-	$html_out .= '<input type="submit" class="del" name="button" value="Delete">'."\n";
-	$html_out .= _jscript("toggleMenu('favorites')", "Close").'</form></div>'."\n";
+	$html_out .= '</select></div>'."\n".
+	 '<div class="favorite_quality"><label class="item" title="Regexp Filter against full title">Quality:</label>'.
+	 '<input type="text" name="quality" value="'.$item['Quality'].'"></div>'."\n".
+	 '<div class="favorite_seedratio"><label class="item" title="Maximum seeding ratio, set to -1 to disable">Seed Ratio:</label>'.
+	 '<input type="text" name="seedratio" value="'._isset($item, 'seedRatio', '-1').'"></div>'."\n".
+	 '<input type="submit" class="add" name="button" value="Update">'."\n".
+	 '<input type="submit" class="del" name="button" value="Delete">'."\n".
+	 _jscript("toggleMenu('favorites')", "Close").'</form></div>'."\n";
 	// Display the fav that was just updated
 	if(isset($_GET['idx']) && $_GET['idx'] == $key) {
-		$html_out .= "<script type='text/javascript'>";
-		$html_out .= 'toggleFav("favorite_'.$_GET['idx'].'");</script>'."\n";
+		$html_out .= "<script type='text/javascript'>".
+		             'toggleFav("favorite_'.$_GET['idx'].'");</script>'."\n";
 	}
 }
 
 function display_favorites() {
 	global $config_values, $html_out;
-	$html_out .= '<div class="dialog_window" id="favorites">';
-	$html_out .= '<div class="Favorite"><ul>';
+	$html_out .= '<div class="dialog_window" id="favorites">'.
+	             '<div class="Favorite"><ul>';
 	foreach($config_values['Favorites'] as $key => $item) {
 		$html_out .= '<li>'._jscript("toggleFav('favorite_".$key."')", $item['Name']).'</li>'."\n";
 	}
@@ -333,22 +246,22 @@ function display_favorites() {
 	              'Feed' => '', 
 	              'Quality' => '');
 	display_favorites_info($item, "new");
-	$html_out .= '<div class="clear"></div>'."\n";
-	$html_out .= '</div>'."\n";
+	$html_out .= '<div class="clear"></div>'."\n".
+	             '</div>'."\n";
 }
 
 function display_topmenu() {
 	global $html_out, $config_values;
-	$html_out .= '<div class="mainoptions" id="mainoptions">'."\n";
-	$html_out .= '<ul>'."\n";
-	$html_out .= '<li id="refresh"><a href="/torrentwatch/index.cgi">Refresh</a></li>';
-	$html_out .= '<li id="divider">&nbsp;</li>';
-	$html_out .= '<li id="favoritesMenu">'._jscript("toggleMenu('favorites')", "Favorites").'</li>';
-	$html_out .= '<li id="config">'._jscript("toggleMenu('configuration')", "Configure").'</li>';
-	$html_out .= '<li class="divider">&nbsp;</li>';
-	$html_out .= '<li id="view">'._jscript("toggleMenu('history')", "View History").'</li>';
-	$html_out .= '<li id="divider">&nbsp;</li>';
-	$html_out .= '<li id="empty">'._jscript("toggleMenu('clear_cache')", 'Empty Cache').'</li>';
+	$html_out .= '<div class="mainoptions" id="mainoptions">'."\n".
+	 '<ul>'."\n".
+	 '<li id="refresh"><a href="/torrentwatch/index.cgi">Refresh</a></li>'.
+	 '<li class="divider">&nbsp;</li>'.
+	 '<li id="favoritesMenu">'._jscript("toggleMenu('favorites')", "Favorites").'</li>'.
+	 '<li id="config">'._jscript("toggleMenu('configuration')", "Configure").'</li>'.
+	 '<li class="divider">&nbsp;</li>'.
+	 '<li id="view">'._jscript("toggleMenu('history')", "View History").'</li>'.
+	 '<li id="divider">&nbsp;</li>'.
+	 '<li id="empty">'._jscript("toggleMenu('clear_cache')", 'Empty Cache').'</li>';
 	switch($config_values['Settings']['Client']) {
 		case 'btpd':
 			$html_out .= '<li id="webui"><a href="http://';
@@ -369,8 +282,8 @@ function display_topmenu() {
 			$html_out .= '<li id="webui"><a href="http://popcorn:8055/">NZB</a></li>';
 			break;
 	}
-	$html_out .= '</ul>'."\n";
-	$html_out .= '</div>'."\n";
+	$html_out .= '</ul>'."\n".
+	             '</div>'."\n";
 }
 
 function display_history() {
@@ -388,37 +301,37 @@ function display_history() {
 		$html_out .= $html_tmp;
 		$html_out .= '</ul>';
 	}
-	$html_out .= _jscript("toggleMenu('history')", "Close");
-	$html_out .= _jscript("updateFrameLoad('index.cgi?mode=clearhistory', 'Clearing History');", "Clear");
-	$html_out .= "</div>";
+	$html_out .= _jscript("toggleMenu('history')", "Close").
+	             _jscript("updateFrameLoad('index.cgi?mode=clearhistory', 'Clearing History');", "Clear").
+	             "</div>";
 }
 
 function display_clear_cache() {
 	global $html_out;
-	$html_out .= '<div class="dialog_window" id="clear_cache">'."\n";
-	$html_out .= '<h2 class="dialog heading">Which Cache</h2>';
-	$html_out .= _jscript("toggleMenu('clear_cache')", 'Close');
-	$html_out .= '<a href="index.cgi?mode=clear_cache&type=feeds">Feeds</a>';
-	$html_out .= '<a href="index.cgi?mode=clear_cache&type=torrents">Torrents</a>';
-	$html_out .= '<a href="index.cgi?mode=clear_cache&type=all">All</a>';
-	$html_out .= '</div>'."\n";
+	$html_out .= '<div class="dialog_window" id="clear_cache">'."\n".
+	 '<h2 class="dialog heading">Which Cache</h2>'.
+	 _jscript("toggleMenu('clear_cache')", 'Close').
+	 '<a href="index.cgi?mode=clear_cache&type=feeds">Feeds</a>'.
+	 '<a href="index.cgi?mode=clear_cache&type=torrents">Torrents</a>'.
+	 '<a href="index.cgi?mode=clear_cache&type=all">All</a>'.
+	 '</div>'."\n";
 }
 
 function display_filter_bar() {
 	global $html_out;
-	$html_out .= '<div id="filterbar"><ul>';
-	$html_out .= '<li id="filter_all">'._jscript("filterFeeds('all')", "All").'</li>';
-	$html_out .= '<li id="filter_matching">'._jscript("filterFeeds('matching')", "Matching").'</li>';
-	$html_out .= '<li id="filter_downloaded">'._jscript("filterFeeds('downloaded')", "Downloaded").'</li>';
-	$html_out .= '</ul></div>'."\n";
+	$html_out .= '<div id="filterbar"><ul>'.
+	 '<li id="filter_all">'._jscript("filterFeeds('all')", "All").'</li>'.
+	 '<li id="filter_matching">'._jscript("filterFeeds('matching')", "Matching").'</li>'.
+	 '<li id="filter_downloaded">'._jscript("filterFeeds('downloaded')", "Downloaded").'</li>'.
+	 '</ul></div>'."\n";
 }
 
 function display_context_menu() {
 	global $html_out;
-	$html_out .= '<div class="context_menu" id="CM1"><ul>';
-	$html_out .= '<li>'._jscript('contextAddToFav()', 'Add to Favorites').'</li>';
-	$html_out .= '<li>'._jscript('contextDLNow()', 'Start Downloading').'</li>';
-	$html_out .= '</ul></div>'."\n";
+	$html_out .= '<div class="context_menu" id="CM1"><ul>'.
+	 '<li>'._jscript('contextAddToFav()', 'Add to Favorites').'</li>'.
+	 '<li>'._jscript('contextDLNow()', 'Start Downloading').'</li>'.
+	 '</ul></div>'."\n";
 }
 	
 function display_hidden_iframe() {
@@ -431,6 +344,7 @@ function set_default_div() {
 	
 	if(!isset($_GET['mode']))
 		return;
+
 	$html_out .= '<script type="text/javascript">';
 	switch($_GET['mode']) {
 		case 'updatefavorite':
@@ -451,10 +365,10 @@ function set_default_div() {
 
 function close_html() {
 	global $html_out, $debug_output, $main_timer;
-	$html_out .= "<div class='clear'></div>\n<div class='timer'>Page Took ";
-	$html_out .= number_format(timer_get_time($main_timer), 4)."s to load</div>";
-	$html_out .= "<div class='rss_debug'>$debug_output</div>";
-	$html_out .= "</body></html>\n";
+	$html_out .= "<div class='clear'></div>\n<div class='timer'>Page Took ".
+	             number_format(timer_get_time($main_timer), 4)."s to load</div>".
+	             "<div class='rss_debug'>$debug_output</div>".
+	             "</body></html>\n";
 	echo $html_out;
 	$html_out = "";
 }
@@ -473,72 +387,61 @@ $main_timer = timer_init();
 <meta http-equiv='expires' content='0'>
 <?php
 if($_SERVER["REMOTE_ADDR"] == '127.0.0.1') {
-	echo ('<link rel="Stylesheet" type="text/css" href="css/torrentwatch.local.css?'.time().'"></link>');
-	echo ('<script type="text/javascript" src="javascript/torrentwatch.local.js"></script>');
+	echo ('<link rel="Stylesheet" type="text/css" href="css/torrentwatch.local.css?'.time().'"></link>'.
+	 '<script type="text/javascript" src="javascript/torrentwatch.local.js"></script>');
 } else {
-	echo ('<link rel="Stylesheet" type="text/css" href="css/torrentwatch.css?'.time().'"></link>');
-	echo ('<script type="text/javascript" src="javascript/torrentwatch.js?'.time().'"></script>');
-	echo ('<script type="text/javascript" src="javascript/webtoolkit.contextmenu.js?'.time().'"></script>');
-	echo ('<script type="text/javascript">');
-	echo ('SimpleContextMenu.setup({"preventDefault":false, "preventForms":false});');
-	echo ('SimpleContextMenu.attach("torrent", "CM1");</script>');
-	echo ('<script type="text/javascript" src="javascript/webappers.com.progress.js?'.time().'"></script>');
+	echo ('<link rel="Stylesheet" type="text/css" href="css/torrentwatch.css?'.time().'"></link>'.
+	 '<script type="text/javascript" src="javascript/torrentwatch.js?'.time().'"></script>'.
+	 '<script type="text/javascript" src="javascript/webtoolkit.contextmenu.js?'.time().'"></script>'.
+	 '<script type="text/javascript">'.
+	 'SimpleContextMenu.setup({"preventDefault":false, "preventForms":false});'.
+	 'SimpleContextMenu.attach("torrent", "CM1");</script>'.
+	 '<script type="text/javascript" src="javascript/webappers.com.progress.js?'.time().'"></script>');
 }
 	
-echo ('</head>'."\n".'<body>'."\n");
-$html_out = "";
-ob_flush();
-flush();
+echo ("</head>\n<body>\n");
+ob_flush();flush();
 
 read_config_file();
 
 $config_values['Global']['HTMLOutput']= 1;
+$html_out = "";
 
-//if($_SERVER["REMOTE_ADDR"] == '127.0.0.1') {
-if(FALSE) {
-	// Basic Interface for Syabas Browser
-	// Most of the logic happens in parse_options_local() to send individual pages
-	if(isset($_GET['mode'])) {
-		parse_options_localhost();
-	}
-	display_topmenu();
-} else {
-	// Clutch Style Interface for PC Browsers
-	display_progress_bar();
-	if(isset($_GET['mode'])) {
-		parse_options();
-	}
-	
-	// Main Menu
-	display_topmenu();
-	display_filter_bar();
-	echo $html_out;
-	$html_out = "";
-	update_progress_bar(5, 'Loading Torrentwatch');
-	
-	
-	// Hidden DIV's
-	display_context_menu();
-	display_global_config();
-	display_favorites();
-	display_clear_cache();
-	display_hidden_iframe();
-	
-	echo $html_out;
-	$html_out = "";
-	update_progress_bar(5, 'Preparing Feeds');
-
-	// Feeds
-
-	load_feeds($config_values['Feeds']);
-	feeds_perform_matching($config_values['Feeds']);
-
-	// Comes later incase we just added a torrent	
-	display_history();
-
-	hide_progress_bar();
-	set_default_div();
+display_progress_bar();
+if(isset($_GET['mode'])) {
+	parse_options();
 }
+
+// Main Menu
+display_topmenu();
+display_filter_bar();
+update_progress_bar(2, 'Loading Torrentwatch');
+echo $html_out;
+ob_flush();flush();
+$html_out = "";
+
+
+// Hidden DIV's
+display_context_menu();
+display_global_config();
+display_favorites();
+display_clear_cache();
+display_hidden_iframe();
+
+update_progress_bar(3, 'Preparing Feeds');
+echo $html_out;
+$html_out = "";
+ob_flush();flush();
+
+// Feeds
+load_feeds($config_values['Feeds']);
+feeds_perform_matching($config_values['Feeds']);
+
+// Comes later incase we just added a torrent	
+display_history();
+
+hide_progress_bar();
+set_default_div();
 
 close_html();
 unlink_temp_files();

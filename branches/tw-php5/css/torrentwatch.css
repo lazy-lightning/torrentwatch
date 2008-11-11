@@ -107,7 +107,7 @@ div.mainoptions ul li#view a {
 }
 
 div.mainoptions ul li#empty a {
-	background: url(../images/remove.png) no-repeat 32px 0;
+	background: url(../images/remove.png) no-repeat 25px 0;
 }
 
 div.mainoptions ul li#empty a:active {

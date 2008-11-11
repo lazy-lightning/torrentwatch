@@ -8,6 +8,7 @@
 		require_once("lastRSS.php");
 		require_once("progressbar.php");
 		require_once("tor_client.php");
+		require_once("platform.php");
 
 		global $config_values;
 		$config_values['Global'] = array();
