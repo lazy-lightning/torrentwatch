@@ -12,12 +12,27 @@
 
 		global $config_values;
 		$config_values['Global'] = array();
-		$config_file = '/share/.torrents/rss_dl.config';
 		$time = 0;
 
+		
 		// Checks array is a key is set, return value or default
 		function _isset($array, $key, $default = 'Not Specified') {
 			return isset($array[$key]) ? $array[$key] : $default;
+		}
+
+		function my_strpos($haystack, $needle) {
+			foreach($needle as $n) {
+				if(strpos($haystack, $n) === TRUE)
+					return TRUE;
+			}
+			return FALSE;
+		}
+
+		function symlink_force($source, $dest){
+			if(file_exists($dest)) {
+				unlink($dest);
+			}
+			symlink($source, $dest);
 		}
 
 		function unlink_temp_files() {
@@ -214,7 +229,6 @@
 			closedir($handle);
 		} else {
 			_debug("check_for_torrents: Couldn't read Directory: $directory\n", 0);
-			exit(1);
 		}
 	}
 	

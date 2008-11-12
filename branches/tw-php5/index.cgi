@@ -1,4 +1,4 @@
-#!/mnt/syb8634/server/php5-cgi
+#!/usr/bin/php
 <?php
 
 ini_set('include_path', '.:./php');

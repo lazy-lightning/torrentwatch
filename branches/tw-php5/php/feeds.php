@@ -23,10 +23,9 @@
 			$guess = guess_match($title);
 			switch(_isset($config_values['Settings'], 'MatchStyle')) {
 				case 'simple':	
-					$tmp = strtolower($item['Filter']);
 					$hit = (($item['Filter'] != '' && strpos($title, strtolower($item['Filter'])) !== FALSE) &&
-					 ($item['Not'] == '' OR !strpos($title, strtolower($item['Not'])) !== FALSE) &&
-					 ($item['Quality'] == 'All' OR strpos($title, strtolower($item['Quality'])) !== FALSE) &&
+					 ($item['Not'] == '' OR my_strpos($title, strtolower($item['Not'])) === FALSE) &&
+					 ($item['Quality'] == 'All' OR my_strpos($title, strtolower($item['Quality'])) !== FALSE) &&
 					 ($item['Episodes'] == '' OR preg_match('/^'.strtolower($item['Episodes']).'$/', $guess['episode'])) );
 					break;
 				case 'glob':
