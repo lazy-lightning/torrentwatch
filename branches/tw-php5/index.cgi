@@ -84,14 +84,10 @@ function parse_options() {
 function display_global_config() {
 	global $config_values, $html_out;
 
-	$html_out .= '<div class="dialog_window" id="configuration">'."\n".
-	 '<h2 class="dialog heading">Configuration</h2>'.
-	 '<form target="update_frame" action="index.cgi" id="config_form"><input type="hidden" name="mode" value="setglobals">'.
-	 '<div class="config_torrentclient">'.
-	 '<label class="category">Client Settings</label>'.
-	 '<label class="item" title="Which torrent client to use">Torrent Client:</label>'.
-	 '<select name="client">';
-	$nzb=$trans122=$trans132=$btpd="";
+	$savetorrents=$nzb=$trans122=$trans132=$btpd="";
+	$deepfull=$deeptitle=$deepoff=$verifyepisode="";
+	$matchregexp=$matchglob=$matchsimple="";
+
 	switch($config_values['Settings']['Client']) {
 		case 'btpd':
 			$btpd = 'selected="selected"';
@@ -110,7 +106,34 @@ function display_global_config() {
 			// Shouldn't happen
 			break;
 	}
-	$html_out .= '<option value="btpd" '.$btpd.'>BTPD</option>'.
+
+	if($config_values['Settings']['Save Torrents'] == 1)
+		$savetorrents = 'checked=1';
+
+	switch($config_values['Settings']['Deep Directories']) {
+		case 'Full': $deepfull = 'selected="selected"';break;
+		case 'Title': $deeptitle = 'selected="selected"'; break;
+		default:$deepoff = 'selected="selected"';break;
+	}
+
+	if($config_values['Settings']['Verify Episode'] == 1)
+		$verifyepisode = 'checked=1';
+
+	switch($config_values['Settings']['MatchStyle']) {
+		case 'glob': $matchglob="selected='selected'";break;
+		case 'simple': $matchsimple="selected='selected'";break;
+		case 'regexp': 
+		default: $matchregexp="selected='selected'";break;
+	}
+
+	$html_out .= '<div class="dialog_window" id="configuration">'."\n".
+	 '<h2 class="dialog heading">Configuration</h2>'.
+	 '<form target="update_frame" action="index.cgi" id="config_form"><input type="hidden" name="mode" value="setglobals">'.
+	 '<div class="config_torrentclient">'.
+	 '<label class="category">Client Settings</label>'.
+	 '<label class="item" title="Which torrent client to use">Torrent Client:</label>'.
+	 '<select name="client">'.
+	 '<option value="btpd" '.$btpd.'>BTPD</option>'.
 	 '<option value="transmission1.22" '.$trans122.'>Transmission 1.22</option>'.
 	 '<option value="transmission1.3x" '.$trans132.'>Transmission &gt;= 1.30</option>'.
 	 '<option value="nzb" '.$nzb.'>NZB</option></select></div>'.
@@ -123,44 +146,26 @@ function display_global_config() {
 	 '<input type="text" name="watchdir" value='.$config_values['Settings']['Watch Dir'].'></div>'.
 
 	 '<div class="config_savetorrent">'.
-	 '<input type="checkbox" name="savetorrents" value=1 ';
-	if($config_values['Settings']['Save Torrents'] == 1)
-		$html_out .= 'checked=1';
-	$html_out .= '><label class="item" title="Save torrent to download directory">Save .torrent</label></div>'.
+	 '<input type="checkbox" name="savetorrents" value=1 '.
+	 '><label class="item" title="Save torrent to download directory">Save .torrent</label></div>'.
 	 '<div class="config_deepdir"><label class="item" title="Save downloads in multi-directory structure">Deep Directories:</label>'.
-	$tmp1 = $tmp2 = $tmp3 = "";
-	switch($config_values['Settings']['Deep Directories']) {
-		case 'Full': $tmp1 = 'selected="selected"';break;
-		case 'Title': $tmp2 = 'selected="selected"'; break;
-		default:$tmp3 = 'selected="selected"';break;
-	}
-	$html_out .= '<select name="deepdir">'.
-	 '<option value="Full" '.$tmp1.'>Full Name</option>'.
-	 '<option value="Title" '.$tmp2.'>Show Title</option>'.
-	 '<option value="0" '.$tmp3.'>Off</option></select></div>'.
+	 '<select name="deepdir">'.
+	 '<option value="Full" '.$deepfull.'>Full Name</option>'.
+	 '<option value="Title" '.$deeptitle.'>Show Title</option>'.
+	 '<option value="0" '.$deepoff.'>Off</option></select></div>'.
 
 	 '<div class="config_verifyepisodes" '.
 	 'title="Try not to download duplicate episodes">'.
 	 '<label class="category">Favorites Settings</label>'.
 
-	 '<input type="checkbox" name="verifyepisodes" value=1 ';
-	if($config_values['Settings']['Verify Episode'] == 1)
-		$html_out .= 'checked=1';
+	 '<input type="checkbox" name="verifyepisodes" value=1 '.
 
-	$tmp1=$tmp2=$tmp3='';
-	switch($config_values['Settings']['MatchStyle']) {
-		case 'glob': $tmp2="selected='selected'";break;
-		case 'simple': $tmp3="selected='selected'";break;
-		case 'regexp': 
-		default: $tmp1="selected='selected'";break;
-	}
-
-	$html_out .= '><label class="item">Verify Episodes</label></div>'.
+	 '><label class="item">Verify Episodes</label></div>'.
 	 '<div class="config_matchstyle">'.
 	 '<label class="item" title="Type of filter to use">Matching Style:</label>'.
-	 '<select name="matchstyle"><option value="regexp" '.$tmp1.'>RegExp</option>'.
-	 '<option value="glob" '.$tmp2.'>Glob</option>'.
-	 '<option value="simple" '.$tmp3.'>Simple</option></select></div>'.
+	 '<select name="matchstyle"><option value="regexp" '.$matchregexp.'>RegExp</option>'.
+	 '<option value="glob" '.$matchglob.'>Glob</option>'.
+	 '<option value="simple" '.$matchsimple.'>Simple</option></select></div>'.
 	 _jscript("saveConfig()", 'Save').
 	 _jscript("toggleMenu('configuration')", 'Close').
 	 _jscript("toggleMenu('feeds')", 'Feeds').
@@ -244,7 +249,7 @@ function display_favorites() {
 	              'Save In' => 'Default',
 	              'Episodes' => '', 
 	              'Feed' => '', 
-	              'Quality' => '');
+	              'Quality' => 'All');
 	display_favorites_info($item, "new");
 	$html_out .= '<div class="clear"></div>'."\n".
 	             '</div>'."\n";
@@ -262,24 +267,24 @@ function display_topmenu() {
 	 '<li id="view">'._jscript("toggleMenu('history')", "View History").'</li>'.
 	 '<li id="divider">&nbsp;</li>'.
 	 '<li id="empty">'._jscript("toggleMenu('clear_cache')", 'Empty Cache').'</li>';
+	if($_SERVER['REMOTE_ADDR'] == "127.0.0.1")
+		$host = '127.0.0.1';
+	else
+		$host = 'popcorn';
+
 	switch($config_values['Settings']['Client']) {
 		case 'btpd':
-			$html_out .= '<li id="webui"><a href="http://';
-			if($_SERVER['REMOTE_ADDR'] == "127.0.0.1")
-				$html_out .= '127.0.0.1';
-			else
-				$html_out .= 'popcorn';
-			$html_out .= ':8883/torrent/bt.cgi">BitTorrent WebUI</a></li>';
+			$html_out .= "<li id='webui'><a href='http://$host:8883/torrent/bt.cgi'>BitTorrent WebUI</a></li>";
 			break;
 		case 'transmission1.3x':
 		case 'transmission1.32':
-			$html_out .= '<li id="webui"><a href="http://popcorn:9091/transmission/web/">Transmission</a></li>';
+			$html_out .= "<li id='webui'><a href='http://$host:9091/transmission/web/'>Transmission</a></li>";
 			break;
 		case 'transmission1.22':
-			$html_out .= '<li id="webui"><a href="http://popcorn:8077/">Clutch</a></li>';
+			$html_out .= "<li id='webui'><a href='http://$host:8077/'>Clutch</a></li>";
 			break;
 		case 'nzb':
-			$html_out .= '<li id="webui"><a href="http://popcorn:8055/">NZB</a></li>';
+			$html_out .= "<li id='webui'><a href='http://$host:8066/'>NZB</a></li>";
 			break;
 	}
 	$html_out .= '</ul>'."\n".

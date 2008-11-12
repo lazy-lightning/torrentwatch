@@ -1,5 +1,11 @@
 #!/mnt/syb8634/server/php5-cgi -qd register_argc_argv=1
 <?php
+// rss_dl.php
+// By Erik Bernhardson
+//
+// This program is a command line interface to torrentwatch
+// 
+
 ini_set('include_path', '.:'.dirname(realpath($argv[0])).'/php');
 ini_set("precision", 4);
    
@@ -16,9 +22,9 @@ function usage() {
 	_debug( "$argv[0] <options> - CLI Interface to Torrent Watch\n",0);
 	_debug( "           -c <dir> : Enable Cache\n",0);
 	_debug( "           -C : Disable Cache\n",0);
-	_debug( "           -d : Dont run torrentwatch.php (fetch .torrent only)\n",0);
-	_debug( "           -D : Run torrentwatch.php (fetch .torrent and begin DL)\n",0);
-	_debug( "           -f <file> : cron file to hook\n",0);
+	_debug( "           -d : skip watch folder\n",0);
+	_debug( "           -D : Start torrents in watch folder\n",0);
+	_debug( "           -f <file> : cron script to hook\n",0);
 	_debug( "           -h : show this help\n",0);
 	_debug( "           -i : install cron hook and setup default config\n",0);
 	_debug( "           -nv: not verbose (default)\n",0);
@@ -138,7 +144,7 @@ function setup_cron_hook() {
 			platform_install();
 			setup_default_config();
 		}
-		setup_cron_hook($config_values['Global']['Install'], $config_values['Settings']['Cron']);
+		setup_cron_hook();
 		exit;
 	}
 
