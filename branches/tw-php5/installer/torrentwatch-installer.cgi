@@ -30,7 +30,7 @@ exename=`echo $pwd | sed 's#.*/\([^/]*\)$#\1#g'`
 
 # Defines used for this version
 NAME="torrentwatch"
-CONFIG="rss_dl.config"
+CONFIG="$NAME.config"
 WEB_SCRIPT='index.cgi'
 
 # Script Defines
