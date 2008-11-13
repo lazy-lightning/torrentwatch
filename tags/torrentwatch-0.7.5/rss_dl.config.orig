@@ -1,0 +1,20 @@
+;;
+;; rss_dl.php configuration file
+;;
+
+[Settings]
+Cache Dir = /share/.torrents/rss_cache
+Watch Dir = /share/.torrents
+Download Dir = /share/Video
+Save Torrents = 0
+Run Torrentwatch = 1
+Cron = /etc/cron.hourly
+Verbose = 0
+Client = transmission1.22
+
+[Feeds]
+0[] = Name => tvRSS.net - EZtv
+0[] = Type => RSS
+0[] = Link => http://tvrss.net/feed/eztv/
+
+
