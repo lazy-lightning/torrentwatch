@@ -21,8 +21,9 @@
 		}
 
 		function my_strpos($haystack, $needle) {
-			foreach($needle as $n) {
-				if(strpos($haystack, $n) === TRUE)
+			$pieces = explode(" ", $needle);
+			foreach($pieces as $n) {
+				if(strpos($haystack, $n) !== FALSE)
 					return TRUE;
 			}
 			return FALSE;

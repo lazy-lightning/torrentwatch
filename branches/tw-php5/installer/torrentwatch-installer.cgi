@@ -49,6 +49,7 @@ START_SCRIPT_OPTS='-i'
 ###############################################################
 MARKER="#M_A_R_K_E_R_do_not_remove_me"
 FTPSERVER="/mnt/syb8634/etc/ftpserver.sh"
+PHP="/mnt/syb8634/server/php5-cgi -qd register_argc_argv=1"
 
 # Send the closing HTML
 end_html() 
@@ -90,7 +91,7 @@ autostart_add()
 			echo "$line" >> /tmp/.starter.tmp
 			if [ x"$line" == x"$MARKER" ]; then
 				# echo "cd ${DEST}/ && ./telnetd -l /bin/sh &" >> /tmp/.starter
-				echo "${DEST}/${START_SCRIPT} ${START_SCRIPT_OPTS}" >> /tmp/.starter.tmp
+				echo "${PHP} ${DEST}/${START_SCRIPT} ${START_SCRIPT_OPTS}" >> /tmp/.starter.tmp
 			fi
 		done
 		cat < /tmp/.starter.tmp > "$STARTER"
@@ -193,11 +194,6 @@ install_harddisk()
 		rm -f /share/tw-iface.cgi /share/tw-iface.local.css /share/tw-iface.css
 	fi
 
-	# Anti-clobber routine for the config script
-	if [ ! -f $DEST/$CONFIG ];then
-		cp $DEST/$CONFIG.orig $DEST/$CONFIG
-	fi
-
 	chown -R nmt.nmt $DEST
 
 	# Check auto starter
@@ -209,7 +205,7 @@ install_harddisk()
 	# Run the script, since the autostart wont be running until reboot
 	date >> /var/rss_dl.log
 	echo "Installed cron hook from configuration script" >> /var/rss_dl.log
-	${DEST}/${START_SCRIPT} ${START_SCRIPT_OPTS}
+	${PHP} ${DEST}/${START_SCRIPT} ${START_SCRIPT_OPTS}
 
 	echo "Stuccess..<br>"
 

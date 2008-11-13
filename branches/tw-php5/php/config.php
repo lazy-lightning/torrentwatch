@@ -1,20 +1,4 @@
 <?php
-	function convert_old_config() {
-		global $config_values;
-		$config_file = platform_getInstallRoot()."/torrentwatch.config"
-
-		if(file_exists($config_file))
-			unlink($config_file);
-		// Reset config_values, saving the global options
-		$global = $config_values['Global'];
-		$config_values = array('Global' => $global);
-
-		if(file_exists($config_file.".orig")) {
-			copy($config_file.".orig", $config_file);
-			read_config_file();
-		}
-	}
-
 	function setup_default_config() {
 		global $config_values;
 		function _default($a, $b) {
@@ -23,16 +7,12 @@
 				$config_values['Settings'][$a] = $b;
 			}
 		}
-		if(read_config_file()) {
-			// Config file was changed in ver 7.0.0
-			if(!isset($config_values['Feeds'])) {
-				// We need to do something here
-				_debug('Pre 0.7 config file found, purging.',0);
-				convert_old_config();
-			}
-		}
+		_debug("Initializing Torrentwatch Configuration\n", 0);
+
+		if(!isset($config_values['Settings']))
+			$config_values['Settings'] = array();
 		// Sensible Defaults 
-		$basedir = platform_getInstallRoot();
+		$basedir = platform_getUserRoot();
 		_default('Watch Dir', $basedir);
 		_default('Download Dir', platform_getDownloadDir());
 		_default('Cache Dir', $basedir."/rss_cache/");
@@ -43,7 +23,7 @@
 		_default('Verify Episode', "0");
 		_default('Deep Directories', "0");
 		_default('History', $basedir."/rss_dl.history");
-		_default('MatchStyle',"regexp");
+		_default('MatchStyle',"simple");
 		write_config_file();
 	}
 
@@ -53,13 +33,15 @@
 	// group[] = key => data as equivilent of group[key] => data
 	function read_config_file() {
 		global $config_values;
-		$config_file = platform_getInstallRoot()."/torrentwatch.config";
+		$config_file = platform_getConfigFile();
 
 		$comment = ";";
 		$group = "NONE";
 		
-		if(!file_exists($config_file))
+		if(!file_exists($config_file)) {
+			_debug("No Config File Found\n", 0);
 			return FALSE;
+		}
 
 		if(!($fp = fopen($config_file, "r"))) {
 			_debug("read_config_file: Could not open $config_file\n", 0);
@@ -90,7 +72,6 @@
 						$config_values[$group][$option] = $value;
 				}
 			}
-			return true;
 		}
 		fclose($fp);
 		// Create the base arrays if not already
@@ -98,13 +79,14 @@
 			$config_values['Favorites'] = array();
 		if(!isset($config_values['Feeds']))
 			$config_values['Feeds'] = array();
+		return true;
 	}
 
 	// I wrote the reverse function of the above, please note if you use any
 	// command line options those will be written as well
 	function write_config_file() {
 		global $config_values, $config_out;
-		$config_file = platform_getInstallRoot()."/torrentwatch.config";
+		$config_file = platform_getConfigFile();
 
 		_debug("Preparing to write config file to $config_file\n");
 
@@ -141,13 +123,20 @@
 
 	function update_global_config() {
 		global $config_values;
-    $config_values['Settings']['Download Dir']=urldecode($_GET['downdir']);
-    $config_values['Settings']['Watch Dir']=urldecode($_GET['watchdir']);
-    $config_values['Settings']['Deep Directories']=urldecode($_GET['deepdir']);
-    $config_values['Settings']['Verify Episode']=(isset($_GET['verifyepisodes']) ? 1 : 0);
-    $config_values['Settings']['Save Torrents']=(isset($_GET['savetorrents']) ? 1 : 0);
-    $config_values['Settings']['Client']=urldecode($_GET['client']);
-		$config_values['Settings']['MatchStyle']=urldecode($_GET['matchstyle']);
+		$input = array('Download Dir'     => 'downdir',
+		               'Watch Dir'        => 'watchdir',
+		               'Deep Directories' => 'deepdir',
+		               'Client'           => 'client',
+		               'MatchStyle'       => 'matchstyle');
+		$checkboxs = array('Verify Episode' => 'verifyepisodes',
+		                   'Save Torrents'  => 'savetorrents');
+		foreach($input as $key => $data) {
+			if(isset($_GET[$data]))
+				$config_values['Settings'][$key] = $_GET[$data];
+		}
+		foreach($checkboxs as $key => $data) 
+			$config_values['Settings'][$key] = isset($_GET[$data]) ? 1 : 0;
+				
 		return;
 	}
 				

@@ -1,4 +1,4 @@
-diff -ur transmission-1.40/daemon/remote.c transmission-1.40.ratioLimit/daemon/remote.c
+diff -ruwb transmission-1.40/daemon/remote.c transmission-1.40.ratioLimit/daemon/remote.c
 --- transmission-1.40/daemon/remote.c	2008-11-10 15:52:35.000000000 +0000
 +++ transmission-1.40.ratioLimit/daemon/remote.c	2008-11-13 02:38:23.000000000 +0000
 @@ -74,6 +74,10 @@
@@ -32,42 +32,17 @@ diff -ur transmission-1.40/daemon/remote.c transmission-1.40.ratioLimit/daemon/r
  static char * reqs[256]; /* arbitrary max */
  static int    reqCount = 0;
  static int    debug = 0;
-@@ -232,22 +249,22 @@
- static const char * details_keys[] = {
-     "activityDate",     "addedDate",              "announceResponse",
-     "announceURL",
--    "comment",        "corruptEver",        "creator",
--    "dateCreated",     "doneDate",
--    "downloadedEver", "errorString",        "eta",
--    "hashString",      "haveUnchecked",
--    "haveValid",      "id",                 "isPrivate",
-+    "comment",          "corruptEver",        "creator",
-+    "dateCreated",      "doneDate",
-+    "downloadedEver",   "errorString",        "eta",
-+    "hashString",       "haveUnchecked",
-+    "haveValid",        "id",                 "isPrivate",
-     "lastAnnounceTime", "lastScrapeTime",
--    "leechers",       "leftUntilDone",      "name",
-+    "leechers",         "leftUntilDone",      "name",
+@@ -242,8 +259,8 @@
      "nextAnnounceTime", "nextScrapeTime",
--    "peersConnected", "peersGettingFromUs", "peersSendingToUs",
--    "pieceCount",     "pieceSize",          "rateDownload",
+     "peersConnected", "peersGettingFromUs", "peersSendingToUs",
+     "pieceCount",     "pieceSize",          "rateDownload",
 -    "rateUpload",      "recheckProgress",
 -    "scrapeResponse", "seeders",
--    "sizeWhenDone",    "startDate",
--    "status",         "timesCompleted",     "totalSize",
-+    "peersConnected",   "peersGettingFromUs", "peersSendingToUs",
-+    "pieceCount",       "pieceSize",          "rateDownload",
 +    "rateUpload",       "ratioLimit",         "ratioLimitMode",
 +    "recheckProgress",  "scrapeResponse",     "seeders",
-+    "sizeWhenDone",     "startDate",
-+    "status",           "timesCompleted",     "totalSize",
+     "sizeWhenDone",    "startDate",
+     "status",         "timesCompleted",     "totalSize",
      "uploadedEver",
--    "webseeds",       "webseedsSendingToUs"
-+    "webseeds",         "webseedsSendingToUs"
- };
- 
- static const char * list_keys[] = {
 @@ -356,6 +373,17 @@
                      tr_bencListAddStr( fields, details_keys[i] );
                  break;
@@ -105,7 +80,23 @@ diff -ur transmission-1.40/daemon/remote.c transmission-1.40.ratioLimit/daemon/r
              if( tr_bencDictFindInt( t, "corruptEver", &i ) )
              {
                  strlsize( buf, i, sizeof( buf ) );
-diff -ur transmission-1.40/libtransmission/resume.c transmission-1.40.ratioLimit/libtransmission/resume.c
+diff -ruwb transmission-1.40/gtk/details.c transmission-1.40.ratioLimit/gtk/details.c
+--- transmission-1.40/gtk/details.c	2008-11-10 15:52:26.000000000 +0000
++++ transmission-1.40.ratioLimit/gtk/details.c	2008-11-13 00:14:59.000000000 +0000
+@@ -828,6 +828,12 @@
+                                           GTK_SHADOW_IN );
+     gtk_container_add ( GTK_CONTAINER( w ), v );
+ 
++static void
++ratio_limit_toggled_cb (GtkToggleButton *tb, gpointer gtor)
++{
++  tr_torrentSetRatioLimitActive( tr_torrent_handle( gtor ),
++                                 gtk_toggle_button_get_active( tb ) );
++}
+ 
+     vbox = gtk_vbox_new ( FALSE, GUI_PAD );
+     gtk_container_set_border_width ( GTK_CONTAINER( vbox ), GUI_PAD_BIG );
+diff -ruwb transmission-1.40/libtransmission/resume.c transmission-1.40.ratioLimit/libtransmission/resume.c
 --- transmission-1.40/libtransmission/resume.c	2008-11-10 15:52:25.000000000 +0000
 +++ transmission-1.40.ratioLimit/libtransmission/resume.c	2008-11-13 00:32:44.000000000 +0000
 @@ -38,6 +38,7 @@
@@ -152,7 +143,7 @@ diff -ur transmission-1.40/libtransmission/resume.c transmission-1.40.ratioLimit
      if( fieldsToLoad & TR_FR_PEERS )
          fieldsLoaded |= loadPeers( &top, tor );
  
-diff -ur transmission-1.40/libtransmission/resume.h transmission-1.40.ratioLimit/libtransmission/resume.h
+diff -ruwb transmission-1.40/libtransmission/resume.h transmission-1.40.ratioLimit/libtransmission/resume.h
 --- transmission-1.40/libtransmission/resume.h	2008-11-10 15:52:25.000000000 +0000
 +++ transmission-1.40.ratioLimit/libtransmission/resume.h	2008-11-13 00:16:19.000000000 +0000
 @@ -28,7 +28,8 @@
@@ -165,7 +156,7 @@ diff -ur transmission-1.40/libtransmission/resume.h transmission-1.40.ratioLimit
  };
  
  /**
-diff -ur transmission-1.40/libtransmission/rpcimpl.c transmission-1.40.ratioLimit/libtransmission/rpcimpl.c
+diff -ruwb transmission-1.40/libtransmission/rpcimpl.c transmission-1.40.ratioLimit/libtransmission/rpcimpl.c
 --- transmission-1.40/libtransmission/rpcimpl.c	2008-11-10 15:52:25.000000000 +0000
 +++ transmission-1.40.ratioLimit/libtransmission/rpcimpl.c	2008-11-13 00:32:35.000000000 +0000
 @@ -364,6 +364,10 @@
@@ -212,7 +203,7 @@ diff -ur transmission-1.40/libtransmission/rpcimpl.c transmission-1.40.ratioLimi
              tr_benc fields;
              tr_bencInitList( &fields, 3 );
              tr_bencListAddStr( &fields, "id" );
-diff -ur transmission-1.40/libtransmission/session.c transmission-1.40.ratioLimit/libtransmission/session.c
+diff -ruwb transmission-1.40/libtransmission/session.c transmission-1.40.ratioLimit/libtransmission/session.c
 --- transmission-1.40/libtransmission/session.c	2008-11-10 15:52:25.000000000 +0000
 +++ transmission-1.40.ratioLimit/libtransmission/session.c	2008-11-13 00:14:59.000000000 +0000
 @@ -269,6 +269,8 @@
@@ -224,7 +215,7 @@ diff -ur transmission-1.40/libtransmission/session.c transmission-1.40.ratioLimi
      h->tag = tr_strdup( tag );
      h->peerMgr = tr_peerMgrNew( h );
  
-diff -ur transmission-1.40/libtransmission/torrent.c transmission-1.40.ratioLimit/libtransmission/torrent.c
+diff -ruwb transmission-1.40/libtransmission/torrent.c transmission-1.40.ratioLimit/libtransmission/torrent.c
 --- transmission-1.40/libtransmission/torrent.c	2008-11-10 15:52:25.000000000 +0000
 +++ transmission-1.40.ratioLimit/libtransmission/torrent.c	2008-11-13 00:32:17.000000000 +0000
 @@ -47,6 +47,7 @@
@@ -315,7 +306,7 @@ diff -ur transmission-1.40/libtransmission/torrent.c transmission-1.40.ratioLimi
 +{
 +    tr_timerNew( handle, queuePulseFunc, handle, QUEUE_PULSE_DELAY );
 +}
-diff -ur transmission-1.40/libtransmission/torrent.h transmission-1.40.ratioLimit/libtransmission/torrent.h
+diff -ruwb transmission-1.40/libtransmission/torrent.h transmission-1.40.ratioLimit/libtransmission/torrent.h
 --- transmission-1.40/libtransmission/torrent.h	2008-11-10 15:52:25.000000000 +0000
 +++ transmission-1.40.ratioLimit/libtransmission/torrent.h	2008-11-13 00:18:29.000000000 +0000
 @@ -154,6 +154,8 @@
@@ -337,7 +328,7 @@ diff -ur transmission-1.40/libtransmission/torrent.h transmission-1.40.ratioLimi
      int                      error;
      char                     errorString[128];
  
-diff -ur transmission-1.40/libtransmission/transmission.h transmission-1.40.ratioLimit/libtransmission/transmission.h
+diff -ruwb transmission-1.40/libtransmission/transmission.h transmission-1.40.ratioLimit/libtransmission/transmission.h
 --- transmission-1.40/libtransmission/transmission.h	2008-11-10 15:52:25.000000000 +0000
 +++ transmission-1.40.ratioLimit/libtransmission/transmission.h	2008-11-13 00:14:59.000000000 +0000
 @@ -875,6 +875,22 @@
@@ -363,3 +354,45 @@ diff -ur transmission-1.40/libtransmission/transmission.h transmission-1.40.rati
  *****  Peer Limits
  ****/
  
+diff -ruwb transmission-1.40/libtransmission/web.c transmission-1.40.ratioLimit/libtransmission/web.c
+--- transmission-1.40/libtransmission/web.c	2008-11-10 15:52:25.000000000 +0000
++++ transmission-1.40.ratioLimit/libtransmission/web.c	2008-11-13 01:28:01.000000000 +0000
+@@ -281,7 +281,7 @@
+ 
+     /* invoke libcurl's processing */
+     do {
+-        rc = curl_multi_socket_action( g->multi, fd, mask, &g->still_running );
++   /*     rc = curl_multi_socket_action( g->multi, fd, mask, &g->still_running ); */
+         dbgmsg( "event_cb(): fd %d, mask %d, still_running is %d",
+                 fd, mask, g->still_running );
+     } while( rc == CURLM_CALL_MULTI_PERFORM );
+diff -ruwb transmission-1.40/third-party/libevent/event-config.h transmission-1.40.ratioLimit/third-party/libevent/event-config.h
+--- transmission-1.40/third-party/libevent/event-config.h	2008-11-10 15:53:55.000000000 +0000
++++ transmission-1.40.ratioLimit/third-party/libevent/event-config.h	2008-11-13 00:26:52.000000000 +0000
+@@ -117,7 +117,7 @@
+ #define _EVENT_HAVE_STRING_H 1
+ 
+ /* Define to 1 if you have the `strlcpy' function. */
+-/* #undef _EVENT_HAVE_STRLCPY */
++#define _EVENT_HAVE_STRLCPY 1
+ 
+ /* Define to 1 if you have the `strsep' function. */
+ #define _EVENT_HAVE_STRSEP 1
+@@ -165,7 +165,7 @@
+ #define _EVENT_HAVE_SYS_TYPES_H 1
+ 
+ /* Define if TAILQ_FOREACH is defined in <sys/queue.h> */
+-#define _EVENT_HAVE_TAILQFOREACH 1
++/* #undef _EVENT_HAVE_TAILQFOREACH */
+ 
+ /* Define if timeradd is defined in <sys/time.h> */
+ #define _EVENT_HAVE_TIMERADD 1
+@@ -222,7 +222,7 @@
+ #define _EVENT_SIZEOF_INT 4
+ 
+ /* The size of `long', as computed by sizeof. */
+-#define _EVENT_SIZEOF_LONG 8
++#define _EVENT_SIZEOF_LONG 4
+ 
+ /* The size of `long long', as computed by sizeof. */
+ #define _EVENT_SIZEOF_LONG_LONG 8

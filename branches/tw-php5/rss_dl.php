@@ -1,4 +1,4 @@
-#!/mnt/syb8634/server/php5-cgi -qd register_argc_argv=1
+#!/usr/bin/php -qd register_argc_argv=1
 <?php
 // rss_dl.php
 // By Erik Bernhardson
@@ -132,7 +132,11 @@ function setup_cron_hook() {
 //
 
 	$main_timer = timer_init();
-	read_config_file();
+	if(file_exists(platform_getConfigFile()))
+		read_config_file();
+	else
+		setup_default_config();
+
 	if(isset($config_values['Settings']['Verbose']))
 		$verbosity = $config_values['Settings']['Verbose'];
 	parse_args();
@@ -142,16 +146,17 @@ function setup_cron_hook() {
 	if(isset($config_values['Global']['Install'])) {
 		if($config_values['Global']['Install'] == 1) {
 			platform_install();
-			setup_default_config();
 		}
 		setup_cron_hook();
 		exit;
 	}
 
-	load_feeds($config_values['Feeds']);
-	feeds_perform_matching($config_values['Feeds']);
+	if(isset($config_values['Feeds'])) {
+		load_feeds($config_values['Feeds']);
+		feeds_perform_matching($config_values['Feeds']);
+	}
 
-	if($config_values['Settings']['Run Torrentwatch'] and !$test_run) {
+	if(_isset($config_values['Settings'], 'Run Torrentwatch', FALSE) and !$test_run) {
 		global $hit;
 		$hit = 0;
 		check_for_torrents($config_values['Settings']['Watch Dir'], $config_values['Settings']['Download Dir']);

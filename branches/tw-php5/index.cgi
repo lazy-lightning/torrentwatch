@@ -84,7 +84,7 @@ function parse_options() {
 function display_global_config() {
 	global $config_values, $html_out;
 
-	$savetorrents=$nzb=$trans122=$trans132=$btpd="";
+	$savetorrent=$nzb=$trans122=$trans132=$btpd="";
 	$deepfull=$deeptitle=$deepoff=$verifyepisode="";
 	$matchregexp=$matchglob=$matchsimple="";
 
@@ -108,7 +108,7 @@ function display_global_config() {
 	}
 
 	if($config_values['Settings']['Save Torrents'] == 1)
-		$savetorrents = 'checked=1';
+		$savetorrent = 'checked=1';
 
 	switch($config_values['Settings']['Deep Directories']) {
 		case 'Full': $deepfull = 'selected="selected"';break;
@@ -140,14 +140,16 @@ function display_global_config() {
 
 	 '<div class="config_downloaddir" title="Default directory to start torrents in"><label class="item">Download Directory:</label>'.
 	 '<input type="text" name="downdir" value='.$config_values['Settings']['Download Dir'].'></div>'.
+
 	 '<div class="config_watchdir">'.
 	 '<label class="category">Torrent Settings</label>'.
 	 '<label class="item" title="Directory to look for new .torrents">Watch Directory:</label>'.
 	 '<input type="text" name="watchdir" value='.$config_values['Settings']['Watch Dir'].'></div>'.
 
 	 '<div class="config_savetorrent">'.
-	 '<input type="checkbox" name="savetorrents" value=1 '.
-	 '><label class="item" title="Save torrent to download directory">Save .torrent</label></div>'.
+	 '<input type="checkbox" name="savetorrents" value=1 '.$savetorrent.'>'.
+	 '<label class="item" title="Save torrent to download directory">Save .torrent</label></div>'.
+
 	 '<div class="config_deepdir"><label class="item" title="Save downloads in multi-directory structure">Deep Directories:</label>'.
 	 '<select name="deepdir">'.
 	 '<option value="Full" '.$deepfull.'>Full Name</option>'.
@@ -157,10 +159,9 @@ function display_global_config() {
 	 '<div class="config_verifyepisodes" '.
 	 'title="Try not to download duplicate episodes">'.
 	 '<label class="category">Favorites Settings</label>'.
+	 '<input type="checkbox" name="verifyepisodes" value=1 '.$verifyepisode.'>'.
+	 '<label class="item">Verify Episodes</label></div>'.
 
-	 '<input type="checkbox" name="verifyepisodes" value=1 '.
-
-	 '><label class="item">Verify Episodes</label></div>'.
 	 '<div class="config_matchstyle">'.
 	 '<label class="item" title="Type of filter to use">Matching Style:</label>'.
 	 '<select name="matchstyle"><option value="regexp" '.$matchregexp.'>RegExp</option>'.
@@ -174,14 +175,16 @@ function display_global_config() {
 	// Feeds
 	$html_out .= '<div class="dialog_window" id="feeds">'.
 	 '<label class="Category">Feeds</label>';
-	foreach($config_values['Feeds'] as $key => $feed) {
-		$html_out .= '<div class="feeditem">'."\n".
-			'<form action="index.cgi" class="feedform">'.
-			'<input type="hidden" name="mode" value="updatefeed">'."\n".
-			'<input type="hidden" name="idx" value="'.$key.'">'.
-			'<input class="del" type="submit" name="button" value="Delete">'."\n".
-			'<label class="item">'.$feed['Name'].': '.$feed['Link'].
-			'</label></form></div>'."\n";
+	if(isset($config_values['Feeds'])) {
+		foreach($config_values['Feeds'] as $key => $feed) {
+			$html_out .= '<div class="feeditem">'."\n".
+				'<form action="index.cgi" class="feedform">'.
+				'<input type="hidden" name="mode" value="updatefeed">'."\n".
+				'<input type="hidden" name="idx" value="'.$key.'">'.
+				'<input class="del" type="submit" name="button" value="Delete">'."\n".
+				'<label class="item">'.$feed['Name'].': '.$feed['Link'].
+				'</label></form></div>'."\n";
+		}
 	}
 	$html_out .= '<div class="feeditem">'."\n".
 		'<form action="index.cgi" class="feedform">'.
@@ -212,11 +215,13 @@ function display_favorites_info($item, $key) {
 	 '<input type="text" name="episodes" value="'.$item['Episodes'].'"></div>'."\n".
 	 '<div class="favorite_feed"><label class="item" title="Feed to match against">Feed:</label><select name="feed">'."\n".
 	 '<option value="all">All</option>'."\n";
-	foreach($config_values['Feeds'] as $feed) {
-		$html_out .= '<option value="'.urlencode($feed['Link']).'"';
-		if($feed['Link'] == $item['Feed'])
-			$html_out .= ' selected="selected"';
-		$html_out .= '>'.$feed['Name'].'</option>'."\n";
+	if(isset($config_values['Feeds'])) {
+		foreach($config_values['Feeds'] as $feed) {
+			$html_out .= '<option value="'.urlencode($feed['Link']).'"';
+			if($feed['Link'] == $item['Feed'])
+				$html_out .= ' selected="selected"';
+			$html_out .= '>'.$feed['Name'].'</option>'."\n";
+		}
 	}
 	$html_out .= '</select></div>'."\n".
 	 '<div class="favorite_quality"><label class="item" title="Regexp Filter against full title">Quality:</label>'.
@@ -237,12 +242,15 @@ function display_favorites() {
 	global $config_values, $html_out;
 	$html_out .= '<div class="dialog_window" id="favorites">'.
 	             '<div class="Favorite"><ul>';
-	foreach($config_values['Favorites'] as $key => $item) {
-		$html_out .= '<li>'._jscript("toggleFav('favorite_".$key."')", $item['Name']).'</li>'."\n";
+	if(isset($config_values['Favorites'])) {
+		foreach($config_values['Favorites'] as $key => $item) {
+			$html_out .= '<li>'._jscript("toggleFav('favorite_".$key."')", $item['Name']).'</li>'."\n";
+		}
 	}
 	$html_out .= '<li>'._jscript("toggleFav('favorite_new')", "New Favorite").'</li>'."\n";
 	$html_out .= '</ul></div>';
-	array_walk($config_values['Favorites'], 'display_favorites_info');
+	if(isset($config_values['Favorites']))
+		array_walk($config_values['Favorites'], 'display_favorites_info');
 	$item = array('Name' => '', 
 	              'Filter' => '', 
 	              'Not' => '', 
@@ -407,7 +415,10 @@ if($_SERVER["REMOTE_ADDR"] == '127.0.0.1') {
 echo ("</head>\n<body>\n");
 ob_flush();flush();
 
-read_config_file();
+if(file_exists(platform_getConfigFile()))
+	read_config_file();
+else
+	setup_default_config();
 
 $config_values['Global']['HTMLOutput']= 1;
 $html_out = "";
@@ -439,8 +450,10 @@ $html_out = "";
 ob_flush();flush();
 
 // Feeds
-load_feeds($config_values['Feeds']);
-feeds_perform_matching($config_values['Feeds']);
+if(isset($config_values['Feeds'])) {
+	load_feeds($config_values['Feeds']);
+	feeds_perform_matching($config_values['Feeds']);
+}
 
 // Comes later incase we just added a torrent	
 display_history();
