@@ -12,4 +12,4 @@ Once the web interface is working properly you will want to setup a cron job to 
 
 `30 * * * * /var/www/torrentwatch/rss_dl.php -D`
 
-The -D switch tells rss_dl.php to also check the watch folder.
+The begining tells cron to run the script at 30 minutes past the hour every hour.  The -D switch tells rss_dl.php to also check the watch folder.
