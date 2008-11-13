@@ -1,13 +1,16 @@
 #!/bin/sh
 
-RELEASE_FILES="atomparser.php lastRSS.php torrentwatch.php rss_dl.php rss_dl.config.orig rss_dl_utils.php tw-iface.php tw-iface.css tw-iface.local.css images CREDITS LICENSE changelog"
-RELEASE=`pwd | sed 's/.*folder\///'`
+PHP_FILES="atomparser.php lastRSS.php torrentwatch.php rss_dl.php rss_dl_utils.php class.bdecode.php rss_dl.functions.php tor_client.php progressbar.php"
+DOC_FILES="TODO CREDITS LICENSE changelog rss_dl.config.orig"
+IMAGE_FILES="images/favicon.ico images/*.gif images/*.png"
+WEB_FILES="tw-iface.php webappers.com.progress.js webtoolkit.contextmenu.js tw-iface.css tw-iface.local.css tw-iface.js $IMAGE_FILES"
+RELEASE_FILES="$PHP_FILES $DOC_FILES $WEB_FILES"
+RELEASE=torrentwatch-dev-$1
 
 rm -rf release
 mkdir -p release
 
 rm *~
-rm -rf images/.svn
 cp *installer* release
 cp twupload.ftp release
 tar -cf release/tw.scripts.tar $RELEASE_FILES

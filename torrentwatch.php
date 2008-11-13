@@ -1,4 +1,4 @@
-#!/mnt/syb8634/server/php
+#!/mnt/syb8634/server/php5-cgi -qd register_argc_argv=1
 <?php
 
 require_once('rss_dl_utils.php');
@@ -23,77 +23,6 @@ function parse_options() {
 		default:
 			usage();
 			exit(1);
-	}
-}
-
-function add_torrent($directory, $filename, $dest) {
-	global $config_values, $hit;
-	$btcli = '/mnt/syb8634/bin/btcli';
-	$btcli_add = 'add -d';
-	$btcli_connect='-d /opt/sybhttpd/localhost.drives/HARD_DISK/.btpd/';
-	$btcli_exec="$btcli $btcli_connect";
-
-	$trans_remote = '/mnt/syb8634/bin/transmission-remote';
-	$trans_connect = '-g /share/.transmission';
-	$trans_exec = "$trans_remote $trans_connect";
-	$trans_down_dir = '-f';
-	$trans_add = '-a';
-
-	$hit = 1;
-	if(isset($config_values['Settings']['Deep Directories'])) {
-		preg_match("/(.*)\.torrent/", $filename, $matches);
-		switch($config_values['Settings']['Deep Directories']) {
-			case '0':
-				break;
-			case 'Title':
-				$guess = guess_match($matches[1]);
-				if(isset($guess['key'])) {
-					$dest = "$dest/".$guess['key'];
-					break;
-				}
-			case 'Full':
-			default:
-				$dest = "$dest/$matches[1]";
-				break;
-		}
-		_debug("Deep Directorys, change dest to $dest\n", 1);
-	}
-	exec("mkdir -p \"$dest\"");
-	if($config_values['Settings']['Client'] == "btpd")
-		exec("$btcli_exec $btcli_add \"$dest\" \"$directory/$filename\"", $output, $return);
-	else if($config_values['Settings']['Client'] == "transmission") {
-		/* Transmission wont let us explicitly set download dir till they release 1.30 */
-		$trans_dl = transmission_get_dl_dir();
-		if(!($trans_dl == $dest))
-			exec("$trans_exec $trans_down_dir \"$dest\"");
-		exec("$trans_exec $trans_add \"$directory/$filename\"", $output, $return);
-		/* sometimes our download ends up here anyways, depending on when the file gets written to disk */
-		if(!($trans_dl == $dest))
-			exec("$trans_exec $trans_down_dir \"$trans_dl\"");
-	} else {
-		_debug("Invalid Torrent Client: ".$config_values['Settings']['Client']."\n",0);
-		exit(1);
-	}
-	if($return == 0)
-		_debug("Starting: $filename in $dest\n",0);
-	else 
-		_debug("Failed Starting: $filename  Return code $return\n",0);
-	if($config_values['Settings']['Save Torrents'])
-		rename("$directory/$filename", "$dest/".basename($filename));
-	else
-		unlink("$directory/$filename");
-}
-
-function check_for_torrents($directory, $dest) {
-	if($handle = opendir($directory)) {
-		while(false !== ($file = readdir($handle))) {
-			if(preg_match('/\.torrent$/', $file))
-				add_torrent($directory, $file, $dest);
-		}
-		closedir($handle);
-	} else {
-		_debug("torrentwatch.php: Couldn't read Directory: $directory\n", 0);
-		exit(1);
 	}
 }
 
