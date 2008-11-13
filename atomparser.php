@@ -15,14 +15,17 @@
 
     var $encoding = array();
 
+    # default caching time (50min)
+
     # constructor for new object
-    function myAtomParser($file, $cache_dir = '')
+    function myAtomParser($file, $cache_dir = '', $cache_time = 3000)
     {
 			// Cache routine from lastRSS.php
-			// Modified to only use local files since the builtin http handler is broken
 			if($cache_dir != '') {
 				$cache_file = $cache_dir . '/atomcache_' . md5($file);
-				if(file_exists($cache_file) and filemtime($cache_file) > filemtime($file)) {
+				$timedif = @(time() - filemtime($cache_file));
+				if($timedif < $cache_time) {
+					// New Enough
 					$this->output = unserialize(join('', file($cache_file)));
 					//set 'cached' to 1 only if cached file is correct
 					if($this->output) $this->output['cached'] = 1;
