@@ -83,8 +83,8 @@ diff -ruwb transmission-1.40/daemon/remote.c transmission-1.40.ratioLimit/daemon
              {
                  strlsize( buf, i, sizeof( buf ) );
 diff -ruwb transmission-1.40/doc/rpc-spec.txt transmission-1.40.ratioLimit/doc/rpc-spec.txt
---- transmission-1.40/doc/rpc-spec.txt  2008-11-10 15:52:35.000000000 +0000
-+++ transmission-1.40.ratioLimit/doc/rpc-spec.txt 2008-11-13 10:07:28.000000000 +0000
+--- transmission-1.40/doc/rpc-spec.txt	2008-11-10 15:52:35.000000000 +0000
++++ transmission-1.40.ratioLimit/doc/rpc-spec.txt	2008-11-13 10:07:28.000000000 +0000
 @@ -95,6 +95,8 @@
     "priority-high"            | array      indices of high-priority file(s)
     "priority-low"             | array      indices of low-priority file(s)
@@ -108,7 +108,7 @@ diff -ruwb transmission-1.40/doc/rpc-spec.txt transmission-1.40.ratioLimit/doc/r
     "paused"           | 'boolean'   if true, don't start the torrent
     "peer-limit"       | number      maximum number of peers
 +   "ratio-limit"      | double      maximum seed ratio
-
+ 
     Either "filename" OR "metainfo" MUST be included.
     All other arguments are optional.
 diff -ruwb transmission-1.40/libtransmission/resume.c transmission-1.40.ratioLimit/libtransmission/resume.c
@@ -232,7 +232,7 @@ diff -ruwb transmission-1.40/libtransmission/session.c transmission-1.40.ratioLi
  
 diff -ruwb transmission-1.40/libtransmission/torrent.c transmission-1.40.ratioLimit/libtransmission/torrent.c
 --- transmission-1.40/libtransmission/torrent.c	2008-11-10 15:52:25.000000000 +0000
-+++ transmission-1.40.ratioLimit/libtransmission/torrent.c	2008-11-13 00:32:17.000000000 +0000
++++ transmission-1.40.ratioLimit/libtransmission/torrent.c	2008-11-13 10:22:23.000000000 +0000
 @@ -47,6 +47,7 @@
  #include "verify.h"
  
@@ -296,7 +296,7 @@ diff -ruwb transmission-1.40/libtransmission/torrent.c transmission-1.40.ratioLi
      loaded = tr_torrentLoadResume( tor, ~0, ctor );
  
      doStart = tor->isRunning;
-@@ -1822,3 +1860,24 @@
+@@ -1822,3 +1860,25 @@
  
      return bytesLeft;
  }
@@ -310,6 +310,7 @@ diff -ruwb transmission-1.40/libtransmission/torrent.c transmission-1.40.ratioLi
 +    for( tor = handle->torrentList; tor; tor = tor->next ) {
 +        if( tr_torrentGetActivity( tor ) == TR_STATUS_SEED &&
 +            tr_torrentRatioLimitExceeded( tor ) ) {
++            tr_torrentSetRatioLimitActive( tor, FALSE );
 +            tr_torrentStop( tor );
 +        }
 +    }
