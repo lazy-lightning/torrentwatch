@@ -62,9 +62,8 @@ class lastRSS {
 		if ($this->cache_dir != '') {
 			$cache_file = $this->cache_dir . '/rsscache_' . md5($rss_url);
 			// Changed to only support local files
-			//$timedif = @(time() - filemtime($cache_file));
-			//if ($timedif < $this->cache_time) {
-			if (file_exists($cache_file) and filemtime($cache_file) > filemtime($rss_url)) {
+			$timedif = @(time() - filemtime($cache_file));
+			if ($timedif < $this->cache_time) {
 				// cached file is fresh enough, return cached array
 				$result = unserialize(join('', file($cache_file)));
 				// set 'cached' to 1 only if cached file is correct
@@ -162,7 +161,7 @@ class lastRSS {
 				if ($temp != '') $result[$channeltag] = $temp; // Set only if not empty
 			}
 			// If date_format is specified and lastBuildDate is valid
-			if ($this->date_format != '' && ($timestamp = strtotime($result['lastBuildDate'])) !==-1) {
+			if ($this->date_format != '' && isset($result['lastBuildDate']) && ($timestamp = strtotime($result['lastBuildDate'])) !==-1) {
 						// convert lastBuildDate to specified date format
 						$result['lastBuildDate'] = date($this->date_format, $timestamp);
 			}
@@ -206,18 +205,18 @@ class lastRSS {
 							preg_match_all( '/([^\s"=]+)="([^"]*?)"/' , $temp2, $attr, PREG_SET_ORDER);
 							$result['items'][$i][$itemtag] = array();
 							if ($temp != '') $result['items'][$i][$itemtag]['value'] = $temp;
-						  	foreach($attr as $a) { 
+								foreach($attr as $a) { 
 								$result['items'][$i][$itemtag][$a[1]] = $a[2];
-						  	}
+								}
 						} else {
-						  if ($temp != '') $result['items'][$i][$itemtag] = $temp; // Set only if not empty
+							if ($temp != '') $result['items'][$i][$itemtag] = $temp; // Set only if not empty
 						}
 						/** end rss attribute changes **/
 
 
 					}
 					// Strip HTML tags and other bullshit from DESCRIPTION
-					if ($this->stripHTML && $result['items'][$i]['description'])
+					if ($this->stripHTML && isset($result['items'][$i]['description']))
 						$result['items'][$i]['description'] = strip_tags($this->unhtmlentities(strip_tags($result['items'][$i]['description'])));
 					// Strip HTML tags and other bullshit from TITLE
 					if ($this->stripHTML && $result['items'][$i]['title'])

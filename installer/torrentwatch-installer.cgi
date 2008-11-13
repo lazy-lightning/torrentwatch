@@ -29,19 +29,19 @@ exename=`echo $pwd | sed 's#.*/\([^/]*\)$#\1#g'`
 
 
 # Defines used for this version
+NAME="torrentwatch"
+CONFIG="$NAME.config"
+WEB_SCRIPT='index.cgi'
+
+# Script Defines
 INSTALL="/opt/sybhttpd/localhost.drives/$urlpwd/tw.scripts.tar"
 DEST="/opt/sybhttpd/localhost.drives/HARD_DISK/.torrents"
 USBDIR="/opt/sybhttpd/localhost.drives/$urlpwd"
 STARTER="/opt/sybhttpd/localhost.drives/HARD_DISK/start_app.sh"
-# This is where our php interface script will be linked to
-# cannot be in a hidden directory like .torrents
-IFACE_DEST="/share/"
-IMAGE_DEST="/share/images/"
 
 # Script to install into the autostarter
 START_SCRIPT='rss_dl.php'
-SCRIPT_OPTS='-i'
-
+START_SCRIPT_OPTS='-i'
 
 ###############################################################
 # Define the functions we will call.
@@ -49,16 +49,17 @@ SCRIPT_OPTS='-i'
 ###############################################################
 MARKER="#M_A_R_K_E_R_do_not_remove_me"
 FTPSERVER="/mnt/syb8634/etc/ftpserver.sh"
+PHP="/mnt/syb8634/server/php5-cgi"
 
 # Send the closing HTML
 end_html() 
 { 
-  cat <<EOF
+	cat <<EOF
 </h2>
 </body>
 </html>
 EOF
-  
+	
 }
 
 
@@ -66,44 +67,61 @@ EOF
 check_has_hdd()
 {
 
-  /bin/mount | /bin/grep -q /opt/sybhttpd/localhost.drives/HARD_DISK
-  if [ $? != 0 ]; then
-    echo "Sorry, but you do not appear to have HARD_DISK mounted<br>" 
-    end_html
-    exit 0
-  fi
+	/bin/mount | /bin/grep -q /opt/sybhttpd/localhost.drives/HARD_DISK
+	if [ $? != 0 ]; then
+		echo "Sorry, but you do not appear to have HARD_DISK mounted<br>" 
+		end_html
+		exit 0
+	fi
 
 }
 
 autostart_add()
-{   
-    /bin/cat "$STARTER" | /bin/grep -q "$START_SCRIPT"
-    if [ $? == 0 ]; then
+{	 
+	/bin/cat "$STARTER" | /bin/grep -q "$START_SCRIPT"
+	if [ $? == 0 ]; then
 		echo "$START_SCRIPT already set to start on boot, skipping <br>"
-    else
+	else
 		echo "Adding $START_SCRIPT to community agreed startup script.<br>"
 		
 		rm -f /tmp/.starter.tmp
 		IFS=""
 		cat "$STARTER" | while read line 
 		do
-		  echo "$line" >> /tmp/.starter.tmp
-		  if [ x"$line" == x"$MARKER" ]; then
-			  # echo "cd ${DEST}/ && ./telnetd -l /bin/sh &" >> /tmp/.starter
-			  echo "${DEST}/${START_SCRIPT} ${SCRIPT_OPTS}" >> /tmp/.starter.tmp
-		  fi
+			echo "$line" >> /tmp/.starter.tmp
+			if [ x"$line" == x"$MARKER" ]; then
+				# echo "cd ${DEST}/ && ./telnetd -l /bin/sh &" >> /tmp/.starter
+				echo "${DEST}/${START_SCRIPT} ${START_SCRIPT_OPTS}" >> /tmp/.starter.tmp
+			fi
 		done
 		cat < /tmp/.starter.tmp > "$STARTER"
 		chmod 755 "$STARTER"
 		rm -f /tmp/.starter.tmp
-    fi
+	fi
 
+
+	/bin/cat "$STARTER" | /bin/grep -q "php-cgi"
+	if [ $? != 0 ]; then
+		rm -f /tmp/.starter.tmp
+		IFS=""
+		cat "$STARTER" | while read line 
+		do
+			echo "$line" >> /tmp/.starter.tmp
+			if [ x"$line" == x"$MARKER" ]; then
+				# echo "cd ${DEST}/ && ./telnetd -l /bin/sh &" >> /tmp/.starter
+				echo "ln -s ${PHP} /usr/bin/php-cgi" >> /tmp/.starter.tmp
+			fi
+		done
+		cat < /tmp/.starter.tmp > "$STARTER"
+		chmod 755 "$STARTER"
+		rm -f /tmp/.starter.tmp
+	fi
 }
 
 autostart_setup()
 {
 
-  # Insert code here to make it auto-start
+	# Insert code here to make it auto-start
 	if [ -f "$STARTER" ]; then
 		echo "Found user community agreed on startup file...<br>"
 	else
@@ -114,14 +132,17 @@ autostart_setup()
 #!/bin/sh
 #
 
+PATH=\$PATH:/share/bin
+HOME=/share/
+
 $MARKER
 
 exit 0
 EOF
 		chmod 755 "$STARTER"
-     fi
+	fi
 
-		# Check if it is already called from ftpserver.sh
+	# Check if it is already called from ftpserver.sh
 	grep -q "$STARTER" "$FTPSERVER"
 	if [ $? != 0 ]; then
 		echo "Installer starter<br>"
@@ -131,12 +152,12 @@ EOF
 		rm -f /tmp/.ftpserver.tmp /tmp/.found
 		IFS=""
 		cat "$FTPSERVER" | while read line
-		  do
-		  echo "$line" >> /tmp/.ftpserver.tmp
-		  if [ x"$line" == x"start() {" ]; then
-			  echo "      $STARTER &" >> /tmp/.ftpserver.tmp
-			  touch /tmp/.found
-		  fi
+			do
+			echo "$line" >> /tmp/.ftpserver.tmp
+			if [ x"$line" == x"start() {" ]; then
+				echo "			$STARTER &" >> /tmp/.ftpserver.tmp
+				touch /tmp/.found
+			fi
 		done
 		
 		if [ -f /tmp/.found ]; then
@@ -157,7 +178,7 @@ install_harddisk()
 	set -- $INSTALL
 	INSTA="$1"
 
- # We expect to find tarball next to this script.
+	# We expect to find tarball next to this script.
 	if [ ! -f "$INSTA" ]; then
 		echo "Unable to read<br>"
 		echo "$INSTALL<br>"
@@ -168,7 +189,7 @@ install_harddisk()
 	fi
 
 	echo "Installing to HARD_DISK...<br>"
-  # We make sure that HARD_DISK/.torrents
+	# We make sure that HARD_DISK/.torrents
 	mkdir -p "$DEST"
 	chmod 777 "$DEST"
 	
@@ -184,32 +205,14 @@ install_harddisk()
 	echo "Configuring installed files.<br>"
 	# Verify our new program in executable
 	chmod a+x $DEST/$START_SCRIPT
-	chmod a+x $DEST/torrentwatch.php
-	chmod a+x $DEST/tw-iface.php
+	chmod a+x $DEST/$WEB_SCRIPT
 
-	# Link our configuration script to the HARD_DRIVE
-	# Necessary because the PCH web server wont let us access hidden folders like .torrents
-	if [ ! -h $IFACE_DEST/tw-iface.cgi ]; then
-		rm $IFACE_DEST/tw-iface.cgi
-		ln -s $DEST/tw-iface.php $IFACE_DEST/tw-iface.cgi
+	# Remenants of an older version of torrentwatch
+	if [ -h /share/tw-iface.cgi ]; then
+		rm -f /share/tw-iface.cgi /share/tw-iface.local.css /share/tw-iface.css
 	fi
-	if [ ! -h $IFACE_DEST/tw-iface.local.css ]; then
-		rm $IFACE_DEST/tw-iface.local.css
-		ln -s $DEST/tw-iface.local.css $IFACE_DEST/tw-iface.local.css
-	fi
-	if [ ! -h $IFACE_DEST/tw-iface.css ]; then
-		rm $IFACE_DEST/tw-iface.css
-		ln -s $DEST/tw-iface.css $IFACE_DEST/tw-iface.css
-	fi
-	# Move the image files where they need to be for the interface
-	mkdir -p $IMAGE_DEST
-	mv $DEST/images/* $IMAGE_DEST
-	rmdir $DEST/images
 
-	# Anti-clobber routine for the config script
-	if [ ! -f $DEST/rss_dl.config ];then
-		cp $DEST/rss_dl.config.orig $DEST/rss_dl.config
-	fi
+	chown -R nmt.nmt $DEST
 
 	# Check auto starter
 	autostart_setup
@@ -220,13 +223,18 @@ install_harddisk()
 	# Run the script, since the autostart wont be running until reboot
 	date >> /var/rss_dl.log
 	echo "Installed cron hook from configuration script" >> /var/rss_dl.log
-	${DEST}/${START_SCRIPT} ${SCRIPT_OPTS}
 
-	echo "Success..<br>"
+	if [ ! -h /usr/bin/php-cgi ]; then
+		rm -f /usr/bin/php-cgi
+		ln -s ${PHP} /usr/bin/php-cgi
+	fi
+	${DEST}/${START_SCRIPT} ${START_SCRIPT_OPTS}
+
+	echo "Stuccess..<br>"
 
 	echo 'Please procede to the';
-	echo '<a href="http://localhost.drives:8883/HARD_DISK/tw-iface.cgi">Configuration Interface</a>.<br>'
-  # Remove the tarball
+	echo '<a href="http://popcorn:8883/torrentwatch/index.cgi">Configuration Interface</a>.<br>'
+	# Remove the tarball
 	rm -f "$INSTA"
 
 	exit 0;
@@ -247,8 +255,8 @@ install_harddisk()
 
 # check if we were run without arguments, if so display "menu"
 case "$1" in
-  install)
-      install_harddisk;;
+	install)
+		install_harddisk;;
 esac
 
 

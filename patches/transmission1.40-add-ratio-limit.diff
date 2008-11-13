@@ -1,0 +1,372 @@
+diff -ruwb transmission-1.40/daemon/remote.c transmission-1.40.ratioLimit/daemon/remote.c
+--- transmission-1.40/daemon/remote.c	2008-11-10 15:52:35.000000000 +0000
++++ transmission-1.40.ratioLimit/daemon/remote.c	2008-11-13 09:57:15.000000000 +0000
+@@ -74,6 +74,10 @@
+       "G",  1, "<files>"             },
+     { 'i', "info",                 "Show details of the current torrent(s)",
+       "i",  0, NULL                  },
++    { 'k', "ratio-limit",          "Set the seeding ratio of the current torrent(s)",
++      "k",  1, "<ratio>"             },
++    { 'K', "no-ratio-limit",       "Disable the seeding ratio of the current torrent(s)",
++      "K",  0, NULL                  },
+     { 'l', "list",                 "List all torrents",
+       "l",  0, NULL                  },
+     { 'm', "portmap",              "Enable portmapping via NAT-PMP or UPnP",
+@@ -138,6 +142,19 @@
+     return num;
+ }
+ 
++static double
++dblarg( const char * arg )
++{
++    char *       end = NULL;
++    const double num = strtod( arg, &end );
++    if( *end )
++    {
++        fprintf( stderr, "Not a double: \"%s\"\n", arg );
++        showUsage( );
++    }
++    return num;
++}
++
+ static char * reqs[256]; /* arbitrary max */
+ static int    reqCount = 0;
+ static int    debug = 0;
+@@ -242,8 +259,8 @@
+     "nextAnnounceTime", "nextScrapeTime",
+     "peersConnected", "peersGettingFromUs", "peersSendingToUs",
+     "pieceCount",     "pieceSize",          "rateDownload",
+-    "rateUpload",      "recheckProgress",
+-    "scrapeResponse", "seeders",
++    "rateUpload",       "ratioLimit",         "ratioLimitMode",
++    "recheckProgress",  "scrapeResponse",     "seeders",
+     "sizeWhenDone",    "startDate",
+     "status",         "timesCompleted",     "totalSize",
+     "uploadedEver",
+@@ -356,6 +373,19 @@
+                     tr_bencListAddStr( fields, details_keys[i] );
+                 break;
+ 
++            case 'k':
++                tr_bencDictAddStr( &top, "method", "torrent-set" );
++                addIdArg( args, id );
++                tr_bencDictAddDouble( args, "ratio-limit", dblarg( optarg ) );
++                tr_bencDictAddInt( args, "ratio-limit-enabled", 1 );
++                break;
++
++            case 'K':
++                tr_bencDictAddStr( &top, "method", "torrent-set" );
++                addIdArg( args, id );
++                tr_bencDictAddInt( args, "ratio-limit-enabled", 0 );
++                break;
++
+             case 'l':
+                 tr_bencDictAddStr( &top, "method", "torrent-get" );
+                 tr_bencDictAddInt( &top, "tag", TAG_LIST );
+@@ -689,6 +719,7 @@
+             char         buf[512];
+             char         buf2[512];
+             int64_t      i, j, k;
++            double       d;
+ 
+             printf( "NAME\n" );
+             if( tr_bencDictFindInt( t, "id", &i ) )
+@@ -744,6 +775,10 @@
+                 strlratio( buf, j, i, sizeof( buf ) );
+                 printf( "  Ratio: %s\n", buf );
+             }
++            if( tr_bencDictFindDouble( t, "ratioLimit", &d ) &&
++                tr_bencDictFindInt( t, "ratioLimitMode", &i ) )
++                printf( "  Ratio Limit: %f\n  Ratio Active: %s\n", 
++                        d, i ? "Yes" : "No" );
+             if( tr_bencDictFindInt( t, "corruptEver", &i ) )
+             {
+                 strlsize( buf, i, sizeof( buf ) );
+diff -ruwb transmission-1.40/doc/rpc-spec.txt transmission-1.40.ratioLimit/doc/rpc-spec.txt
+--- transmission-1.40/doc/rpc-spec.txt	2008-11-10 15:52:35.000000000 +0000
++++ transmission-1.40.ratioLimit/doc/rpc-spec.txt	2008-11-13 10:07:28.000000000 +0000
+@@ -95,6 +95,8 @@
+    "priority-high"            | array      indices of high-priority file(s)
+    "priority-low"             | array      indices of low-priority file(s)
+    "priority-normal"          | array      indices of normal-priority file(s)
++   "ratio-limit"              | double     maximum seed ratio
++   "ratio-limit-enabled"      | 'boolean'  true if seeding is ratio limited
+    "speed-limit-down"         | number     maximum download speed (in K/s)
+    "speed-limit-down-enabled" | 'boolean'  true if the download speed is limited
+    "speed-limit-up"           | number     maximum upload speed (in K/s)
+@@ -164,6 +166,8 @@
+    priorities             | array (see below)                    | n/a
+    rateDownload (B/s)     | number                               | tr_stat
+    rateUpload (B/s)       | number                               | tr_stat
++   ratioLimit             | 'double'                             | tr_torrent
++   ratioLimitMode         | 'boolean'                            | tr_torrent
+    recheckProgress        | 'double'                             | tr_stat
+    scrapeResponse         | string                               | tr_stat
+    scrapeURL              | string                               | tr_stat
+@@ -283,6 +287,7 @@
+    "metainfo"         | string      base64-encoded .torrent content
+    "paused"           | 'boolean'   if true, don't start the torrent
+    "peer-limit"       | number      maximum number of peers
++   "ratio-limit"      | double      maximum seed ratio
+ 
+    Either "filename" OR "metainfo" MUST be included.
+    All other arguments are optional.
+diff -ruwb transmission-1.40/libtransmission/resume.c transmission-1.40.ratioLimit/libtransmission/resume.c
+--- transmission-1.40/libtransmission/resume.c	2008-11-10 15:52:25.000000000 +0000
++++ transmission-1.40.ratioLimit/libtransmission/resume.c	2008-11-13 00:32:44.000000000 +0000
+@@ -38,6 +38,7 @@
+ #define KEY_PROGRESS        "progress"
+ #define KEY_SPEEDLIMIT      "speed-limit"
+ #define KEY_UPLOADED        "uploaded"
++#define KEY_RATIO_LIMIT     "ratio-limit"
+ 
+ #define KEY_SPEEDLIMIT_DOWN_SPEED "down-speed"
+ #define KEY_SPEEDLIMIT_DOWN_MODE  "down-mode"
+@@ -408,6 +409,8 @@
+                        tor->maxConnectedPeers );
+     tr_bencDictAddInt( &top, KEY_PAUSED,
+                        tor->isRunning ? 0 : 1 );
++    tr_bencDictAddDouble( &top, KEY_RATIO_LIMIT,
++                          tor->ratioLimitActive ? tor->ratioLimit : -tor->ratioLimit );
+     savePeers( &top, tor );
+     savePriorities( &top, tor );
+     saveDND( &top, tor );
+@@ -426,6 +429,7 @@
+               uint64_t     fieldsToLoad )
+ {
+     int64_t      i;
++    double       d;
+     const char * str;
+     uint64_t     fieldsLoaded = 0;
+     char *       filename;
+@@ -516,6 +520,18 @@
+         fieldsLoaded |= TR_FR_ACTIVITY_DATE;
+     }
+ 
++    if( ( fieldsToLoad & TR_FR_RATIO_LIMIT )
++        && tr_bencDictFindDouble( &top, KEY_RATIO_LIMIT, &d ) ) {
++        if( d >= 0.0 ) {
++            tor->ratioLimitActive = TRUE;
++            tor->ratioLimit = d;
++        } else {
++            tor->ratioLimitActive = FALSE;
++            tor->ratioLimit = -d;
++        }
++        fieldsLoaded |= TR_FR_RATIO_LIMIT;
++    }
++
+     if( fieldsToLoad & TR_FR_PEERS )
+         fieldsLoaded |= loadPeers( &top, tor );
+ 
+diff -ruwb transmission-1.40/libtransmission/resume.h transmission-1.40.ratioLimit/libtransmission/resume.h
+--- transmission-1.40/libtransmission/resume.h	2008-11-10 15:52:25.000000000 +0000
++++ transmission-1.40.ratioLimit/libtransmission/resume.h	2008-11-13 00:16:19.000000000 +0000
+@@ -28,7 +28,8 @@
+     TR_FR_MAX_PEERS      = ( 1 << 10 ),
+     TR_FR_ADDED_DATE     = ( 1 << 11 ),
+     TR_FR_DONE_DATE      = ( 1 << 12 ),
+-    TR_FR_ACTIVITY_DATE  = ( 1 << 13 )
++    TR_FR_ACTIVITY_DATE  = ( 1 << 13 ),
++    TR_FR_RATIO_LIMIT    = ( 1 << 14 )
+ };
+ 
+ /**
+diff -ruwb transmission-1.40/libtransmission/rpcimpl.c transmission-1.40.ratioLimit/libtransmission/rpcimpl.c
+--- transmission-1.40/libtransmission/rpcimpl.c	2008-11-10 15:52:25.000000000 +0000
++++ transmission-1.40.ratioLimit/libtransmission/rpcimpl.c	2008-11-13 00:32:35.000000000 +0000
+@@ -364,6 +364,10 @@
+         tr_bencDictAddInt( d, key, (int)( st->pieceDownloadSpeed * 1024 ) );
+     else if( !strcmp( key, "rateUpload" ) )
+         tr_bencDictAddInt( d, key, (int)( st->pieceUploadSpeed * 1024 ) );
++    else if( !strcmp( key, "ratioLimit" ) )
++        tr_bencDictAddDouble( d, key, tr_torrentGetRatioLimit( tor ) );
++    else if( !strcmp( key, "ratioLimitMode" ) )
++        tr_bencDictAddInt( d, key, tr_torrentGetRatioLimitActive( tor ) );
+     else if( !strcmp( key, "recheckProgress" ) )
+         tr_bencDictAddDouble( d, key, st->recheckProgress );
+     else if( !strcmp( key, "scrapeResponse" ) )
+@@ -523,6 +527,7 @@
+     for( i = 0; i < torrentCount; ++i )
+     {
+         int64_t      tmp;
++        double       ratio;
+         tr_benc *    files;
+         tr_torrent * tor = torrents[i];
+ 
+@@ -538,6 +543,10 @@
+             setFilePriorities( tor, TR_PRI_LOW, files );
+         if( tr_bencDictFindList( args_in, "priority-normal", &files ) )
+             setFilePriorities( tor, TR_PRI_NORMAL, files );
++        if( tr_bencDictFindInt( args_in, "ratio-limit-enabled", &tmp) )
++            tr_torrentSetRatioLimitActive( tor, tmp );
++        if( tr_bencDictFindDouble( args_in, "ratio-limit", &ratio ) )
++            tr_torrentSetRatioLimit( tor, ratio );
+         if( tr_bencDictFindInt( args_in, "speed-limit-down", &tmp ) )
+             tr_torrentSetSpeedLimit( tor, TR_DOWN, tmp );
+         if( tr_bencDictFindInt( args_in, "speed-limit-down-enabled", &tmp ) )
+@@ -607,6 +616,13 @@
+ 
+         if( tor )
+         {
++            double d;
++            if( tr_bencDictFindDouble( args_in, "ratio-limit", &d ) ) 
++            {
++                tr_torrentSetRatioLimitActive( tor, TRUE );
++                tr_torrentSetRatioLimit( tor, d );
++            }
++
+             tr_benc fields;
+             tr_bencInitList( &fields, 3 );
+             tr_bencListAddStr( &fields, "id" );
+diff -ruwb transmission-1.40/libtransmission/session.c transmission-1.40.ratioLimit/libtransmission/session.c
+--- transmission-1.40/libtransmission/session.c	2008-11-10 15:52:25.000000000 +0000
++++ transmission-1.40.ratioLimit/libtransmission/session.c	2008-11-13 00:14:59.000000000 +0000
+@@ -269,6 +269,8 @@
+     while( !h->events )
+         tr_wait( 50 );
+ 
++    tr_queuePulseInit( h );
++
+     h->tag = tr_strdup( tag );
+     h->peerMgr = tr_peerMgrNew( h );
+ 
+diff -ruwb transmission-1.40/libtransmission/torrent.c transmission-1.40.ratioLimit/libtransmission/torrent.c
+--- transmission-1.40/libtransmission/torrent.c	2008-11-10 15:52:25.000000000 +0000
++++ transmission-1.40.ratioLimit/libtransmission/torrent.c	2008-11-13 10:22:23.000000000 +0000
+@@ -47,6 +47,7 @@
+ #include "verify.h"
+ 
+ #define MAX_BLOCK_SIZE ( 1024 * 16 )
++#define QUEUE_PULSE_DELAY 1000
+ 
+ /***
+ ****
+@@ -224,6 +225,40 @@
+ }
+ 
+ /***
++**** Ratio Limiting
++***/
++
++void tr_torrentSetRatioLimitActive( tr_torrent * tor,
++                                    int          active )
++{
++    tor->ratioLimitActive = !!active;
++}
++
++int tr_torrentGetRatioLimitActive( const tr_torrent * tor )
++{
++    return tor->ratioLimitActive;
++}
++
++void tr_torrentSetRatioLimit( tr_torrent * tor,
++                              double       ratio )
++{
++    if( ratio >= 0.0 ) {
++        tor->ratioLimit = ratio;
++    }
++}
++
++double tr_torrentGetRatioLimit( const tr_torrent * tor )
++{
++    return tor->ratioLimit;
++}
++
++int tr_torrentRatioLimitExceeded( tr_torrent * tor )
++{
++    return tor->ratioLimitActive &&
++        tr_torrentStat( tor )->ratio >= tor->ratioLimit;
++}
++
++/***
+ ****
+ ***/
+ 
+@@ -562,8 +597,11 @@
+     tor->checkedPieces = tr_bitfieldNew( tor->info.pieceCount );
+     tr_torrentUncheck( tor );
+ 
+-    tor->addedDate = time( NULL ); /* this is a default value to be
+-                                      overwritten by the resume file */
++    /* these are default values to be overwritten by the resume file */
++    tor->addedDate = time( NULL );
++    tor->ratioLimitActive = FALSE;
++    tor->ratioLimit = 1.0;
++
+     loaded = tr_torrentLoadResume( tor, ~0, ctor );
+ 
+     doStart = tor->isRunning;
+@@ -1822,3 +1860,25 @@
+ 
+     return bytesLeft;
+ }
++
++static int
++queuePulseFunc( void * vhandle )
++{
++    tr_handle * handle = (tr_handle *)vhandle;
++    tr_torrent * tor;
++
++    for( tor = handle->torrentList; tor; tor = tor->next ) {
++        if( tr_torrentGetActivity( tor ) == TR_STATUS_SEED &&
++            tr_torrentRatioLimitExceeded( tor ) ) {
++            tr_torrentSetRatioLimitActive( tor, FALSE );
++            tr_torrentStop( tor );
++        }
++    }
++    return 1;
++}
++
++void
++tr_queuePulseInit( tr_handle * handle )
++{
++    tr_timerNew( handle, queuePulseFunc, handle, QUEUE_PULSE_DELAY );
++}
+diff -ruwb transmission-1.40/libtransmission/torrent.h transmission-1.40.ratioLimit/libtransmission/torrent.h
+--- transmission-1.40/libtransmission/torrent.h	2008-11-10 15:52:25.000000000 +0000
++++ transmission-1.40.ratioLimit/libtransmission/torrent.h	2008-11-13 00:18:29.000000000 +0000
+@@ -154,6 +154,8 @@
+ time_t*          tr_torrentGetMTimes( const tr_torrent  * tor,
+                                       size_t            * setmeCount );
+ 
++void tr_queuePulseInit( struct tr_handle * handle );
++
+ typedef enum
+ {
+     TR_VERIFY_NONE,
+@@ -174,6 +176,9 @@
+ 
+     struct tr_ratecontrol *  swarmSpeed;
+ 
++    double                   ratioLimit;
++    int                      ratioLimitActive;
++
+     int                      error;
+     char                     errorString[128];
+ 
+diff -ruwb transmission-1.40/libtransmission/transmission.h transmission-1.40.ratioLimit/libtransmission/transmission.h
+--- transmission-1.40/libtransmission/transmission.h	2008-11-10 15:52:25.000000000 +0000
++++ transmission-1.40.ratioLimit/libtransmission/transmission.h	2008-11-13 00:14:59.000000000 +0000
+@@ -875,6 +875,22 @@
+                                        tr_direction        direction );
+ 
+ /****
++*****  Ratio Limits
++****/
++
++void tr_torrentSetRatioLimitActive( tr_torrent * tor,
++                                    int          active );
++
++int tr_torrentGetRatioLimitActive( const tr_torrent * tor );
++
++void tr_torrentSetRatioLimit( tr_torrent * tor,
++                              double       ratio );
++
++double tr_torrentGetRatioLimit( const tr_torrent * tor );
++
++int tr_torrentRatioLimitExceeded( tr_torrent * tor );
++
++/****
+ *****  Peer Limits
+ ****/
+ 
