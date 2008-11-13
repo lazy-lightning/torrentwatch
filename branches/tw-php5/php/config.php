@@ -117,6 +117,12 @@
 		array_walk($config_values, 'group_callback');
 		_debug("Finalized Config\n");
 		_debug($config_out,2);
+		$dir = dirname($config_file);
+		if(!is_dir($dir)) {
+			if(file_exists($dir))
+				unlink($dir)
+			mkdir($dir, 777);
+		}
 		file_put_contents($config_file, $config_out);
 		unset($config_out);
 	}

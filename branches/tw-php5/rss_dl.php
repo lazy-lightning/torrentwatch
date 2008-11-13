@@ -1,4 +1,4 @@
-#!/usr/bin/php -qd register_argc_argv=1
+#!/usr/bin/php-cgi -qd register_argc_argv=1
 <?php
 // rss_dl.php
 // By Erik Bernhardson
