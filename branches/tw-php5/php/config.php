@@ -120,7 +120,7 @@
 		$dir = dirname($config_file);
 		if(!is_dir($dir)) {
 			if(file_exists($dir))
-				unlink($dir)
+				unlink($dir);
 			mkdir($dir, 777);
 		}
 		file_put_contents($config_file, $config_out);

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 EXE_FILES="index.cgi rss_dl.php"
-DOC_FILES="changelog CREDITS LICENSE TODO torrentwatch.config.orig"
+DOC_FILES="changelog CREDITS LICENSE TODO"
 RELEASE_FILES="$EXE_FILES $DOC_FILES css/ images/ javascript/ php/ patches/"
 RELEASE=torrentwatch-dev-$1
 

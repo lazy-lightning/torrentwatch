@@ -49,7 +49,7 @@ START_SCRIPT_OPTS='-i'
 ###############################################################
 MARKER="#M_A_R_K_E_R_do_not_remove_me"
 FTPSERVER="/mnt/syb8634/etc/ftpserver.sh"
-PHP="/mnt/syb8634/server/php5-cgi -qd register_argc_argv=1"
+PHP="/mnt/syb8634/server/php5-cgi"
 
 # Send the closing HTML
 end_html() 
@@ -91,7 +91,25 @@ autostart_add()
 			echo "$line" >> /tmp/.starter.tmp
 			if [ x"$line" == x"$MARKER" ]; then
 				# echo "cd ${DEST}/ && ./telnetd -l /bin/sh &" >> /tmp/.starter
-				echo "${PHP} ${DEST}/${START_SCRIPT} ${START_SCRIPT_OPTS}" >> /tmp/.starter.tmp
+				echo "${DEST}/${START_SCRIPT} ${START_SCRIPT_OPTS}" >> /tmp/.starter.tmp
+			fi
+		done
+		cat < /tmp/.starter.tmp > "$STARTER"
+		chmod 755 "$STARTER"
+		rm -f /tmp/.starter.tmp
+	fi
+
+
+	/bin/cat "$STARTER" | /bin/grep -q "php-cgi"
+	if [ $? != 0 ]; then
+		rm -f /tmp/.starter.tmp
+		IFS=""
+		cat "$STARTER" | while read line 
+		do
+			echo "$line" >> /tmp/.starter.tmp
+			if [ x"$line" == x"$MARKER" ]; then
+				# echo "cd ${DEST}/ && ./telnetd -l /bin/sh &" >> /tmp/.starter
+				echo "ln -s ${PHP} /usr/bin/php-cgi" >> /tmp/.starter.tmp
 			fi
 		done
 		cat < /tmp/.starter.tmp > "$STARTER"
@@ -205,7 +223,12 @@ install_harddisk()
 	# Run the script, since the autostart wont be running until reboot
 	date >> /var/rss_dl.log
 	echo "Installed cron hook from configuration script" >> /var/rss_dl.log
-	${PHP} ${DEST}/${START_SCRIPT} ${START_SCRIPT_OPTS}
+
+	if [ ! -h /usr/bin/php-cgi ]; then
+		rm -f /usr/bin/php-cgi
+		ln -s ${PHP} /usr/bin/php-cgi
+	fi
+	${DEST}/${START_SCRIPT} ${START_SCRIPT_OPTS}
 
 	echo "Stuccess..<br>"
 
