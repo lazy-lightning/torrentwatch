@@ -16,7 +16,7 @@
 	}
 
 	function setup_default_config() {
-		global $config_values, $argv;
+		global $config_values;
 		function _default($a, $b) {
 			global $config_values;
 			if(!isset($config_values['Settings'][$a])) {

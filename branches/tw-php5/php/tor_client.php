@@ -108,11 +108,6 @@
 		}
 	}
 
-	function nzbget_add_nzb($tor, $dest) {
-		// this isn't actually torrents, but news files
-		return $return;
-	}
-
 	function client_add_nzb($filename, $fav = NULL, $feed = NULL) {
 		global $config_values, $hit;
 		$hit = 1;
