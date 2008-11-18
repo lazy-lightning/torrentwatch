@@ -90,28 +90,32 @@
 
 		_debug("Preparing to write config file to $config_file\n");
 
-		$config_out = ";;\n;; rss_dl.php config file\n;;\n\n";
-		function group_callback($group, $key) {
-			global $config_values, $config_out;
-			if($key == 'Global')
-				return;
-			$config_out .= "[$key]\n";
-			array_walk($config_values[$key], 'key_callback');
-			$config_out .= "\n\n";
+		$config_out = ";;\n;; torrentwatch config file\n;;\n\n";
+		if(!function_exists('group_callback')) {
+			function group_callback($group, $key) {
+				global $config_values, $config_out;
+				if($key == 'Global')
+					return;
+				$config_out .= "[$key]\n";
+				array_walk($config_values[$key], 'key_callback');
+				$config_out .= "\n\n";
+			}
 		}
 
-		function key_callback($group, $key, $subkey = NULL) {
-			global $config_values, $config_out;
-			if(is_array($group)) {
-				array_walk($group, 'key_callback', $key.'[]');
-			} else {
-				if($subkey) {
-					if(!is_numeric($key)) {	// What does this do?
-						$group = "$key => $group";
+		if(!function_exists('key_callback')) {
+			function key_callback($group, $key, $subkey = NULL) {
+				global $config_values, $config_out;
+				if(is_array($group)) {
+					array_walk($group, 'key_callback', $key.'[]');
+				} else {
+					if($subkey) {
+						if(!is_numeric($key)) {	// What does this do?
+							$group = "$key => $group";
+						}
+						$key = $subkey;
 					}
-					$key = $subkey;
+					$config_out .= "$key = $group\n";
 				}
-				$config_out .= "$key = $group\n";
 			}
 		}
 		array_walk($config_values, 'group_callback');
@@ -119,9 +123,13 @@
 		_debug($config_out,2);
 		$dir = dirname($config_file);
 		if(!is_dir($dir)) {
+			_debug("Creating configuration directory\n", 1);
 			if(file_exists($dir))
 				unlink($dir);
-			mkdir($dir, 777);
+			if(!mkdir($dir)) {
+				_debug("Unable to create config directory\n", 0);
+				return FALSE;
+			}
 		}
 		file_put_contents($config_file, $config_out);
 		unset($config_out);
@@ -189,14 +197,14 @@
 			$_GET['idx'] = $idx; // So display_favorite_info() can see it
 		} else
 			return; // Bad form data
-		$list = array("name"			=> "Name",
-									"filter"		=> "Filter",
-									"not"			  => "Not",
-									"savein"		=> "Save In",
-									"episodes"	=> "Episodes",
-									"feed"			=> "Feed",
-									"quality"	  => "Quality",
-									"seedratio" => "seedRatio");
+		$list = array("name"      => "Name",
+		              "filter"    => "Filter",
+		              "not"       => "Not",
+		              "savein"    => "Save In",
+		              "episodes"  => "Episodes",
+		              "feed"      => "Feed",
+		              "quality"	  => "Quality",
+		              "seedratio" => "seedRatio");
 		foreach($list as $key => $data) {
 			if(isset($_GET[$key]))
 				$config_values['Favorites'][$idx][$data] = urldecode($_GET[$key]);

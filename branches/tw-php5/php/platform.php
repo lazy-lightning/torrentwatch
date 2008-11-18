@@ -2,6 +2,8 @@
 
 if(file_exists("/etc/init_nmt"))
 	$platform = "NMT";
+else if(is_dir("/home/xbmc"))
+	$platform = "XBMC";
 else
 	$platform = "Linux";
 
@@ -28,6 +30,9 @@ function platform_getUserRoot() {
 	switch($platform) {
 		case 'NMT':
 			return "/share/.torrents";
+			break;
+		case 'XBMC':
+			return "/home/xbmc/.torrents";
 			break;
 		case 'Linux':
 		default:
@@ -66,6 +71,14 @@ function platform_getDownloadDir() {
 function platform_getInstallRoot() {
 	global $platform, $argv;
 	return dirname(realpath($argv[0]));
+}
+
+function platform_getTransmissionRemote() {
+	if(file_exists('/usr/bin/transmission-remote'))
+		return '/usr/bin/transmission/remote';
+	else if(file_exists('/mnt/syb8634/bin/transmission-remote'))
+		return '/mnt/syb8634/bin/transmission-remote';
+	return FALSE;
 }
 
 ?>

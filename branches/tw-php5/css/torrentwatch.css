@@ -12,6 +12,13 @@
  * inspired by Clutch
  */
 
+/*---------------------
+ * Some debugging info
+ * --------------------*/
+div.rss_debug {
+	display: none;
+}
+
 /*-----------------
  *
  * G L O B A L
@@ -137,7 +144,7 @@ div.mainoptions ul li.divider {
  *
  * ---------------*/
 
-div#filterbar {
+ul#filterbar {
 	margin: 0;
 	height: 24px;
 	background: #C0C8D6 url('../images/filter_bar_bg.png') repeat-x;
@@ -147,17 +154,10 @@ div#filterbar {
 	right: 0px;
 	top: 76px;
 	z-index: 2;
-	}
-
-div#filterbar ul {
-	width: 100%;
-	height: 17px;
-	margin: 0;
-	padding: 0;
 	text-align: left;
 	}
 
-div#filterbar ul li {
+ul#filterbar li {
 	list-style-type: none;
 	list-style-image: none;
 	float: left;
@@ -167,7 +167,7 @@ div#filterbar ul li {
 	height: 17px;
 	}
 
-div#filterbar ul li a {
+ul#filterbar li a {
 	font-size: 1.2em;
 	color: #4E4E4F;
 	text-decoration: none;
@@ -177,20 +177,20 @@ div#filterbar ul li a {
 	}
 
 
-div#filterbar ul li:hover {
+ul#filterbar li:hover {
 	background: transparent url('../images/filter_hover_left.png') no-repeat top left;
 	}
 
-div#filterbar ul li:hover a {
+ul#filterbar li:hover a {
 	background: transparent url('../images/filter_hover_right.png') no-repeat top right;
 	color: #fff !important;
 	}
 
-div#filterbar ul li.selected {
+ul#filterbar li.selected {
 	background: transparent url('../images/filter_selected_left.png') no-repeat top left;
 	}
 
-div#filterbar ul li.selected a {
+ul#filterbar li.selected a {
 	background: transparent url('../images/filter_selected_right.png') no-repeat top right;
 	color: #fff !important;
 	}
@@ -644,10 +644,6 @@ div.feedcurrent {
 	border: 1px solid white;
 	margin: 4px;
 	text-decoration: underline;
-}
-
-div.rss_debug {
-	display: none;
 }
 
 div.timer {

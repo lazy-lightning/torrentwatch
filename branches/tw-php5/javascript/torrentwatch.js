@@ -84,7 +84,7 @@ function markTorrentAlt()
 {
 	var alt = 0;
 	var elem = document.getElementById('torrentlist_container');
-	for(	var F in elem.childNodes ) {
+	for( var F in elem.childNodes ) {
 		if ( elem.childNodes[F].className == 'feed' ) {
 			for ( var T in elem.childNodes[F].firstChild.childNodes ) {
 				var torrent = elem.childNodes[F].firstChild.childNodes[T];

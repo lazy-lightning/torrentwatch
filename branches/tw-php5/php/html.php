@@ -25,8 +25,8 @@
 
 		$feed = urlencode($feed);
 		$html_out .= "<li class='torrent match_$matched $alt' title='"._isset($item, 'description')."'>";
-		$html_out .= "<a class='context_link' href='index.cgi?mode=matchtitle&rss=$feed&title=".rawurlencode($item['title'])."'></a>";
-		$html_out .= "<a class='context_link' href='index.cgi?mode=dltorrent&title=".rawurlencode($item['title'])."&link=".rawurlencode(get_torrent_link($item))."'></a>";
+		$html_out .= "<a class='context_link' href='".$_SERVER['PHP_SELF']."?mode=matchtitle&rss=$feed&title=".rawurlencode($item['title'])."'></a>";
+		$html_out .= "<a class='context_link' href='".$_SERVER['PHP_SELF']."?mode=dltorrent&title=".rawurlencode($item['title'])."&link=".rawurlencode(get_torrent_link($item))."'></a>";
 		$html_out .= "<div class='torrent_name'>".$item['title']."</div>";
 		$html_out .= "<div class='torrent_pubDate'>"._isset($item, 'pubDate').'</div>';
 		$html_out .= "</li>\n";
