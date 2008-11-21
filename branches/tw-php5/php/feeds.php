@@ -2,14 +2,15 @@
 	 function get_torrent_link($rs) {
 		if(isset($rs['id'])) { // Atom
 			if(stristr($rs['id'], 'torrent')) // torrent link in id
-				return $rs['id'];
+				$link = $rs['id'];
 			else // torrent hidden in summary
-			  	return guess_atom_torrent($rs['summary']);
+			  	$link = guess_atom_torrent($rs['summary']);
 		} else if(isset($rs['enclosure'])) { // RSS Enclosure
-			return $rs['enclosure']['url'];
+			$link = $rs['enclosure']['url'];
 		} else {  // Standard RSS
-			return $rs['link'];
+			$link = $rs['link'];
 		}
+		return html_entity_decode($link);
 	}
 
 	function check_for_torrent(&$item, $key, $opts) {
