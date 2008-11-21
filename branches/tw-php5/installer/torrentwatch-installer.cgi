@@ -189,9 +189,6 @@ install_harddisk()
 	fi
 
 	echo "Installing to HARD_DISK...<br>"
-	# We make sure that HARD_DISK/.torrents
-	mkdir -p "$DEST"
-	chmod 777 "$DEST"
 
 	# Move the last install out of the way
 	if [ -d "$DEST" ]; then
@@ -211,6 +208,10 @@ install_harddisk()
 		fi
 	fi
 		
+	# We make sure that HARD_DISK/.torrents
+	mkdir -p "$DEST"
+	chmod 777 "$DEST"
+
 	# Actually copy the data now.
 	(cd "$DEST" && tar -xf "$INSTA")
 	#cp -f "$INSTA" "$DEST/"
