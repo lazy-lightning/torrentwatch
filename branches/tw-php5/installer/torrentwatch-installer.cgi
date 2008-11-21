@@ -192,7 +192,25 @@ install_harddisk()
 	# We make sure that HARD_DISK/.torrents
 	mkdir -p "$DEST"
 	chmod 777 "$DEST"
-	
+
+	# Move the last install out of the way
+	if [ -d "$DEST" ]; then
+		mv "$DEST" "$DEST.old"
+		mkdir "$DEST"
+		if [ -f "$DEST.old/rss_dl.config" ]; then
+			mv "$DEST.old/rss_dl.config"  "$DEST/torrentwatch.config"
+		fi
+		if [ -f "$DEST.old/torrentwatch.config" ]; then
+			mv "$DEST.old/torrentwatch.config" "$DEST"
+		fi
+		if [ -f "$DEST.old/rss_dl.history" ]; then
+			cp -rf "$DEST.old/rss_dl.history" "$DEST"
+		fi
+		if [ -d "$DEST.old/rss_cache" ]; then
+			cp -rf "$DEST.old/rss_cache" "$DEST"
+		fi
+	fi
+		
 	# Actually copy the data now.
 	(cd "$DEST" && tar -xf "$INSTA")
 	#cp -f "$INSTA" "$DEST/"
