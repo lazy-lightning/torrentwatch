@@ -106,9 +106,12 @@ function array_change_key_case_ext($array, $case = ARRAY_KEY_LOWERCASE) {
 function _debug($string, $lvl = 1) {
   global $config_values, $verbosity, $debug_output;
   if($verbosity >= $lvl) {
-    if(isset($config_values['Global']['HTMLOutput']))
-      $debug_output .= $string;
-    else
+    if(isset($config_values['Global']['HTMLOutput'])) {
+      if($lvl == -1) 
+        $debug_output .= "<script type='text/javascript'>alert('$string');</script>";
+      else
+        $debug_output .= $string;
+    } else
       echo($string);
   }
 }

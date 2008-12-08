@@ -117,7 +117,7 @@ function transmission13x_add_torrent($tor, $dest, $seedRatio = -1) {
   if(isset($responce['result']) AND ($responce['result'] == 'success' or $responce['result'] == 'duplicate torrent'))
     return 0;
   else {
-    _debug(print_r($responce));
+    _debug("Transmission 1.3x error adding torrent: ".print_r($responce), -1);
     return 1;
   }
 }
@@ -125,7 +125,7 @@ function transmission13x_add_torrent($tor, $dest, $seedRatio = -1) {
 function nzbget_add_nzb($filename) {
   global $config_values;
   if(!($nzb = file_get_contents($filename))) {
-    _debug("Couldn't open nzb: $filename\n",0);
+    _debug("Couldn't open nzb: $filename\n",-1);
     return FALSE;
   }
   $nzb_exec = "/mnt/syb8634/bin/nzbget";
@@ -161,7 +161,7 @@ function client_add_nzb($filename, $fav = NULL, $feed = NULL) {
       if(isset($config_values['Global']['HTMLOutput']))
       echo("Starting: $tor_name in $dest<br>\n");
   } else {
-    _debug("<script type='text/javascript'>alert(\"Failed Starting: $tor_name  Return code $return\");</script>\n",0);
+    _debug("Failed Starting: $tor_name  Return code $return",-1);
   }
   return ($return == 0);
 }
@@ -183,12 +183,12 @@ function client_add_torrent($filename, $dest, $fav = NULL, $feed = NULL) {
   }
   $context = stream_context_create($stream_opts);
   if(!($tor = file_get_contents($filename, FALSE, $context))) {
-    _debug("<script type='text/javascript'>alert(\"Couldn't open torrent: $filename\");</script>\n",0);
+    _debug("Couldn't open torrent: $filename\n",-1);
     return FALSE;
   }
   $tor_info = new BDecode("", $tor);
   if(!($tor_name = $tor_info->{'result'}['info']['name'])) {
-    _debug("<script type='text/javascript'>alert(\"Couldn't parse torrent: $filename\");</script>\n", 0);
+    _debug("Couldn't parse torrent: $filename\n", -1);
     return FALSE;
   }
 
@@ -221,7 +221,7 @@ function client_add_torrent($filename, $dest, $fav = NULL, $feed = NULL) {
       $dest = $tr_state->{'result'}['default-directory'];
       break;
     default:
-      _debug("Invalid Torrent Client: ".$config_values['Settings']['Client']."\n",0);
+      _debug("Invalid Torrent Client: ".$config_values['Settings']['Client']."\n",-1);
       exit(1);
   }
   if($return == 0) {
@@ -230,7 +230,7 @@ function client_add_torrent($filename, $dest, $fav = NULL, $feed = NULL) {
     if($config_values['Settings']['Save Torrents'])
       file_put_contents("$dest/$tor_name.torrent", $tor);
   } else {
-    _debug("<script type='text/javascript'>alert(\"Failed Starting: $tor_name  Return code $return\");</script>\n",0);
+    _debug("Failed Starting: $tor_name  Return code $return\n",-1);
   }
   return ($return == 0);
 }

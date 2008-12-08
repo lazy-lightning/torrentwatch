@@ -57,12 +57,12 @@ function check_for_torrent(&$item, $key, $opts) {
         } else if(client_add_torrent($link, NULL, $item, $opts['URL'])) {
           add_cache($rs['title']);
         } else {
-          _debug("Failed adding torrent $link\n", 0);
+          _debug("Failed adding torrent $link\n", -1);
           return FALSE;
         }
 
       } else {                     
-        _debug("Unable to find URL for ".$rs['title']."\n");
+        _debug("Unable to find URL for ".$rs['title']."\n", -1);
         $matched = "nourl";
       }
     }
@@ -79,7 +79,7 @@ function parse_one_rss($feed) {
   if(isset($config_values['Settings']['Cache Dir']))
     $rss->cache_dir = $config_values['Settings']['Cache Dir'];
   if(!$config_values['Global']['Feeds'][$feed['Link']] = $rss->get($feed['Link']))
-    _debug("Error creating rss parser for ".$feed['Link']."\n",0);
+    _debug("Error creating rss parser for ".$feed['Link']."\n",-1);
   else {
     $config_values['Global']['Feeds'][$feed['Link']]['URL'] = $feed['Link'];
     $config_values['Global']['Feeds'][$feed['Link']]['Feed Type'] = 'RSS';
@@ -95,7 +95,7 @@ function parse_one_atom($feed) {
     $atom_parser = new myAtomParser($feed['Link']);
 
   if(!$config_values['Global']['Feeds'][$feed['Link']] = $atom_parser->getRawOutput())
-    _debug("Error creating atom parser for ".$feed['Link']."\n",0);
+    _debug("Error creating atom parser for ".$feed['Link']."\n",-1);
   else {
     $config_values['Global']['Feeds'][$feed['Link']]['URL'] = $feed['Link'];
     $config_values['Global']['Feeds'][$feed['Link']]['Feed Type'] = 'Atom';
@@ -176,7 +176,7 @@ function feeds_perform_matching($feeds) {
         atom_perform_matching($config_values['Global']['Feeds'][$feed['Link']], $key);
         break;
       default:
-        _debug("Unknown Feed. Feed: ".$feed['Link']."Type: ".$feed['Type']."\n",0);
+        _debug("Unknown Feed. Feed: ".$feed['Link']."Type: ".$feed['Type']."\n",-1);
         break;
     }
   }
@@ -199,7 +199,7 @@ function load_feeds($feeds) {
         parse_one_atom($feed);
         break;
       default:
-        _debug("Unknown Feed. Feed: ".$feed['Link']."Type: ".$feed['Type']."\n",0);
+        _debug("Unknown Feed. Feed: ".$feed['Link']."Type: ".$feed['Type']."\n",-1);
         break;
     }
   }

@@ -81,7 +81,7 @@ function check_cache_episode($title) {
       }
     }
   } else {
-    _debug("Unable to open ".$config_values['Settings']['Cache Dir']."\n");
+    _debug("Unable to open Cache Directory: ".$config_values['Settings']['Cache Dir']."\n", -1);
   }
   return 1;
 }
