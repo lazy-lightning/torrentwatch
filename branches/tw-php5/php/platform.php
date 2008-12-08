@@ -7,6 +7,16 @@ else if(is_dir("/home/xbmc"))
 else
 	$platform = "Linux";
 
+function platform_initialize() {
+	global $platform;
+	switch($platform) {
+		case 'NMT':
+			// PHP_SELF isn't properly set on the NMT
+			$_SERVER['PHP_SELF'] = $_SERVER['SCRIPT_NAME'];
+			break;
+	}
+}
+
 function platform_install() {
 	global $platform;
 	switch($platform) {
