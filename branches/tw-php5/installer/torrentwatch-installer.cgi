@@ -145,8 +145,7 @@ EOF
 	# Check if it is already called from ftpserver.sh
 	grep -q "$STARTER" "$FTPSERVER"
 	if [ $? != 0 ]; then
-		echo "Installer starter<br>"
-
+		echo "Installing auto-starter hook to $FTPSERVER"
 		cp "$FTPSERVER" "$FTPSERVER.backup"
 		
 		rm -f /tmp/.ftpserver.tmp /tmp/.found
@@ -237,7 +236,6 @@ install_harddisk()
 	autostart_setup
 	
 	# Add our script to the auto starter
-	echo "<p>Installing ${START_SCRIPT} into ${STARTER}</p>"
 	autostart_add
 	# Run the script, since the autostart wont be running until reboot
 	date >> /var/rss_dl.log
@@ -249,10 +247,10 @@ install_harddisk()
 	fi
 	${DEST}/${START_SCRIPT} ${START_SCRIPT_OPTS}
 
-	echo "Stuccess..<br>"
+	echo "Success..<br>"
 
 	echo 'Please procede to the';
-	echo '<a href="http://popcorn:8883/torrentwatch/index.cgi">Configuration Interface</a>.<br>'
+	echo '<a href="http://popcorn:8883/torrentwatch/index.cgi">Configuration Interface</a> in a PC Browser.<br>'
 	# Remove the tarball
 	rm -f "$INSTA"
 
