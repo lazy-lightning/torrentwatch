@@ -445,6 +445,8 @@ function close_html() {
 //
 //
 $main_timer = timer_init();
+platform_initialize();
+
 ?>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
