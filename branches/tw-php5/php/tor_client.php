@@ -6,7 +6,7 @@
 
 
 function sabnzbd_addurl($url) {
-  $Host = "192.168.1.121";
+  $Host = "127.0.0.1";
   $Port = "8080";
   $URI = "sabnzbd/api";
 

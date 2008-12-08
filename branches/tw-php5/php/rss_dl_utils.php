@@ -175,7 +175,7 @@ function guess_match($title, $normalize = FALSE) {
     if(preg_match($quality, $title, $qregs))
       $data_guess = str_replace("'", "&#39;", trim($qregs[1]));
     else
-      $data_guess = '.*';
+      $data_guess = '';
   } else
     return False;
   if($normalize == TRUE) {

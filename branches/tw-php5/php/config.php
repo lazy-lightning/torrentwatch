@@ -10,7 +10,7 @@ function setup_default_config() {
   _debug("Initializing Torrentwatch Configuration\n", 0);
 
   if(!isset($config_values['Settings']))
-  $config_values['Settings'] = array();
+    $config_values['Settings'] = array();
   // Sensible Defaults 
   $basedir = platform_getUserRoot();
   _default('Watch Dir', $basedir);
