@@ -15,7 +15,7 @@ function sabnzbd_addurl($url) {
   if($contents = file_get_contents($request)) {
     return 0;
   } else {
-    return 1;
+    return "Failed to connect with SabNZBd at $Host:$Port/$URI";
   }
 }
 
@@ -85,7 +85,7 @@ function btpd_add_torrent($tor, $dest) {
   $config_values['Global']['Unlink'][] = $tmpname;
   file_put_contents($tmpname, $tor);
   exec("$btcli_exec $btcli_add \"$dest\" \"$tmpname\"", $output, $return);
-  return $return;
+  return $return == 0 ? 0 : "$btcli exited with return status of $return";
 }
 
 function transmission122_add_torrent($tor, $dest) {
@@ -99,7 +99,7 @@ function transmission122_add_torrent($tor, $dest) {
   $config_values['Global']['Unlink'][] = $tmpname;
   file_put_contents($tmpname, $tor);
   exec("$trans_exec $trans_add \"$tmpname\"", $output, $return);
-  return $return;
+  return $return == 0 ? 0 : "$trans_remote exited with return status of $return";
 }
 
 function transmission13x_add_torrent($tor, $dest, $seedRatio = -1) {
@@ -117,8 +117,10 @@ function transmission13x_add_torrent($tor, $dest, $seedRatio = -1) {
   if(isset($responce['result']) AND ($responce['result'] == 'success' or $responce['result'] == 'duplicate torrent'))
     return 0;
   else {
-    _debug("Transmission 1.3x error adding torrent: ".print_r($responce), -1);
-    return 1;
+    if(!isset($responce['result']))
+      return "Failure connecting to Transmission >= 1.30";
+    else
+      return "Transmission RPC Error: ".print_r($responce);
   }
 }
 
@@ -137,7 +139,7 @@ function nzbget_add_nzb($filename) {
   $nzb_append = "-A '$tmpnam'";
 
   exec("$nzb_exec $nzb_connect $nzb_append", $output, $return);
-  return $return;
+  return $return == 0 ? 0 : "$nzb_exec exited with return code $return";
 }
 
 
@@ -154,16 +156,13 @@ function client_add_nzb($filename, $fav = NULL, $feed = NULL) {
       $return = nzbget_add_nzb($filename);
       break;
   }
-
-  if($return == 0) {
-    add_history($tor_name);
-    _debug("Starting: $tor_name in $dest\n",0);
-      if(isset($config_values['Global']['HTMLOutput']))
-      echo("Starting: $tor_name in $dest<br>\n");
+  if($return === 0) {
+    add_history($filename);
+    _debug("Starting: $filename\n",0);
   } else {
-    _debug("Failed Starting: $tor_name  Return code $return",-1);
+    _debug("Failed Starting: $filename. Error: $return",-1);
   }
-  return ($return == 0);
+  return ($return === 0);
 }
   
 function client_add_torrent($filename, $dest, $fav = NULL, $feed = NULL) {
@@ -224,14 +223,14 @@ function client_add_torrent($filename, $dest, $fav = NULL, $feed = NULL) {
       _debug("Invalid Torrent Client: ".$config_values['Settings']['Client']."\n",-1);
       exit(1);
   }
-  if($return == 0) {
+  if($return === 0) {
     add_history($tor_name);
     _debug("Starting: $tor_name in $dest\n",0);
     if($config_values['Settings']['Save Torrents'])
       file_put_contents("$dest/$tor_name.torrent", $tor);
   } else {
-    _debug("Failed Starting: $tor_name  Return code $return\n",-1);
+    _debug("Failed Starting: $tor_name  Error: $return\n",-1);
   }
-  return ($return == 0);
+  return ($return === 0);
 }
 ?>
