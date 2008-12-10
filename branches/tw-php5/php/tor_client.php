@@ -124,7 +124,7 @@ function transmission13x_add_torrent($tor, $dest, $seedRatio = -1) {
   }
 }
 
-function nzbget_add_nzb($filename) {
+function nzbget_add_nzb($filename, $title) {
   global $config_values;
   $be = new BrowserEmulator();
   if(!($nzb = $be->file_get_contents($filename))) {
@@ -134,7 +134,7 @@ function nzbget_add_nzb($filename) {
   $nzb_exec = "/mnt/syb8634/bin/nzbget";
   $nzb_connect = "-c /share/.nzbget/nzbget.conf";
 
-  $tmpname = tempnam("","torrentwatch");
+  $tmpname = tempnam("","torrentwatch-$title-");
   $config_values['Global']['Unlink'][] = $tmpname;
   file_put_contents($tmpname, $nzb);
   $nzb_append = "-A '$tmpname'";
@@ -149,7 +149,7 @@ function client_add_nzb($filename, $fav = NULL, $feed = NULL, $title = NULL) {
   $hit = 1;
   $filename = htmlspecialchars_decode($filename);
 
-  if(!isset($title)) {
+  if(empty($title)) {
     if(isset($fav))
       $title = $fav['Name'];
     else
@@ -161,7 +161,7 @@ function client_add_nzb($filename, $fav = NULL, $feed = NULL, $title = NULL) {
       $return = sabnzbd_addurl($filename);
       break;
     case 'nzbget':
-      $return = nzbget_add_nzb($filename);
+      $return = nzbget_add_nzb($filename, $title);
       break;
   }
   if($return === 0) {

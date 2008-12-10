@@ -4,6 +4,7 @@
 ini_set('include_path', '.:./php');
 $test_run = 0;
 $firstrun = 0;
+$verbosity = 0;
 
 require_once('rss_dl_utils.php');
 
