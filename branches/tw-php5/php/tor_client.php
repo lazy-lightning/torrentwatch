@@ -144,7 +144,7 @@ function nzbget_add_nzb($filename, $title) {
 }
 
 
-function client_add_nzb($filename, $fav = NULL, $feed = NULL, $title = NULL) {
+function client_add_nzb($filename, &$fav = NULL, $feed = NULL, $title = NULL) {
   global $config_values, $hit;
   $hit = 1;
   $filename = htmlspecialchars_decode($filename);
@@ -166,14 +166,16 @@ function client_add_nzb($filename, $fav = NULL, $feed = NULL, $title = NULL) {
   }
   if($return === 0) {
     add_history($title);
-    _debug("Starting: $filename\n",0);
+    if(isset($fav))
+      updateFavoriteEpisode($fav, $title);
+    _debug("Starting: $title\n",0);
   } else {
     _debug("Failed Starting $title. Error: $return",-1);
   }
   return ($return === 0);
 }
   
-function client_add_torrent($filename, $dest, $fav = NULL, $feed = NULL) {
+function client_add_torrent($filename, $dest, &$fav = NULL, $feed = NULL) {
   global $config_values, $hit;
   $hit = 1;
   $filename = htmlspecialchars_decode($filename);
@@ -230,6 +232,8 @@ function client_add_torrent($filename, $dest, $fav = NULL, $feed = NULL) {
   if($return === 0) {
     add_history($tor_name);
     _debug("Starting: $tor_name in $dest\n",0);
+    if(isset($fav))
+      updateFavoriteEpisode($fav, $tor_name);
     if($config_values['Settings']['Save Torrents'])
       file_put_contents("$dest/$tor_name.torrent", $tor);
   } else {

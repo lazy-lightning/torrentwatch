@@ -302,6 +302,16 @@ ul.torrentlist li.torrent.match_duplicate {
 	display: block;
 	}
 
+ul.torrentlist li.torrent.match_old {
+	background: transparent url('../images/nuvola_ledlightblue.png') no-repeat 3px center;
+	display: block;
+	}
+
+ul.torrentlist li.torrent.match_test {
+	background: transparent url('../images/nuvola_ledpurple.png') no-repeat 3px center;
+	display: block;
+	}
+
 ul.torrentlist li.torrent.alt {
 	background-color: #EDF3FE;
 	}
@@ -439,6 +449,7 @@ div#config_deepdir label.item {
 	}
 
 div#config_savetorrent label.item,
+div#config_onlynewer label.item,
 div#config_verifyepisodes label.item {
 	margin: 0 5px 0 0;
 	}

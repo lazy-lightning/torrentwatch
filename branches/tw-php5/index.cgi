@@ -108,6 +108,7 @@ function display_global_config() {
 	$savetorrent=$nzbget=$trans122=$trans13x=$btpd="";
 	$deepfull=$deeptitle=$deepoff=$verifyepisode="";
 	$matchregexp=$matchglob=$matchsimple=$sabnzbd="";
+	$onlynewer="";
 
 	switch($config_values['Settings']['Client']) {
 		case 'btpd':
@@ -142,6 +143,8 @@ function display_global_config() {
 
 	if($config_values['Settings']['Verify Episode'] == 1)
 		$verifyepisode = 'checked=1';
+	if($config_values['Settings']['Only Newer'] == 1)
+		$onlynewer = 'checked=1';
 
 	switch($config_values['Settings']['MatchStyle']) {
 		case 'glob': $matchglob="selected='selected'";break;
@@ -191,6 +194,10 @@ function display_global_config() {
 	 '      <label class="category">Favorites Settings</label>'.
 	 '      <input type="checkbox" name="verifyepisodes" value=1 '.$verifyepisode.'>'.
 	 '      <label class="item">Verify Episodes</label>'.
+	 '    </div>'.
+	 '    <div id="config_onlynewer" title="Only download episodes newer than the last">'.
+	 '      <input type="checkbox" name="onlynewer" value=1 '.$onlynewer.'>'.
+	 '      <label class="item">Newer Episodes Only</label>'.
 	 '    </div>'.
 	 '    <div id="config_matchstyle">'.
 	 '      <label class="item" title="Type of filter to use">Matching Style:</label>'.

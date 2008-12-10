@@ -21,7 +21,6 @@ function check_for_torrent(&$item, $key, $opts) {
 
   $rs = $opts['Obj'];
   $title = strtolower($rs['title']);
-  $guess = guess_match($title);
   switch(_isset($config_values['Settings'], 'MatchStyle')) {
     case 'simple':  
       $hit = (($item['Filter'] != '' && strpos($title, strtolower($item['Filter'])) !== FALSE) &&
@@ -44,10 +43,25 @@ function check_for_torrent(&$item, $key, $opts) {
       break;
   }
   if($hit) {
-    _debug('Match found for '.$rs['title']."\n");
     if(check_cache($rs['title'])) {
-      if($test_run)
+      $guess = guess_match($title, TRUE);
+      if(_isset($config_values['Settings'], 'Only Newer') == 1) {
+        if(!empty($guess['episode']) && preg_match('/(\d+)x(\d+)/i',$guess['episode'],$regs)) {
+          if($item['Season'] >= $regs[1]) {
+            $matched = "old";
+            return FALSE;
+          }
+          if($item['Episode'] >= $regs[2]) {
+            $matched = "old";
+            return FALSE;
+          }
+        }
+      }
+      _debug('Match found for '.$rs['title']."\n");
+      if($test_run) {
+        $matched = 'test';
         return;
+      }
       if($link = get_torrent_link($rs)) {
         if(isset($config_values['Global']['HTMLOutput']))
           update_progress_bar(0, "Starting $title");

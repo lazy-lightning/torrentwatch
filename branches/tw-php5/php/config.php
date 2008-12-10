@@ -21,6 +21,7 @@ function setup_default_config() {
   _default('Cron', "/etc/cron.hourly");
   _default('Client', "btpd");
   _default('Verify Episode', "1");
+  _default('Only Newer', "1");
   _default('Deep Directories', "0");
   _default('History', $basedir."/rss_dl.history");
   _default('MatchStyle',"simple");
@@ -142,7 +143,8 @@ function update_global_config() {
                  'Watch Dir'        => 'watchdir',
                  'Deep Directories' => 'deepdir',
                  'Client'           => 'client',
-                 'MatchStyle'       => 'matchstyle');
+                 'MatchStyle'       => 'matchstyle',
+                 'Only Newer'       => 'onlynewer');
   $checkboxs = array('Verify Episode' => 'verifyepisodes',
                      'Save Torrents'  => 'savetorrents');
   foreach($input as $key => $data) {
@@ -221,6 +223,17 @@ function del_favorite() {
   }
 }
 
+function updateFavoriteEpisode(&$fav, $title) {
+  if(!$guess = guess_match($title, TRUE))
+    return;
+  if(!preg_match('/(\d+)x(\d+)/i', $guess['episode'], $regs))
+    return;
+  if(!isset($fav['Season']) || $regs[1] > $fav['Season'])
+    $fav['Season'] = $regs[1];
+  if(!isset($fav['Episode']) || $regs[2] > $fav['Episode'])
+    $fav['Episode'] = $regs[2];
+  write_config_file();
+} 
 
 function add_feed() {
   global $config_values;
