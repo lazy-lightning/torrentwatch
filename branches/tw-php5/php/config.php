@@ -20,11 +20,11 @@ function setup_default_config() {
   _default('Run Torrentwatch', "1");
   _default('Cron', "/etc/cron.hourly");
   _default('Client', "btpd");
-  _default('Verify Episode', "0");
+  _default('Verify Episode', "1");
   _default('Deep Directories', "0");
   _default('History', $basedir."/rss_dl.history");
   _default('MatchStyle',"simple");
-  write_config_file();
+  _default('FirstRun',"1");
 }
 
 // This function is from
@@ -239,7 +239,8 @@ function add_feed() {
         $config_values['Feeds'][$idx]['Name'] = $config_values['Global']['Feeds'][$link]['Name'];
         break;
     }
-  }
+  } else
+    _debug("Could not connect to Feed/guess Feed Type", -1);
 }
 
 function del_feed() {

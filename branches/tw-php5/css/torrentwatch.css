@@ -194,6 +194,23 @@ ul#filterbar li.selected a {
 	background: transparent url('../images/filter_selected_right.png') no-repeat top right;
 	color: #fff !important;
 	}
+/*--------------------------
+ *
+ * I N S P E C T O R
+ *
+ * ------------------------*/
+iframe#tvshow_inspector {
+	display: none;
+	background-color: #DDDDDD;
+	border-left: 1px solid #888888;
+	position: fixed;
+	right: 0;
+	text-align: left;
+	top: 101px;
+	width: 350px;
+	z-index: 3;
+	height: 100%;
+	}
 
 /*--------------------------
  *
@@ -356,11 +373,11 @@ div.dialog_window select {
 
 
 div.FavInfo a,
+div.welcome a,
 div.dialog_window#clear_cache a,
 div.dialog_window#history a,
 div.dialog_window#configuration a,
 div.dialog_window#feeds a {
-	display: block;
 	float: right;
 	margin: 5px 10px 0 0;
 	padding: 5px;
@@ -371,6 +388,11 @@ div.dialog_window#feeds a {
 	font-weight: bold;
 	text-decoration: none;
 	color: #323232;
+	clear: left;
+	}
+
+/* Welcome Dialogs */
+div.welcome input {
 	clear: left;
 	}
 
@@ -393,18 +415,18 @@ div#progressBarText {
 	}
 
 /* Configuration Dialog */
-div.config_torrentclient label.item,
-div.config_downloaddir label.item,
-div.config_watchdir label.item, 
-div.config_matchstyle label.item,
-div.config_deepdir label.item {
+div#config_torrentclient label.item,
+div#config_downloaddir label.item,
+div#config_watchdir label.item, 
+div#config_matchstyle label.item,
+div#config_deepdir label.item {
 	width: 110px;
 	clear: left;
 	padding-right: 10px;
 	}
 
-div.config_savetorrent label.item,
-div.config_verifyepisodes label.item {
+div#config_savetorrent label.item,
+div#config_verifyepisodes label.item {
 	margin: 0 5px 0 0;
 	}
 
@@ -438,7 +460,7 @@ div.dialog_window#favorites {
 
 div.Favorite,
 div.FavInfo {
-	height: 235px;
+	height: 230px;
 	}
 
 

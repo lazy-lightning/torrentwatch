@@ -9,6 +9,7 @@ require_once("lastRSS.php");
 require_once("progressbar.php");
 require_once("tor_client.php");
 require_once("platform.php");
+require_once("guess.php");
 
 global $config_values;
 $config_values['Global'] = array();
@@ -107,9 +108,10 @@ function _debug($string, $lvl = 1) {
   global $config_values, $verbosity, $debug_output;
   if($verbosity >= $lvl) {
     if(isset($config_values['Global']['HTMLOutput'])) {
-      if($lvl == -1) 
+      if($lvl == -1)  {
+        $string = trim(strtr($string, array("'" => "\\'")));
         $debug_output .= "<script type='text/javascript'>alert('$string');</script>";
-      else
+      } else
         $debug_output .= $string;
     } else
       echo($string);
@@ -137,86 +139,6 @@ function timer_get_time($time = NULL) {
   if($time == NULL)
     $time = $time_start;
   return (microtime_float() - $time);
-}
-
-function guess_match($title, $normalize = FALSE) { 
-  // Main regexp
-  $reg1 ='/^';
-  // Series Title 
-  $reg1.='([^-\(]+)'; // string not including - or (
-  $reg1.='(?:.+)?'; // optinally followed by a title, length is determined by the episode match
-  // Episode 
-  $reg1.='\b(';  // must be a word boundry before the episode
-  $reg1.='S\d+E\d+'.'|';  // S12E1
-  $reg1.='\d+x\d+' .'|';  // 1x23
-  $reg1.='\d+of\d+'.'|';  // 03of18
-  $reg1.='[\d -.]{10}';   // 2008-03-23 or 07.23.2008 or .20082306. etc
-  $reg1.=')/';
-
-  // Quality
-  $quality ='/(DVB'  .'|';
-  $quality.='DSRIP'  .'|';
-  $quality.='DVBRip' .'|';
-  $quality.='DVDR'   .'|';
-  $quality.='DVDRip' .'|';
-  $quality.='DVDScr' .'|';
-  $quality.='HR.HDTV'.'|';
-  $quality.='HDTV'   .'|';
-  $quality.='HR.PDTV'.'|';
-  $quality.='PDTV'   .'|';
-  $quality.='SatRip' .'|';
-  $quality.='SVCD'   .'|';
-  $quality.='TVRip'  .'|';
-  $quality.='WebRip' .'|';
-  $quality.='720p'   .'|';
-  $quality.='1080i'  .'|';
-  $quality.='1080p)/i';
-
-  if(preg_match($reg1, $title, $regs)) {
-    $episode_guess = trim($regs[2]);
-    $key_guess = str_replace("'", "&#39;", trim($regs[1]));
-    if(preg_match($quality, $title, $qregs))
-      $data_guess = str_replace("'", "&#39;", trim($qregs[1]));
-    else
-      $data_guess = '';
-  } else
-    return False;
-  if($normalize == TRUE) {
-    // Convert . and _ to spaces, and trim result
-    $from = "._";
-    $to = "  ";
-    $key_guess = trim(strtr($key_guess, $from, $to));
-    $data_guess = trim(strtr($data_guess, $from, $to));
-    $episode_guess = trim(strtr($episode_guess, $from, $to));
-    // Standardize episode output to SSxEE, strip leading 0
-    // This is (b|c|d) from earlier.  If it is style e there will be no replacement, only strip leading 0
-    $episode_guess = ltrim(preg_replace('/(S(\d+)E(\d+)|(\d+)x(\d+)|(\d+)of(\d+))/', '\2\4\6x\3\5\7', $episode_guess), '0');
-  }
-  return array("key" => $key_guess, "data" => $data_guess, "episode" => $episode_guess);
-}
-
-function guess_feedtype($feedurl) {
-  global $config_values;
-  $content = file($feedurl);
-  for($i = 0;$i < count($content);$i++) {
-    if(preg_match('/<feed xml/', $content[$i], $regs))
-      return 'Atom';
-    else if (preg_match('/<rss/', $content[$i], $regs))
-      return 'RSS';
-  }
-  return "Unknown";
-}
-
-function guess_atom_torrent($summary) {
-  $wc = '[\/\:\w\.\+\?\&\=\%\;]+';
-  // Detects: A HREF=\"http://someplace/with/torrent/in/the/name\"
-  if(preg_match('/A HREF=\\\"(http'.$wc.'torrent'.$wc.')\\\"/', $summary, $regs)) {
-    _debug("guess_atom_torrent: $regs[1]\n",2);
-    return $regs[1];
-  } else {
-    _debug("guess_atom_torrent: failed\n",2);
-  }
-  return FALSE;
 }
 
 // Makes a name fit for use as a filename

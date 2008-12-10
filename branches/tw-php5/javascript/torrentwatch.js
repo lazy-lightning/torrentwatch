@@ -1,3 +1,64 @@
+// Variable options based on chosen client
+function updateClientOptions() {
+	elem = document.getElementById('client');
+	if(!elem)
+		elem = document.parent.getElementById('client');
+	hideLayer('favorite_seedratio');
+	switch(elem.value) {
+		case 'transmission1.3x':
+			showLayer('config_downloaddir');
+			showLayer('config_watchdir');
+			showLayer('config_savetorrent');
+			showLayer('config_deepdir');
+			showLayer('config_verifyepisodes');
+			showLayer('favorite_seedratio');
+			showLayer('favorite_savein');
+			changecss('div.Favorite', 'height', '230');
+			changecss('div.FavInfo', 'height', '230');
+			break;
+		case 'transmission1.22':
+			hideLayer('config_downloaddir');
+			showLayer('config_watchdir');
+			showLayer('config_savetorrent');
+			hideLayer('config_deepdir');
+			showLayer('config_verifyepisodes');
+			hideLayer('favorite_savein');
+			changecss('div.Favorite', 'height', '180');
+			changecss('div.FavInfo', 'height', '180');
+			break;
+		case 'btpd':
+			showLayer('config_downloaddir');
+			showLayer('config_watchdir');
+			showLayer('config_savetorrent');
+			showLayer('config_deepdir');
+			showLayer('config_verifyepisodes');
+			showLayer('favorite_savein');
+			changecss('div.Favorite', 'height', '205');
+			changecss('div.FavInfo', 'height', '205');
+			break;
+		case 'nzbget':
+			hideLayer('config_downloaddir');
+			showLayer('config_watchdir');
+			hideLayer('config_savetorrent');
+			hideLayer('config_deepdir');
+			showLayer('config_verifyepisodes');
+			hideLayer('favorite_savein');
+			changecss('div.Favorite', 'height', '180');
+			changecss('div.FavInfo', 'height', '180');
+			break;
+		case 'sabnzbd':
+			hideLayer('config_downloaddir');
+			hideLayer('config_watchdir');
+			hideLayer('config_savetorrent');
+			hideLayer('config_deepdir');
+			showLayer('config_verifyepisodes');
+			hideLayer('favorite_savein');
+			changecss('div.Favorite', 'height', '180');
+			changecss('div.FavInfo', 'height', '180');
+			break;
+	}
+}
+
 // Buttons
 
 function saveConfig() {
@@ -6,6 +67,14 @@ function saveConfig() {
 	setProgress('progressBar', 50);
 	setText('progressBar', 'Saving Config');
 	submitForm('config_form');
+}
+
+function saveWelcome() {
+	toggleMenu('welcome5');
+	showLayer('progressDiv');
+	setProgress('progressBar', 50);
+	setText('progressBar', 'Saving Config');
+	submitForm('welcome_form');
 }
 
 // Update Frame Utils
@@ -39,6 +108,12 @@ function contextDLNow()
 	document.getElementById('update_frame').src = SimpleContextMenu._attachedElement.childNodes[1].href;
 }
 
+function contextInspect()
+{
+	showLayer('tvshow_inspector');
+	document.getElementById('tvshow_inspector').src = '/torrentwatch/inspector.cgi?title='+SimpleContextMenu._attachedElement.childNodes[2].textContent;
+	changecss('div#torrentlist_container', "right", "351")
+}
 
 function submitForm ( whichForm )
 {
@@ -193,7 +268,8 @@ function hideLayer( whichLayer ) {
 			elem = document.all[whichLayer];
 	else if( document.layers ) // this is the way nn4 works
 		elem = document.layers[whichLayer];
-	elem.style.display = 'none';
+	if(elem)
+		elem.style.display = 'none';
 }
 function showLayer( whichLayer ) {
 	var elem, vis;
@@ -203,5 +279,6 @@ function showLayer( whichLayer ) {
 			elem = document.all[whichLayer];
 	else if( document.layers ) // this is the way nn4 works
 		elem = document.layers[whichLayer];
-	elem.style.display = 'block';
+	if(elem)
+		elem.style.display = 'block';
 }

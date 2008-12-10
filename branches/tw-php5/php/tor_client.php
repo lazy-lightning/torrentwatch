@@ -148,6 +148,11 @@ function client_add_nzb($filename, $fav = NULL, $feed = NULL) {
   $hit = 1;
   $filename = htmlspecialchars_decode($filename);
 
+  if(isset($fav))
+    $title = $fav['Name'];
+  else
+    $title = $filename;
+
   switch($config_values['Settings']['Client']) {
     case 'sabnzbd':
       $return = sabnzbd_addurl($filename);
@@ -157,10 +162,10 @@ function client_add_nzb($filename, $fav = NULL, $feed = NULL) {
       break;
   }
   if($return === 0) {
-    add_history($filename);
+    add_history($title);
     _debug("Starting: $filename\n",0);
   } else {
-    _debug("Failed Starting: $filename. Error: $return",-1);
+    _debug("Failed Starting $title. Error: $return",-1);
   }
   return ($return === 0);
 }

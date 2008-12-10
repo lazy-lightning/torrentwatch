@@ -164,8 +164,10 @@ function atom_perform_matching($atom, $idx) {
 
 function feeds_perform_matching($feeds) {
   global $config_values;
-  if(isset($config_values['Global']['HTMLOutput']))
+  if(isset($config_values['Global']['HTMLOutput'])) {
+    echo('<div class="progressBarUpdates">');
     setup_rss_list_html();
+  }
   cache_setup();
   foreach($feeds as $key => $feed) {
     switch($feed['Type']) {
@@ -181,8 +183,10 @@ function feeds_perform_matching($feeds) {
     }
   }
 
-  if(isset($config_values['Global']['HTMLOutput']))
+  if(isset($config_values['Global']['HTMLOutput'])) {
+    echo('</div>');
     finish_rss_list_html();
+  }
 }
 
 function load_feeds($feeds) {
