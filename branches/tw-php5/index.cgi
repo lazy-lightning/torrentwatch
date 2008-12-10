@@ -45,8 +45,8 @@ function parse_options() {
 			break;
 		case 'matchtitle':
 			if(($tmp = guess_match(html_entity_decode($_GET['title'])))) {
-				$_GET['name'] = $tmp['key'];
-				$_GET['filter'] = $tmp['key'];
+				$_GET['name'] = trim(strtr($tmp['key'], "._", "  "));
+				$_GET['filter'] = trim($tmp['key']);
 				if($config_values['Settings']['MatchStyle'] == "glob")
 					$_GET['filter'] .= '*';
 				$_GET['quality'] = $tmp['data'];
@@ -68,7 +68,7 @@ function parse_options() {
 		case 'dltorrent':
 			// Dont display full information, this link is loaded in a hidden iframe
 			if(stripos($config_values['Settings']['Client'], 'nzb') !== FALSE) 
-				$r = client_add_nzb(trim(urldecode($_GET['link'])));
+				$r = client_add_nzb(urldecode($_GET['link']),NULL,NULL,$_GET['title']);
 			else
 				$r = client_add_torrent(trim(urldecode($_GET['link'])), $config_values['Settings']['Download Dir']);
 			display_history();
@@ -421,7 +421,7 @@ function display_hidden_iframe() {
 
 function display_inspector() {
 	global $html_out;
-	$html_out .= '<iframe id="tvshow_inspector" src="about:blank" name="inspector"></iframe>';
+	$html_out .= '<div id="inspector_container"><iframe id="tvshow_inspector" src="about:blank" name="inspector"></iframe></div>';
 }
 
 function set_default_div() {

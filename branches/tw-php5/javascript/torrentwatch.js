@@ -3,7 +3,7 @@ function updateClientOptions() {
 	elem = document.getElementById('client');
 	if(!elem)
 		elem = document.parent.getElementById('client');
-	hideLayer('favorite_seedratio');
+	changecss('div.favorite_seedratio', 'display', 'none');
 	switch(elem.value) {
 		case 'transmission1.3x':
 			showLayer('config_downloaddir');
@@ -11,8 +11,8 @@ function updateClientOptions() {
 			showLayer('config_savetorrent');
 			showLayer('config_deepdir');
 			showLayer('config_verifyepisodes');
-			showLayer('favorite_seedratio');
-			showLayer('favorite_savein');
+			changecss('div.favorite_seedratio', 'display', 'block');
+			changecss('div.favorite_savein', 'display', 'block');
 			changecss('div.Favorite', 'height', '230');
 			changecss('div.FavInfo', 'height', '230');
 			break;
@@ -22,7 +22,7 @@ function updateClientOptions() {
 			showLayer('config_savetorrent');
 			hideLayer('config_deepdir');
 			showLayer('config_verifyepisodes');
-			hideLayer('favorite_savein');
+			changecss('div.favorite_savein', 'display', 'none');
 			changecss('div.Favorite', 'height', '180');
 			changecss('div.FavInfo', 'height', '180');
 			break;
@@ -32,7 +32,7 @@ function updateClientOptions() {
 			showLayer('config_savetorrent');
 			showLayer('config_deepdir');
 			showLayer('config_verifyepisodes');
-			showLayer('favorite_savein');
+			changecss('div.favorite_savein', 'display', 'block');
 			changecss('div.Favorite', 'height', '205');
 			changecss('div.FavInfo', 'height', '205');
 			break;
@@ -42,7 +42,7 @@ function updateClientOptions() {
 			hideLayer('config_savetorrent');
 			hideLayer('config_deepdir');
 			showLayer('config_verifyepisodes');
-			hideLayer('favorite_savein');
+			changecss('div.favorite_savein', 'display', 'none');
 			changecss('div.Favorite', 'height', '180');
 			changecss('div.FavInfo', 'height', '180');
 			break;
@@ -52,7 +52,7 @@ function updateClientOptions() {
 			hideLayer('config_savetorrent');
 			hideLayer('config_deepdir');
 			showLayer('config_verifyepisodes');
-			hideLayer('favorite_savein');
+			changecss('div.favorite_savein', 'display', 'none');
 			changecss('div.Favorite', 'height', '180');
 			changecss('div.FavInfo', 'height', '180');
 			break;
@@ -110,7 +110,7 @@ function contextDLNow()
 
 function contextInspect()
 {
-	showLayer('tvshow_inspector');
+	showLayer('inspector_container');
 	document.getElementById('tvshow_inspector').src = '/torrentwatch/inspector.cgi?title='+SimpleContextMenu._attachedElement.childNodes[2].textContent;
 	changecss('div#torrentlist_container', "right", "351")
 }
@@ -230,6 +230,7 @@ function toggleFav( whichLayer )
 		hideLayer(last_fav)
 	showLayer(whichLayer);
 	last_fav = whichLayer;
+	updateClientOptions();
 }
 
 var last_menu;

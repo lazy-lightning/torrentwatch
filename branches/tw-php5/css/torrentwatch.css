@@ -199,17 +199,30 @@ ul#filterbar li.selected a {
  * I N S P E C T O R
  *
  * ------------------------*/
-iframe#tvshow_inspector {
+div#inspector_container {
 	display: none;
-	background-color: #DDDDDD;
-	border-left: 1px solid #888888;
 	position: fixed;
-	right: 0;
-	text-align: left;
+	border: 1px 0px 0px 0px solid #888888;
 	top: 101px;
+	right: 0;
+	bottom: 0;
 	width: 350px;
-	z-index: 3;
+	z-index: 2;
+	}
+
+iframe#tvshow_inspector {
 	height: 100%;
+	width: 100%;
+	overflow: scroll
+	}
+
+h2.inspector_heading {
+	padding-left: 10px;
+	}
+
+div.tvepisode,
+div.tvshow {
+	text-align: left;
 	}
 
 /*--------------------------
@@ -491,6 +504,14 @@ div.FavInfo {
 	margin: 5px;
 	width: 350px;
 	float: right;
+	}
+
+div.favorite_savein {
+	display: block;
+	}
+
+div.favorite_seedratio {
+	display: block;
 	}
 
 div.favorite_name label.item,

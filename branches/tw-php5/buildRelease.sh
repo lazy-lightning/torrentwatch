@@ -1,8 +1,8 @@
 #!/bin/sh
 
-EXE_FILES="index.cgi rss_dl.php"
+EXE_FILES="index.cgi rss_dl.php inspector.cgi"
 DOC_FILES="changelog CREDITS LICENSE TODO"
-RELEASE_FILES="$EXE_FILES $DOC_FILES css/ images/ javascript/ php/ "
+RELEASE_FILES="$EXE_FILES $DOC_FILES css/ images/ javascript/ php/ html/"
 RELEASE=torrentwatch-dev-$1
 
 rm -rf release

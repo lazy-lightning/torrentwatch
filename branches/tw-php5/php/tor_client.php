@@ -10,7 +10,7 @@ function sabnzbd_addurl($url) {
   $Port = "8080";
   $URI = "sabnzbd/api";
 
-  $request="http://$Host:$Port/$URI?mode=addurl&name=$url";
+  $request="http://$Host:$Port/$URI?mode=addurl&name=".urlencode($url);
 
   if($contents = file_get_contents($request)) {
     return 0;
@@ -126,7 +126,8 @@ function transmission13x_add_torrent($tor, $dest, $seedRatio = -1) {
 
 function nzbget_add_nzb($filename) {
   global $config_values;
-  if(!($nzb = file_get_contents($filename))) {
+  $be = new BrowserEmulator();
+  if(!($nzb = $be->file_get_contents($filename))) {
     _debug("Couldn't open nzb: $filename\n",-1);
     return FALSE;
   }
@@ -135,23 +136,25 @@ function nzbget_add_nzb($filename) {
 
   $tmpname = tempnam("","torrentwatch");
   $config_values['Global']['Unlink'][] = $tmpname;
-  file_put_contents($tmpnam, $nzb);
-  $nzb_append = "-A '$tmpnam'";
+  file_put_contents($tmpname, $nzb);
+  $nzb_append = "-A '$tmpname'";
 
   exec("$nzb_exec $nzb_connect $nzb_append", $output, $return);
   return $return == 0 ? 0 : "$nzb_exec exited with return code $return";
 }
 
 
-function client_add_nzb($filename, $fav = NULL, $feed = NULL) {
+function client_add_nzb($filename, $fav = NULL, $feed = NULL, $title = NULL) {
   global $config_values, $hit;
   $hit = 1;
   $filename = htmlspecialchars_decode($filename);
 
-  if(isset($fav))
-    $title = $fav['Name'];
-  else
-    $title = $filename;
+  if(!isset($title)) {
+    if(isset($fav))
+      $title = $fav['Name'];
+    else
+      $title = $filename;
+  }
 
   switch($config_values['Settings']['Client']) {
     case 'sabnzbd':
@@ -175,18 +178,14 @@ function client_add_torrent($filename, $dest, $fav = NULL, $feed = NULL) {
   $hit = 1;
   $filename = htmlspecialchars_decode($filename);
 
-  $stream_opts = array('http' =>array('method' => 'GET'));
+  $be = new BrowserEmulator();
   // Support for private trackers using cookies
   if($feed != NULL && ($cookies = stristr($feed, '&:COOKIE:'))) {
     $cookies = substr($cookies, 9);
-    $cookies = explode('&', $cookies);
-    $stream_opts['http']['header'] = "Cookie: ";
-    foreach($cookies as $cookie) {
-      $stream_opts['http']['header'] .= " $cookie;";
-    }
+    $cookies = strtr($cookies, '&', ' ');
+    $be->addHeaderLine("Cookie", $cookies);
   }
-  $context = stream_context_create($stream_opts);
-  if(!($tor = file_get_contents($filename, FALSE, $context))) {
+  if(!($tor = $be->file_get_contents($filename))) {
     _debug("Couldn't open torrent: $filename\n",-1);
     return FALSE;
   }
