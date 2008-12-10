@@ -419,6 +419,10 @@ div.welcome input {
 	clear: left;
 	}
 
+div.form_radio {
+	padding-left: 10px;
+	}
+
 /* Progress Bar */
 div.dialog_window#progressDiv {
 	height: 26px;

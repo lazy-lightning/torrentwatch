@@ -1,7 +1,7 @@
 // Variable options based on chosen client
 function updateClientOptions() {
 	elem = document.getElementById('client');
-	if(!elem)
+	if(!elem && document.parent)
 		elem = document.parent.getElementById('client');
 	changecss('div.favorite_seedratio', 'display', 'none');
 	switch(elem.value) {

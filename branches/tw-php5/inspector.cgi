@@ -43,14 +43,17 @@ if(!empty($tvShow->overview)) echo "
 echo "
       </ul>
     </div>";
-if(!empty($tvEpisode)) echo "
+if(!empty($tvEpisode)) {
+	echo "
     <div class='tvepisode'>
       <h2 id='tvepisode_title' class='inspector_heading'>".$tvEpisode->name."</h2>
-      <ul id='tvepisode'>
-        <li id='tvepisode_number'>$episode</li>
-        <li id='tvepisode_overview'>".$tvEpisode->overview."</li>
+      <ul id='tvepisode'>";
+	if(!empty($episode)) echo "        <li id='tvepisode_number'>$episode</li>";
+	if(!empty($tvEpisode->overview)) echo "        <li id='tvepisode_overview'>".$tvEpisode->overview."</li>";
+	echo "
       </ul>
     </div>";
+}
 
 echo "
   </body>
