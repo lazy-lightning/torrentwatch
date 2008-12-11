@@ -15,8 +15,8 @@ function updateClientOptions() {
 			showLayer('config_verifyepisodes');
 			changecss('div.favorite_seedratio', 'display', 'block');
 			changecss('div.favorite_savein', 'display', 'block');
-			changecss('div.Favorite', 'height', '230');
-			changecss('div.FavInfo', 'height', '230');
+			changecss('div.favorite', 'height', '230');
+			changecss('div.favinfo', 'height', '230');
 			break;
 		case 'transmission1.22':
 			hideLayer('config_downloaddir');
@@ -25,8 +25,8 @@ function updateClientOptions() {
 			hideLayer('config_deepdir');
 			showLayer('config_verifyepisodes');
 			changecss('div.favorite_savein', 'display', 'none');
-			changecss('div.Favorite', 'height', '180');
-			changecss('div.FavInfo', 'height', '180');
+			changecss('div.favorite', 'height', '180');
+			changecss('div.favinfo', 'height', '180');
 			break;
 		case 'btpd':
 			showLayer('config_downloaddir');
@@ -35,8 +35,8 @@ function updateClientOptions() {
 			showLayer('config_deepdir');
 			showLayer('config_verifyepisodes');
 			changecss('div.favorite_savein', 'display', 'block');
-			changecss('div.Favorite', 'height', '205');
-			changecss('div.FavInfo', 'height', '205');
+			changecss('div.favorite', 'height', '205');
+			changecss('div.favinfo', 'height', '205');
 			break;
 		case 'nzbget':
 			hideLayer('config_downloaddir');
@@ -45,8 +45,8 @@ function updateClientOptions() {
 			hideLayer('config_deepdir');
 			showLayer('config_verifyepisodes');
 			changecss('div.favorite_savein', 'display', 'none');
-			changecss('div.Favorite', 'height', '180');
-			changecss('div.FavInfo', 'height', '180');
+			changecss('div.favorite', 'height', '180');
+			changecss('div.favinfo', 'height', '180');
 			break;
 		case 'sabnzbd':
 			hideLayer('config_downloaddir');
@@ -55,8 +55,8 @@ function updateClientOptions() {
 			hideLayer('config_deepdir');
 			showLayer('config_verifyepisodes');
 			changecss('div.favorite_savein', 'display', 'none');
-			changecss('div.Favorite', 'height', '180');
-			changecss('div.FavInfo', 'height', '180');
+			changecss('div.favorite', 'height', '180');
+			changecss('div.favinfo', 'height', '180');
 			break;
 	}
 }
@@ -230,18 +230,24 @@ function filterFeeds( filterType )
 			changeFilter('match', 'block');
 			changeFilter('cachehit', 'block');
 			changeFilter('duplicate', 'block');
+			changeFilter('old', 'block');
+			changeFilter('test', 'block');
 			break;
 		case 'matching':
 			changeFilter('nomatch', 'none');
 			changeFilter('match', 'block');
 			changeFilter('cachehit', 'block');
-			changeFilter('duplicate', 'none');
+			changeFilter('duplicate', 'block');
+			changeFilter('old', 'block');
+			changeFilter('test', 'block');
 			break;
 		case 'downloaded':
 			changeFilter('nomatch', 'none');
 			changeFilter('match', 'none');
 			changeFilter('cachehit', 'block');
 			changeFilter('duplicate', 'none');
+			changeFilter('old', 'none');
+			changeFilter('test', 'none');
 			break;
 	}
 	markTorrentAlt();

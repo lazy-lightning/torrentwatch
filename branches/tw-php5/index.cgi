@@ -249,7 +249,7 @@ function display_favorites_info($item, $key) {
 	global $config_values, $html_out;
 	$style = "";
 	$html_out .= 
-	 '<div class="FavInfo" id="favorite_'.$key.'" '.$style.'>'.
+	 '<div class="favinfo" id="favorite_'.$key.'" '.$style.'>'.
 	 '  <form action="'.$_SERVER['PHP_SELF'].'">'.
 	 '    <input type="hidden" name="mode" value="updatefavorite">'.
 	 '    <input type="hidden" name="idx" value="'.$key.'">'.
@@ -310,7 +310,7 @@ function display_favorites_info($item, $key) {
 function display_favorites() {
 	global $config_values, $html_out;
 	$html_out .= '<div class="dialog_window" id="favorites">'.
-	             '<div class="Favorite"><ul>';
+	             '<div class="favorite"><ul>';
 	if(isset($config_values['Favorites'])) {
 		foreach($config_values['Favorites'] as $key => $item) {
 			$html_out .= '<li>'._jscript("toggleFav('favorite_".$key."')", $item['Name']).'</li>'."\n";

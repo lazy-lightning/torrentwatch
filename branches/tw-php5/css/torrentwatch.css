@@ -424,7 +424,7 @@ div.dialog_window select {
 	}
 
 
-div.FavInfo a,
+div.favinfo a,
 div.welcome a,
 div.dialog_window#clear_cache a,
 div.dialog_window#history a,
@@ -515,13 +515,13 @@ div.feeditem input[type=text] {
 div.dialog_window#favorites {
 	}
 
-div.Favorite,
-div.FavInfo {
+div.favinfo {
 	height: 230px;
 	}
 
 
-div.Favorite {
+div.favorite {
+	height: 230px;
 	float: left;
 	clear: left;
 	border: 1px solid gray;
@@ -532,16 +532,16 @@ div.Favorite {
 	overflow: auto;
 	}
 
-div.Favorite ul li a {
+div.favorite ul li a {
 	text-decoration: none;
 	color: #000000;
 	}
 
-div.Favorite ul li:hover {
+div.favorite ul li:hover {
 	background-color: #3879D7;
 	}
 
-div.FavInfo {
+div.favinfo {
 	display: none;
 	border: 1px solid gray;
 	padding: 5px;
@@ -571,12 +571,12 @@ div.favorite_quality label.item {
 	padding-right: 10px;
 	}
 
-div.FavInfo input[type=text] {
+div.favinfo input[type=text] {
 	width: 241px;
 	}
 
 div.dialog_window#feeds input[type=submit],
-div.FavInfo input[type=submit] {
+div.favinfo input[type=submit] {
 	color: #323232;
 	background-color: #EEE;
 	border: 1px solid #787878;
