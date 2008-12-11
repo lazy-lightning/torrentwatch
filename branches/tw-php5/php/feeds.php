@@ -23,7 +23,7 @@ function check_for_torrent(&$item, $key, $opts) {
   $title = strtolower($rs['title']);
   switch(_isset($config_values['Settings'], 'MatchStyle')) {
     case 'simple':  
-      $hit = (($item['Filter'] != '' && strpos($title, strtolower($item['Filter'])) !== FALSE) &&
+      $hit = (($item['Filter'] != '' && strpos($title, strtolower($item['Filter'])) === 0) &&
        ($item['Not'] == '' OR my_strpos($title, strtolower($item['Not'])) === FALSE) &&
        ($item['Quality'] == 'All' OR $item['Quality'] == '' OR my_strpos($title, strtolower($item['Quality'])) !== FALSE) &&
        ($item['Episodes'] == '' OR preg_match('/^'.strtolower($item['Episodes']).'$/', $guess['episode'])) );
@@ -47,11 +47,13 @@ function check_for_torrent(&$item, $key, $opts) {
       $guess = guess_match($title, TRUE);
       if(_isset($config_values['Settings'], 'Only Newer') == 1) {
         if(!empty($guess['episode']) && preg_match('/(\d+)x(\d+)/i',$guess['episode'],$regs)) {
-          if($item['Season'] >= $regs[1]) {
+          if($item['Season'] > $regs[1]) {
+	    _debug($item['Season'] .' > '.$regs[1], 2);
             $matched = "old";
             return FALSE;
           }
           if($item['Episode'] >= $regs[2]) {
+	    _debug($item['Episode'] .' >= '.$regs[2], 2);
             $matched = "old";
             return FALSE;
           }
@@ -87,7 +89,7 @@ function parse_one_rss($feed) {
   global $config_values;
   $rss = new lastRSS;
   $rss->stripHTML = True;
-  $rss->cache_time = 50*60;
+  $rss->cache_time = 15*60;
   $rss->date_format = 'M j h:ia';
 
   if(isset($config_values['Settings']['Cache Dir']))
@@ -131,9 +133,7 @@ function rss_perform_matching($rs, $idx) {
     if(isset($config_values['Favorites']))
       array_walk($config_values['Favorites'], 'check_for_torrent', 
                  array('Obj' =>$item, 'URL' => $rs['URL']));
-    if($matched == "nomatch") {
-      _Debug("No match for $item[title]\n", 2);
-    }
+    _Debug("$matched: $item[title]\n", 1);
     if(isset($config_values['Global']['HTMLOutput'])) {
       update_progress_bar($percPerItem, $item['title']);
       show_torrent_html($item, $rs['URL'], $alt);

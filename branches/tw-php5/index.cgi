@@ -345,7 +345,7 @@ function display_topmenu() {
 	 '    <li id="view">'._jscript("toggleMenu('history')", "View History").'</li>'.
 	 '    <li id="divider">&nbsp;</li>'.
 	 '    <li id="empty">'._jscript("toggleMenu('clear_cache')", 'Empty Cache').'</li>'.
-	 '    <li id="inspector">'._jscript("toggleMenu('tvshow_inspector')", 'Inspector').'</li>';
+	 '    <li id="inspector">'._jscript("toggleInspector()", 'Inspector').'</li>';
 	if($_SERVER['REMOTE_ADDR'] == "127.0.0.1")
 		$host = '127.0.0.1';
 	else
@@ -406,11 +406,14 @@ function display_clear_cache() {
 function display_filter_bar() {
 	global $html_out;
 	$html_out .= 
-	 '<ul id="filterbar">'.
-	 '  <li id="filter_all">'._jscript("filterFeeds('all')", "All").'</li>'.
-	 '  <li id="filter_matching">'._jscript("filterFeeds('matching')", "Matching").'</li>'.
-	 '  <li id="filter_downloaded">'._jscript("filterFeeds('downloaded')", "Downloaded").'</li>'.
-	 '</ul>'."\n";
+	 '<div id="filterbar_container">'.
+	 '  <ul id="filterbar">'.
+	 '    <li id="filter_all">'._jscript("filterFeeds('all')", "All").'</li>'.
+	 '    <li id="filter_matching">'._jscript("filterFeeds('matching')", "Matching").'</li>'.
+	 '    <li id="filter_downloaded">'._jscript("filterFeeds('downloaded')", "Downloaded").'</li>'.
+	 '  </ul>'.
+	 '  <input type="text" id="filter_text_input" onblur="filterFeedsByName();">'.
+	 '</div>';
 }
 
 function display_context_menu() {
@@ -429,7 +432,11 @@ function display_hidden_iframe() {
 
 function display_inspector() {
 	global $html_out;
-	$html_out .= '<div id="inspector_container"><iframe id="tvshow_inspector" src="about:blank" name="inspector"></iframe></div>';
+	$html_out .= '
+<div id="inspector_container">
+  <div id="inspector_loading"></div>
+  <div id="inspector_info"></div>
+</div>';
 }
 
 function set_default_div() {
@@ -489,7 +496,7 @@ if($_SERVER["REMOTE_ADDR"] == '127.0.0.1') {
 	 '<script type="text/javascript" src="javascript/torrentwatch.local.js"></script>');
 } else {
 	echo ('<link rel="Stylesheet" type="text/css" href="css/torrentwatch.css?'.time().'"></link>'.
-	 '<script type="text/javascript" src="javascript/torrentwatch.js?'.time().'"></script>'.
+	 '<script type="text/javascript" src="javascript/torrentwatch.js"></script>'.
 	 '<script type="text/javascript" src="javascript/webtoolkit.contextmenu.js?'.time().'"></script>'.
 	 '<script type="text/javascript">'.
 	 'SimpleContextMenu.setup({"preventDefault":false, "preventForms":false});'.

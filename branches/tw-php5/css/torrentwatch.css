@@ -144,16 +144,24 @@ div.mainoptions ul li.divider {
  *
  * ---------------*/
 
-ul#filterbar {
+div#filterbar_container {
+	border-bottom: 1px solid #979797;
+	background: #C0C8D6 url('../images/filter_bar_bg.png') repeat-x;
 	margin: 0;
 	height: 24px;
-	background: #C0C8D6 url('../images/filter_bar_bg.png') repeat-x;
-	border-bottom: 1px solid #979797;
 	position: fixed;
 	left: 0;
-	right: 0px;
+	right: 0;
 	top: 76px;
+	overflow: hidden;
 	z-index: 2;
+	}
+
+ul#filterbar {
+	display: inline;
+	height: 17px;
+	margin: 0;
+	padding: 0;
 	text-align: left;
 	}
 
@@ -194,26 +202,47 @@ ul#filterbar li.selected a {
 	background: transparent url('../images/filter_selected_right.png') no-repeat top right;
 	color: #fff !important;
 	}
+
+input#filter_text_input {
+	float: right;
+	height: 19px;
+	width: 100px;
+	border: 0 solid #FFFFFF;
+	padding: 0 2px;
+	margin: 4px 5px 0 0;
+	}
+
+/* Safari-look filter input for Firefox */
+@-moz-document url-prefix() {
+	input#filter_text_input {
+		background: #FFF url('images/filter_icon.png') top left no-repeat;
+		border: 1px solid #5D80A1;
+		margin-top: 3px;
+		padding: 1px 10px 1px 18px;
+		width: 76px;
+		-moz-border-radius: 10px;
+		}
+	input#filter_text_input.blur {
+		border-color: #CCC;
+		}
+}
+
 /*--------------------------
  *
  * I N S P E C T O R
  *
  * ------------------------*/
+
 div#inspector_container {
 	display: none;
 	position: fixed;
-	border: 1px 0px 0px 0px solid #888888;
-	top: 101px;
+	overflow: auto;
+	border-left: 1px solid #888888;
+	top: 76px;
 	right: 0;
 	bottom: 0;
 	width: 350px;
 	z-index: 2;
-	}
-
-iframe#tvshow_inspector {
-	height: 100%;
-	width: 100%;
-	overflow: scroll
 	}
 
 h2.inspector_heading {

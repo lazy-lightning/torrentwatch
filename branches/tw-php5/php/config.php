@@ -146,7 +146,8 @@ function update_global_config() {
                  'MatchStyle'       => 'matchstyle',
                  'Only Newer'       => 'onlynewer');
   $checkboxs = array('Verify Episode' => 'verifyepisodes',
-                     'Save Torrents'  => 'savetorrents');
+                     'Save Torrents'  => 'savetorrents',
+                     'Only Newer'     => 'onlynewer');
   foreach($input as $key => $data) {
     if(isset($_GET[$data]))
       $config_values['Settings'][$key] = $_GET[$data];

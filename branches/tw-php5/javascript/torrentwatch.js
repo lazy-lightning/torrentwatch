@@ -3,6 +3,8 @@ function updateClientOptions() {
 	elem = document.getElementById('client');
 	if(!elem && document.parent)
 		elem = document.parent.getElementById('client');
+	if(!elem)
+		return;
 	changecss('div.favorite_seedratio', 'display', 'none');
 	switch(elem.value) {
 		case 'transmission1.3x':
@@ -110,9 +112,35 @@ function contextDLNow()
 
 function contextInspect()
 {
+	showInspector(SimpleContextMenu._attachedElement.childNodes[2].textContent);
+}
+
+var $inspector_status = 0;
+
+function showInspector($title)
+{
+	$inspector_status = 1;
 	showLayer('inspector_container');
-	document.getElementById('tvshow_inspector').src = '/torrentwatch/inspector.cgi?title='+SimpleContextMenu._attachedElement.childNodes[2].textContent;
-	changecss('div#torrentlist_container', "right", "351")
+	changecss('div#torrentlist_container', "right", "351");
+	changecss('div#filterbar_container', "right", "351");
+	if($title != '')
+		updateFrameLoad('/torrentwatch/inspector.cgi?title='+$title, 'Loading Inspector');
+}
+
+function hideInspector()
+{
+	$inspector_status = 0;
+	hideLayer('inspector_container');
+	changecss('div#torrentlist_container', "right", "0");
+	changecss('div#filterbar_container', "right", "0");
+}
+
+function toggleInspector()
+{
+	if($inspector_status)
+		hideInspector();
+	else
+		showInspector('');
 }
 
 function submitForm ( whichForm )
@@ -171,7 +199,7 @@ function markTorrentAlt()
 					}
 					if(!class_item)
 						return;
-					if(class_item.style.display == "block") {
+					if(class_item.style.display == "block" || torrent.style.display == "block") {
 						if(alt) {
 							torrent.className = "torrent "+match_class;
 							alt = 0;
@@ -219,8 +247,29 @@ function filterFeeds( filterType )
 	markTorrentAlt();
 }
 
-		
-			
+function filterFeedsByName() {
+	var filter_name = document.getElementById('filter_text_input').value;
+	var alt = 0;
+	var elem = document.getElementById('torrentlist_container');
+	for( var F in elem.childNodes ) {
+		if ( elem.childNodes[F].className == 'feed' ) {
+			for ( var T in elem.childNodes[F].firstChild.childNodes ) {
+				var torrent = elem.childNodes[F].firstChild.childNodes[T];
+				if(torrent.className && torrent.className.substring(0,7) == 'torrent') {
+					var torrent_name = torrent.childNodes[2].textContent;
+					if(filter_name == '')
+						torrent.style.display = '';
+					else if(torrent_name.match(filter_name))
+						torrent.style.display = 'block';
+					else
+						torrent.style.display = 'none';
+				}
+			}
+		}
+	}
+	markTorrentAlt();
+}
+
 // Inspiration from http://www.netlobo.com/div_hiding.html
 
 var last_fav;
