@@ -68,7 +68,7 @@ function check_for_torrent(&$item, $key, $opts) {
         if(isset($config_values['Global']['HTMLOutput']))
           update_progress_bar(0, "Starting $title");
         if(stripos($config_values['Settings']['Client'],'nzb') !== FALSE) {
-          if(client_add_nzb($link, $item, $opts['URL'], $title))
+          if(client_add_nzb($link, $title, $item, $opts['URL']))
             add_cache($rs['title']);
         } else if(client_add_torrent($link, NULL, $item, $opts['URL'])) {
           add_cache($rs['title']);

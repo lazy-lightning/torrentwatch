@@ -144,7 +144,7 @@ function nzbget_add_nzb($filename, $title) {
 }
 
 
-function client_add_nzb($filename, &$fav = NULL, $feed = NULL, $title = NULL) {
+function client_add_nzb($filename, $title = NULL, &$fav = NULL, $feed = NULL) {
   global $config_values, $hit;
   $hit = 1;
   $filename = htmlspecialchars_decode($filename);
@@ -166,7 +166,7 @@ function client_add_nzb($filename, &$fav = NULL, $feed = NULL, $title = NULL) {
   }
   if($return === 0) {
     add_history($title);
-    if(isset($fav))
+    if(!empty($fav))
       updateFavoriteEpisode($fav, $title);
     _debug("Starting: $title\n",0);
   } else {

@@ -69,7 +69,7 @@ function parse_options() {
 		case 'dltorrent':
 			// Dont display full information, this link is loaded in a hidden iframe
 			if(stripos($config_values['Settings']['Client'], 'nzb') !== FALSE) 
-				$r = client_add_nzb(urldecode($_GET['link']),NULL,NULL,$_GET['title']);
+				$r = client_add_nzb(urldecode($_GET['link']),$_GET['title']);
 			else
 				$r = client_add_torrent(trim(urldecode($_GET['link'])), $config_values['Settings']['Download Dir']);
 			display_history();
