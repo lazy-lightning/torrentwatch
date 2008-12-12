@@ -513,7 +513,6 @@ ob_flush();flush();
 setup_default_config();
 if(file_exists(platform_getConfigFile()))
 	read_config_file();
-}
 
 $config_values['Global']['HTMLOutput']= 1;
 $html_out = "";
