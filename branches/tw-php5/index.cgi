@@ -37,6 +37,7 @@ function parse_options() {
 			break;
 		case 'setglobals':
 			update_global_config();
+			$config_values['Settings']['FirstRun'] = FALSE;
 			write_config_file();
 			// This is always called in a hidden frame, so display new config and exit
 			display_global_config();
@@ -509,10 +510,9 @@ if($_SERVER["REMOTE_ADDR"] == '127.0.0.1') {
 echo ("</head>\n<body onload='updateClientOptions();'>\n");
 ob_flush();flush();
 
+setup_default_config();
 if(file_exists(platform_getConfigFile()))
 	read_config_file();
-else {
-	setup_default_config();
 }
 
 $config_values['Global']['HTMLOutput']= 1;
