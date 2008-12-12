@@ -348,8 +348,10 @@ function display_topmenu() {
 	 '    <li id="inspector">'._jscript("toggleInspector()", 'Inspector').'</li>';
 	if($_SERVER['REMOTE_ADDR'] == "127.0.0.1")
 		$host = '127.0.0.1';
-	else
+	else if(!empty($_SERVER['SERVER_NAME']))
 		$host = $_SERVER['SERVER_NAME'];
+	else
+		$host = platform_getHostname();
 
 	switch($config_values['Settings']['Client']) {
 		case 'btpd':

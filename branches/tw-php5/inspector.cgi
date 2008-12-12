@@ -7,7 +7,10 @@ require_once('guess.php');
 function _die($errmsg) {
 	echo "
 <body>
-  <head><title>Inspector Error</title></head>
+  <head>
+    <title>Inspector Error</title>
+    <script type='text/javascript' src='javascript/torrentwatch.js'>
+  </head>
   <body>
     <div id='inspector_container'>$errmsg</div>
     <script type='text/javascript'>

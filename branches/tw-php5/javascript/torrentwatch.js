@@ -187,25 +187,39 @@ function markTorrentAlt()
 {
 	var alt = 0;
 	var elem = document.getElementById('torrentlist_container');
+	var textFilterActive = (document.getElementById('filter_text_input').value != '');
 	for( var F in elem.childNodes ) {
 		if ( elem.childNodes[F].className == 'feed' ) {
 			for ( var T in elem.childNodes[F].firstChild.childNodes ) {
 				var torrent = elem.childNodes[F].firstChild.childNodes[T];
 				if(torrent.className && torrent.className.substring(0,7) == 'torrent') {
 					var match_class = torrent.className.split(" ")[1];
+
 					var class_item = getClassBySelector('ul.torrentlist li.torrent.'+match_class);
-					if(!class_item) {
+					if(!class_item)
 						class_item = getClassBySelector('UL.torrentlist LI.'+match_class);
-					}
 					if(!class_item)
 						return;
-					if(class_item.style.display == "block" || torrent.style.display == "block") {
-						if(alt) {
-							torrent.className = "torrent "+match_class;
-							alt = 0;
-						} else {
-							torrent.className = "torrent "+match_class+" alt";
-							alt = 1;
+
+					if(textFilterActive) {
+						if(torrent.style.display == "block") {
+							if(alt) {
+								torrent.className = "torrent "+match_class;
+								alt = 0;
+							} else {
+								torrent.className = "torrent "+match_class+" alt";
+								alt = 1;
+							}
+						}
+					} else {
+						if(class_item.style.display == "block") {
+							if(alt) {
+								torrent.className = "torrent "+match_class;
+								alt = 0;
+							} else {
+								torrent.className = "torrent "+match_class+" alt";
+								alt = 1;
+							}
 						}
 					}
 				}
@@ -265,7 +279,7 @@ function filterFeedsByName() {
 					var torrent_name = torrent.childNodes[2].textContent;
 					if(filter_name == '')
 						torrent.style.display = '';
-					else if(torrent_name.match(filter_name))
+					else if(torrent_name.toLowerCase().match(filter_name.toLowerCase()))
 						torrent.style.display = 'block';
 					else
 						torrent.style.display = 'none';

@@ -30,6 +30,23 @@ function platform_install() {
   }
 }
       
+function platform_getHostName() {
+  global $platform;
+  if(TRUE) {
+    exec('ifconfig eth0', $output, $return);
+    if(preg_match('/inet addr:(\d+\.\d+\.\d+\.\d+)/', $output[1], $regs))
+      return $regs[1];
+  }
+  switch($platform) {
+    case 'NMT':
+      return 'popcorn';
+      break;
+    case 'Linux':
+    default:
+      return file_get_contents('/etc/hostname');
+    break;
+  }
+}
 
 function platform_getConfigFile() {
   return platform_getUserRoot()."/torrentwatch.config";
