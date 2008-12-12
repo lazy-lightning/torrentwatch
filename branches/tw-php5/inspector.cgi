@@ -4,13 +4,15 @@ ini_set('include_path', '.:./php');
 require_once('TVDB.php');
 require_once('guess.php');
 
+echo "
+<html>
+  <head>
+    <title>TV Show Inspector</title>
+    <script type='text/javascript' src='javascript/torrentwatch.js'></script>
+  </head>";
+
 function _die($errmsg) {
 	echo "
-<body>
-  <head>
-    <title>Inspector Error</title>
-    <script type='text/javascript' src='javascript/torrentwatch.js'>
-  </head>
   <body>
     <div id='inspector_container'>$errmsg</div>
     <script type='text/javascript'>
@@ -43,11 +45,6 @@ if(preg_match('/(\d+)x(\d+)/i',$guess['episode'], $regs)) {
 }
 
 echo "
-<html>
-  <head>
-    <title>TV Show Inspector</title>
-    <script type='text/javascript' src='javascript/torrentwatch.js'></script>
-  </head>
   <body>
     <div id='inspector_container'>
       <div class='tvshow'>

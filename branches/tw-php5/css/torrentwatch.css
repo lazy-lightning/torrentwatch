@@ -235,6 +235,7 @@ input#filter_text_input {
 
 div#inspector_container {
 	display: none;
+	background-color: #DBDBDB;
 	position: fixed;
 	overflow: auto;
 	border-left: 1px solid #888888;
