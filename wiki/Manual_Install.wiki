@@ -1,16 +1,6 @@
 #summary Manual Installation Instructions
 #labels Featured,Phase-Deploy
 
-==Pre Install==
-You will need to configure torrentwatch from your PC. Here we are going to setup so you can access that page from your PC.  This is also used to call the install routine
-
-  # open your hosts file
-   * On Windows this is C:\Windows\System32\drivers\etc\hosts
-   * On Linux/Unix this is /etc/hosts
-  # Add the folowing line, making sure to use your PCH's ip
-   * 192.168.1.104 localhost.drives popcorn
-  # Bookmark http://localhost.drives:8883/HARD_DISK/tw-iface.php
-
 ==To install via FTP==
   # decompress the zip
   # ftp to your popcorn, and upload these 3 files from the zip to your PCH
@@ -18,7 +8,7 @@ You will need to configure torrentwatch from your PC. Here we are going to setup
     * torrentwatch-installer.html
     * torrentwatch-installer.cgi
   # send the command "site chmod 755 torrentwatch-installer.cgi" through ftp
-  # Go to [http://localhost.drives:8883/HARD_DISK/torrentwatch-installer.cgi?install] *OR*
+  # Go to [http://ip-of-pch:8088/stream/file=/opt/sybhttpd/localhost.drives/HARD_DISK/torrentwatch-installer.cgi?install] *OR*
   # On your popcorn remote push the source button
   # Select HARD_DISK
   # Select the 4th icon, which is files
@@ -39,3 +29,8 @@ This means the torrentwatch-installer.cgi is not executable. Redo step 3.
   # Select torrentwatch-installer.html
   # Select Run from USB_DRIVE_A-1
   # Select Install to HARD_DISK
+
+==Post Install==
+After installing torrentwatch to your NMT you will want to configure it, this is done from a normal PC browser like firefox, opera, or safari.   
+  * http://ip-of-pch:8883/torrentwatch/index.cgi
+  * Be sure to bookmark the configuration page after you first use it.
