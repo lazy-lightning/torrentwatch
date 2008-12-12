@@ -1,4 +1,17 @@
-#!/bin/sh 
+#!/bin/sh --
+# fix and run DOS format sh. ALord/Ydrol
+true # Keep blank below
+
+##################################
+if [ $? != 0 ]; then             #
+    set -e                       #
+    sed 's/$//' "$0" > /tmp/$$ #
+    cat /tmp/$$ > "$0"           #
+    rm -f /tmp/$$                #
+    exec /bin/sh "$0" "$@"       #
+fi                               #
+##################################
+# REAL SCRIPT FOLLOWS
 
 # Get the header in early, incase we have any errors
 cat <<EOF
