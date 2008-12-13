@@ -14,7 +14,11 @@ echo "
 function _die($errmsg) {
 	echo "
   <body>
-    <div id='inspector_container'>$errmsg</div>
+    <div id='inspector_container'>
+      <div class='tvshow'>
+        <h2 id='tvshow_title' class='inspector_heading'>$errmsg</h2>
+      </div>
+    </div>
     <script type='text/javascript'>
       updateFrameCopyDiv('inspector_container');
       updateFrameFinished();
