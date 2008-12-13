@@ -47,17 +47,21 @@
       <label class="item">Torrent Watch requires a feed from the internet that will point it to the TV Episodes.  Choose a feed from the list or add your own feed from the net.</label>
     <label class="category">Bit Torrent</label>
     <div class="form_radio">
-      <input type="radio" name="link" value="http://tvrss.net/feed/eztv/"><label class="item">TvRss.net - EzTV</label>
+      <input type="radio" name="link" value="http://tvrss.net/feed/eztv/"><label class="item">tvRSS.net - EzTV</label>
+      <label class="item">The EzTV feed from tvRSS.net</label>
     </div>
     <div class="form_radio">
-      <input type="radio" name="link" value="http://tvrss.net/feed/vtv/"><label class="item">TvRss.net - VTV</label>
+      <input type="radio" name="link" value="http://tvrss.net/feed/vtv/"><label class="item">tvRSS.net - VTV</label>
+      <label class="item">The VTV feed from tvRSS.net contains only the most popular tv shows</label>
     </div>
     <label class="category">NZB</label>
     <div class="form_radio">
       <input type="radio" name="link" value="http://www.tvnzb.com/tvnzb.rss"><label class="item">TvNZB.com</label>
+      <label class="item">TvNZB.com offers a feed of user submitted .nzb files</label>
     </div>
     <div class="form_radio">
-      <input type="radio" name="link" value="http://tvbinz.net/rss.php"><label class="item">TvBinz.net</label>
+      <input type="radio" name="link" value="http://tvbinz.net/rss.php"><label class="item">TVBINZ.NET</label>
+      <label class="item">TvBinz.net offers an automatically generated feed of files posted to select news groups</label>
     </div>
 
     <a href="javascript:toggleMenu('welcome4');">Next</a>
@@ -76,7 +80,7 @@
         <div class='torrent_name'>Duplicate Episode - Same episode downloaded previously.  Will not be downloaded.</div>
         <a class='context_link' href='#'></a><a class='context_link' href='#'></a></li>
       <li class='torrent match_old'>
-        <div class='torrent_name'>Old Episode - Episode is Older than the most recently downloaded episode.</div>
+        <div class='torrent_name'>Old Episode - Episode is Older than the most recently downloaded episode. Will not be downloaded.</div>
         <a class='context_link' href='#'></a><a class='context_link' href='#'></a></li>
       <li class='torrent match_cachehit alt'>
         <div class='torrent_name'>Cache Hit - This item was previously downloaded.</div>
@@ -94,6 +98,34 @@
   </div>
         
   <div id="welcome5" class="dialog_window welcome">
+    <h2 class="dialog_heading">Favorites Settings</h2>
+    <label class="item">Torrent Watch has a few different settings that effect which matches will be downloaded, and which will be passed over.</label>
+    <label class="category">
+      <input type="checkbox" name="onlynewer" value="1" selected="selected">
+      Newer Episodes Only
+    </label>
+    <label class="item">Only download newer episodes.  So if previously S3E10 has been downloaded for a particular favorite, when S2E03 shows up in the feed it will be skipped</label>
+    <label class="category">
+      <input type="checkbox" name="verifyepisodes" value="1" selected="selected">
+      Verify Episodes
+    </label>
+      <label class="item">Only download each episode once.  So if previously S01E13 had been downloaded, a second copy of S01E13 showing up in a feed will not be downloaded.  Items tagged Proper or Repack are an exception to this setting.  Note that this depends on the name being spelled the same between feeds.</label>
+    <label class="category">
+      <input type="checkbox" name="savetorrents" value=1>
+      Save index files
+    </label>
+    <label class="item">Save the related .torrent or .nzb file in the download directory</label>
+
+    <a href="javascript:toggleMenu('welcome6');">Next</a>
+    <a href="javascript:toggleMenu('welcome4');">Back</a>
+  </div>
+  <div id="welcome6" class="dialog_window welcome">
+    <h2 class="dialog_heading">Favorites Settings (cont.)</h2>
+
+    <a href="javascript:toggleMenu('welcome7');">Next</a>
+    <a href="javascript:toggleMenu('welcome5');">Back</a>
+  </div>
+  <div id="welcome7" class="dialog_window welcome">
     <h2 class="dialog_heading">Initial Configuration is Complete!</h2>
       <label class="item">To get started click Apply below and you will be presented with the episodes in your chosen feed.</label>
       <label class="item">Right click on any show on the list and add it to your favorites.  Once a show is in your favorites it will automatically download every week</label>
@@ -101,6 +133,6 @@
       <label class="item">Feeds only contain the most recent additions.  For more info please visit your feeds website.</label>
 
     <a href="javascript:saveWelcome();">Apply</a>
-    <a href="javascript:toggleMenu('welcome4');">Back</a>
+    <a href="javascript:toggleMenu('welcome6');">Back</a>
   </div>
 </form>

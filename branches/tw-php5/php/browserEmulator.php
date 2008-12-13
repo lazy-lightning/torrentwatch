@@ -186,7 +186,7 @@ class BrowserEmulator {
        
         if ($this->debug) echo $request;
         fputs ($socket, $request);
-  if (count($this->postData)>0) {
+        if (count($this->postData)>0) {
           $PostStringArray = Array();
           foreach ($this->postData AS $key=>$value) {
             $PostStringArray[] = "$key=$value";
@@ -239,7 +239,8 @@ class BrowserEmulator {
     } else {
         return FALSE;
     }
-    
+    fclose($socket);
+
     if(strstr($this->lastResponse, 'Content-Encoding: gzip') !== FALSE) {
       if(function_exists('gzinflate'))
         $file = gzinflate(substr($file,10));

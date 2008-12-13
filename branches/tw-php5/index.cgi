@@ -424,7 +424,7 @@ function display_context_menu() {
 	$html_out .= '<div class="context_menu" id="CM1"><ul>'.
 	 '<li>'._jscript('contextAddToFav()', 'Add to Favorites').'</li>'.
 	 '<li>'._jscript('contextDLNow()', 'Start Downloading').'</li>'.
-	 '<li'._jscript('contextInspect()', 'Inspect').'</li>'.
+	 '<li>'._jscript('contextInspect()', 'Inspect').'</li>'.
 	 '</ul></div>'."\n";
 }
 	

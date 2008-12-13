@@ -445,6 +445,11 @@ div.dialog_window#feeds a {
 	}
 
 /* Welcome Dialogs */
+div.welcome {
+	margin: -3px auto 0 -300px;
+	width: 600px;
+	}
+
 div.welcome input {
 	clear: left;
 	}
