@@ -114,7 +114,10 @@ autostart_add()
 
 
 	/bin/cat "$STARTER" | /bin/grep -q "php-cgi"
-	if [ $? != 0 ]; then
+	if [ $? == 0 ]; then
+		echo "PHP already linked into place.<br>";
+	else
+		echo "Adding link to php in /usr/bin/php-cgi <br>"
 		rm -f /tmp/.starter.tmp
 		IFS=""
 		cat "$STARTER" | while read line 
@@ -204,6 +207,9 @@ install_harddisk()
 
 	# Move the last install out of the way
 	if [ -d "$DEST" ]; then
+		if [ -d "$DEST.old" ]; then
+			rm -rf "$DEST.old"
+		fi
 		mv "$DEST" "$DEST.old"
 		mkdir "$DEST"
 		if [ -f "$DEST.old/rss_dl.config" ]; then
