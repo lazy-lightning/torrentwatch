@@ -66,11 +66,13 @@ class lastRSS {
 			// Changed to only support local files
 			$timedif = @(time() - filemtime($cache_file));
 			if ($timedif < $this->cache_time) {
+				_debug("lastRSS: feed loaded from file cache: $rss_url", 0);
 				// cached file is fresh enough, return cached array
 				$result = unserialize(join('', file($cache_file)));
 				// set 'cached' to 1 only if cached file is correct
 				if ($result) $result['cached'] = 1;
 			} else {
+				_debug("lastRSS: feed cache is old, loading fresh: $rss_url", 0);
 				// cached file is too old, create new
 				$result = $this->Parse($rss_url);
 				$serialized = serialize($result);
@@ -234,6 +236,7 @@ class lastRSS {
 		}
 		else // Error in opening return False
 		{
+			_debug("lastRSS: file_get_contents failed for $rss_url", -1);
 			return False;
 		}
 	}

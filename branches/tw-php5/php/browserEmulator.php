@@ -237,6 +237,7 @@ class BrowserEmulator {
           $file .= fgets($socket, 10000);
         }
     } else {
+	_debug('Browser Emulator: file_get_contents bad socket', -1);
         return FALSE;
     }
     fclose($socket);
