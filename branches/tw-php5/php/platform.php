@@ -52,6 +52,28 @@ function platform_getConfigFile() {
   return platform_getUserRoot()."/torrentwatch.config";
 }
 
+function platform_getGunzip() {
+  global $platform;
+  switch($platform) {
+    case 'NMT':
+      if(file_exists('/bin/gunzip'))
+        return "/bin/gunzip";
+      else if(file_exists('/bin/busybox')) {
+	exec('/bin/busybox gunzip 2>&1', $output);
+	if($output[0] == 'busybox: applet not found')
+          return FALSE;
+        else
+          return "/bin/busybox gunzip";
+      }
+      return FALSE;
+    case 'Linux':
+    default:
+      if(file_exists('/bin/gunzip'))
+        return "/bin/gunzip";
+      return FALSE;
+  }
+}
+
 function platform_getUserRoot() {
   global $platform;
   switch($platform) {

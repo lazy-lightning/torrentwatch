@@ -61,7 +61,7 @@ v1.0
 function my_gzinflate($string) {
 	$tmp = tempnam("", "browserEmulator");
 	file_put_contents($tmp, $string);
-	$cmd = "cat $tmp | gunzip";
+	$cmd = "cat $tmp | ".platform_getGunzip();	
 	exec($cmd, $output, $return);
 	return implode($output, "\n");
 }
@@ -112,7 +112,8 @@ class BrowserEmulator {
     /**
     * Set default to accept gzip encoded files
     */
-    $this->headerLines["Accept-Encoding"] = "gzip";
+    if(platform_getGunzip())
+      $this->headerLines["Accept-Encoding"] = "gzip";
   }
  
   /**
