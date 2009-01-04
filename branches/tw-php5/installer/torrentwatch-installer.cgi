@@ -213,10 +213,10 @@ install_harddisk()
 		mv "$DEST" "$DEST.old"
 		mkdir "$DEST"
 		if [ -f "$DEST.old/rss_dl.config" ]; then
-			mv "$DEST.old/rss_dl.config"  "$DEST/torrentwatch.config"
+			cp "$DEST.old/rss_dl.config"  "$DEST/torrentwatch.config"
 		fi
 		if [ -f "$DEST.old/torrentwatch.config" ]; then
-			mv "$DEST.old/torrentwatch.config" "$DEST"
+			cp "$DEST.old/torrentwatch.config" "$DEST"
 		fi
 		if [ -f "$DEST.old/rss_dl.history" ]; then
 			cp -rf "$DEST.old/rss_dl.history" "$DEST"
