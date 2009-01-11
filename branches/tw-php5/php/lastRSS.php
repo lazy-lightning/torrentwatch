@@ -66,7 +66,7 @@ class lastRSS {
 			// Changed to only support local files
 			$timedif = @(time() - filemtime($cache_file));
 			if ($timedif < $this->cache_time) {
-				_debug("lastRSS: feed loaded from file cache: $rss_url", 0);
+				_debug("lastRSS: feed loaded from file cache: $rss_url\n", 0);
 				// cached file is fresh enough, return cached array
 				$result = unserialize(join('', file($cache_file)));
 				// set 'cached' to 1 only if cached file is correct

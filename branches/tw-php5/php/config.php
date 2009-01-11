@@ -17,7 +17,7 @@ function setup_default_config() {
   _default('Download Dir', platform_getDownloadDir());
   _default('Cache Dir', $basedir."/rss_cache/");
   _default('Save Torrents', "0");
-  _default('Run Torrentwatch', "1");
+  _default('Run Torrentwatch', "True");
   _default('Cron', "/etc/cron.hourly");
   _default('Client', "btpd");
   _default('Verify Episode', "1");
