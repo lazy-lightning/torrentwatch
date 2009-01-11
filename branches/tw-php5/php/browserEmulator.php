@@ -231,6 +231,8 @@ class BrowserEmulator {
   * Returns the requested file as a string on success, or false on failure.
   **/
   function file_get_contents($url) {
+    if(file_exists($url)) // local file
+      return file_get_contents($url);
     $file = '';
     $socket = $this->fopen($url);
     if ($socket) {
