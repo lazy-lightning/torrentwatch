@@ -51,8 +51,7 @@ function check_for_torrent(&$item, $key, $opts) {
 	    _debug($item['Season'] .' > '.$regs[1], 2);
             $matched = "old";
             return FALSE;
-          }
-          if($item['Episode'] >= $regs[2]) {
+          } else if($item['Season'] == $regs[1] && $item['Episode'] >= $regs[2]) {
 	    _debug($item['Episode'] .' >= '.$regs[2], 2);
             $matched = "old";
             return FALSE;
