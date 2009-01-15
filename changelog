@@ -1,4 +1,4 @@
-9 aug 0.6-9
+9 aug 0.8-??
   * modified add_torrent() to take directory and name of torrent seperatly
   * fixes a bug where deep directorys chooses the wrong destination directory
 

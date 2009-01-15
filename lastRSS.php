@@ -31,8 +31,6 @@
  ======================================================================
 */
 
-require_once('browserEmulator.php');
-
 /**
 * lastRSS
 * Simple yet powerfull PHP class to parse RSS files.
@@ -64,15 +62,14 @@ class lastRSS {
 		if ($this->cache_dir != '') {
 			$cache_file = $this->cache_dir . '/rsscache_' . md5($rss_url);
 			// Changed to only support local files
-			$timedif = @(time() - filemtime($cache_file));
-			if ($timedif < $this->cache_time) {
-				_debug("lastRSS: feed loaded from file cache: $rss_url\n", 0);
+			//$timedif = @(time() - filemtime($cache_file));
+			//if ($timedif < $this->cache_time) {
+			if (file_exists($cache_file) and filemtime($cache_file) > filemtime($rss_url)) {
 				// cached file is fresh enough, return cached array
 				$result = unserialize(join('', file($cache_file)));
 				// set 'cached' to 1 only if cached file is correct
 				if ($result) $result['cached'] = 1;
 			} else {
-				_debug("lastRSS: feed cache is old, loading fresh: $rss_url", 0);
 				// cached file is too old, create new
 				$result = $this->Parse($rss_url);
 				$serialized = serialize($result);
@@ -141,8 +138,13 @@ class lastRSS {
 	// -------------------------------------------------------------------
 	function Parse ($rss_url) {
 		// Open and load RSS file
-		$be = new BrowserEmulator();
-		if ($rss_content = $be->file_get_contents($rss_url)) {
+		if ($f = @fopen($rss_url, 'r')) {
+			$rss_content = '';
+			while (!feof($f)) {
+				$rss_content .= fgets($f, 4096);
+			}
+			fclose($f);
+
 			// Parse document encoding
 			$result['encoding'] = $this->my_preg_match("'encoding=[\'\"](.*?)[\'\"]'si", $rss_content);
 			// if document codepage is specified, use it
@@ -160,7 +162,7 @@ class lastRSS {
 				if ($temp != '') $result[$channeltag] = $temp; // Set only if not empty
 			}
 			// If date_format is specified and lastBuildDate is valid
-			if ($this->date_format != '' && isset($result['lastBuildDate']) && ($timestamp = strtotime($result['lastBuildDate'])) !==-1) {
+			if ($this->date_format != '' && ($timestamp = strtotime($result['lastBuildDate'])) !==-1) {
 						// convert lastBuildDate to specified date format
 						$result['lastBuildDate'] = date($this->date_format, $timestamp);
 			}
@@ -204,25 +206,24 @@ class lastRSS {
 							preg_match_all( '/([^\s"=]+)="([^"]*?)"/' , $temp2, $attr, PREG_SET_ORDER);
 							$result['items'][$i][$itemtag] = array();
 							if ($temp != '') $result['items'][$i][$itemtag]['value'] = $temp;
-								foreach($attr as $a) { 
+						  	foreach($attr as $a) { 
 								$result['items'][$i][$itemtag][$a[1]] = $a[2];
-								}
+						  	}
 						} else {
-							if ($temp != '') $result['items'][$i][$itemtag] = $temp; // Set only if not empty
+						  if ($temp != '') $result['items'][$i][$itemtag] = $temp; // Set only if not empty
 						}
 						/** end rss attribute changes **/
 
 
 					}
 					// Strip HTML tags and other bullshit from DESCRIPTION
-					if ($this->stripHTML && isset($result['items'][$i]['description']))
+					if ($this->stripHTML && $result['items'][$i]['description'])
 						$result['items'][$i]['description'] = strip_tags($this->unhtmlentities(strip_tags($result['items'][$i]['description'])));
 					// Strip HTML tags and other bullshit from TITLE
-					if ($this->stripHTML && isset($result['items'][$i]['title']))
+					if ($this->stripHTML && $result['items'][$i]['title'])
 						$result['items'][$i]['title'] = strip_tags($this->unhtmlentities(strip_tags($result['items'][$i]['title'])));
 					// If date_format is specified and pubDate is valid
-					if ($this->date_format != '' && isset($result['items'][$i]['pubDate']) &&
-					    ($timestamp = strtotime($result['items'][$i]['pubDate'])) !==-1) {
+					if ($this->date_format != '' && ($timestamp = strtotime($result['items'][$i]['pubDate'])) !==-1) {
 						// convert pubDate to specified date format
 						$result['items'][$i]['pubDate'] = date($this->date_format, $timestamp);
 					}
@@ -236,7 +237,6 @@ class lastRSS {
 		}
 		else // Error in opening return False
 		{
-			_debug("lastRSS: file_get_contents failed for $rss_url", -1);
 			return False;
 		}
 	}

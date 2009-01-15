@@ -1,20 +1,16 @@
 #!/bin/sh
 
-EXE_FILES="index.cgi rss_dl.php inspector.cgi"
-DOC_FILES="changelog CREDITS LICENSE TODO"
-RELEASE_FILES="$EXE_FILES $DOC_FILES .htaccess css/ images/ javascript/ php/ html/"
-RELEASE=torrentwatch-dev-$1
+RELEASE_FILES="atomparser.php lastRSS.php torrentwatch.php rss_dl.php rss_dl.config.orig rss_dl_utils.php tw-iface.php tw-iface.css tw-iface.local.css images CREDITS LICENSE changelog"
+RELEASE=`pwd | sed 's/.*folder\///'`
 
 rm -rf release
 mkdir -p release
 
-cp -rf patches/* release
-cp installer/* release
-tar -cf release/tw.scripts.tar --exclude-vcs $RELEASE_FILES
+rm *~
+rm -rf images/.svn
+cp *installer* release
+cp twupload.ftp release
+tar -cf release/tw.scripts.tar $RELEASE_FILES
 
-if [ x"$1" != x"" ]; then
-        ln -s release $RELEASE
-	zip -r $RELEASE.zip $RELEASE/*
-        rm $RELEASE
-fi
+zip -r ../$RELEASE.zip release/*
 
