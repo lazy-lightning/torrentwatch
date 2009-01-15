@@ -1,2 +1,0 @@
-RemoveHandler .cgi
-AddType application/x-httpd-php .php .cgi
