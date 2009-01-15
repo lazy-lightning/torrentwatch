@@ -2,11 +2,7 @@
 // Return a formatted html link that will call javascript in a normal
 // browser, and in the NMT browser
 function _jscript($func, $contents) {
-  if($_SERVER["REMOTE_ADDR"] == '127.0.0.1') {
-    return('<a href=# onclick="'.$func.';return false;">'.$contents.'</a>');
-  } else {
-    return('<a href="javascript:'.$func.'">'.$contents.'</a>');
-  }
+  return "<a href=#>$contents</a>";
 }
 
 function setup_rss_list_html() {

@@ -1,3 +1,59 @@
+$(function() {
+//  alert("jQuery loaded");
+  // MenuBar
+  $("li#favoritesMenu a,li#config a,li#view a,li#empty a").click(function() {
+    $(this).toggleDialog();
+  });
+  // Dialog Buttons
+  $("div#history a,div.welcome a,div.favinfo form a,form#config_form a,form.feedform a,div#clear_cache a:first").not("a#save").click(function() {
+    $(this).toggleDialog();
+  });
+
+  // Favorites
+  $(".favorite ul li:first a").toggleFavorite();
+  $(".favorite ul li a").click(function() {
+    $(this).toggleFavorite();
+  });
+
+  // Inspector
+  var inspect_status = '-';
+  $("li#inspector a").click(function() {
+    $("div#torrentlist_container").animate(
+      { width:inspect_status+"=350" },
+      { queue:false , duration:600 }
+    );
+    $("div#filterbar_container").animate( { width:inspect_status+"=350" }, 600);
+    $("div#inspector_container").animate( { width:"toggle" }, 600);
+    inspect_status = (inspect_status == '+' ? '-' : '+');
+  });
+
+});
+
+(function($) {
+  var current_favorite, current_dialog;
+  $.fn.toggleDialog = function() {
+    this.each(function() {
+      var last = current_dialog;
+      current_dialog = (last == this.hash ? '' : this.hash);
+      if(last) $(last).fadeOut();
+      if(current_dialog) $(current_dialog).fadeIn();
+    });
+    return this;
+  };
+  $.fn.toggleFavorite = function() {
+    this.each(function() {
+      var last = current_favorite;
+      current_favorite = this.hash
+      if(!last) $(current_favorite).show();
+      $(last).fadeOut(400, function() {
+        $(current_favorite).fadeIn(400);
+      });
+    });
+    return this;
+  };
+})(jQuery);
+
+
 // Variable options based on chosen client
 function updateClientOptions() {
 	elem = document.getElementById('client');
