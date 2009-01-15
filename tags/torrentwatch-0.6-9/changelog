@@ -1,0 +1,120 @@
+9 aug 0.8-??
+  * modified add_torrent() to take directory and name of torrent seperatly
+  * fixes a bug where deep directorys chooses the wrong destination directory
+
+7 aug 0.6-??
+  * Fixed up warnings
+  * adjusted tw-iface handling of when to read config file
+  * Added option "Client" to choose bittorrent client(btpd or transmission)
+  * display_options() now shows btwebui or clutch depending on Client setting
+  * Modified setup_default_config() to default us to btpd
+  * modified add_torrent() in torrentwatch.php to call chosen client
+
+6 aug 0.6-8
+  * 0.6-7 also broken, referenced missing file
+  * Removed reference to Eolin.HTTPRequest from rss_dl.php
+
+6 aug 0.6-7
+  * 0.6-6 was broken, saved options Install and HTMLOutput to file breaking
+  rss_dl.php
+  * Changed all references of ['Settings'] to ['Global'] for these two options
+  * modified write_config_file to ignore Global
+  * modified feed_callback to ignore Global
+
+5 aug 2008: 0.6-6
+  * modified add_torrent in torrentwatch.php to use 'Save Torrents' option
+  * modified display_global_settings to display new option
+  * modified parse_options() in tw-iface.php to handle new option
+  * add function setup_default_config() called just before cron installer
+  * modified tw-iface.php to send different css sheet if environment var
+  REMOTE_ADDR=127.0.0.1
+  * Duplicated tw-iface.css to tw-iface.local.css
+  * Adjust torrentwatch-installer.cgi to link tw-iface.local.css
+  * Renamed 'Torrent Dir' to 'Watch Dir' to avoid confusion
+  * Special case in setup_default_config() to move the setting
+
+3 aug 2008: 0.6-5
+  * Completed dltorrent option for tw-iface.php
+    * seperated out get_torrent_link() function from check_for_torrent()
+    * Fixed case where get_torrent_link() would pass an array
+    * Removed handling of said array from fetch_http()
+    * added download link to any torrent labeled "No Match"
+  * Updated torrentwatch.php to unlink torrents after starting them
+  * Finished updating rss_dl_utils.php to use the new torrent dir setting
+
+3 aug 2008: 0.6-4
+  * config file now defined in rss_dl_utils.php rather than individual scripts
+  * Removed some custom network code in favor of only supporting wget
+  * Rewrote torrentwatch.sh in php
+  * Removed install/uninstall calls to torrentwatch.sh from rss_dl.php
+  * Added option 'Deep Directories' to create individual dir's for torrent
+  downloads
+  * Added option 'Verify Episodes'
+    * Addded function check_cache_episode() to compare title and episode to
+    cached torrents using guess_match()
+    * Adjusted guess_match to also return the episode number
+    * Adjusted check_cache to call check_cache_episode() when set
+    * Added torrent status matched = 3 (duplicate)
+  * added mode "setglobals" to tw-iface.php
+    * New form at bottom of main config page lists global options 
+    * Changed display_down_dir() to display_global_settings()
+    * Removed mode 'setdownload'
+  * Adjusted hardcoded torrent download dir to link to new torrent dir config
+  option
+
+24 jul 2008: 0.6-3
+  * Added filename_encode() - Strips inconvenient chars from strings before being
+  used as a filename
+  * Function is called from add_cache(), check_cache(), fetch_torrent(), and
+  feed_callback()
+  * guess_feedtype() no longer requires start tag to be first item on a line
+
+* Previous Changelog entries derived from forum posts and diff's
+22 jul 2008: 0.6-2
+  * adjusted twupload.ftp for binary transfer
+  * torrentwatch-installer.cgi
+    * Removed " from Content-Type line
+    * Test if links exist for tw-iface.cgi/css before creating
+    * Added hyperlink to configuration upon completion
+  * Adjusted windows-installer.au3 to stay with install page since installer
+  now works properly
+
+22 jul 2008: 0.6-1
+  * Removed debug calls previously added to atomparser.php
+  * Fixed caching routine in atomparser.php
+  * Removed add/del images from tw-iface.css
+  * Replaced with <input type=image> tags in tw-iface.php so they are visible
+  in FF and IE
+  * Added windows-installer.au3 -  autoit script which will update the windows
+  hosts file, ftp the install files to the popcorn, and call the install page
+  from the users browser.
+  * Added twupload.ftp - Script for ms ftp to transfer install files
+  * Added windows-installer.exe - Precompiled version of windows-installer.au3
+
+20 jul 2008: 0.6
+  * Adjusted various _debug() statements verbosity levels.
+  * Rearanged options list in rss_dl.php to be alphabetical
+  * Moved caching functions, fetch_torrent(), and update_btcli() to rss_dl_utils.php
+  * Adjusted the way the download directory is displayed on configuration page
+  * Added timer functions for basic profiling
+  * disabled my_urlencode() in favor of urlencode() - profiling showed it to
+    be slow and unneccesary
+  * Added atom support
+    * added atomparser.php from http://www.the-art-of-web.com/php/atom/
+    * copied caching routine from lastRSS into atomparser.php
+    * Adjusted lastRSS to use filemtime when checking for cache timeout
+    * Changed feed_callback() to use guess_feedtype() and call apropriate parser
+    * added guess_feedtype() - looks for either <rss or <xmlns tags
+    * added parse_one_atom() - uses our new atomparser class
+    * Moved most of feed_callback() into parse_one_rss()
+    * Adjusted check_for_torrent() to also check for atom style
+    * added guess_atom_torrent() to pull a torrent url out of the summary
+    * Added array_change_key_case_ext() to normalize atom feeds.  From: 
+      http://us.php.net/manual/en/function.array-change-key-case.php 
+  * Adjusted rss_dl.php to include debug info on html output
+    * Changed white-space handling of <p> tags to pre in tw-iface.css
+    * Added <div> rss_debug as display:none in tw-iface.css
+    * Changed _debug() to keep a log of standard output, and send it with html
+      in a <div> named rss_debug
+    * Lowered verbosity of "Test Matches" page call to rss_dl.php
+ 
