@@ -311,13 +311,13 @@ function display_favorites_info($item, $key) {
 function display_favorites() {
 	global $config_values, $html_out;
 	$html_out .= '<div class="dialog_window" id="favorites">'.
-	             '<div class="favorite"><ul>';
+	             '<div class="favorite"><ul>'.
+	             '<li><a href="#favorite_new">New Favorite</a></li>'."\n";
 	if(isset($config_values['Favorites'])) {
 		foreach($config_values['Favorites'] as $key => $item) {
 			$html_out .= '<li><a href="#favorite_'.$key.'">'.$item['Name'].'</a></li>'."\n";
 		}
 	}
-	$html_out .= '<li><a hef="#favorite_new">New Favorite</a></li>'."\n";
 	$html_out .= '</ul></div>';
 	if(isset($config_values['Favorites']))
 		array_walk($config_values['Favorites'], 'display_favorites_info');
@@ -501,6 +501,7 @@ if($_SERVER["REMOTE_ADDR"] == '127.0.0.1') {
 	echo ('<link rel="Stylesheet" type="text/css" href="css/torrentwatch.css?'.time().'"></link>'.
 	 '<script type="text/javascript" src="javascript/webappers.com.progress.js?'.time().'"></script>'.
          '<script type="text/javascript" src="javascript/jquery.min.js"></script>'.
+         '<script type="text/javascript" src="javascript/jquery.tinysort.min.js"></script>'.
          '<script type="text/javascript" src="javascript/torrentwatch.js?'.time().'"></script>');
 }
 	

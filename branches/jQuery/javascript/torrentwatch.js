@@ -11,6 +11,7 @@ $(function() {
 
   // Favorites
   $(".favorite ul li:first a").toggleFavorite();
+  $(".favorite ul li:not(:first)").tsort("a");
   $(".favorite ul li a").click(function() {
     $(this).toggleFavorite();
   });
