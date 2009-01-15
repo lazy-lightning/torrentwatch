@@ -598,7 +598,13 @@ div.favinfo input[type=submit] {
 	}
 
 /* History Dialog */
-div.dialog_window#history {
+div#history {
+	bottom: 10px;
+	}
+
+div#historyItems {
+	overflow: auto;
+	height: 90%
 	}
 
 /*--------------------------

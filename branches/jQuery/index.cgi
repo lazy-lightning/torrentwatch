@@ -209,9 +209,9 @@ function display_global_config() {
 	 '      </select>'.
 	 '    </div>'.
 	 _jscript("saveConfig()", 'Save').
-	 _jscript("toggleMenu('configuration')", 'Close').
-	 _jscript("toggleMenu('feeds')", 'Feeds').
-         _jscript("toggleMenu('welcome1')", "Wizard").
+	 "   <a href='#configuration'>Close</a>".
+	 "   <a href='#feeds'>Feeds</a>".
+         "   <a href='#welcome1'>Wizard</a>".
 	 '  </form>'.
 	 '</div>'."\n";
 
@@ -239,8 +239,8 @@ function display_global_config() {
 	 '      <input type="submit" class="add" name="button" value="Add">'.
 	 '      <label class="item">New Feed:</label>'.
 	 '      <input type="text" name="link">'.
-	 _jscript("toggleMenu('feeds')", "Close").
-	 _jscript("toggleMenu('configuration')", "Back").
+	 '      <a href="#feeds">Close</a>'.
+	 '      <a href="#configuration">Back</a>'.
 	 '    </form>'.
 	 '  </div>'.
 	 '</div>'."\n";
@@ -298,7 +298,7 @@ function display_favorites_info($item, $key) {
 	 '    </div>'.
 	 '    <input type="submit" class="add" name="button" value="Update">'.
 	 '    <input type="submit" class="del" name="button" value="Delete">'.
-	 _jscript("toggleMenu('favorites')", "Close").
+	 '    <a href="#favorites">Close</a>'.
 	 '  </form>'.
 	 '</div>'."\n";
 	// Display the fav that was just updated
@@ -314,10 +314,10 @@ function display_favorites() {
 	             '<div class="favorite"><ul>';
 	if(isset($config_values['Favorites'])) {
 		foreach($config_values['Favorites'] as $key => $item) {
-			$html_out .= '<li>'._jscript("toggleFav('favorite_".$key."')", $item['Name']).'</li>'."\n";
+			$html_out .= '<li><a href="#favorite_'.$key.'">'.$item['Name'].'</a></li>'."\n";
 		}
 	}
-	$html_out .= '<li>'._jscript("toggleFav('favorite_new')", "New Favorite").'</li>'."\n";
+	$html_out .= '<li><a hef="#favorite_new">New Favorite</a></li>'."\n";
 	$html_out .= '</ul></div>';
 	if(isset($config_values['Favorites']))
 		array_walk($config_values['Favorites'], 'display_favorites_info');
@@ -340,13 +340,13 @@ function display_topmenu() {
 	 '  <ul>'.
 	 '    <li id="refresh"><a href="'.$_SERVER['PHP_SELF'].'">Refresh</a></li>'.
 	 '    <li class="divider">&nbsp;</li>'.
-	 '    <li id="favoritesMenu">'._jscript("toggleMenu('favorites')", "Favorites").'</li>'.
-	 '    <li id="config">'._jscript("toggleMenu('configuration')", "Configure").'</li>'.
+	 '    <li id="favoritesMenu"><a href="#favorites">Favorites</a></li>'.
+	 '    <li id="config"><a href="#configuration">Configure</a></li>'.
 	 '    <li class="divider">&nbsp;</li>'.
-	 '    <li id="view">'._jscript("toggleMenu('history')", "View History").'</li>'.
+	 '    <li id="view"><a href="#history">View History</a></li>'.
 	 '    <li id="divider">&nbsp;</li>'.
-	 '    <li id="empty">'._jscript("toggleMenu('clear_cache')", 'Empty Cache').'</li>'.
-	 '    <li id="inspector">'._jscript("toggleInspector()", 'Inspector').'</li>';
+	 '    <li id="empty"><a href="#clear_cache">Empty Cache</a></li>'.
+	 '    <li id="inspector"><a href="#inspector_container">Inspector</a></li>';
 	if($_SERVER['REMOTE_ADDR'] == "127.0.0.1")
 		$host = '127.0.0.1';
 	else if(!empty($_SERVER['SERVER_NAME']))
@@ -378,7 +378,7 @@ function display_topmenu() {
 function display_history() {
 	global $html_out, $config_values;
 
-	$html_out .= '<div class="dialog_window" id="history"><ul>'."\n";
+	$html_out .= '<div class="dialog_window" id="history"><div id="historyItems"><ul>'."\n";
 	if(file_exists($config_values['Settings']['History'])) {
 		$history = unserialize(file_get_contents($config_values['Settings']['History']));
 
@@ -387,9 +387,9 @@ function display_history() {
 			// History is written to file in reverse order
 			$html_tmp = '<li>'.$item['Date'].' - '.$item['Title'].'</li>'.$html_tmp;
 		}
-		$html_out .= $html_tmp.'</ul>';;
 	}
-	$html_out .= _jscript("toggleMenu('history')", "Close").
+	$html_out .= $html_tmp.'</ul></div>';;
+	$html_out .= "<a href='#history'>Close</a>".
 	             _jscript("updateFrameLoad('".$_SERVER['PHP_SELF']."?mode=clearhistory', 'Clearing History');", "Clear").
 	             "</div>";
 }
@@ -399,7 +399,7 @@ function display_clear_cache() {
 	$html_out .= 
    '<div class="dialog_window" id="clear_cache">'."\n".
 	 '  <h2 class="dialog heading">Which Cache</h2>'.
-	 _jscript("toggleMenu('clear_cache')", 'Close').
+	 '  <a href="#clear_cache">Close</a>'.
 	 '  <a href="'.$_SERVER['PHP_SELF'].'?mode=clear_cache&type=feeds">Feeds</a>'.
 	 '  <a href="'.$_SERVER['PHP_SELF'].'?mode=clear_cache&type=torrents">Torrents</a>'.
 	 '  <a href="'.$_SERVER['PHP_SELF'].'?mode=clear_cache&type=all">All</a>'.
@@ -499,12 +499,9 @@ if($_SERVER["REMOTE_ADDR"] == '127.0.0.1') {
 	 '<script type="text/javascript" src="javascript/torrentwatch.local.js"></script>');
 } else {
 	echo ('<link rel="Stylesheet" type="text/css" href="css/torrentwatch.css?'.time().'"></link>'.
-	 '<script type="text/javascript" src="javascript/torrentwatch.js"></script>'.
-	 '<script type="text/javascript" src="javascript/webtoolkit.contextmenu.js?'.time().'"></script>'.
-	 '<script type="text/javascript">'.
-	 'SimpleContextMenu.setup({"preventDefault":false, "preventForms":false});'.
-	 'SimpleContextMenu.attach("torrent", "CM1");</script>'.
-	 '<script type="text/javascript" src="javascript/webappers.com.progress.js?'.time().'"></script>');
+	 '<script type="text/javascript" src="javascript/webappers.com.progress.js?'.time().'"></script>'.
+         '<script type="text/javascript" src="javascript/jquery.min.js"></script>'.
+         '<script type="text/javascript" src="javascript/torrentwatch.js?'.time().'"></script>');
 }
 	
 echo ("</head>\n<body onload='updateClientOptions();'>\n");
