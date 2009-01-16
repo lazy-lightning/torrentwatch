@@ -49,7 +49,8 @@ $(function() {
         location.replace($(t).find("a.context_link:last").get(0).href);
       },
       'inspect': function(t) {
-        alert('Trigger was '+t.id+'\nAction was Inspect');
+        if(inspect_status == false) toggleInspector();
+        $("div#inspector_container").load('inspector.cgi?title='+$(t).find("div.torrent_name").text());
       }
     }
   });
@@ -67,17 +68,17 @@ $(function() {
   });
 
   // Inspector
-  var inspect_status = '-';
-  $("li#inspector a").click(function() {
+  var inspect_status = false;
+  var toggleInspector = function() {
     $("div#torrentlist_container").animate(
-      { width:inspect_status+"=350" },
+      { width:(inspect_status?'+':'-')+"=350" },
       { queue:false , duration:600 }
     );
-    $("div#filterbar_container").animate( { width:inspect_status+"=350" }, 600);
+    $("div#filterbar_container").animate( { width:(inspect_status?'+':'-')+"=350" }, 600);
     $("div#inspector_container").animate( { width:"toggle" }, 600);
-    inspect_status = (inspect_status == '+' ? '-' : '+');
-  });
-
+    inspect_status = !inspect_status;
+  };
+  $("li#inspector a").click(toggleInspector);
 });
 
 (function($) {
