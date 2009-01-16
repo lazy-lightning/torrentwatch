@@ -41,7 +41,7 @@ function parse_options() {
 			write_config_file();
 			// This is always called in a hidden frame, so display new config and exit
 			display_global_config();
-			$html_out .= '<script type="text/javascript">updateClientOptions();updateFrameCopyDiv("configuration");updateFrameFinished();</script>';
+			$html_out .= '<script type="text/javascript">updateFrameCopyDiv("configuration");updateFrameFinished();</script>';
 			close_html();
 			exit(0);
 			break;
@@ -162,7 +162,7 @@ function display_global_config() {
 	 '    <div id="config_torrentclient">'.
 	 '      <label class="category">Client Settings</label>'.
 	 '      <label class="item" title="Which torrent client to use">Client:</label>'.
-	 '      <select name="client" id="client" onchange="updateClientOptions();">'.
+	 '      <select name="client" id="client">'.
 	 '        <option value="btpd" '.$btpd.'>BTPD</option>'.
 	 '        <option value="transmission1.22" '.$trans122.'>Transmission 1.22</option>'.
 	 '        <option value="transmission1.3x" '.$trans13x.'>Transmission &gt;= 1.30</option>'.
@@ -506,7 +506,7 @@ if($_SERVER["REMOTE_ADDR"] == '127.0.0.1') {
          '<script type="text/javascript" src="javascript/torrentwatch.js?'.time().'"></script>');
 }
 	
-echo ("</head>\n<body onload='updateClientOptions();'>\n");
+echo ("</head>\n<body>\n");
 ob_flush();flush();
 
 setup_default_config();

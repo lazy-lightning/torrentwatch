@@ -78,12 +78,13 @@ $(function() {
   };
   $("li#inspector a").click(toggleInspector);
   // Switching visible items for different clients
-  var updateClientOptions = function() {
+  $("select#client").change(function() {
     $("div.favorite_seedratio").css("display","none");
     switch($("select#client")) {
       case 'transmission1.3x':
         $("#config_downloaddir,#config_watchdir,#config_savetorrent,#config_deepdir,#config_verifyepisodes,div.favorite_seedratio,div.favorite_savein").css("display","block");
-        $("div.favinfo,div.favorite").css("height",230);break;
+        $("div.favinfo,div.favorite").css("height",230);
+      break;
       case 'transmission1.22':
         $("#config_downloaddir,#config_deepdir,div.favorite_savein").css("display","none");
         $("#config_watchdir,#config_savetorrent,#config_verifyepisodes").css("display","block");
@@ -91,23 +92,21 @@ $(function() {
       break;
       case 'btpd':
         $("#config_downloaddir,#config_watchdir,#config_savetorrent,#config_deepdir,#config_verifyepisodes,div.favorite_savein").css("display","block");
-        $("div.favorite,div.favinfo").css("height","205");
+        $("div.favorite,div.favinfo").css("height",205);
       break;
       case 'nzbget':
         $("#config_watchdir,#config_verifyepisodes").css("display","block");
         $("#config_downloaddir,#config_savetorrent,#config_deepdir,div.favorite_savein").css("display","none");
-        $("div.favorite,div.favinfo").css("height","180");
+        $("div.favorite,div.favinfo").css("height",180);
       break;
       case 'sabnzbd':
         $("#config_downloaddir,#config_watchdir,#config_savetorrent,#config_deepdir,div.favorite_savein").css("display","none");
         $("#config_verifyepisodes").css("display","block");
-        $("div.favorite,div.favinfo").css("height","180");
+        $("div.favorite,div.favinfo").css("height",180);
       break;
     }
-  }
-  $("select#client").blur(updateClientOptions);
-  updateClientOptions();
-
+  });
+  $("select#client").change();
 });
 
 (function($) {
