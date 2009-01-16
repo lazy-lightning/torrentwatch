@@ -1,8 +1,30 @@
 $(function() {
-//  alert("jQuery loaded");
-  // MenuBar
+  // Menu Bar
   $("li#favoritesMenu a,li#config a,li#view a,li#empty a").click(function() {
     $(this).toggleDialog();
+  });
+  // Filter Bar
+  $("ul#filterbar li a").click(function() {
+    switch(this.hash) {
+    case '#filter_all':
+      $("li.torrent").removeClass('alt').show().filter(":even").addClass('alt');break;
+    case '#filter_matching':
+      $("li.torrent").removeClass('alt').show().filter("li.match_nomatch").hide().end().
+        filter(":not(li.match_nomatch)").filter(":even").addClass('alt');
+      break;
+    case '#filter_downloaded':
+      $("li.torrent").removeClass('alt').hide().filter("li.match_cachehit").show().filter(":even").addClass('alt');break;
+    }
+  });
+  $("input#filter_text_input").keyup(function() {
+    var filter = $(this).val().toLowerCase();
+    $("div.feed ul.torrentlist li.torrent").removeClass('alt').each(function() {
+      if($(this).find("div.torrent_name").text().toLowerCase().match(filter)) {
+        $(this).show();
+      } else {
+        $(this).hide();
+      }
+    }).filter(":visible:even").addClass('alt');
   });
   // Dialog Buttons
   $("div#history a,div.welcome a,div.favinfo form a,form#config_form a,form.feedform a,div#clear_cache a:first").not("a#save").click(function() {
@@ -172,34 +194,6 @@ function contextInspect()
 	showInspector(SimpleContextMenu._attachedElement.childNodes[2].textContent);
 }
 
-var $inspector_status = 0;
-
-function showInspector($title)
-{
-	$inspector_status = 1;
-	showLayer('inspector_container');
-	changecss('div#torrentlist_container', "right", "351");
-	changecss('div#filterbar_container', "right", "351");
-	if($title != '')
-		updateFrameLoad('/torrentwatch/inspector.cgi?title='+$title, 'Loading Inspector');
-}
-
-function hideInspector()
-{
-	$inspector_status = 0;
-	hideLayer('inspector_container');
-	changecss('div#torrentlist_container', "right", "0");
-	changecss('div#filterbar_container', "right", "0");
-}
-
-function toggleInspector()
-{
-	if($inspector_status)
-		hideInspector();
-	else
-		showInspector('');
-}
-
 function submitForm ( whichForm )
 {
 	document.getElementById(whichForm).submit();
@@ -238,113 +232,6 @@ function getClassBySelector( whichClass ) {
 function changeFilter( filterType , data) {
 	changecss('UL.torrentlist LI.match_'+filterType, 'display', data); // IE
 	changecss('ul.torrentlist li.torrent.match_'+filterType, 'display', data); // FF
-}
-
-function markTorrentAlt()
-{
-	var alt = 0;
-	var elem = document.getElementById('torrentlist_container');
-	var textFilterActive = (document.getElementById('filter_text_input').value != '');
-	for( var F in elem.childNodes ) {
-		if ( elem.childNodes[F].className == 'feed' ) {
-			for ( var T in elem.childNodes[F].firstChild.childNodes ) {
-				var torrent = elem.childNodes[F].firstChild.childNodes[T];
-				if(torrent.className && torrent.className.substring(0,7) == 'torrent') {
-					var match_class = torrent.className.split(" ")[1];
-
-					var class_item = getClassBySelector('ul.torrentlist li.torrent.'+match_class);
-					if(!class_item)
-						class_item = getClassBySelector('UL.torrentlist LI.'+match_class);
-					if(!class_item)
-						return;
-
-					if(textFilterActive) {
-						if(torrent.style.display == "block") {
-							if(alt) {
-								torrent.className = "torrent "+match_class;
-								alt = 0;
-							} else {
-								torrent.className = "torrent "+match_class+" alt";
-								alt = 1;
-							}
-						}
-					} else {
-						if(class_item.style.display == "block") {
-							if(alt) {
-								torrent.className = "torrent "+match_class;
-								alt = 0;
-							} else {
-								torrent.className = "torrent "+match_class+" alt";
-								alt = 1;
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
-function filterFeeds( filterType )
-{
-	var elem;
-	elem = document.getElementById('filter_'+filterType);
-	for ( var i in elem.parentNode.childNodes )
-	{
-		elem.parentNode.childNodes[i].className = ''
-	}
-	elem.className = 'selected';
-
-	switch(filterType) {
-		case 'all':
-			changeFilter('nomatch', 'block');
-			changeFilter('match', 'block');
-			changeFilter('cachehit', 'block');
-			changeFilter('duplicate', 'block');
-			changeFilter('old', 'block');
-			changeFilter('test', 'block');
-			break;
-		case 'matching':
-			changeFilter('nomatch', 'none');
-			changeFilter('match', 'block');
-			changeFilter('cachehit', 'block');
-			changeFilter('duplicate', 'block');
-			changeFilter('old', 'block');
-			changeFilter('test', 'block');
-			break;
-		case 'downloaded':
-			changeFilter('nomatch', 'none');
-			changeFilter('match', 'none');
-			changeFilter('cachehit', 'block');
-			changeFilter('duplicate', 'none');
-			changeFilter('old', 'none');
-			changeFilter('test', 'none');
-			break;
-	}
-	markTorrentAlt();
-}
-
-function filterFeedsByName() {
-	var filter_name = document.getElementById('filter_text_input').value;
-	var alt = 0;
-	var elem = document.getElementById('torrentlist_container');
-	for( var F in elem.childNodes ) {
-		if ( elem.childNodes[F].className == 'feed' ) {
-			for ( var T in elem.childNodes[F].firstChild.childNodes ) {
-				var torrent = elem.childNodes[F].firstChild.childNodes[T];
-				if(torrent.className && torrent.className.substring(0,7) == 'torrent') {
-					var torrent_name = torrent.childNodes[2].textContent;
-					if(filter_name == '')
-						torrent.style.display = '';
-					else if(torrent_name.toLowerCase().match(filter_name.toLowerCase()))
-						torrent.style.display = 'block';
-					else
-						torrent.style.display = 'none';
-				}
-			}
-		}
-	}
-	markTorrentAlt();
 }
 
 // Inspiration from http://www.netlobo.com/div_hiding.html

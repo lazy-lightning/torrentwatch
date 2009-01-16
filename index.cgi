@@ -411,11 +411,11 @@ function display_filter_bar() {
 	$html_out .= 
 	 '<div id="filterbar_container">'.
 	 '  <ul id="filterbar">'.
-	 '    <li id="filter_all">'._jscript("filterFeeds('all')", "All").'</li>'.
-	 '    <li id="filter_matching">'._jscript("filterFeeds('matching')", "Matching").'</li>'.
-	 '    <li id="filter_downloaded">'._jscript("filterFeeds('downloaded')", "Downloaded").'</li>'.
+	 '    <li id="filter_all"><a href="#filter_all">All</a></li>'.
+	 '    <li id="filter_matching"><a href="#filter_matching">Matching</a></li>'.
+	 '    <li id="filter_downloaded"><a href="#filter_downloaded">Downloaded</a></li>'.
 	 '  </ul>'.
-	 '  <input type="text" id="filter_text_input" onblur="filterFeedsByName();">'.
+	 '  <input type="text" id="filter_text_input">'.
 	 '</div>';
 }
 
