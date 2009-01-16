@@ -422,9 +422,9 @@ function display_filter_bar() {
 function display_context_menu() {
 	global $html_out;
 	$html_out .= '<div class="context_menu" id="CM1"><ul>'.
-	 '<li>'._jscript('contextAddToFav()', 'Add to Favorites').'</li>'.
-	 '<li>'._jscript('contextDLNow()', 'Start Downloading').'</li>'.
-	 '<li>'._jscript('contextInspect()', 'Inspect').'</li>'.
+	 '<li id="addToFavorites">Add to Favorites</li>'.
+	 '<li id="startDownloading">Start Downloading</li>'.
+	 '<li id="inspect">Inspect</li>'.
 	 '</ul></div>'."\n";
 }
 	
@@ -502,6 +502,7 @@ if($_SERVER["REMOTE_ADDR"] == '127.0.0.1') {
 	 '<script type="text/javascript" src="javascript/webappers.com.progress.js?'.time().'"></script>'.
          '<script type="text/javascript" src="javascript/jquery.min.js"></script>'.
          '<script type="text/javascript" src="javascript/jquery.tinysort.min.js"></script>'.
+         '<script type="text/javascript" src="javascript/jquery.contextmenu.r2.js"></script>'.
          '<script type="text/javascript" src="javascript/torrentwatch.js?'.time().'"></script>');
 }
 	
