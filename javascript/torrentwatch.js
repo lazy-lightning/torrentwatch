@@ -1,8 +1,6 @@
 $(function() {
   // Menu Bar
-  $("li#favoritesMenu a,li#config a,li#view a,li#empty a").click(function() {
-    $(this).toggleDialog();
-  });
+  $("li#favoritesMenu a,li#config a,li#view a,li#empty a").click(function() {$(this).toggleDialog();});
   // Filter Bar
   $("ul#filterbar li a").click(function() {
     var filter = this.hash;
@@ -79,6 +77,37 @@ $(function() {
     inspect_status = !inspect_status;
   };
   $("li#inspector a").click(toggleInspector);
+  // Switching visible items for different clients
+  var updateClientOptions = function() {
+    $("div.favorite_seedratio").css("display","none");
+    switch($("select#client")) {
+      case 'transmission1.3x':
+        $("#config_downloaddir,#config_watchdir,#config_savetorrent,#config_deepdir,#config_verifyepisodes,div.favorite_seedratio,div.favorite_savein").css("display","block");
+        $("div.favinfo,div.favorite").css("height",230);break;
+      case 'transmission1.22':
+        $("#config_downloaddir,#config_deepdir,div.favorite_savein").css("display","none");
+        $("#config_watchdir,#config_savetorrent,#config_verifyepisodes").css("display","block");
+        $("div.favinfo,div.favorite").css("height",180);
+      break;
+      case 'btpd':
+        $("#config_downloaddir,#config_watchdir,#config_savetorrent,#config_deepdir,#config_verifyepisodes,div.favorite_savein").css("display","block");
+        $("div.favorite,div.favinfo").css("height","205");
+      break;
+      case 'nzbget':
+        $("#config_watchdir,#config_verifyepisodes").css("display","block");
+        $("#config_downloaddir,#config_savetorrent,#config_deepdir,div.favorite_savein").css("display","none");
+        $("div.favorite,div.favinfo").css("height","180");
+      break;
+      case 'sabnzbd':
+        $("#config_downloaddir,#config_watchdir,#config_savetorrent,#config_deepdir,div.favorite_savein").css("display","none");
+        $("#config_verifyepisodes").css("display","block");
+        $("div.favorite,div.favinfo").css("height","180");
+      break;
+    }
+  }
+  $("select#client").blur(updateClientOptions);
+  updateClientOptions();
+
 });
 
 (function($) {
@@ -105,69 +134,6 @@ $(function() {
   };
 })(jQuery);
 
-
-// Variable options based on chosen client
-function updateClientOptions() {
-	elem = document.getElementById('client');
-	if(!elem && document.parent)
-		elem = document.parent.getElementById('client');
-	if(!elem)
-		return;
-	changecss('div.favorite_seedratio', 'display', 'none');
-	switch(elem.value) {
-		case 'transmission1.3x':
-			showLayer('config_downloaddir');
-			showLayer('config_watchdir');
-			showLayer('config_savetorrent');
-			showLayer('config_deepdir');
-			showLayer('config_verifyepisodes');
-			changecss('div.favorite_seedratio', 'display', 'block');
-			changecss('div.favorite_savein', 'display', 'block');
-			changecss('div.favorite', 'height', '230');
-			changecss('div.favinfo', 'height', '230');
-			break;
-		case 'transmission1.22':
-			hideLayer('config_downloaddir');
-			showLayer('config_watchdir');
-			showLayer('config_savetorrent');
-			hideLayer('config_deepdir');
-			showLayer('config_verifyepisodes');
-			changecss('div.favorite_savein', 'display', 'none');
-			changecss('div.favorite', 'height', '180');
-			changecss('div.favinfo', 'height', '180');
-			break;
-		case 'btpd':
-			showLayer('config_downloaddir');
-			showLayer('config_watchdir');
-			showLayer('config_savetorrent');
-			showLayer('config_deepdir');
-			showLayer('config_verifyepisodes');
-			changecss('div.favorite_savein', 'display', 'block');
-			changecss('div.favorite', 'height', '205');
-			changecss('div.favinfo', 'height', '205');
-			break;
-		case 'nzbget':
-			hideLayer('config_downloaddir');
-			showLayer('config_watchdir');
-			hideLayer('config_savetorrent');
-			hideLayer('config_deepdir');
-			showLayer('config_verifyepisodes');
-			changecss('div.favorite_savein', 'display', 'none');
-			changecss('div.favorite', 'height', '180');
-			changecss('div.favinfo', 'height', '180');
-			break;
-		case 'sabnzbd':
-			hideLayer('config_downloaddir');
-			hideLayer('config_watchdir');
-			hideLayer('config_savetorrent');
-			hideLayer('config_deepdir');
-			showLayer('config_verifyepisodes');
-			changecss('div.favorite_savein', 'display', 'none');
-			changecss('div.favorite', 'height', '180');
-			changecss('div.favinfo', 'height', '180');
-			break;
-	}
-}
 
 // Buttons
 
@@ -207,57 +173,4 @@ function updateFrameFinished() {
 function submitForm ( whichForm )
 {
 	document.getElementById(whichForm).submit();
-}
-
-// Function by Shawn Olsen
-function changecss(theClass,element,value) {
-	//Last Updated on May 21, 2008
-	//documentation for this script at
-	//http://www.shawnolson.net/a/503/altering-css-class-attributes-with-javascript.html
-	//
-	//Logic moved to getClassBySelector by Erik Bernhardson
-	var myClass = getClassBySelector(theClass);
-	if(myClass)
-		myClass.style[element] = value;
-}
-
-
-// Logic origionally in changecss by Shawn Olsen
-function getClassBySelector( whichClass ) {
-	var cssRules;
-	if (document.all) {
-		cssRules = 'rules';
-	} else if (document.getElementById) {
-		cssRules = 'cssRules';
-	}
-	for (var S = 0; S < document.styleSheets.length; S++) {
-		for (var R = 0; R < document.styleSheets[S][cssRules].length; R++) {
-			if(document.styleSheets[S][cssRules][R].selectorText == whichClass) {
-				return document.styleSheets[S][cssRules][R];
-			}
-		}
-	}
-}
-
-function hideLayer( whichLayer ) {
-	var elem, vis;
-	if( document.getElementById ) // this is the way the standards work
-		elem = document.getElementById( whichLayer );
-	else if( document.all ) // this is the way old msie versions work
-			elem = document.all[whichLayer];
-	else if( document.layers ) // this is the way nn4 works
-		elem = document.layers[whichLayer];
-	if(elem)
-		elem.style.display = 'none';
-}
-function showLayer( whichLayer ) {
-	var elem, vis;
-	if( document.getElementById ) // this is the way the standards work
-		elem = document.getElementById( whichLayer );
-	else if( document.all ) // this is the way old msie versions work
-			elem = document.all[whichLayer];
-	else if( document.layers ) // this is the way nn4 works
-		elem = document.layers[whichLayer];
-	if(elem)
-		elem.style.display = 'block';
 }
