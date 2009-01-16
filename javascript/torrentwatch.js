@@ -26,6 +26,29 @@ $(function() {
       }
     }).filter(":visible:even").addClass('alt');
   });
+  // Context Menu
+  $("li.torrent").contextMenu("CM1", {
+    menuStyle: {
+      textAlign: "left",
+      width: "160px"
+    },
+    itemStyle: {
+      fontSize: "1.3em",
+      paddingLeft: "15px"
+    },
+    bindings: {
+      'addToFavorites': function(t) {
+        location.replace($(t).find("a.context_link:first").get(0).href);
+      },
+      'startDownloading': function(t) {
+        location.replace($(t).find("a.context_link:last").get(0).href);
+      },
+      'inspect': function(t) {
+        alert('Trigger was '+t.id+'\nAction was Inspect');
+      }
+    }
+  });
+
   // Dialog Buttons
   $("div#history a,div.welcome a,div.favinfo form a,form#config_form a,form.feedform a,div#clear_cache a:first").not("a#save").click(function() {
     $(this).toggleDialog();
@@ -175,25 +198,6 @@ function updateFrameFinished() {
 	parent.hideLayer('progressDiv');
 }
 
-// Context Menu links 
-function contextAddToFav()
-{
-	location.assign(SimpleContextMenu._attachedElement.childNodes[0].href);
-}
-
-function contextDLNow()
-{
-	setProgress('progressBar', 20);
-	setText('progressBar', 'Starting Torrent');
-	showLayer('progressDiv');	
-	document.getElementById('update_frame').src = SimpleContextMenu._attachedElement.childNodes[1].href;
-}
-
-function contextInspect()
-{
-	showInspector(SimpleContextMenu._attachedElement.childNodes[2].textContent);
-}
-
 function submitForm ( whichForm )
 {
 	document.getElementById(whichForm).submit();
@@ -227,51 +231,6 @@ function getClassBySelector( whichClass ) {
 			}
 		}
 	}
-}
-
-function changeFilter( filterType , data) {
-	changecss('UL.torrentlist LI.match_'+filterType, 'display', data); // IE
-	changecss('ul.torrentlist li.torrent.match_'+filterType, 'display', data); // FF
-}
-
-// Inspiration from http://www.netlobo.com/div_hiding.html
-
-var last_fav;
-function toggleFav( whichLayer )
-{
-	if(last_fav)
-		hideLayer(last_fav)
-	showLayer(whichLayer);
-	last_fav = whichLayer;
-	updateClientOptions();
-}
-
-var last_menu;
-function toggleMenu( whichLayer )
-{
-	if(last_menu && last_menu != whichLayer) {
-		hideLayer(last_menu);
-	}
-	toggleLayer(whichLayer);
-	last_menu = whichLayer;
-}
-
-function toggleLayer( whichLayer )
-{
-	var elem, vis;
-	if( document.getElementById ) // this is the way the standards work
-		elem = document.getElementById( whichLayer );
-	else if( document.all ) // this is the way old msie versions work
-			elem = document.all[whichLayer];
-	else if( document.layers ) // this is the way nn4 works
-		elem = document.layers[whichLayer];
-	vis = elem.style;
-	// if the style.display value is blank we try to figure it out here
-	if(vis.display==''&&elem.offsetWidth!=undefined&&elem.offsetHeight!=undefined)
-		vis.display = (elem.offsetWidth!=0&&elem.offsetHeight!=0)?'block':'none';
-	vis.display = (vis.display==''||vis.display=='block')?'none':'block';
-	if(whichLayer=='favorites') // Also display the first fav 
-		toggleFav(elem.childNodes[1].id);
 }
 
 function hideLayer( whichLayer ) {
