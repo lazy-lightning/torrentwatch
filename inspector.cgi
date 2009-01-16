@@ -4,27 +4,14 @@ ini_set('include_path', '.:./php');
 require_once('TVDB.php');
 require_once('guess.php');
 
-echo "
-<html>
-  <head>
-    <title>TV Show Inspector</title>
-    <script type='text/javascript' src='javascript/torrentwatch.js'></script>
-  </head>";
-
 function _die($errmsg) {
-	echo "
-  <body>
-    <div id='inspector_container'>
-      <div class='tvshow'>
-        <h2 id='tvshow_title' class='inspector_heading'>$errmsg</h2>
-      </div>
-    </div>
-    <script type='text/javascript'>
-      updateFrameCopyDiv('inspector_container');
-      updateFrameFinished();
-    </script>
-  </body>";
-	die();
+?>
+<div id='inspector_container'>
+  <div class='tvshow'>
+    <h2 id='tvshow_title' class='inspector_heading'><?php echo $errmsg; ?></h2>
+  </div>
+</div>
+<?php die();
 }
 
 if(!isset($_GET['title']))
@@ -48,47 +35,53 @@ if(preg_match('/(\d+)x(\d+)/i',$guess['episode'], $regs)) {
 	$episode = $regs['1']."x".$regs['2'];
 }
 
-echo "
-  <body>
-    <div id='inspector_container'>
-      <div class='tvshow'>
-        <h2 id='tvshow_title' class='inspector_heading'>".$tvShow->seriesName." - ".$tvShow->network."</h2>
-        <ul id='tvshow_series'>";
-if(!empty($tvShow->daysOfWeek)) echo "
-          <li class='item' id='tvshow_airday'>".$tvShow->daysOfWeek." ".$tvShow->airTime."</li>";
-else if (!empty($tvShow->dayOfWeek)) echo "
-          <li class='item' id='tvshow_airday'>".$tvShow->dayOfWeek." ".$tvShow->airTime."</li>";
-if(!empty($tvShow->rating)) echo "
-          <li class='item' id='tvshow_rating'>".$tvShow->rating." out of 10 stars</li>";
-if(!empty($tvShow->genres)) echo "
-          <li class='item' id='tvshow_genres'>".implode($tvShow->genres, " / ")."</li>";
-if(!empty($tvShow->overview)) echo "
-          <li class='item' id='tvshow_overview'>".$tvShow->overview."</li>";
-echo "
-        </ul>
-      </div>";
-if(!empty($tvEpisode)) {
-	echo "
-      <div class='tvepisode'>
-        <h2 id='tvepisode_title' class='inspector_heading'>".$tvEpisode->name."</h2>
-        <ul id='tvepisode'>";
-	if(!empty($episode)) echo "          <li id='tvepisode_number'>$episode</li>";
-	if(!empty($tvEpisode->overview)) echo "          <li id='tvepisode_overview'>".$tvEpisode->overview."</li>";
-	echo "
-        </ul>
-      </div>";
-}
-
-echo "
-      <div id='inspector_credits'>
-        Results provided by <a href='http://www.thetvdb.com'>The TVDB</a>
-      </div>
-    </div>
-    <script type='text/javascript'>
-      updateFrameCopyDiv('inspector_container');
-      updateFrameFinished();
-    </script>
-  </body>
-</html>";
-
 ?>
+<div class='tvshow'>
+  <h2 id='tvshow_title' class='inspector_heading'>
+    <?php echo $tvShow->seriesName; ?> - <?php echo $tvShow->network; ?>
+  </h2>
+  <ul id='tvshow_series'>
+    <?php if(!empty($tvShow->daysOfWeek)): ?>
+      <li class='item' id='tvshow_airday'>
+        <?php echo $tvShow->daysOfWeek." ".$tvShow->airTime; ?>
+      </li>
+    <?php elseif (!empty($tvShow->dayOfWeek)): ?>
+      <li class='item' id='tvshow_airday'>
+        <?php echo $tvShow->dayOfWeek." ".$tvShow->airTime; ?>
+      </li>
+    <?php endif; ?>
+    <?php if(!empty($tvShow->rating)): ?>
+      <li class='item' id='tvshow_rating'>
+        <?php echo $tvShow->rating ?> out of 10 stars
+      </li>
+    <?php endif; ?>
+    <?php if(!empty($tvShow->genres)): ?>
+      <li class='item' id='tvshow_genres'>
+        <?php echo implode($tvShow->genres, " / "); ?>
+      </li>
+    <?php endif; ?>
+    <?php if(!empty($tvShow->overview)): ?>
+      <li class='item' id='tvshow_overview'>
+        <?php echo $tvShow->overview; ?>
+      </li>
+    <?php endif; ?>
+  </ul>
+</div>
+<?php if(!empty($tvEpisode)): ?>
+  <div class='tvepisode'>
+    <h2 id='tvepisode_title' class='inspector_heading'>
+      <?php echo $tvEpisode->name; ?>
+    </h2>
+    <ul id='tvepisode'>
+      <?php if(empty($episode)): ?>
+        <li id='tvepisode_number'><?php echo $episode; ?></li>
+      <?php endif; ?>
+      <?php if(empty($tvEpisode->overview)): ?>
+        <li id='tvepisode_overview'><?php echo $tvEpisode->overview; ?></li>
+      <?php endif; ?>
+    </ul>
+  </div>
+<?php endif; ?>
+<div id='inspector_credits'>
+  Results provided by <a href='http://www.thetvdb.com'>The TVDB</a>
+</div>
