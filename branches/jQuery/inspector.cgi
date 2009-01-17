@@ -73,10 +73,10 @@ if(preg_match('/(\d+)x(\d+)/i',$guess['episode'], $regs)) {
       <?php echo $tvEpisode->name; ?>
     </h2>
     <ul id='tvepisode'>
-      <?php if(empty($episode)): ?>
+      <?php if(!empty($episode)): ?>
         <li id='tvepisode_number'><?php echo $episode; ?></li>
       <?php endif; ?>
-      <?php if(empty($tvEpisode->overview)): ?>
+      <?php if(!empty($tvEpisode->overview)): ?>
         <li id='tvepisode_overview'><?php echo $tvEpisode->overview; ?></li>
       <?php endif; ?>
     </ul>

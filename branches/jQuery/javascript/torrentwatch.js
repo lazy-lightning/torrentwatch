@@ -80,7 +80,7 @@ $(function() {
   // Switching visible items for different clients
   $("select#client").change(function() {
     $("div.favorite_seedratio").css("display","none");
-    switch($("select#client")) {
+    switch($(this).val()) {
       case 'transmission1.3x':
         $("#config_downloaddir,#config_watchdir,#config_savetorrent,#config_deepdir,#config_verifyepisodes,div.favorite_seedratio,div.favorite_savein").css("display","block");
         $("div.favinfo,div.favorite").css("height",230);
