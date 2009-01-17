@@ -120,7 +120,7 @@ function transmission13x_add_torrent($tor, $dest, $seedRatio = -1) {
     if(!isset($responce['result']))
       return "Failure connecting to Transmission >= 1.30";
     else
-      return "Transmission RPC Error: ".print_r($responce);
+      return "Transmission RPC Error: ".print_r($responce, TRUE);
   }
 }
 

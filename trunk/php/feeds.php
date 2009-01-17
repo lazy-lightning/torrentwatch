@@ -43,6 +43,7 @@ function check_for_torrent(&$item, $key, $opts) {
       break;
   }
   if($hit) {
+    $matched = 'match';
     if(check_cache($rs['title'])) {
       $guess = guess_match($title, TRUE);
       if(_isset($config_values['Settings'], 'Only Newer') == 1) {
@@ -133,6 +134,8 @@ function rss_perform_matching($rs, $idx) {
       array_walk($config_values['Favorites'], 'check_for_torrent', 
                  array('Obj' =>$item, 'URL' => $rs['URL']));
     _Debug("$matched: $item[title]\n", 1);
+    if($matched == "nomatch" && file_exists($config_values['Settings']['Cache Dir'].'/rss_dl_'.filename_encode($item['title'])))
+      $matched = 'downloaded';
     if(isset($config_values['Global']['HTMLOutput'])) {
       update_progress_bar($percPerItem, $item['title']);
       show_torrent_html($item, $rs['URL'], $alt);

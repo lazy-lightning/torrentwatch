@@ -322,6 +322,11 @@ ul.torrentlist li.torrent.match_match {
 	display: block;
 	}
 
+ul.torrentlist li.torrent.match_downloaded {
+	background: transparent url('../images/nuvola_ledlightgreen.png') no-repeat 3px center;
+	display: block;
+	}
+
 ul.torrentlist li.torrent.match_cachehit {
 	background: transparent url('../images/nuvola_ledgreen.png') no-repeat 3px center;
 	display: block;

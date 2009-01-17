@@ -73,6 +73,7 @@ function parse_options() {
 				$r = client_add_nzb(urldecode($_GET['link']),$_GET['title']);
 			else
 				$r = client_add_torrent(trim(urldecode($_GET['link'])), $config_values['Settings']['Download Dir']);
+			if($r) add_cache($_GET['title']);
 			display_history();
 			$html_out .= "<script type='text/javascript'>updateFrameCopyDiv('history');updateFrameFinished();</script>";
 			close_html();
