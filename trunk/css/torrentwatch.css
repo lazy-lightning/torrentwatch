@@ -459,6 +459,10 @@ div.welcome input {
 	clear: left;
 	}
 
+div.welcome label.item {
+	line-height: 19px;
+	}
+
 div.form_radio {
 	padding-left: 10px;
 	}
