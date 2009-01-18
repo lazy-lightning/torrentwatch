@@ -97,8 +97,6 @@
 		 **/
 		function __construct($config) {
 			
-
-			
 			$this->id = (string)$config->id;
 			$this->season = (string)$config->SeasonNumber;
 			$this->number = (string)$config->EpisodeNumber;
@@ -111,6 +109,12 @@
 			$this->overview = (string)$config->Overview;
 			$this->imdbId = (string)$config->IMDB_ID;
 			$this->name = (string)$config->EpisodeName;	
+			$this->seasonId = (int)$config->seasonId;
+			$this->seriesId = (int)$config->seriesId;
+			$this->productionCode = (string)$config->ProductionCode;
+			$this->language = (string)$config->Language
+			$this->image = (string) $config->filename;
+			$this->lastupdated = (string) $config->lastupdated;
 		}
 	}
 ?>
