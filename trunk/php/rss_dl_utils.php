@@ -149,7 +149,8 @@ function filename_encode($filename) {
 function check_for_torrents($directory, $dest) {
   if($handle = opendir($directory)) {
     while(false !== ($file = readdir($handle))) {
-      if(preg_match('/\.torrent$/', $file) && client_add_torrent("$directory/$file", $dest))
+      $title = substr($file, 0, strrpos($file, '.')-1);
+      if(preg_match('/\.torrent$/', $file) && client_add_torrent("$directory/$file", $dest, $title))
           unlink("$directory/$file");
     }
     closedir($handle);

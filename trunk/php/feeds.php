@@ -70,7 +70,7 @@ function check_for_torrent(&$item, $key, $opts) {
         if(stripos($config_values['Settings']['Client'],'nzb') !== FALSE) {
           if(client_add_nzb($link, $title, $item, $opts['URL']))
             add_cache($rs['title']);
-        } else if(client_add_torrent($link, NULL, $item, $opts['URL'])) {
+        } else if(client_add_torrent($link, NULL, $rs['title'], $item, $opts['URL'])) {
           add_cache($rs['title']);
         } else {
           _debug("Failed adding torrent $link\n", -1);
