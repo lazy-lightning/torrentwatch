@@ -1,9 +1,6 @@
 <?php
 // Return a formatted html link that will call javascript in a normal
 // browser, and in the NMT browser
-function _jscript($func, $contents) {
-  return "<a href=#>$contents</a>";
-}
 
 function setup_rss_list_html() {
   global $html_out, $html_header;

@@ -44,7 +44,17 @@ $(function() {
         location.replace($(t).find("a.context_link:first").get(0).href);
       },
       'startDownloading': function(t) {
-        location.replace($(t).find("a.context_link:last").get(0).href);
+        $("#progressbar").show();
+        $.ajax({
+          type: "GET",
+          url: document.baseURI,
+          cache: false,
+          data: $(t).find("a.context_link:last").get(0).search.substr(1),
+          dataType: 'html',
+          success: function(data,textStatus) {
+            $("#progressbar").hide();
+          }
+        })
       },
       'inspect': function(t) {
         if(inspect_status == false) toggleInspector();
@@ -54,10 +64,66 @@ $(function() {
   });
 
   // Dialog Buttons
-  $("div#history a,div.welcome a,div.favinfo form a,form#config_form a,form.feedform a,div#clear_cache a:first").not("a#save").click(function() {
-    $(this).toggleDialog();
-  });
 
+  // Config Dialog
+  var initConfigDialog = function() {
+    // Switching visible items for different clients
+    $("select#client").change(function() {
+      $("div.favorite_seedratio").css("display","none");
+      switch($(this).val()) {
+        case 'transmission1.3x':
+          $("#config_downloaddir,#config_watchdir,#config_savetorrent,#config_deepdir,#config_verifyepisodes,div.favorite_seedratio,div.favorite_savein").css("display","block");
+          $("div.favinfo,div.favorite").css("height",230);
+        break;
+        case 'transmission1.22':
+          $("#config_downloaddir,#config_deepdir,div.favorite_savein").css("display","none");
+          $("#config_watchdir,#config_savetorrent,#config_verifyepisodes").css("display","block");
+          $("div.favinfo,div.favorite").css("height",180);
+        break;
+        case 'btpd':
+          $("#config_downloaddir,#config_watchdir,#config_savetorrent,#config_deepdir,#config_verifyepisodes,div.favorite_savein").css("display","block");
+          $("div.favorite,div.favinfo").css("height",205);
+        break;
+        case 'nzbget':
+          $("#config_watchdir,#config_verifyepisodes").css("display","block");
+          $("#config_downloaddir,#config_savetorrent,#config_deepdir,div.favorite_savein").css("display","none");
+          $("div.favorite,div.favinfo").css("height",180);
+        break;
+        case 'sabnzbd':
+          $("#config_downloaddir,#config_watchdir,#config_savetorrent,#config_deepdir,div.favorite_savein").css("display","none");
+          $("#config_verifyepisodes").css("display","block");
+          $("div.favorite,div.favinfo").css("height",180);
+        break;
+      }
+    });
+    $("select#client").change();
+    $("div#history a,div.welcome a,div.favinfo form a,form#config_form a,form.feedform a,div#clear_cache a:first").not("a#save,a#saveConfig").unbind('click').click(function() {
+
+      $(this).toggleDialog();
+    });
+    $("a#saveConfig").click(function() {
+      $("#progressbar").show();
+      var dataString='';
+      $("#configuration input,#configuration select").each(function() {
+        dataString = dataString+this.name+'='+this.value+'&';
+      });
+      dataString = dataString.substr(0,dataString.length-1);
+      $.ajax({
+        type: "GET",
+        url: document.baseURI,
+        cache: false,
+        data: dataString,
+        dataType: 'html',
+        success: function(data,textStatus) {
+          $("#configuration,#feeds").remove();
+          $(data).filter("#configuration,#feeds").appendTo("body");
+          initConfigDialog();
+          $("#progressbar").hide();
+        }
+      })
+    });
+  };
+  initConfigDialog();
   // Favorites
   $(".favorite ul li:first a").toggleFavorite();
   $(".favorite ul li:not(:first)").tsort("a");
@@ -77,36 +143,6 @@ $(function() {
     inspect_status = !inspect_status;
   };
   $("li#inspector a").click(toggleInspector);
-  // Switching visible items for different clients
-  $("select#client").change(function() {
-    $("div.favorite_seedratio").css("display","none");
-    switch($(this).val()) {
-      case 'transmission1.3x':
-        $("#config_downloaddir,#config_watchdir,#config_savetorrent,#config_deepdir,#config_verifyepisodes,div.favorite_seedratio,div.favorite_savein").css("display","block");
-        $("div.favinfo,div.favorite").css("height",230);
-      break;
-      case 'transmission1.22':
-        $("#config_downloaddir,#config_deepdir,div.favorite_savein").css("display","none");
-        $("#config_watchdir,#config_savetorrent,#config_verifyepisodes").css("display","block");
-        $("div.favinfo,div.favorite").css("height",180);
-      break;
-      case 'btpd':
-        $("#config_downloaddir,#config_watchdir,#config_savetorrent,#config_deepdir,#config_verifyepisodes,div.favorite_savein").css("display","block");
-        $("div.favorite,div.favinfo").css("height",205);
-      break;
-      case 'nzbget':
-        $("#config_watchdir,#config_verifyepisodes").css("display","block");
-        $("#config_downloaddir,#config_savetorrent,#config_deepdir,div.favorite_savein").css("display","none");
-        $("div.favorite,div.favinfo").css("height",180);
-      break;
-      case 'sabnzbd':
-        $("#config_downloaddir,#config_watchdir,#config_savetorrent,#config_deepdir,div.favorite_savein").css("display","none");
-        $("#config_verifyepisodes").css("display","block");
-        $("div.favorite,div.favinfo").css("height",180);
-      break;
-    }
-  });
-  $("select#client").change();
 });
 
 (function($) {
@@ -169,7 +205,7 @@ function updateFrameFinished() {
 	parent.hideLayer('progressDiv');
 }
 
-function submitForm ( whichForm )
-{
+function submitForm( whichForm ) {
 	document.getElementById(whichForm).submit();
 }
+
