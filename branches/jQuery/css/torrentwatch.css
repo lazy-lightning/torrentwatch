@@ -148,7 +148,7 @@ div#filterbar_container {
 	border-bottom: 1px solid #979797;
 	background: #C0C8D6 url('../images/filter_bar_bg.png') repeat-x;
 	margin: 0;
-	height: 24px;
+	height: 29px;
 	position: fixed;
 	left: 0;
 	right: 0;
@@ -170,7 +170,7 @@ ul#filterbar li {
 	list-style-image: none;
 	float: left;
 	padding: 0;
-	margin: 4px 2px 0 5px;
+	margin: 7px 2px 0 5px;
 	vertical-align: middle;
 	height: 17px;
 	}
@@ -204,28 +204,37 @@ ul#filterbar li.selected a {
 	}
 
 input#filter_text_input {
-	float: right;
-	height: 19px;
-	width: 100px;
-	border: 0 solid #FFFFFF;
-	padding: 0 2px;
+	float: right; /* */
+	height: 23px; 
+	width: 100px; 
+	border: 1px solid #5D80A1; 
+	padding: 2px 10px 2px 18px;
 	margin: 4px 5px 0 0;
+	border-radius: 10px;
+	background: #FFF url('../images/filter_icon.png') top left no-repeat;
+	-o-border-radius: 10px; 
+	-icab-border-radius: 10px;
+	-khtml-border-radius: 10px;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px; 
+	outline-style: none;
 	}
 
-/* Safari-look filter input for Firefox */
+input#filter_text_input.blur {
+	border-color: #CCC;
+	}
+
+/* Safari-look filter input for Firefox 
 @-moz-document url-prefix() {
 	input#filter_text_input {
-		background: #FFF url('images/filter_icon.png') top left no-repeat;
-		border: 1px solid #5D80A1;
 		margin-top: 3px;
-		padding: 1px 10px 1px 18px;
 		width: 76px;
 		-moz-border-radius: 10px;
 		}
 	input#filter_text_input.blur {
 		border-color: #CCC;
 		}
-}
+} */
 
 /*--------------------------
  *

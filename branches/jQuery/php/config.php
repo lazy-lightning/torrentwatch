@@ -7,7 +7,7 @@ function setup_default_config() {
       $config_values['Settings'][$a] = $b;
     }
   }
-  _debug("Initializing Torrentwatch Configuration\n", 0);
+  _debug("Initializing Torrentwatch Configuration\n", 1);
 
   if(!isset($config_values['Settings']))
     $config_values['Settings'] = array();

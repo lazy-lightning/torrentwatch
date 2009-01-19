@@ -6,6 +6,7 @@ $test_run = 0;
 $firstrun = 0;
 $verbosity = 0;
 
+file_put_contents('/tmp/twlog', print_r($_GET, TRUE), FILE_APPEND);
 require_once('rss_dl_utils.php');
 
 // This function parses commands sent from a PC browser
@@ -41,7 +42,6 @@ function parse_options() {
 			write_config_file();
 			// This is always called in a hidden frame, so display new config and exit
 			display_global_config();
-			$html_out .= '<script type="text/javascript">updateFrameCopyDiv("configuration");updateFrameFinished();</script>';
 			close_html();
 			exit(0);
 			break;
@@ -74,7 +74,6 @@ function parse_options() {
 			else
 				$r = client_add_torrent(trim(urldecode($_GET['link'])), $config_values['Settings']['Download Dir']);
 			display_history();
-			$html_out .= "<script type='text/javascript'>updateFrameCopyDiv('history');updateFrameFinished();</script>";
 			close_html();
 			exit(0);
 			break;
@@ -83,7 +82,6 @@ function parse_options() {
 			if(file_exists($config_values['Settings']['History']))
 				unlink($config_values['Settings']['History']);
 			display_history();
-			$html_out .= '<script type="text/javascript">updateFrameCopyDiv("history");updateFrameFinished();</script>';
 			close_html();
 			exit(0);
 			break;
@@ -155,7 +153,7 @@ function display_global_config() {
 	}
 
 	$html_out .= 
-	 '<div class="dialog_window" id="configuration">'."\n".
+	 '<div class="dialog_window" id="configuration">'.
 	 '  <h2 class="dialog heading">Configuration</h2>'.
 	 '  <form target="update_frame" action="'.$_SERVER['PHP_SELF'].'" id="config_form">'.
 	 '    <input type="hidden" name="mode" value="setglobals">'.
@@ -208,17 +206,17 @@ function display_global_config() {
 	 '        <option value="simple" '.$matchsimple.'>Simple</option>'.
 	 '      </select>'.
 	 '    </div>'.
-	 _jscript("saveConfig()", 'Save').
+	 '   <a id="saveConfig">Save</a>'.
 	 "   <a href='#configuration'>Close</a>".
 	 "   <a href='#feeds'>Feeds</a>".
          "   <a href='#welcome1'>Wizard</a>".
 	 '  </form>'.
-	 '</div>'."\n";
+	 '</div>';
 
 	// Feeds
 	$html_out .= 
 	 '<div class="dialog_window" id="feeds">'.
-	 '  <h2 class="dialog_heading">Feeds</h2>'."\n";
+	 '  <h2 class="dialog_heading">Feeds</h2>';
 	if(isset($config_values['Feeds'])) {
 		foreach($config_values['Feeds'] as $key => $feed) {
 			$html_out .= 
@@ -229,11 +227,11 @@ function display_global_config() {
 			 '    <input class="del" type="submit" name="button" value="Delete">'.
 			 '    <label class="item">'.$feed['Name'].': '.$feed['Link'].'</label>'.
 			 '  </form>'.
-			 '</div>'."\n";
+			 '</div>';
 		}
 	}
 	$html_out .= 
-	 '  <div class="feeditem">'."\n".
+	 '  <div class="feeditem">'.
 	 '    <form action="'.$_SERVER['PHP_SELF'].'" class="feedform">'.
 	 '      <input type="hidden" name="mode" value="updatefeed">'.
 	 '      <input type="submit" class="add" name="button" value="Add">'.
@@ -243,7 +241,7 @@ function display_global_config() {
 	 '      <a href="#configuration">Back</a>'.
 	 '    </form>'.
 	 '  </div>'.
-	 '</div>'."\n";
+	 '</div>';
 }
 
 function display_favorites_info($item, $key) {
@@ -283,7 +281,7 @@ function display_favorites_info($item, $key) {
 			$html_out .= '<option value="'.urlencode($feed['Link']).'"';
 			if($feed['Link'] == $item['Feed'])
 				$html_out .= ' selected="selected"';
-			$html_out .= '>'.$feed['Name'].'</option>'."\n";
+			$html_out .= '>'.$feed['Name'].'</option>';
 		}
 	}
 	$html_out .= 
@@ -300,22 +298,17 @@ function display_favorites_info($item, $key) {
 	 '    <input type="submit" class="del" name="button" value="Delete">'.
 	 '    <a href="#favorites">Close</a>'.
 	 '  </form>'.
-	 '</div>'."\n";
-	// Display the fav that was just updated
-	if(isset($_GET['idx']) && $_GET['idx'] == $key) {
-		$html_out .= "<script type='text/javascript'>".
-		             'toggleFav("favorite_'.$_GET['idx'].'");</script>'."\n";
-	}
+	 '</div>';
 }
 
 function display_favorites() {
 	global $config_values, $html_out;
 	$html_out .= '<div class="dialog_window" id="favorites">'.
 	             '<div class="favorite"><ul>'.
-	             '<li><a href="#favorite_new">New Favorite</a></li>'."\n";
+	             '<li><a href="#favorite_new">New Favorite</a></li>';
 	if(isset($config_values['Favorites'])) {
 		foreach($config_values['Favorites'] as $key => $item) {
-			$html_out .= '<li><a href="#favorite_'.$key.'">'.$item['Name'].'</a></li>'."\n";
+			$html_out .= '<li><a href="#favorite_'.$key.'">'.$item['Name'].'</a></li>';
 		}
 	}
 	$html_out .= '</ul></div>';
@@ -329,8 +322,8 @@ function display_favorites() {
 	              'Feed' => '', 
 	              'Quality' => 'All');
 	display_favorites_info($item, "new");
-	$html_out .= '<div class="clear"></div>'."\n".
-	             '</div>'."\n";
+	$html_out .= '<div class="clear"></div>'.
+	             '</div>';
 }
 
 function display_topmenu() {
@@ -372,13 +365,13 @@ function display_topmenu() {
 			$html_out .= "<li id='webui'><a href='http://$host:8080/sabnzbd/'>SabNZBd</a></li>";
 			break;
 	}
-	$html_out .= '</ul></div>'."\n";
+	$html_out .= '</ul></div>';
 }
 
 function display_history() {
 	global $html_out, $config_values;
 
-	$html_out .= '<div class="dialog_window" id="history"><div id="historyItems"><ul>'."\n";
+	$html_out .= '<div class="dialog_window" id="history"><div id="historyItems"><ul>';
 	if(file_exists($config_values['Settings']['History'])) {
 		$history = unserialize(file_get_contents($config_values['Settings']['History']));
 
@@ -390,20 +383,20 @@ function display_history() {
 	}
 	$html_out .= $html_tmp.'</ul></div>';;
 	$html_out .= "<a href='#history'>Close</a>".
-	             _jscript("updateFrameLoad('".$_SERVER['PHP_SELF']."?mode=clearhistory', 'Clearing History');", "Clear").
+                     '<a id="clearhistory" href="'.$_SERVER['PHP_SELF'].'?mode=clearhistory">Clear</a>'.
 	             "</div>";
 }
 
 function display_clear_cache() {
 	global $html_out;
 	$html_out .= 
-   '<div class="dialog_window" id="clear_cache">'."\n".
+   '<div class="dialog_window" id="clear_cache">'.
 	 '  <h2 class="dialog heading">Which Cache</h2>'.
 	 '  <a href="#clear_cache">Close</a>'.
 	 '  <a href="'.$_SERVER['PHP_SELF'].'?mode=clear_cache&type=feeds">Feeds</a>'.
 	 '  <a href="'.$_SERVER['PHP_SELF'].'?mode=clear_cache&type=torrents">Torrents</a>'.
 	 '  <a href="'.$_SERVER['PHP_SELF'].'?mode=clear_cache&type=all">All</a>'.
-	 '</div>'."\n";
+	 '</div>';
 }
 
 function display_filter_bar() {
@@ -425,7 +418,7 @@ function display_context_menu() {
 	 '<li id="addToFavorites">Add to Favorites</li>'.
 	 '<li id="startDownloading">Start Downloading</li>'.
 	 '<li id="inspect">Inspect</li>'.
-	 '</ul></div>'."\n";
+	 '</ul></div>';
 }
 	
 function display_hidden_iframe() {
@@ -444,7 +437,8 @@ function display_inspector() {
 
 function set_default_div() {
 	global $html_out, $config_values;
-	
+	return;
+
 	if(!isset($_GET['mode']) && $config_values['Settings']['FirstRun'] == FALSE)
 		return;
 
@@ -465,16 +459,21 @@ function set_default_div() {
 			$html_out .= 'toggleMenu(\'configuration\');';
 			break;
 	}
-	$html_out .= '</script>'."\n";
+	$html_out .= '</script>';
 }
 
 function close_html() {
 	global $html_out, $debug_output, $main_timer;
+	if(isset($_GET['mode']) && $_GET['mode'] == 'setglobals') {
+          echo $html_out;
+          $html_out = "";
+	  return;
+	}
 	$debug_output .= $verbosity;
-	$html_out .= "<div class='clear'></div>\n<div class='timer'>Page Took ".
+	$html_out .= "<div class='clear'></div><div class='timer'>Page Took ".
 	             number_format(timer_get_time($main_timer), 4)."s to load</div>".
 	             "<div class='rss_debug'>$debug_output</div>".
-	             "</body></html>\n";
+	             "</body></html>";
 	echo $html_out;
 	$html_out = "";
 }
@@ -486,6 +485,7 @@ function close_html() {
 $main_timer = timer_init();
 platform_initialize();
 
+if(!(isset($_GET['mode']) && $_GET['mode'] == 'setglobals')) {
 ?>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
@@ -499,16 +499,15 @@ if($_SERVER["REMOTE_ADDR"] == '127.0.0.1') {
 	 '<script type="text/javascript" src="javascript/torrentwatch.local.js"></script>');
 } else {
 	echo ('<link rel="Stylesheet" type="text/css" href="css/torrentwatch.css?'.time().'"></link>'.
-	 '<script type="text/javascript" src="javascript/webappers.com.progress.js?'.time().'"></script>'.
-         '<script type="text/javascript" src="javascript/jquery.min.js"></script>'.
+         '<script type="text/javascript" src="javascript/jquery-1.2.6.js"></script>'.
          '<script type="text/javascript" src="javascript/jquery.tinysort.min.js"></script>'.
          '<script type="text/javascript" src="javascript/jquery.contextmenu.r2.js"></script>'.
          '<script type="text/javascript" src="javascript/torrentwatch.js?'.time().'"></script>');
 }
 	
-echo ("</head>\n<body>\n");
+echo ("</head><body>");
 ob_flush();flush();
-
+}
 setup_default_config();
 if(file_exists(platform_getConfigFile()))
 	read_config_file();
