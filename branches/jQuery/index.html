@@ -1,0 +1,189 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Torrentwatch</title>
+  <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" ></link>
+  <link rel="Stylesheet" type="text/css" href="css/torrentwatch.css?2342JADF2"></link>
+  <script type="text/javascript" src="javascript/jquery-1.3.1.js"></script>
+  <script type="text/javascript" src="javascript/jquery.tinysort.min.js"></script>
+  <script type="text/javascript" src="javascript/jquery.contextmenu.r2.js"></script>
+  <script type="text/javascript" src="javascript/torrentwatch.js?A41231298710412L"></script>
+</head>
+<body>
+<ul class="mainoptions" id="mainoptions">
+  <li id="refresh"><a href="">Refresh</a></li>
+  <li class="divider">&nbsp;</li>
+  <li id="favoritesMenu"><a href="#favorites">Favorites</a></li>
+  <li id="config"><a href="#configuration">Configure</a></li>
+  <li class="divider">&nbsp;</li>
+  <li id="view"><a href="#history">View History</a></li>
+  <li id="empty"><a href="#clear_cache">Empty Cache</a></li>
+  <li id="inspector"><a href="#inspector_container">Inspector</a></li>
+  <li id='webui'><a href='http://192.168.1.121:8080/sabnzbd/'>SabNZBd</a></li>
+</ul>
+<ul id="filterbar_container">
+  <li id="filter_all">All</li>
+  <li id="filter_matching">Matching</li>
+  <li id="filter_downloaded">Downloaded</li>
+  <li id="filter_bytext"><input type="text" id="filter_text_input"></li>
+</ul>
+<div class="progressbar dialog_window" id="progressbar">
+ <span>Loading . . .</span>
+</div>
+<div class="context_menu" id="CM1">
+  <ul>
+    <li id="addToFavorites">Add to Favorites</li>
+    <li id="startDownloading">Start Downloading</li>
+    <li id="inspect">Inspect</li>
+  </ul>
+</div>
+<div id="inspector_container">
+  <div id="inspector_loading"></div>
+  <div id="inspector_info"></div>
+</div>
+<form id="welcome_form" action="/torrentwatch/index.cgi">
+  <input type="hidden" name="mode" value="firstrun">
+  <input type="hidden" name="button" value="Add">
+  <div id="welcome1" class="dialog_window welcome">
+    <h2 class="dialog_heading">Welcome to torrentwatch</h2>
+      <label class="item">Torrent Watch is a browser based program designed to bring TV shows from the internet to your living room.</label>
+      <label class="item">Torrent Watch accesses feeds from the internet to tell it about newly avaiable shows, and uses TheTVDB.com to pull up detailed information about individual shows and episodes</label>
+      <label class="item">You will need to answer a few simple questions to get started.</label>
+    <a href="#welcome2">Next</a>
+    <a href="#welcome1">Close</a>
+  </div>
+
+  <div id="welcome2" class="dialog_window welcome">
+    <h2 class="dialog_heading">Choose a Client</h2>
+      <label class="item">Torrent Watch can use a variety of clients to download the TV Episodes.  Items with a * are installed by default on the NMT</label>
+    <label class="category">Bit Torrent</label>
+      <label class="item">Bit Torrent is available to everyone, and as such is very popular.</label>
+    <div class="form_radio">
+      <input type="radio" name="client" value="btpd">
+      <label class="item">BTPD</label>
+    </div>
+    <div class="form_radio">
+      <input type="radio" name="client" value="transmission1.22">
+      <label class="item">Transmission 1.22*</label>
+    </div>
+    <div class="form_radio">
+      <input type="radio" name="client" value="transmission1.3x">
+      <label class="item">Transmission &gt;= 1.30</label>
+    </div>
+    <label class="category">NZB</label>
+      <label class="item">NZB Requires you to subscribe to a Newsgroup Server.  Newsgroup servers can be very fast, and will often max out your net connection with a good provider.</label>
+    <div class="form_radio">
+      <input type="radio" name="client" value="nzbget">
+      <label class="item">NZBGet*</label>
+    </div>
+    <div class="form_radio">
+      <input type="radio" name="client" value="sabnzbd">
+      <label class="item">SabNZBd</label>
+    </div>
+
+    <a href="#welcome3">Next</a>
+    <a href="#welcome1">Back</a>
+    <a href="#welcome2">Close</a>
+  </div>
+
+  <div id="welcome3" class="dialog_window welcome">
+    <h2 class="dialog_heading">Choose a Feed</h2>
+      <label class="item">Torrent Watch requires a feed from the internet that will point it to the TV Episodes.  Choose a feed from the list or add your own feed from the net.</label>
+    <label class="category">Bit Torrent</label>
+    <div class="form_radio">
+      <input type="radio" name="link" value="http://tvrss.net/feed/eztv/"><label class="item">tvRSS.net - EzTV</label>
+      <label class="item">The EzTV feed from tvRSS.net</label>
+    </div>
+    <div class="form_radio">
+      <input type="radio" name="link" value="http://tvrss.net/feed/vtv/"><label class="item">tvRSS.net - VTV</label>
+      <label class="item">The VTV feed from tvRSS.net contains only the most popular tv shows</label>
+    </div>
+    <label class="category">NZB</label>
+    <div class="form_radio">
+      <input type="radio" name="link" value="http://www.tvnzb.com/tvnzb.rss"><label class="item">TvNZB.com</label>
+      <label class="item">TvNZB.com offers a feed of user submitted .nzb files</label>
+    </div>
+    <div class="form_radio">
+      <input type="radio" name="link" value="http://tvbinz.net/rss.php"><label class="item">TVBINZ.NET</label>
+      <label class="item">TvBinz.net offers an automatically generated feed of files posted to select news groups</label>
+    </div>
+
+    <a href="#welcome4">Next</a>
+    <a href="#welcome2">Back</a>
+    <a href="#welcome3">Close</a>
+  </div>
+  <div id="welcome4" class="dialog_window welcome">
+    <h2 class="dialog_heading">The Basics</h2>
+      <label class="item">Torrentwatch classifys the feed items with various colored leds</label>
+      <label class="category">Note</label>
+      <label class="item">If you modify or add a favorite in the web interface no new matches will be started until you press the refresh button.</label>
+    <ul id='torrentlist' class='torrentlist'>
+      <li class='torrent match_nomatch'>
+        <div class='torrent_name'>No Match - Will not be downloaded</div>
+        <a class='context_link' href='#'></a><a class='context_link' href='#'></a></li>
+      <li class='torrent match_duplicate alt'>
+        <div class='torrent_name'>Duplicate Episode - Same episode downloaded previously.  Will not be downloaded.</div>
+        <a class='context_link' href='#'></a><a class='context_link' href='#'></a></li>
+      <li class='torrent match_old'>
+        <div class='torrent_name'>Old Episode - Episode is Older than the most recently downloaded episode. Will not be downloaded.</div>
+        <a class='context_link' href='#'></a><a class='context_link' href='#'></a></li>
+      <li class='torrent match_cachehit alt'>
+        <div class='torrent_name'>Cache Hit - This item was previously downloaded.</div>
+        <a class='context_link' href='#'></a><a class='context_link' href='#'></a></li>
+      <li class='torrent match_test'>
+        <div class='torrent_name'>Test Hit - This item is ready to download.  Press Refresh to start all test hits.</div>
+        <a class='context_link' href='#'></a><a class='context_link' href='#'></a></li>
+      <li class='torrent match_match alt'>
+        <div class='torrent_name'>New Hit - This item has just been started.</div>
+        <a class='context_link' href='#'></a><a class='context_link' href='#'></a></li>
+    </ul>
+
+    <a href="#welcome5">Next</a>
+    <a href="#welcome3">Back</a>
+    <a href="#welcome4">Close</a>
+  </div>
+        
+  <div id="welcome5" class="dialog_window welcome">
+    <h2 class="dialog_heading">Favorites Settings</h2>
+    <label class="item">Torrent Watch has a few different settings that effect which matches will be downloaded, and which will be passed over.</label>
+    <label class="category">
+      <input type="checkbox" name="onlynewer" value="1" selected="selected">
+      Newer Episodes Only
+    </label>
+    <label class="item">Only download newer episodes.  So if previously S3E10 has been downloaded for a particular favorite, when S2E03 shows up in the feed it will be skipped</label>
+    <label class="category">
+      <input type="checkbox" name="verifyepisodes" value="1" selected="selected">
+      Verify Episodes
+    </label>
+      <label class="item">Only download each episode once.  So if previously S01E13 had been downloaded, a second copy of S01E13 showing up in a feed will not be downloaded.  Items tagged Proper or Repack are an exception to this setting.  Note that this depends on the name being spelled the same between feeds.</label>
+    <label class="category">
+      <input type="checkbox" name="savetorrents" value=1>
+      Save index files
+    </label>
+    <label class="item">Save the related .torrent or .nzb file in the download directory</label>
+
+    <a href="#welcome6">Next</a>
+    <a href="#welcome4">Back</a>
+    <a href="#welcome5">Close</a>
+  </div>
+  <div id="welcome6" class="dialog_window welcome">
+    <h2 class="dialog_heading">Favorites Settings (cont.)</h2>
+
+    <a href="#welcome7">Next</a>
+    <a href="#welcome5">Back</a>
+    <a href="#welcome6">Close</a>
+  </div>
+  <div id="welcome7" class="dialog_window welcome">
+    <h2 class="dialog_heading">Initial Configuration is Complete!</h2>
+    <label class="item">To get started click Apply below and you will be presented with the episodes in your chosen feed.</label>
+    <label class="item">Right click on any show on the list and add it to your favorites.  Once a show is in your favorites it will automatically download every week</label>
+    <label class="category">Note</label>
+    <label class="item">Feeds only contain the most recent additions.  For more info please visit your feeds website.</label>
+
+    <a id="saveWelcome" href="#save">Apply</a>
+    <a href="#welcome6">Back</a>
+    <a href="#welcome7">Close</a>
+  </div>
+</form>
+</body></html>

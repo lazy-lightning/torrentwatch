@@ -205,7 +205,7 @@ ul#filterbar li.selected a {
 
 input#filter_text_input {
 	float: right; /* */
-	height: 23px; 
+	height: 16px; 
 	width: 100px; 
 	border: 1px solid #5D80A1; 
 	padding: 2px 10px 2px 18px;
@@ -468,17 +468,21 @@ div.form_radio {
 	}
 
 /* Progress Bar */
-div.dialog_window#progressDiv {
-	height: 26px;
+#progressbar {
+	background: #DBDBDB url('../images/ajaxload.gif') no-repeat center bottom;
+	display: block;
+	height: 30px;
 	top: 150px;
 	overflow: hidden;
 	z-index: 5;
+	width: 300px;
+	margin: -3px auto 0 -150px;
 	}
 
-img.percentImage1 {
-	background: white url(../images/percentImage_back1.png) no-repeat scroll 1px 0;
-	margin: 5px 0 0;
-	padding: 0;
+#progressbar span {
+	text-align: center;
+	font-size: 1.4em;
+	padding-left: 125px;
 	}
 
 div#progressBarText {
@@ -528,6 +532,7 @@ div.feeditem input[type=text] {
 
 /* Favorites Dialog */
 div.dialog_window#favorites {
+	margin-left:287;
 	}
 
 div.favinfo {
@@ -554,6 +559,11 @@ div.favorite ul li a {
 
 div.favorite ul li:hover {
 	background-color: #3879D7;
+	}
+
+div.favorite ul {
+	padding-left: 5px;
+	margin-top: 0px;
 	}
 
 div.favinfo {
