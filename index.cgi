@@ -26,15 +26,23 @@ function parse_options() {
 			}
 			$config_values['Settings']['FirstRun'] = FALSE;
 			write_config_file();
+			echo '<meta http-equiv="refresh" content="0;index.html">';
+			exit();
 			break;
 		case 'updatefavorite':
 			update_favorite();
+			echo '<meta http-equiv="refresh" content="0;index.html">';
+			exit();
 			break;
 		case 'updatefeed':
 			update_feed();
+			echo '<meta http-equiv="refresh" content="0;index.html">';
+			exit();
 			break;
 		case 'clear_cache':
 			clear_cache();
+			echo '<meta http-equiv="refresh" content="0;index.html">';
+			exit();
 			break;
 		case 'setglobals':
 			update_global_config();
@@ -66,6 +74,7 @@ function parse_options() {
 				$_GET['seedratio'] = '-1';
 			}
 			update_favorite();
+			exit;
 			break;
 		case 'dltorrent':
 			// Dont display full information, this link is loaded in a hidden iframe
@@ -412,6 +421,16 @@ function display_filter_bar() {
 	 '</div>';
 }
 
+function display_progress_bar() {
+  global $html_out;
+  $html_out .= <<<EOD
+<div class="progressbar dialog_window" id="progressbar">
+ <span>Loading . . .</span>
+</div>
+EOD;
+
+}
+
 function display_context_menu() {
 	global $html_out;
 	$html_out .= '<div class="context_menu" id="CM1"><ul>'.
@@ -464,16 +483,7 @@ function set_default_div() {
 
 function close_html() {
 	global $html_out, $debug_output, $main_timer;
-	if(isset($_GET['mode']) && $_GET['mode'] == 'setglobals') {
-          echo $html_out;
-          $html_out = "";
-	  return;
-	}
 	$debug_output .= $verbosity;
-	$html_out .= "<div class='clear'></div><div class='timer'>Page Took ".
-	             number_format(timer_get_time($main_timer), 4)."s to load</div>".
-	             "<div class='rss_debug'>$debug_output</div>".
-	             "</body></html>";
 	echo $html_out;
 	$html_out = "";
 }
@@ -485,29 +495,6 @@ function close_html() {
 $main_timer = timer_init();
 platform_initialize();
 
-if(!(isset($_GET['mode']) && $_GET['mode'] == 'setglobals')) {
-?>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-
-<head>
-<title>Torrentwatch</title>
-<link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
-<meta http-equiv='expires' content='0'>
-<?php
-if($_SERVER["REMOTE_ADDR"] == '127.0.0.1') {
-	echo ('<link rel="Stylesheet" type="text/css" href="css/torrentwatch.local.css?'.time().'"></link>'.
-	 '<script type="text/javascript" src="javascript/torrentwatch.local.js"></script>');
-} else {
-	echo ('<link rel="Stylesheet" type="text/css" href="css/torrentwatch.css?'.time().'"></link>'.
-         '<script type="text/javascript" src="javascript/jquery-1.2.6.js"></script>'.
-         '<script type="text/javascript" src="javascript/jquery.tinysort.min.js"></script>'.
-         '<script type="text/javascript" src="javascript/jquery.contextmenu.r2.js"></script>'.
-         '<script type="text/javascript" src="javascript/torrentwatch.js?'.time().'"></script>');
-}
-	
-echo ("</head><body>");
-ob_flush();flush();
-}
 setup_default_config();
 if(file_exists(platform_getConfigFile()))
 	read_config_file();
@@ -522,25 +509,23 @@ if(isset($_GET['mode'])) {
 }
 
 // Main Menu
-display_topmenu();
-display_filter_bar();
-$html_out .= file_get_contents('html/welcome.html');
+//display_topmenu();
+//display_filter_bar();
+//$html_out .= file_get_contents('html/welcome.html');
 
-display_progress_bar();
-update_progress_bar(2, 'Loading Torrentwatch');
-echo $html_out;
-ob_flush();flush();
-$html_out = "";
+//display_progress_bar();
+//echo $html_out;
+//ob_flush();flush();
+//$html_out = "";
 
 
 // Hidden DIV's
-display_context_menu();
+//display_context_menu();
 display_global_config();
 display_favorites();
-display_clear_cache();
-display_hidden_iframe();
+//display_clear_cache();
+//display_hidden_iframe();
 
-update_progress_bar(3, 'Preparing Feeds');
 echo $html_out;
 $html_out = "";
 ob_flush();flush();
@@ -553,10 +538,9 @@ if(isset($config_values['Feeds'])) {
 
 // Comes later incase we just added a torrent	
 display_history();
-display_inspector();
+//display_inspector();
 
-hide_progress_bar();
-set_default_div();
+//set_default_div();
 
 close_html();
 unlink_temp_files();

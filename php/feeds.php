@@ -64,8 +64,6 @@ function check_for_torrent(&$item, $key, $opts) {
         return;
       }
       if($link = get_torrent_link($rs)) {
-        if(isset($config_values['Global']['HTMLOutput']))
-          update_progress_bar(0, "Starting $title");
         if(stripos($config_values['Settings']['Client'],'nzb') !== FALSE) {
           if(client_add_nzb($link, $title, $item, $opts['URL']))
             add_cache($rs['title']);
@@ -134,7 +132,6 @@ function rss_perform_matching($rs, $idx) {
                  array('Obj' =>$item, 'URL' => $rs['URL']));
     _Debug("$matched: $item[title]\n", 1);
     if(isset($config_values['Global']['HTMLOutput'])) {
-      update_progress_bar($percPerItem, $item['title']);
       show_torrent_html($item, $rs['URL'], $alt);
     }
     
@@ -206,8 +203,6 @@ function load_feeds($feeds) {
   global $config_values;
   $count = count($feeds);
   foreach($feeds as $feed) {
-    if(isset($config_values['Global']['HTMLOutput']))
-      update_progress_bar(10/$count, "Loading ".$feed['Type']." feed from ".$feed['Link']); // Load feeds uses 10%
     switch($feed['Type']){
       case 'RSS':
         parse_one_rss($feed);
