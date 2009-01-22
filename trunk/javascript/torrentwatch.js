@@ -6,7 +6,19 @@ function updateClientOptions() {
 	if(!elem)
 		return;
 	changecss('div.favorite_seedratio', 'display', 'none');
+	hideLayer('config_folderclient');
 	switch(elem.value) {
+		case 'folder':
+			showLayer('config_folderclient');
+			showLayer('config_downloaddir');
+			hideLayer('config_watchdir');
+			hideLayer('config_savetorrent');
+			hideLayer('config_deepdir');
+			showLayer('config_verifyepisodes');
+			changecss('div.favorite_savein', 'display', 'block');
+			changecss('div.favorite', 'height', '205');
+			changecss('div.favinfo', 'height', '205');
+			break;
 		case 'transmission1.3x':
 			showLayer('config_downloaddir');
 			showLayer('config_watchdir');

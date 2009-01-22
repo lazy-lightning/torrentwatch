@@ -155,7 +155,8 @@ function update_global_config() {
       $config_values['Settings'][$key] = $_GET[$data];
   }
   foreach($checkboxs as $key => $data) 
-    $config_values['Settings'][$key] = isset($_GET[$data]) ? 1 : 0;
+    $config_values['Settings'][$key] = $_GET[$data]; // The ajax query returns all the variables, unlike standard
+  //  $config_values['Settings'][$key] = isset($_GET[$data]) ? 1 : 0; // Browser which would not send the unchecked var
       
   return;
 }

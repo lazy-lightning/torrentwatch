@@ -486,6 +486,7 @@ div#progressBarText {
 	}
 
 /* Configuration Dialog */
+div#config_folderclient label.item,
 div#config_torrentclient label.item,
 div#config_downloaddir label.item,
 div#config_watchdir label.item, 

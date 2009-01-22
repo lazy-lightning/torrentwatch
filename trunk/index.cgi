@@ -72,7 +72,7 @@ function parse_options() {
 			if(stripos($config_values['Settings']['Client'], 'nzb') !== FALSE) 
 				$r = client_add_nzb(urldecode($_GET['link']),$_GET['title']);
 			else
-				$r = client_add_torrent(trim(urldecode($_GET['link'])), $config_values['Settings']['Download Dir']);
+				$r = client_add_torrent(trim(urldecode($_GET['link'])), $config_values['Settings']['Download Dir'], $_GET['title']);
 			if($r) add_cache($_GET['title']);
 			display_history();
 			$html_out .= "<script type='text/javascript'>updateFrameCopyDiv('history');updateFrameFinished();</script>";
@@ -110,7 +110,7 @@ function display_global_config() {
 	$savetorrent=$nzbget=$trans122=$trans13x=$btpd="";
 	$deepfull=$deeptitle=$deepoff=$verifyepisode="";
 	$matchregexp=$matchglob=$matchsimple=$sabnzbd="";
-	$onlynewer="";
+	$onlynewer=$folderclient="";
 
 	switch($config_values['Settings']['Client']) {
 		case 'btpd':
@@ -128,6 +128,9 @@ function display_global_config() {
 			break;
 		case 'sabnzbd':
 			$sabnzbd = 'selected="selected"';
+			break;
+		case 'folder':
+			$folderclient = 'selected="selected"';
 			break;
 		default:
 			// Shouldn't happen
@@ -169,8 +172,13 @@ function display_global_config() {
 	 '        <option value="transmission1.3x" '.$trans13x.'>Transmission &gt;= 1.30</option>'.
 	 '        <option value="nzbget" '.$nzbget.'>NZBGet</option>'.
 	 '        <option value="sabnzbd" '.$sabnzbd.'>SabNZBd</option>'.
+         '        <option value="folder" '.$folderclient.'>Simple Folder</option>'.
 	 '      </select>'.
 	 '    </div>'.
+	 '    <div id="config_folderclient">'.
+	 '      <label class="item">File Extension</label>'.
+	 '      <input type="text" name="extension" value='.$config_values['Settings']['Extension'].'>'.
+         '    </div>'.
 	 '    <div id="config_downloaddir" title="Default directory to start items in">'.
 	 '      <label class="item">Download Directory:</label>'.
 	 '      <input type="text" name="downdir" value='.$config_values['Settings']['Download Dir'].'>'.
@@ -372,6 +380,8 @@ function display_topmenu() {
 		case 'sabnzbd':
 			$html_out .= "<li id='webui'><a href='http://$host:8080/sabnzbd/'>SabNZBd</a></li>";
 			break;
+		case 'folder':
+			break;
 	}
 	$html_out .= '</ul></div>'."\n";
 }
@@ -488,6 +498,7 @@ $main_timer = timer_init();
 platform_initialize();
 
 ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
 <head>
@@ -500,7 +511,7 @@ if($_SERVER["REMOTE_ADDR"] == '127.0.0.1') {
 	 '<script type="text/javascript" src="javascript/torrentwatch.local.js"></script>');
 } else {
 	echo ('<link rel="Stylesheet" type="text/css" href="css/torrentwatch.css?'.time().'"></link>'.
-	 '<script type="text/javascript" src="javascript/torrentwatch.js"></script>'.
+	 '<script type="text/javascript" src="javascript/torrentwatch.js?'.time().'"></script>'.
 	 '<script type="text/javascript" src="javascript/webtoolkit.contextmenu.js?'.time().'"></script>'.
 	 '<script type="text/javascript">'.
 	 'SimpleContextMenu.setup({"preventDefault":false, "preventForms":false});'.
