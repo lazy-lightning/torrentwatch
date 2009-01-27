@@ -4,22 +4,22 @@
 <head>
   <title>Torrentwatch</title>
   <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" ></link>
-  <link rel="Stylesheet" type="text/css" href="css/torrentwatch.css?2342JADF2"></link>
+  <link rel="Stylesheet" type="text/css" href="css/torrentwatch.css?2423F"></link>
   <script type="text/javascript" src="javascript/jquery-1.3.1.js"></script>
   <script type="text/javascript" src="javascript/jquery.tinysort.min.js"></script>
   <script type="text/javascript" src="javascript/jquery.contextmenu.r2.js"></script>
-  <script type="text/javascript" src="javascript/torrentwatch.js?A41231298710412L"></script>
+  <script type="text/javascript" src="javascript/torrentwatch.js?A12FDS2234FD2DSQER"></script>
 </head>
 <body>
 <ul class="mainoptions" id="mainoptions">
   <li id="refresh"><a href="">Refresh</a></li>
   <li class="divider">&nbsp;</li>
-  <li id="favoritesMenu"><a href="#favorites">Favorites</a></li>
-  <li id="config"><a href="#configuration">Configure</a></li>
+  <li id="favoritesMenu"><a class="toggleDialog" href="#favorites">Favorites</a></li>
+  <li id="config"><a class="toggleDialog" href="#configuration">Configure</a></li>
   <li class="divider">&nbsp;</li>
-  <li id="view"><a href="#history">View History</a></li>
-  <li id="empty"><a href="#clear_cache">Empty Cache</a></li>
-  <li id="inspector"><a href="#inspector_container">Inspector</a></li>
+  <li id="view"><a class="toggleDialog" href="#history">View History</a></li>
+  <li id="empty"><a class="toggleDialog" href="#clear_cache">Empty Cache</a></li>
+  <li id="inspector"><a class="toggleDialog" href="#inspector_container">Inspector</a></li>
   <li id='webui'><a href='http://192.168.1.121:8080/sabnzbd/'>SabNZBd</a></li>
 </ul>
 <ul id="filterbar_container">
@@ -50,8 +50,8 @@
       <label class="item">Torrent Watch is a browser based program designed to bring TV shows from the internet to your living room.</label>
       <label class="item">Torrent Watch accesses feeds from the internet to tell it about newly avaiable shows, and uses TheTVDB.com to pull up detailed information about individual shows and episodes</label>
       <label class="item">You will need to answer a few simple questions to get started.</label>
-    <a href="#welcome2">Next</a>
-    <a href="#welcome1">Close</a>
+    <a class="toggleDialog" href="#welcome2">Next</a>
+    <a class="toggleDialog" href="#welcome1">Close</a>
   </div>
 
   <div id="welcome2" class="dialog_window welcome">
@@ -82,9 +82,9 @@
       <label class="item">SabNZBd</label>
     </div>
 
-    <a href="#welcome3">Next</a>
-    <a href="#welcome1">Back</a>
-    <a href="#welcome2">Close</a>
+    <a class="toggleDialog" href="#welcome3">Next</a>
+    <a class="toggleDialog" href="#welcome1">Back</a>
+    <a class="toggleDialog" href="#welcome2">Close</a>
   </div>
 
   <div id="welcome3" class="dialog_window welcome">
@@ -109,9 +109,9 @@
       <label class="item">TvBinz.net offers an automatically generated feed of files posted to select news groups</label>
     </div>
 
-    <a href="#welcome4">Next</a>
-    <a href="#welcome2">Back</a>
-    <a href="#welcome3">Close</a>
+    <a class="toggleDialog" href="#welcome4">Next</a>
+    <a class="toggleDialog" href="#welcome2">Back</a>
+    <a class="toggleDialog" href="#welcome3">Close</a>
   </div>
   <div id="welcome4" class="dialog_window welcome">
     <h2 class="dialog_heading">The Basics</h2>
@@ -139,9 +139,9 @@
         <a class='context_link' href='#'></a><a class='context_link' href='#'></a></li>
     </ul>
 
-    <a href="#welcome5">Next</a>
-    <a href="#welcome3">Back</a>
-    <a href="#welcome4">Close</a>
+    <a class="toggleDialog" href="#welcome5">Next</a>
+    <a class="toggleDialog" href="#welcome3">Back</a>
+    <a class="toggleDialog" href="#welcome4">Close</a>
   </div>
         
   <div id="welcome5" class="dialog_window welcome">
@@ -163,16 +163,16 @@
     </label>
     <label class="item">Save the related .torrent or .nzb file in the download directory</label>
 
-    <a href="#welcome6">Next</a>
-    <a href="#welcome4">Back</a>
-    <a href="#welcome5">Close</a>
+    <a class="toggleDialog" href="#welcome6">Next</a>
+    <a class="toggleDialog" href="#welcome4">Back</a>
+    <a class="toggleDialog" href="#welcome5">Close</a>
   </div>
   <div id="welcome6" class="dialog_window welcome">
     <h2 class="dialog_heading">Favorites Settings (cont.)</h2>
 
-    <a href="#welcome7">Next</a>
-    <a href="#welcome5">Back</a>
-    <a href="#welcome6">Close</a>
+    <a class="toggleDialog" href="#welcome7">Next</a>
+    <a class="toggleDialog" href="#welcome5">Back</a>
+    <a class="toggleDialog" href="#welcome6">Close</a>
   </div>
   <div id="welcome7" class="dialog_window welcome">
     <h2 class="dialog_heading">Initial Configuration is Complete!</h2>
@@ -182,8 +182,8 @@
     <label class="item">Feeds only contain the most recent additions.  For more info please visit your feeds website.</label>
 
     <a id="saveWelcome" href="#save">Apply</a>
-    <a href="#welcome6">Back</a>
-    <a href="#welcome7">Close</a>
+    <a class="toggleDialog" href="#welcome6">Back</a>
+    <a class="toggleDialog" href="#welcome7">Close</a>
   </div>
 </form>
 </body></html>
