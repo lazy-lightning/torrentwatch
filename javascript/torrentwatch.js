@@ -81,7 +81,7 @@ $(function() {
         dynamic.find(".favorite > ul > li").initFavorites().end().find("li.torrent").myContextMenu().end()
                 .initConfigDialog().appendTo("body");
         $("#progressbar").hide();
-    }); 
+    }; 
     // Load The Dynamic Information (feeds/favorites/history/config) 
     $.get('index.cgi', '', function(html) {
         loadDynamicData(html);
