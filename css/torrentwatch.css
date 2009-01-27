@@ -48,12 +48,20 @@ input[type=text] {
 	border: 1px solid #787878;
 	}
 
+ul {
+	padding: 0;
+	}
+
+li {
+	list-style-type: none;
+	list-style-image: none;
+	}
 /*-----------------
  *
  * T O P   M E N U
  *
  * ----------------*/
-div.mainoptions {
+ul.mainoptions {
 	width: 100%;
 	height: 75px;
 	margin: 0;
@@ -64,19 +72,10 @@ div.mainoptions {
 	right: 0;
 	top: 0;
 	z-index: 2;
-	}
-
-div.mainoptions ul {
-	width: 100%;
-	height: 50px;
-	margin: 0;
-	padding: 0;
 	text-align: left;
 	}
 
-div.mainoptions ul li {
-	list-style-type: none;
-	list-style-image: none;
+ul.mainoptions li {
 	float: left;
 	padding: 0;
 	margin: 15px 0 0 0;
@@ -84,16 +83,16 @@ div.mainoptions ul li {
 	height: 50px;
 	}
 
-div.mainoptions ul li#inspector,
-div.mainoptions ul li#webui {
+ul.mainoptions li#inspector,
+ul.mainoptions li#webui {
 	float: right;
 	}
 
-div.mainoptions ul li#refresh a {
+ul.mainoptions li#refresh a {
 	background: url(../images/nuvola_refresh.png) no-repeat 19px 0;
-}
+	}
 
-div.mainoptions ul li a {
+ul.mainoptions li a {
 	color: #030303;
 	font-size: 1.1em;
 	text-decoration: none;
@@ -102,38 +101,38 @@ div.mainoptions ul li a {
 	margin: 0;
 	}
 
-div.mainoptions ul li#favoritesMenu a {
+ul.mainoptions li#favoritesMenu a {
 	background: url(../images/nuvola_bookmark.png) no-repeat 19px 0;
 }
-div.mainoptions ul li#config a {
+ul.mainoptions li#config a {
 	background: url(../images/nuvola_configure.png) no-repeat 19px 0;
 }
 
-div.mainoptions ul li#view a {
+ul.mainoptions li#view a {
 	background: url(../images/nuvola_history.png) no-repeat 26px 0;
 }
 
-div.mainoptions ul li#empty a {
+ul.mainoptions li#empty a {
 	background: url(../images/remove.png) no-repeat 25px 0;
 }
 
-div.mainoptions ul li#empty a:active {
+ul.mainoptions li#empty a:active {
 	background: url('../images/remove_on.png') no-repeat 32px 0;
 	}
 
-div.mainoptions ul li#webui a {
+ul.mainoptions li#webui a {
 	background: url(../images/webui.png) no-repeat center 0;
 }
 
-div.mainoptions ul li#inspector a {
+ul.mainoptions li#inspector a {
 	background: url('../images/info.png') no-repeat 18px 0;
 	}
 
-div.mainoptions ul li#inspector a:active {
+ul.mainoptions li#inspector a:active {
 	background: url('../images/info_on.png') no-repeat 18px 0;
 	}
 
-div.mainoptions ul li.divider {
+ul.mainoptions li.divider {
 	background: transparent url('../images/menu_divider.png') no-repeat top right;
 	margin: 17px 0 0 0;
 	}
@@ -144,7 +143,7 @@ div.mainoptions ul li.divider {
  *
  * ---------------*/
 
-div#filterbar_container {
+ul#filterbar_container {
 	border-bottom: 1px solid #979797;
 	background: #C0C8D6 url('../images/filter_bar_bg.png') repeat-x;
 	margin: 0;
@@ -155,17 +154,14 @@ div#filterbar_container {
 	top: 76px;
 	overflow: hidden;
 	z-index: 2;
-	}
-
-ul#filterbar {
 	display: inline;
-	height: 17px;
+	height: 22px;
 	margin: 0;
 	padding: 0;
 	text-align: left;
 	}
 
-ul#filterbar li {
+ul#filterbar_container li {
 	list-style-type: none;
 	list-style-image: none;
 	float: left;
@@ -173,43 +169,33 @@ ul#filterbar li {
 	margin: 7px 2px 0 5px;
 	vertical-align: middle;
 	height: 17px;
-	}
-
-ul#filterbar li a {
 	font-size: 1.2em;
 	color: #4E4E4F;
 	text-decoration: none;
 	font-weight: bold;
 	padding: 0 7px 0 7px; 
-	margin: 0;
+	margin: 4px 0;
 	}
 
-
-ul#filterbar li:hover {
+ul#filterbar_container li:hover {
 	background: transparent url('../images/filter_hover_left.png') no-repeat top left;
 	}
 
-ul#filterbar li:hover a {
-	background: transparent url('../images/filter_hover_right.png') no-repeat top right;
-	color: #fff !important;
-	}
-
-ul#filterbar li.selected {
+ul#filterbar_container li.selected {
 	background: transparent url('../images/filter_selected_left.png') no-repeat top left;
 	}
 
-ul#filterbar li.selected a {
-	background: transparent url('../images/filter_selected_right.png') no-repeat top right;
-	color: #fff !important;
+ul#filterbar_container > li#filter_bytext {
+	float: right;
+	margin: 0;
 	}
 
 input#filter_text_input {
-	float: right; /* */
 	height: 16px; 
 	width: 100px; 
 	border: 1px solid #5D80A1; 
-	padding: 2px 10px 2px 18px;
-	margin: 4px 5px 0 0;
+	padding: 0 10px 2px 18px;
+	margin: 1px 5px 0 0;
 	border-radius: 10px;
 	background: #FFF url('../images/filter_icon.png') top left no-repeat;
 	-o-border-radius: 10px; 

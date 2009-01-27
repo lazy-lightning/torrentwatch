@@ -216,9 +216,9 @@ function display_global_config() {
 	 '      </select>'.
 	 '    </div>'.
 	 '   <a id="saveConfig">Save</a>'.
-	 "   <a href='#configuration'>Close</a>".
-	 "   <a href='#feeds'>Feeds</a>".
-         "   <a href='#welcome1'>Wizard</a>".
+	 "   <a class='toggleDialog' href='#configuration'>Close</a>".
+	 "   <a class='toggleDialog' href='#feeds'>Feeds</a>".
+         "   <a class='toggleDialog' href='#welcome1'>Wizard</a>".
 	 '  </form>'.
 	 '</div>';
 
@@ -246,8 +246,8 @@ function display_global_config() {
 	 '      <input type="submit" class="add" name="button" value="Add">'.
 	 '      <label class="item">New Feed:</label>'.
 	 '      <input type="text" name="link">'.
-	 '      <a href="#feeds">Close</a>'.
-	 '      <a href="#configuration">Back</a>'.
+	 '      <a class="toggleDialog" href="#feeds">Close</a>'.
+	 '      <a class="toggleDialog" href="#configuration">Back</a>'.
 	 '    </form>'.
 	 '  </div>'.
 	 '</div>';
@@ -305,7 +305,7 @@ function display_favorites_info($item, $key) {
 	 '    </div>'.
 	 '    <input type="submit" class="add" name="button" value="Update">'.
 	 '    <input type="submit" class="del" name="button" value="Delete">'.
-	 '    <a href="#favorites">Close</a>'.
+	 '    <a class="toggleDialog" href="#favorites">Close</a>'.
 	 '  </form>'.
 	 '</div>';
 }
@@ -342,12 +342,12 @@ function display_topmenu() {
 	 '  <ul>'.
 	 '    <li id="refresh"><a href="'.$_SERVER['PHP_SELF'].'">Refresh</a></li>'.
 	 '    <li class="divider">&nbsp;</li>'.
-	 '    <li id="favoritesMenu"><a href="#favorites">Favorites</a></li>'.
-	 '    <li id="config"><a href="#configuration">Configure</a></li>'.
+	 '    <li id="favoritesMenu"><a class="toggleDialog" href="#favorites">Favorites</a></li>'.
+	 '    <li id="config"><a class="toggleDialog" href="#configuration">Configure</a></li>'.
 	 '    <li class="divider">&nbsp;</li>'.
-	 '    <li id="view"><a href="#history">View History</a></li>'.
+	 '    <li id="view"><a class="toggleDialog" href="#history">View History</a></li>'.
 	 '    <li id="divider">&nbsp;</li>'.
-	 '    <li id="empty"><a href="#clear_cache">Empty Cache</a></li>'.
+	 '    <li id="empty"><a class="toggleDialog" href="#clear_cache">Empty Cache</a></li>'.
 	 '    <li id="inspector"><a href="#inspector_container">Inspector</a></li>';
 	if($_SERVER['REMOTE_ADDR'] == "127.0.0.1")
 		$host = '127.0.0.1';
@@ -391,7 +391,7 @@ function display_history() {
 		}
 	}
 	$html_out .= $html_tmp.'</ul></div>';;
-	$html_out .= "<a href='#history'>Close</a>".
+	$html_out .= "<a class='toggleDialog' href='#history'>Close</a>".
                      '<a id="clearhistory" href="'.$_SERVER['PHP_SELF'].'?mode=clearhistory">Clear</a>'.
 	             "</div>";
 }
@@ -401,7 +401,7 @@ function display_clear_cache() {
 	$html_out .= 
    '<div class="dialog_window" id="clear_cache">'.
 	 '  <h2 class="dialog heading">Which Cache</h2>'.
-	 '  <a href="#clear_cache">Close</a>'.
+	 '  <a class="toggleDialog" href="#clear_cache">Close</a>'.
 	 '  <a href="'.$_SERVER['PHP_SELF'].'?mode=clear_cache&type=feeds">Feeds</a>'.
 	 '  <a href="'.$_SERVER['PHP_SELF'].'?mode=clear_cache&type=torrents">Torrents</a>'.
 	 '  <a href="'.$_SERVER['PHP_SELF'].'?mode=clear_cache&type=all">All</a>'.
