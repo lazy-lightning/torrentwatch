@@ -604,12 +604,31 @@ div.favinfo input[type=submit] {
 
 /* History Dialog */
 div#history {
-	bottom: 10px;
+	height: 250px;
 	}
 
-div#historyItems {
+ul#historyItems {
+	position: inherit;
+	top: 0;
+	bottom: 30px;
+	left: 0;
+	right: 0;
 	overflow: auto;
-	height: 90%
+	border-bottom: 1px solid #979797;
+	padding: 2px 0 0 10px;
+	}
+
+div#history > a {
+	position: inherit;
+	bottom: 3px;
+	}
+
+div#history > a#clearhistory {
+	right: 0px;
+	}
+
+div#history > a.toggleDialog {
+	right: 70px;
 	}
 
 /*--------------------------

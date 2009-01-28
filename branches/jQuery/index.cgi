@@ -380,7 +380,7 @@ function display_topmenu() {
 function display_history() {
 	global $html_out, $config_values;
 
-	$html_out .= '<div class="dialog_window" id="history"><div id="historyItems"><ul>';
+	$html_out .= '<div class="dialog_window" id="history"><ul id="historyItems">';
 	if(file_exists($config_values['Settings']['History'])) {
 		$history = unserialize(file_get_contents($config_values['Settings']['History']));
 
@@ -390,7 +390,7 @@ function display_history() {
 			$html_tmp = '<li>'.$item['Date'].' - '.$item['Title'].'</li>'.$html_tmp;
 		}
 	}
-	$html_out .= $html_tmp.'</ul></div>';;
+	$html_out .= $html_tmp.'</ul>';;
 	$html_out .= "<a class='toggleDialog' href='#history'>Close</a>".
                      '<a id="clearhistory" href="'.$_SERVER['PHP_SELF'].'?mode=clearhistory">Clear</a>'.
 	             "</div>";
