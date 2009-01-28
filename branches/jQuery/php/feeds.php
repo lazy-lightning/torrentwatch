@@ -94,6 +94,10 @@ function parse_one_rss($feed) {
   if(!$config_values['Global']['Feeds'][$feed['Link']] = $rss->get($feed['Link']))
     _debug("Error creating rss parser for ".$feed['Link']."\n",-1);
   else {
+    if($config_values['Global']['Feeds'][$feed['Link']]['items_count'] == 0) {
+      unset($config_values['Global']['Feeds'][$feed['Link']]);
+      return False;
+    }
     $config_values['Global']['Feeds'][$feed['Link']]['URL'] = $feed['Link'];
     $config_values['Global']['Feeds'][$feed['Link']]['Feed Type'] = 'RSS';
   }
@@ -118,6 +122,8 @@ function parse_one_atom($feed) {
 
 function rss_perform_matching($rs, $idx) {
   global $config_values, $matched;
+  if(count($rs['items']) == 0)
+    return;
   $percPerFeed = 80/count($config_values['Feeds']);
   $percPerItem = $percPerFeed/count($rs['items']);
   if(isset($config_values['Global']['HTMLOutput'])) {
