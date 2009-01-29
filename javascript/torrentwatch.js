@@ -14,18 +14,18 @@ $(function() {
         $(this).toggleDialog();
     });
     // Filter Bar - Buttons
-    $("ul#filterbar li").click(function() {
-        var filter = this.hash;
+    $("ul#filterbar_container li").click(function() {
+        var filter = this.id;
         $("div#torrentlist_container").slideUp(400, function() {
             switch (filter) {
-            case '#filter_all':
+            case 'filter_all':
                 $("li.torrent").removeClass('alt').show().filter(":even").addClass('alt');
                 break;
-            case '#filter_matching':
+            case 'filter_matching':
                 $("li.torrent").removeClass('alt').show().filter("li.match_nomatch").hide().end()
                         .filter(":not(li.match_nomatch)").filter(":even").addClass('alt');
                 break;
-            case '#filter_downloaded':
+            case 'filter_downloaded':
                 $("li.torrent").removeClass('alt').hide().filter("li.match_cachehit").show()
                         .filter(":even").addClass('alt');
                 break;
