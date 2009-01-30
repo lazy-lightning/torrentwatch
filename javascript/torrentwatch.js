@@ -37,13 +37,13 @@ $(function() {
     // Filter Bar -- By Text
     $("input#filter_text_input").keyup(function() {
         var filter = $(this).val().toLowerCase();
-        $("div.feed ul.torrentlist li.torrent").removeClass('alt').each(function() {
-            if ($(this).find("div.torrent_name").text().toLowerCase().match(filter)) {
+        $("li.torrent").removeClass('alt').each(function() {
+            if ($(this).find("span.torrent_name").text().toLowerCase().match(filter)) {
                 $(this).show();
             } else {
                 $(this).hide();
             }
-        }).filter(":visible:even").addClass('alt');
+        }).filter(":visible:even").addClass('alt'); 
     });
     // Switching visible items for different clients
     $("select#client").live('change', function() {
@@ -177,7 +177,8 @@ $(function() {
                 },
                 'startDownloading': function(t) {
                     $("#progressbar").show();
-                    $.get('index.cgi', $(t).find("a.context_link:last").get(0).search.substr(1), function() {
+                    var link = $(t).find("a.context_link:last")[0];
+                    $.get(link.href, '', function() {
                         $("#progressbar").hide();
                     });
                 },
@@ -186,7 +187,7 @@ $(function() {
                     if (!inspect_status) {
                         toggleInspector();
                     }
-                    $.get('inspector.cgi', 'title=' + encodeURIComponent($(t).find("div.torrent_name").text()), function(html) {
+                    $.get('inspector.cgi', 'title=' + encodeURIComponent($(t).find("span.torrent_name").text()), function(html) {
                         $("div#inspector_container").html(html);
 			$("#progressbar").hide();
                     }, 'html');

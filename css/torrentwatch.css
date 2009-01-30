@@ -171,7 +171,7 @@ ul#filterbar_container li:hover a {
 	background: transparent url('../images/filter_hover_right.png') no-repeat top right;
 	}
 
-ul#filterbar_container li:hover {
+ul#filterbar_container li:not(#filter_bytext):hover {
 	background: transparent url('../images/filter_hover_left.png') no-repeat top left;
 	}
 
@@ -243,18 +243,19 @@ div#torrentlist_container {
 	left: 0px;
 	right: 0px;
 	}
+ul.torrentlist li {
+	height: 31px;
+	}
 
 ul.torrentlist li.header {
 	border-bottom: 1px solid #ccc;
 	font-size: 1.4em;
 	text-align: center;
-	height: 29px;
 	}
 
 ul.torrentlist li.torrent {
 	border-bottom: 1px solid #ccc;
 	padding: 3px 16px 3px 28px;
-	height: 22px;
 	font-size: 0.9em;
 	}
 
@@ -290,9 +291,12 @@ ul.torrentlist li.torrent.alt {
 	background-color: #EDF3FE;
 	}
 
+span.torrent_name {
+	margin-right: 10px;
+	}
+
 span.torrent_pubDate {
-	position: absolute;
-	right: 15px;
+	float: right;
 	}	
 
 a.context_link {
@@ -373,6 +377,10 @@ div.welcome input {
 	clear: left;
 	}
 
+div#welcome1 label {
+	display: block;
+	}
+	
 div.form_radio {
 	padding-left: 10px;
 	}
