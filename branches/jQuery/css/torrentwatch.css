@@ -30,14 +30,43 @@ html {
 	}
 
 body {
-	font: 62.5% "lucida grande", Tahoma, Verdana, Arial, Helvetica, sans-serif;
+	font: 100% "lucida grande", Tahoma, Verdana, Arial, Helvetica, sans-serif;
 	color: #323232 !important;
-	text-align: center;
+	text-align: left;
 	overflow: hidden;
+	}
+
+input, select {
+	margin-left: 10px;
+	display: inline;
 	}
 
 input[type=text] {
 	border: 1px solid #787878;
+	}
+
+input[type=hidden] {
+	display: none;
+	}
+
+label {
+	display: inline;
+	font-size: 0.9em;
+	margin-left: 3px;
+	vertical-align: middle;
+	}
+
+label.category {
+	display: block;
+	font-size: 1.0em;
+	margin-top: 5px;
+	}
+
+label.item {
+	margin-left: 20px;
+	}
+
+label.suffix {
 	}
 
 /*-----------------
@@ -67,29 +96,29 @@ ul.mainoptions li#webui {
 
 ul.mainoptions li a {
 	color: #030303;
-	font-size: 1.1em;
+	font-size: 0.9em;
 	text-decoration: none;
 	padding: 36px 10px 0 10px;
 	display: block;
 	}
 
 ul.mainoptions li#refresh a {
-	background: url(../images/nuvola_refresh.png) no-repeat 19px 0;
+	background: url(../images/nuvola_refresh.png) no-repeat center 0;
 	}
 
 ul.mainoptions li#favoritesMenu a {
-	background: url(../images/nuvola_bookmark.png) no-repeat 19px 0;
+	background: url(../images/nuvola_bookmark.png) no-repeat center 0;
 	}
 ul.mainoptions li#config a {
-	background: url(../images/nuvola_configure.png) no-repeat 19px 0;
+	background: url(../images/nuvola_configure.png) no-repeat center 0;
 	}
 
 ul.mainoptions li#view a {
-	background: url(../images/nuvola_history.png) no-repeat 26px 0;
+	background: url(../images/nuvola_history.png) no-repeat center 0;
 	}
 
 ul.mainoptions li#empty a {
-	background: url(../images/remove.png) no-repeat 25px 0;
+	background: url(../images/remove.png) no-repeat center 0;
 	}
 
 ul.mainoptions li#webui a {
@@ -97,7 +126,7 @@ ul.mainoptions li#webui a {
 	}
 
 ul.mainoptions li#inspector a {
-	background: url('../images/info.png') no-repeat 18px 0;
+	background: url('../images/info.png') no-repeat center 0;
 	}
 
 ul.mainoptions li.divider {
@@ -112,20 +141,34 @@ ul.mainoptions li.divider {
  * ---------------*/
 
 ul#filterbar_container {
+	position: fixed;
 	background: #C0C8D6 url('../images/filter_bar_bg.png') repeat-x;
 	border-bottom: 1px solid #979797;
 	height: 24px;
+	right: 0;
+	left: 0;
 	z-index: 2;
 	}
 
 ul#filterbar_container li {
 	float: left;
-	margin: 7px 2px 0 5px;
+	margin: 4px 2px 0 5px;
+	padding-left: 8px;
 	vertical-align: middle;
 	height: 17px;
-	font-size: 1.2em;
+	font-size: 0.9em;
 	color: #4E4E4F;
 	margin: 4px 7px; 
+	}
+
+ul#filterbar_container li a {
+	padding-right: 8px;
+	text-decoration: none;
+	text-color: black;
+	}
+
+ul#filterbar_container li:hover a {
+	background: transparent url('../images/filter_hover_right.png') no-repeat top right;
 	}
 
 ul#filterbar_container li:hover {
@@ -134,6 +177,10 @@ ul#filterbar_container li:hover {
 
 ul#filterbar_container li.selected {
 	background: transparent url('../images/filter_selected_left.png') no-repeat top left;
+	}
+
+ul#filterbar_container li.selected a {
+	background: transparent url('../images/filter_selected_right.png') no-repeat top right;
 	}
 
 ul#filterbar_container > li#filter_bytext {
@@ -146,7 +193,7 @@ input#filter_text_input {
 	width: 100px; 
 	border: 1px solid #5D80A1; 
 	padding: 0 10px 2px 18px;
-	margin: 1px 5px 0 0;
+	margin: 2px 5px 0 0;
 	border-radius: 10px;
 	background: #FFF url('../images/filter_icon.png') top left no-repeat;
 	-o-border-radius: 10px; 
@@ -168,13 +215,12 @@ input#filter_text_input.blur {
  * ------------------------*/
 
 div#inspector_container {
-	display: none;
 	background-color: #DBDBDB;
 	position: fixed;
 	overflow: auto;
 	border-left: 1px solid #888888;
 	top: 76px;
-	right: 0;
+	right: -350px;
 	bottom: 0;
 	width: 350px;
 	z-index: 2;
@@ -199,15 +245,21 @@ div#torrentlist_container {
 	}
 
 ul.torrentlist li.header {
-	font-size: 2.2em;
+	border-bottom: 1px solid #ccc;
+	font-size: 1.4em;
 	text-align: center;
+	height: 29px;
 	}
 
-ul.torrentlist li.header,
 ul.torrentlist li.torrent {
 	border-bottom: 1px solid #ccc;
 	padding: 3px 16px 3px 28px;
 	height: 22px;
+	font-size: 0.9em;
+	}
+
+ul.torrentlist li.torrent.alt {
+	background: #afdbff;
 	}
 
 ul.torrentlist li.torrent.match_nomatch {
@@ -238,18 +290,14 @@ ul.torrentlist li.torrent.alt {
 	background-color: #EDF3FE;
 	}
 
-div.torrent_name {
-	text-align: left;
-	}
-
-div.torrent_pubDate,
-div.torrent_status {
-	text-align: right;
-}	
+span.torrent_pubDate {
+	position: absolute;
+	right: 15px;
+	}	
 
 a.context_link {
 	display: none;
-}
+	}
 
 /*--------------------------
  *
@@ -276,61 +324,46 @@ div.dialog_window {
 	padding: 5px;
 	}
 
-div.dialog_window label {
-	font-size: 1.1em;
-	line-height: 25px;
-	vertical-align: middle;
-	display: block;
+h2.dialog_heading {
+	font-size: 1.3em;
+	text-align: center;
 	}
 
-div.dialog_window label.category {
-	clear: both;
-	font-size: 1.2em;
-	margin: 0 0 0 2px;
+div.buttonContainer {
+	width: 100%;
+	border-top: 1px solid gray;
+	margin-top: 2px;
 	}
 
-div.dialog_window label.item {
-	margin: 0 5px 0 20px;
-	float: left;
-	}
-
-div.dialog_window label.suffix {
-	margin: 0 5px 0 10px;
-	float: left;
-	}
-
-div.dialog_window h2.dialog_heading {
-	display: block;
-	float: left;
-	width: 305px;
-	}
-
-div.dialog_window input,
-div.dialog_window select {
-	float: left;
-	}
-
-
-div.favinfo a,
-div.welcome a,
-div.dialog_window#clear_cache a,
-div.dialog_window#history a,
-div.dialog_window#configuration a,
-div.dialog_window#feeds a {
+a.button,
+input[type=submit] {
 	float: right;
 	margin: 5px 10px 0 0;
 	padding: 5px;
 	background-color: #EEE;
 	border: 1px solid #787878;
-	width: 50px;
-	text-align: center;
-	font-weight: bold;
-	text-decoration: none;
+	font-size: 0.8em;
 	color: #323232;
 	clear: left;
+	cursor: pointer;
 	}
 
-/* Welcome Dialogs */
+a.button {
+	width: 50px;
+	text-align: center;
+	text-decoration: none;
+	}
+
+input[type=submit] {
+	width: 62px;
+	height: 28px;
+	}
+
+/********************************
+ *
+ * W I Z A R D   D I A L O G S
+ *
+ *******************************/
 div.welcome {
 	margin: -3px auto 0 -300px;
 	width: 600px;
@@ -344,7 +377,11 @@ div.form_radio {
 	padding-left: 10px;
 	}
 
-/* Progress Bar */
+/***************************
+ *
+ * P R O G R E S S   B A R
+ *
+ ***************************/
 #progressbar {
 	background: #DBDBDB url('../images/ajaxload.gif') no-repeat center bottom;
 	display: block;
@@ -358,38 +395,28 @@ div.form_radio {
 
 #progressbar span {
 	text-align: center;
-	font-size: 1.4em;
+	font-size: 1.2em;
 	padding-left: 125px;
 	}
 
-div#progressBarText {
-	overflow: hidden;
-	}
-
-/* Configuration Dialog */
-div#config_torrentclient label.item,
-div#config_downloaddir label.item,
-div#config_watchdir label.item, 
-div#config_matchstyle label.item,
-div#config_deepdir label.item {
-	width: 110px;
-	clear: left;
-	padding-right: 10px;
-	}
-
-div#config_savetorrent label.item,
-div#config_onlynewer label.item,
-div#config_verifyepisodes label.item {
-	margin: 0 5px 0 0;
-	}
-
+/*****************************
+ *
+ * C O N F I G   D I A L O G 
+ *
+ ****************************/
+div.dialog_window#configuration select,
 div.dialog_window#configuration input[type=text] {
-	width: 261px;
+	position: absolute;
+	right: 30px;
+	width: 225px;
 	}
 
 div.dialog_window#configuration input[type=checkbox] {
 	margin: 4px 5px 0 22px;
-	clear: left;
+	}
+
+form#config_form > div {
+	min-height: 22px;
 	}
 
 div.feeditem label.item {
@@ -407,93 +434,73 @@ div.feeditem input[type=text] {
 	margin: 11px 0;
 	}
 
-/* Favorites Dialog */
+/***********************************
+ *
+ * F A V O R I T E S   D I A L O G
+ *`
+ **********************************/
 div.dialog_window#favorites {
 	margin-left:287;
 	}
 
-div.favinfo {
-	height: 230px;
-	}
-
-
-div.favorite {
+ul.favorite {
 	height: 230px;
 	float: left;
 	clear: left;
 	border: 1px solid gray;
-	padding: 5px;
-	margin: 5px;
+	padding: 5px 0 5px 5px;
+	margin: 5px 0 5px 5px;
 	width: 180px;
 	font-size: 120%;
 	overflow: auto;
 	}
 
-div.favorite ul li a {
-	text-decoration: none;
-	color: #000000;
-	}
-
-div.favorite ul li:hover {
-	background-color: #3879D7;
-	}
-
-div.favorite ul {
-	padding-left: 5px;
-	margin-top: 0px;
-	}
-
-div.favinfo {
-	display: none;
-	border: 1px solid gray;
-	padding: 5px;
-	margin: 5px;
-	width: 350px;
-	float: right;
-	}
-
-div.favorite_savein {
-	display: block;
-	}
-
-div.favorite_seedratio {
-	display: block;
-	}
-
-div.favorite_name label.item,
-div.favorite_filter label.item,
-div.favorite_not label.item,
-div.favorite_savein label.item,
-div.favorite_episodes label.item,
-div.favorite_feed label.item,
-div.favorite_seedratio label.item,
-div.favorite_quality label.item {
-	clear: left;
-	width: 70px;
-	padding-right: 10px;
-	}
-
-div.favinfo input[type=text] {
-	width: 241px;
-	}
-
-div.dialog_window#feeds input[type=submit],
-div.favinfo input[type=submit] {
-	color: #323232;
-	background-color: #EEE;
-	border: 1px solid #787878;
-	width: 62px;
-	height: 24px;
-	clear: left;
-	float: right;
-	margin: 5px 10px 0 0;
-	padding: 5px;
-	font: 95% "lucida grande", Tahoma, Verdana, Arial, Helvetica, sans-serif;
-	font-weight: bold;
+ul.favorite li {
+	overflow: hidden;
 	cursor: pointer;
 	}
 
-/* History Dialog */
+ul.favorite li a {
+	vertical-align: top;
+	font-size: 0.8em;
+	text-decoration: none;
+	color: #000000;
+	overflow: none;
+	}
+
+ul.favorite li:hover {
+	background-color: #3879D7;
+	}
+
+form.favinfo {
+	height: 230px;
+	display: none;
+	padding: 5px 0;
+	margin: 5px 0;
+	width: 380px;
+	float: right;
+	}
+
+form.favinfo > div {
+	height: 24px;
+	}
+
+form.favinfo input#mode,
+form.favinfo input#idx {
+	display: none;
+	}
+
+form.favinfo select,
+form.favinfo input[type=text] {
+	position: absolute;
+	right: 45px;
+	width: 240px;
+	}
+/******************************
+ *
+ * H I S T O R Y   D I A L O G
+ *
+ *****************************/
 div#history {
 	height: 250px;
 	}
@@ -501,13 +508,21 @@ div#history {
 ul#historyItems {
 	position: inherit;
 	top: 0;
-	bottom: 30px;
+	bottom: 35px;
 	left: 0;
 	right: 0;
+	height: 222px;
 	overflow: auto;
 	border-bottom: 1px solid #979797;
 	padding: 2px 0 0 10px;
 	}
+
+div#history ul li{
+	white-space: nowrap;
+	overflow: hidden;
+	font-size: 0.9em
+	}
+
 
 div#history > a {
 	position: inherit;
@@ -522,12 +537,11 @@ div#history > a.toggleDialog {
 	right: 70px;
 	}
 
-/*--------------------------
+/**************************
  *
- * C O N T E X T	 M E N U
+ * C O N T E X T   M E N U
  *
- * ------------------------*/
-
+ *************************/
 div.context_menu {
 	display: none;
 	position: absolute;
@@ -536,7 +550,6 @@ div.context_menu {
 	border: 1px solid rgb(119, 119, 119);
 	background-color: white;
 	z-index: 500;
-	text-align: left;
 	width: 190px;
 	}
 
@@ -568,7 +581,6 @@ div.context_menu ul li a:hover {
  *
  * ----------------*/
 
-.alt { background: #afdbff; }
 
 .clear { clear: both; }
 
@@ -577,11 +589,6 @@ div.dialog_window#favorites {
 	width: 575px;
 	margin-left: -288;
 }
-
-div#history ul li{
-	white-space: nowrap;
-	overflow: hidden;
-	}
 
 div.timer {
 	font-size: 8pt;
@@ -595,7 +602,6 @@ div.timer {
 .favorite li {
 	background: url(../images/favorites.png) no-repeat left center;
 	height: 20px;
-	line-height: 20px;
 	margin-bottom: 5px;
 	padding-left: 24px;
 	overflow: hidden;

@@ -1,11 +1,10 @@
 var inspect_status = false;
 function toggleInspector() {
-    $("div#torrentlist_container,ul#filterbar_container").stop(true,true).animate(
-            { width: (inspect_status? '+' : '-') + "=350" },
-            { queue: false, duration: 600 }
-    );
-    $("div#inspector_container").stop(true,true).animate({ width: "toggle" }, 600);
     inspect_status = !inspect_status;
+    $("div#torrentlist_container,ul#filterbar_container,div#inspector_container").stop(true,true).animate(
+            { right: (inspect_status? '+' : '-') + "=350" },
+            { duration: 600 }
+    );
 }
 
 $(function() { 
@@ -14,7 +13,9 @@ $(function() {
         $(this).toggleDialog();
     });
     // Filter Bar - Buttons
-    $("ul#filterbar_container li").click(function() {
+    $("ul#filterbar_container li:not(#filter_bytext)").click(function() {
+	$("ul#filterbar_container li").removeClass("selected");
+	$(this).addClass("selected");
         var filter = this.id;
         $("div#torrentlist_container").slideUp(400, function() {
             switch (filter) {
@@ -46,30 +47,29 @@ $(function() {
     });
     // Switching visible items for different clients
     $("select#client").live('change', function() {
-        $("div.favorite_seedratio").css("display", "none");
+        $(".favorite_seedratio").css("display", "none");
         switch ($(this).val()) {
         case 'transmission1.3x':
-            $("#config_downloaddir, #config_watchdir, #config_savetorrent, #config_deepdir, #config_verifyepisodes, div.favorite_seedratio, div.favorite_savein").css("display", "block");
-            $("div.favinfo, div.favorite").css("height", 230);
+            $("#config_downloaddir, #config_watchdir, #config_savetorrent, #config_deepdir, div.favorite_seedratio, div.favorite_savein").css("display", "block");
+            $("form.favinfo, ul.favorite").css("height", 214);
             break;
         case 'transmission1.22':
             $("#config_downloaddir, #config_deepdir, div.favorite_savein").css("display", "none");
-            $("#config_watchdir, #config_savetorrent, #config_verifyepisodes").css("display", "block");
-            $("div.favinfo, div.favorite").css("height", 180);
+            $("#config_watchdir, #config_savetorrent").css("display", "block");
+            $("form.favinfo, ul.favorite").css("height", 166);
             break;
         case 'btpd':
-            $("#config_downloaddir, #config_watchdir, #config_savetorrent, #config_deepdir, #config_verifyepisodes, div.favorite_savein").css("display", "block");
-            $("div.favorite, div.favinfo").css("height", 205);
+            $("#config_downloaddir, #config_watchdir, #config_savetorrent, #config_deepdir, div.favorite_savein").css("display", "block");
+            $("ul.favorite, form.favinfo").css("height", 190);
             break;
         case 'nzbget':
-            $("#config_watchdir, #config_verifyepisodes").css("display", "block");
+            $("#config_watchdir").css("display", "block");
             $("#config_downloaddir, #config_savetorrent, #config_deepdir, div.favorite_savein").css("display", "none");
-            $("div.favorite, div.favinfo").css("height", 180);
+            $("ul.favorite, form.favinfo").css("height", 166);
             break;
         case 'sabnzbd':
             $("#config_downloaddir, #config_watchdir, #config_savetorrent, #config_deepdir, div.favorite_savein").css("display", "none");
-            $("#config_verifyepisodes").css("display", "block");
-            $("div.favorite, div.favinfo").css("height", 180);
+            $("ul.favorite, form.favinfo").css("height", 166);
             break;
         }
     }); 
@@ -78,7 +78,7 @@ $(function() {
     var loadDynamicData = function(html) {
         var dynamic = $("<div id='dynamicdata'></div>");
         dynamic[0].innerHTML = html;
-        dynamic.find(".favorite > ul > li").initFavorites().end().find("li.torrent").myContextMenu().end()
+        dynamic.find("ul.favorite > li").initFavorites().end().find("li.torrent").myContextMenu().end()
                 .initConfigDialog().appendTo("body");
         $("#progressbar").hide();
     }; 
@@ -106,13 +106,22 @@ $(function() {
             } 
         });
     }); 
+    // Clear History ajax submit
+    $("a#clearhistory").live('click', function() {
+      $("#progressbar").show();
+      $.get(this.href, '', function(html) {
+          $("#progressbar").hide();
+          $("div#history").html($(html).html());
+      }, 'html');
+      return false;
+    });
     // Inspector
     $("li#inspector a").click(toggleInspector);
   
 });
 
 (function($) {
-    var current_favorite, current_dialog, inspect_status;
+    var current_favorite, current_dialog;
     $.fn.toggleDialog = function() {
         this.each(function() {
             var last = current_dialog;
@@ -128,8 +137,8 @@ $(function() {
     };
     $.fn.initFavorites = function() {
         var selector = this.selector;
-        this.not(":first").tsort("a").end().find("a").click(function() {
-            $(this).toggleFavorite();
+        this.not(":first").tsort("a").end().click(function() {
+            $(this).find("a").toggleFavorite();
         });
         setTimeout(function() {
             $(selector + ":first a").toggleFavorite();
@@ -156,7 +165,7 @@ $(function() {
             width: "160px"
         },
         itemStyle: {
-            fontSize: "1.3em",
+            fontSize: "1.0em",
             paddingLeft: "15px"
         }
     });
@@ -173,10 +182,14 @@ $(function() {
                     });
                 },
                 'inspect': function(t) {
+                    $("#progressbar").show();
                     if (!inspect_status) {
                         toggleInspector();
                     }
-                    $("div#inspector_container").load('inspector.cgi?title=' + $(t).find("div.torrent_name").text());
+                    $.get('inspector.cgi', 'title=' + encodeURIComponent($(t).find("div.torrent_name").text()), function(html) {
+                        $("div#inspector_container").html(html);
+			$("#progressbar").hide();
+                    }, 'html');
                 }
             }
         });
