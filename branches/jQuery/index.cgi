@@ -18,7 +18,7 @@ function parse_options() {
 		return FALSE;
 
 	$commands = explode('/', $_SERVER['PATH_INFO']);
-	file_put_contents('/tmp/twlog', 'TorrentWatch: '.$commands[1]."\n".print_r($_GET, TRUE), FILE_APPEND);
+	file_put_contents('/tmp/twlog', 'TorrentWatch: '.$_SERVER['PATH_INFO']."\n".print_r($_GET, TRUE), FILE_APPEND);
 	switch($commands[1]) {
 		case 'firstRun':
 			if(isset($_GET['link']))
@@ -204,7 +204,7 @@ function display_global_config() {
 	 '      </select>'.
 	 '    </div>'.
          '    <div class="buttonContainer">'.
-	 '      <a class="submitForm button" href="#">Save</a>'.
+	 '      <a class="submitForm button" id="Save" href="#">Save</a>'.
 	 "      <a class='toggleDialog button' href='#configuration'>Close</a>".
 	 "      <a class='toggleDialog button' href='#feeds'>Feeds</a>".
          "      <a class='toggleDialog button' href='#welcome1'>Wizard</a>".

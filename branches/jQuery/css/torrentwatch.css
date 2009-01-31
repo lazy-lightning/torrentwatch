@@ -68,7 +68,6 @@ label.item {
 
 label.suffix {
 	}
-
 /*-----------------
  *
  * T O P   M E N U
@@ -257,6 +256,11 @@ ul.torrentlist li.torrent {
 	border-bottom: 1px solid #ccc;
 	padding: 3px 16px 3px 28px;
 	font-size: 0.9em;
+	}
+
+li.torrent.hidden_bytext,
+li.torrent.hidden {
+	display: none;
 	}
 
 ul.torrentlist li.torrent.alt {
