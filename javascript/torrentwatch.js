@@ -74,8 +74,9 @@ $(function() {
         }
     }); 
 
-    // Insert our dynamic content, after initializing the parts
+    // Remove old dynamic content, replace it with passed html 
     var loadDynamicData = function(html) {
+        $("#dynamicdata").remove();
         var dynamic = $("<div id='dynamicdata'></div>");
         dynamic[0].innerHTML = html;
         dynamic.find("ul.favorite > li").initFavorites().end().find("li.torrent").myContextMenu().end()
@@ -83,9 +84,7 @@ $(function() {
         $("#progressbar").hide();
     }; 
     // Load The Dynamic Information (feeds/favorites/history/config) 
-    $.get('index.cgi', '', function(html) {
-        loadDynamicData(html);
-    });
+    $.get('index.cgi', '', loadDynamicData, 'html');
     //  Configuration dialog ajax submit
     $("a#saveConfig").live('click', function() {
         $("#progressbar").show();
@@ -94,27 +93,38 @@ $(function() {
             dataString = dataString + this.name + '=' + encodeURIComponent(this.value) + '&';
         }); 
         dataString = dataString.substr(0, dataString.length - 1); 
-        $.ajax({
-            type: "GET",
-            url: 'index.cgi',
-            cache: false,
-            data: dataString,
-            dataType: 'html',
-            success: function(html, textStatus) {
-                $("#dynamicdata").remove();
-		loadDynamicData(html);
-            } 
-        });
+        $.get('index.cgi', dataString, loadDynamicData, 'html');
     }); 
     // Clear History ajax submit
     $("a#clearhistory").live('click', function() {
       $("#progressbar").show();
-      $.get(this.href, '', function(html) {
+      $.get('index.cgi/clearHistory', '', function(html) {
           $("#progressbar").hide();
           $("div#history").html($(html).html());
       }, 'html');
       return false;
     });
+    // Update/Delete Favorite ajax submit
+    $("form.favinfo a.submitForm").live('click', function() {
+      $("#progressbar").show();
+      var form =$(this).closest("form");
+	
+      $.get('index.cgi/updateFavorite', {
+          idx: form.find("#idx").val(),
+          name: form.find(".favorite_name input").val(),
+          filter: form.find(".favorite_filter input").val(),
+          not: form.find(".favorite_not input").val(),
+          savein: form.find(".favorite_savein input").val(),
+          episodes: form.find(".favorite_episodes input").val(),
+          feed: form.find(".favorite_feed select").val(),
+          quality: form.find(".favorite_quality input").val(),
+          seedratio: form.find(".favorite_seedratio input").val(),
+          button: this.id
+        }, 
+        loadDynamicData, 'html'
+      );
+    });
+      
     // Inspector
     $("li#inspector a").click(toggleInspector);
   
