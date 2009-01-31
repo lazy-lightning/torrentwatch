@@ -83,17 +83,14 @@ $(function() {
                 .initConfigDialog().appendTo("body");
         $("#progressbar").hide();
     }; 
-    // Load The Dynamic Information (feeds/favorites/history/config) 
+    // Perform the first load of the dynamic information
     $.get('index.cgi', '', loadDynamicData, 'html');
-    //  Configuration dialog ajax submit
-    $("a#saveConfig").live('click', function() {
+
+    //  Configuration, wizard, and update/delete favorite ajax submit
+    $("a.submitForm").live('click', function() {
         $("#progressbar").show();
-        var dataString = '';
-        $("#configuration input,#configuration select").each(function() {
-            dataString = dataString + this.name + '=' + encodeURIComponent(this.value) + '&';
-        }); 
-        dataString = dataString.substr(0, dataString.length - 1); 
-        $.get('index.cgi', dataString, loadDynamicData, 'html');
+        var form = $(this).closest("form");
+        $.get(form.get(0).action, form.buildDataString(this), loadDynamicData, 'html');
     }); 
     // Clear History ajax submit
     $("a#clearhistory").live('click', function() {
@@ -103,26 +100,6 @@ $(function() {
           $("div#history").html($(html).html());
       }, 'html');
       return false;
-    });
-    // Update/Delete Favorite ajax submit
-    $("form.favinfo a.submitForm").live('click', function() {
-      $("#progressbar").show();
-      var form =$(this).closest("form");
-	
-      $.get('index.cgi/updateFavorite', {
-          idx: form.find("#idx").val(),
-          name: form.find(".favorite_name input").val(),
-          filter: form.find(".favorite_filter input").val(),
-          not: form.find(".favorite_not input").val(),
-          savein: form.find(".favorite_savein input").val(),
-          episodes: form.find(".favorite_episodes input").val(),
-          feed: form.find(".favorite_feed select").val(),
-          quality: form.find(".favorite_quality input").val(),
-          seedratio: form.find(".favorite_seedratio input").val(),
-          button: this.id
-        }, 
-        loadDynamicData, 'html'
-      );
     });
       
     // Inspector
@@ -211,6 +188,15 @@ $(function() {
             $('select#client').change();
         }, 500);
         return this;
+    };
+    $.fn.buildDataString = function(buttonElement) {
+        var dataString = '';
+        this.find('input,select').each(function() {
+            dataString = dataString + this.name + '=' + encodeURIComponent(this.value) + '&';
+        }); 
+        if(buttonElement)
+          dataString = dataString + 'button=' + buttonElement.id + '&';
+        return dataString.substr(0, dataString.length-1); // Trim the last &
     };
 })(jQuery);
 

@@ -23,33 +23,23 @@ function parse_options() {
 		case 'firstRun':
 			if(isset($_GET['link']))
 				update_feed();
-			if(isset($_GET['client'])) {
-				$config_values['Settings']['Client'] = $_GET['client'];
-			}
+			update_global_config();
 			$config_values['Settings']['FirstRun'] = FALSE;
 			write_config_file();
-			echo $refresh;
-			exit();
 			break;
 		case 'updateFavorite':
 			update_favorite();
 			break;
 		case 'updateFeed':
 			update_feed();
-			echo $refresh;
-			exit();
 			break;
 		case 'clearCache':
 			clear_cache();
-			echo $refresh;
-			exit();
 			break;
 		case 'setGlobals':
 			update_global_config();
 			$config_values['Settings']['FirstRun'] = FALSE;
 			write_config_file();
-			echo $refresh;
-			exit(0);
 			break;
 		case 'matchTitle':
 			if(($tmp = guess_match(html_entity_decode($_GET['title'])))) {
@@ -214,7 +204,7 @@ function display_global_config() {
 	 '      </select>'.
 	 '    </div>'.
          '    <div class="buttonContainer">'.
-	 '      <a class="button" id="saveConfig">Save</a>'.
+	 '      <a class="submitForm button" href="#">Save</a>'.
 	 "      <a class='toggleDialog button' href='#configuration'>Close</a>".
 	 "      <a class='toggleDialog button' href='#feeds'>Feeds</a>".
          "      <a class='toggleDialog button' href='#welcome1'>Wizard</a>".
@@ -232,7 +222,7 @@ function display_global_config() {
 			 '<div class="feeditem">'.
 			 '  <form action="'.$_SERVER['PHP_SELF'].'/updateFeed" class="feedform">'.
 			 '    <input type="hidden" name="idx" value="'.$key.'">'.
-			 '    <input class="del" type="submit" name="button" value="Delete">'.
+                         '    <a class="submitForm button" id="Delete" href="#">Delete</a>'.
 			 '    <label class="item">'.$feed['Name'].': '.$feed['Link'].'</label>'.
 			 '  </form>'.
 			 '</div>';
@@ -241,7 +231,7 @@ function display_global_config() {
 	$html_out .= 
 	 '  <div class="feeditem">'.
 	 '    <form action="'.$_SERVER['PHP_SELF'].'/updateFeed" class="feedform">'.
-	 '      <input type="submit" class="add" name="button" value="Add">'.
+         '      <a class="submitForm button" id="Add" href="#">Add</a>'.
 	 '      <label class="item">New Feed:</label>'.
 	 '      <input type="text" name="link">'.
 	 '      <a class="toggleDialog button" href="#feeds">Close</a>'.

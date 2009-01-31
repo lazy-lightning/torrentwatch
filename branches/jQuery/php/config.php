@@ -148,12 +148,15 @@ function update_global_config() {
   $checkboxs = array('Verify Episode' => 'verifyepisodes',
                      'Save Torrents'  => 'savetorrents',
                      'Only Newer'     => 'onlynewer');
-  foreach($input as $key => $data) {
+  foreach($input as $key => $data)
     if(isset($_GET[$data]))
       $config_values['Settings'][$key] = $_GET[$data];
-  }
+
+  // Checkboxs are treated like normal inputs because the ajax submit will always
+  // put a 1 or a 0 for the val.
   foreach($checkboxs as $key => $data) 
-    $config_values['Settings'][$key] = isset($_GET[$data]) ? 1 : 0;
+    if(isset($_GET[$data]))
+      $config_values['Settings'][$key] = $_GET[$data];
       
   return;
 }
