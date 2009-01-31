@@ -15,6 +15,8 @@ function platform_initialize() {
       $_SERVER['PHP_SELF'] = $_SERVER['SCRIPT_NAME'];
       break;
   }
+  if(substr($_SERVER['PHP_SELF'], -strlen($_SERVER['PATH_INFO'])) == $_SERVER['PATH_INFO'])
+    $_SERVER['PHP_SELF'] = substr($_SERVER['PHP_SELF'], 0, -strlen($_SERVER['PATH_INFO']));
 }
 
 function platform_install() {

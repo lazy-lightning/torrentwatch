@@ -14,34 +14,31 @@ $(function() {
     });
     // Filter Bar - Buttons
     $("ul#filterbar_container li:not(#filter_bytext)").click(function() {
+	if($(this).hasClass('selected'))
+            return;
 	$("ul#filterbar_container li").removeClass("selected");
 	$(this).addClass("selected");
         var filter = this.id;
         $("div#torrentlist_container").slideUp(400, function() {
+            var tor = $("li.torrent").removeClass('alt').removeClass('hidden');
             switch (filter) {
-            case 'filter_all':
-                $("li.torrent").removeClass('alt').show().filter(":even").addClass('alt');
-                break;
             case 'filter_matching':
-                $("li.torrent").removeClass('alt').show().filter("li.match_nomatch").hide().end()
-                        .filter(":not(li.match_nomatch)").filter(":even").addClass('alt');
+                tor.filter("li.match_nomatch").addClass('hidden');
                 break;
             case 'filter_downloaded':
-                $("li.torrent").removeClass('alt').hide().filter("li.match_cachehit").show()
-                        .filter(":even").addClass('alt');
+                tor.not('li.match_cachehit, li.match_match').addClass('hidden');
                 break;
             }
+            tor.not('.hidden').filter(':even').addClass('alt');
             $("div#torrentlist_container").slideDown(400);
         });
     });
     // Filter Bar -- By Text
     $("input#filter_text_input").keyup(function() {
         var filter = $(this).val().toLowerCase();
-        $("li.torrent").removeClass('alt').each(function() {
+        $("li.torrent").removeClass('alt').addClass('hidden_bytext').each(function() {
             if ($(this).find("span.torrent_name").text().toLowerCase().match(filter)) {
-                $(this).show();
-            } else {
-                $(this).hide();
+                $(this).removeClass('hidden_bytext');
             }
         }).filter(":visible:even").addClass('alt'); 
     });
@@ -192,11 +189,20 @@ $(function() {
     $.fn.buildDataString = function(buttonElement) {
         var dataString = '';
         this.find('input,select').each(function() {
-            dataString = dataString + this.name + '=' + encodeURIComponent(this.value) + '&';
+            if(dataString.length != 0)
+                dataString += '&';
+            dataString += this.name + '=';
+            if(this.type == 'checkbox')
+                dataString += (this.checked ? '1' : '0');
+            else
+                dataString += encodeURIComponent(this.value);
         }); 
-        if(buttonElement)
-          dataString = dataString + 'button=' + buttonElement.id + '&';
-        return dataString.substr(0, dataString.length-1); // Trim the last &
+        if(buttonElement) {
+            if(dataString.length != 0)
+                dataString += '&';
+            dataString += 'button=' + buttonElement.id;
+        }
+        return dataString;
     };
 })(jQuery);
 
