@@ -11,7 +11,6 @@ require_once('rss_dl_utils.php');
 // This function parses commands sent from a PC browser
 function parse_options() {
 	global $html_out, $config_values;
-	$refresh = "<html><head><meta http-equiv='refresh' content='0;../index.html'></meta></head></html>";
 	$filler = "<br>";
 
 	if(empty($_SERVER['PATH_INFO']) OR $_SERVER['PATH_INFO'] == '/')
@@ -62,8 +61,6 @@ function parse_options() {
 				$_GET['seedratio'] = '-1';
 			}
 			update_favorite();
-			echo $refresh;
-			exit;
 			break;
 		case 'dlTorrent':
 			// Loaded via ajax

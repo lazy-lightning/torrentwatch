@@ -166,13 +166,14 @@ ul#filterbar_container li a {
 	text-color: black;
 	}
 
+ul#filterbar_container li:not(#filter_bytext):hover {
+	background: transparent url('../images/filter_hover_left.png') no-repeat top left;
+	}
+
 ul#filterbar_container li:hover a {
 	background: transparent url('../images/filter_hover_right.png') no-repeat top right;
 	}
 
-ul#filterbar_container li:not(#filter_bytext):hover {
-	background: transparent url('../images/filter_hover_left.png') no-repeat top left;
-	}
 
 ul#filterbar_container li.selected {
 	background: transparent url('../images/filter_selected_left.png') no-repeat top left;
@@ -182,7 +183,7 @@ ul#filterbar_container li.selected a {
 	background: transparent url('../images/filter_selected_right.png') no-repeat top right;
 	}
 
-ul#filterbar_container > li#filter_bytext {
+ul#filterbar_container li#filter_bytext {
 	float: right;
 	margin: 0;
 	}
@@ -427,7 +428,7 @@ div.dialog_window#configuration input[type=checkbox] {
 	margin: 4px 5px 0 22px;
 	}
 
-form#config_form > div {
+form#config_form div {
 	min-height: 22px;
 	}
 
@@ -493,7 +494,7 @@ form.favinfo {
 	float: right;
 	}
 
-form.favinfo > div {
+form.favinfo div {
 	height: 24px;
 	}
 
@@ -536,16 +537,16 @@ div#history ul li{
 	}
 
 
-div#history > a {
+div#history a {
 	position: inherit;
 	bottom: 3px;
 	}
 
-div#history > a#clearhistory {
+div#history a#clearhistory {
 	right: 0px;
 	}
 
-div#history > a.toggleDialog {
+div#history a.toggleDialog {
 	right: 70px;
 	}
 
