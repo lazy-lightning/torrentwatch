@@ -6,7 +6,6 @@ $test_run = 0;
 $firstrun = 0;
 $verbosity = 0;
 
-file_put_contents('/tmp/twlog', print_r($_GET, TRUE), FILE_APPEND);
 require_once('rss_dl_utils.php');
 
 // This function parses commands sent from a PC browser
@@ -18,8 +17,9 @@ function parse_options() {
 	if(empty($_SERVER['PATH_INFO']) OR $_SERVER['PATH_INFO'] == '/')
 		return FALSE;
 
-	$command = explode('/', $_SERVER['PATH_INFO']);
-	switch($command[1]) {
+	$commands = explode('/', $_SERVER['PATH_INFO']);
+	file_put_contents('/tmp/twlog', 'TorrentWatch: '.$commands[1]."\n".print_r($_GET, TRUE), FILE_APPEND);
+	switch($commands[1]) {
 		case 'firstRun':
 			if(isset($_GET['link']))
 				update_feed();
@@ -33,8 +33,6 @@ function parse_options() {
 			break;
 		case 'updateFavorite':
 			update_favorite();
-			echo $refresh;
-			exit();
 			break;
 		case 'updateFeed':
 			update_feed();
@@ -302,8 +300,8 @@ function display_favorites_info($item, $key) {
 	 '    <input type="text" name="seedratio" value="'._isset($item, 'seedRatio', '-1').'">'.
 	 '  </div>'.
 	 '  <div class="buttonContainer">'.
-	 '    <input type="submit" class="add" name="button" value="Update">'.
-	 '    <input type="submit" class="del" name="button" value="Delete">'.
+         '    <a class="submitForm button" id="Update" href="#">Update</a>'.
+         '    <a class="submitForm button" id="Delete" href="#">Delete</a>'.
 	 '    <a class="toggleDialog button" href="#favorites">Close</a>'.
 	 '  </div>'.
 	 '</form>';
