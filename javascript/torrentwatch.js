@@ -6,6 +6,16 @@ function toggleInspector() {
             { duration: 600 }
     );
 }
+// Remove old dynamic content, replace it with passed html(ajax success function)
+var loadDynamicData = function(html) {
+    $("#dynamicdata").remove();
+    var dynamic = $("<div id='dynamicdata'></div>");
+    // Use innerHTML because some browsers choke with $(html) when html is many KB
+    dynamic[0].innerHTML = html;
+    dynamic.find("ul.favorite > li").initFavorites().end().find("li.torrent").myContextMenu().end()
+            .initConfigDialog().appendTo("body");
+    $("#progressbar").hide();
+}; 
 
 $(function() { 
     // Menu Bar, and other buttons which show/hide a dialog
@@ -69,16 +79,6 @@ $(function() {
             break;
         }
     }); 
-    // Remove old dynamic content, replace it with passed html(ajax success function)
-    var loadDynamicData = function(html) {
-        $("#dynamicdata").remove();
-        var dynamic = $("<div id='dynamicdata'></div>");
-        // Use innerHTML because some browsers choke with $(html) when html is many KB
-        dynamic[0].innerHTML = html;
-        dynamic.find("ul.favorite > li").initFavorites().end().find("li.torrent").myContextMenu().end()
-                .initConfigDialog().appendTo("body");
-        $("#progressbar").hide();
-    }; 
     // Perform the first load of the dynamic information
     $.get('index.cgi', '', loadDynamicData, 'html');
 
@@ -156,7 +156,8 @@ $(function() {
         this.contextMenu("CM1", {
             bindings: {
                 'addToFavorites': function(t) {
-                    location.replace($(t).find("a.context_link:first").get(0).href);
+                    $("#progressbar").show();
+                    $.get($(t).find("a.context_link:first").get(0).href, '', loadDynamicData, 'html')
                 },
                 'startDownloading': function(t) {
                     $("#progressbar").show();
@@ -195,7 +196,7 @@ $(function() {
                 dataString += encodeURIComponent(this.value);
         }); 
         if(buttonElement) {
-            dataString += (datastring.length == 0 ? '' : '&' ) + 'button=' + buttonElement.id;
+            dataString += (dataString.length == 0 ? '' : '&' ) + 'button=' + buttonElement.id;
         }
         return dataString;
     };

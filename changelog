@@ -1,3 +1,7 @@
+**
+this file is depreciated in favor of the SVN commit log
+**
+
 9 aug 0.6-9
   * modified add_torrent() to take directory and name of torrent seperatly
   * fixes a bug where deep directorys chooses the wrong destination directory
