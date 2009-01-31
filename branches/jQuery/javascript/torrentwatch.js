@@ -14,37 +14,36 @@ $(function() {
     });
     // Filter Bar - Buttons
     $("ul#filterbar_container li:not(#filter_bytext)").click(function() {
-	if($(this).hasClass('selected'))
+	if($(this).is('.selected'))
             return;
-	$("ul#filterbar_container li").removeClass("selected");
-	$(this).addClass("selected");
+	$(this).addClass('selected').siblings().removeClass("selected");
         var filter = this.id;
         $("div#torrentlist_container").slideUp(400, function() {
-            var tor = $("li.torrent").removeClass('alt').removeClass('hidden');
+            var tor = $("li.torrent").removeClass('hidden');
             switch (filter) {
             case 'filter_matching':
-                tor.filter("li.match_nomatch").addClass('hidden');
+                tor.filter(".match_nomatch").addClass('hidden');
                 break;
             case 'filter_downloaded':
-                tor.not('li.match_cachehit, li.match_match').addClass('hidden');
+                tor.not('.match_cachehit, .match_match').addClass('hidden');
                 break;
             }
-            tor.not('.hidden').filter(':even').addClass('alt');
-            $("div#torrentlist_container").slideDown(400);
+            tor.markAlt().closest("#torrentlist_container").slideDown(400);
         });
     });
     // Filter Bar -- By Text
     $("input#filter_text_input").keyup(function() {
         var filter = $(this).val().toLowerCase();
-        $("li.torrent").removeClass('alt').addClass('hidden_bytext').each(function() {
+        $("li.torrent").addClass('hidden_bytext').each(function() {
             if ($(this).find("span.torrent_name").text().toLowerCase().match(filter)) {
                 $(this).removeClass('hidden_bytext');
             }
-        }).filter(":visible:even").addClass('alt'); 
+        }).markAlt(); 
     });
     // Switching visible items for different clients
     $("select#client").live('change', function() {
         $(".favorite_seedratio").css("display", "none");
+        $("#torrent_settings").css("display", "block");
         switch ($(this).val()) {
         case 'transmission1.3x':
             $("#config_downloaddir, #config_watchdir, #config_savetorrent, #config_deepdir, div.favorite_seedratio, div.favorite_savein").css("display", "block");
@@ -65,16 +64,16 @@ $(function() {
             $("ul.favorite, form.favinfo").css("height", 166);
             break;
         case 'sabnzbd':
-            $("#config_downloaddir, #config_watchdir, #config_savetorrent, #config_deepdir, div.favorite_savein").css("display", "none");
+            $("#config_downloaddir, #config_watchdir, #config_savetorrent, #config_deepdir, div.favorite_savein,#torrent_settings").css("display", "none");
             $("ul.favorite, form.favinfo").css("height", 166);
             break;
         }
     }); 
-
-    // Remove old dynamic content, replace it with passed html 
+    // Remove old dynamic content, replace it with passed html(ajax success function)
     var loadDynamicData = function(html) {
         $("#dynamicdata").remove();
         var dynamic = $("<div id='dynamicdata'></div>");
+        // Use innerHTML because some browsers choke with $(html) when html is many KB
         dynamic[0].innerHTML = html;
         dynamic.find("ul.favorite > li").initFavorites().end().find("li.torrent").myContextMenu().end()
                 .initConfigDialog().appendTo("body");
@@ -92,7 +91,7 @@ $(function() {
     // Clear History ajax submit
     $("a#clearhistory").live('click', function() {
       $("#progressbar").show();
-      $.get('index.cgi/clearHistory', '', function(html) {
+      $.get(this.href, '', function(html) {
           $("#progressbar").hide();
           $("div#history").html($(html).html());
       }, 'html');
@@ -189,20 +188,19 @@ $(function() {
     $.fn.buildDataString = function(buttonElement) {
         var dataString = '';
         this.find('input,select').each(function() {
-            if(dataString.length != 0)
-                dataString += '&';
-            dataString += this.name + '=';
+            dataString += (dataString.length == 0 ? '' : '&' ) + this.name + '=';
             if(this.type == 'checkbox')
                 dataString += (this.checked ? '1' : '0');
             else
                 dataString += encodeURIComponent(this.value);
         }); 
         if(buttonElement) {
-            if(dataString.length != 0)
-                dataString += '&';
-            dataString += 'button=' + buttonElement.id;
+            dataString += (datastring.length == 0 ? '' : '&' ) + 'button=' + buttonElement.id;
         }
         return dataString;
+    };
+    $.fn.markAlt = function() {
+      return this.removeClass('alt').filter(":visible:even").addClass('alt');
     };
 })(jQuery);
 

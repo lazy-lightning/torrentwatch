@@ -169,7 +169,7 @@ function display_global_config() {
 	 '      <label class="item textinput">Download Directory:</label>'.
 	 '      <input type="text" name="downdir" value='.$config_values['Settings']['Download Dir'].'>'.
 	 '    </div>'.
-	 '    <label class="category">Torrent Settings</label>'.
+	 '    <label class="category" id="torrent_settings">Torrent Settings</label>'.
 	 '    <div id="config_watchdir">'.
 	 '      <label class="item textinput" title="Directory to look for new .torrents">Watch Directory:</label>'.
 	 '      <input type="text" name="watchdir" value='.$config_values['Settings']['Watch Dir'].'>'.
@@ -322,7 +322,7 @@ function display_favorites() {
 	             '</div>';
 }
 
-/* Needs to be re-integrated somewhere
+/* Needs to be re-integrated somewhere, javascript?
 	if($_SERVER['REMOTE_ADDR'] == "127.0.0.1")
 		$host = '127.0.0.1';
 	else if(!empty($_SERVER['SERVER_NAME']))
