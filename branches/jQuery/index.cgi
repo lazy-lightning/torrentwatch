@@ -202,7 +202,7 @@ function display_global_config() {
 	 '    </div>'.
          '    <div class="buttonContainer">'.
 	 '      <a class="submitForm button" id="Save" href="#">Save</a>'.
-	 "      <a class='toggleDialog button' href='#configuration'>Close</a>".
+	 "      <a class='toggleDialog button' href='#'>Close</a>".
 	 "      <a class='toggleDialog button' href='#feeds'>Feeds</a>".
          "      <a class='toggleDialog button' href='#welcome1'>Wizard</a>".
          '    </div>'.
@@ -231,9 +231,11 @@ function display_global_config() {
          '      <a class="submitForm button" id="Add" href="#">Add</a>'.
 	 '      <label class="item">New Feed:</label>'.
 	 '      <input type="text" name="link">'.
-	 '      <a class="toggleDialog button" href="#feeds">Close</a>'.
-	 '      <a class="toggleDialog button" href="#configuration">Back</a>'.
 	 '    </form>'.
+	 '  </div>'.
+	 '  <div class="buttonContainer">'.
+	 '    <a class="toggleDialog button" href="#">Close</a>'.
+	 '    <a class="toggleDialog button" href="#configuration">Back</a>'.
 	 '  </div>'.
 	 '</div>';
 }
@@ -289,7 +291,7 @@ function display_favorites_info($item, $key) {
 	 '  <div class="buttonContainer">'.
          '    <a class="submitForm button" id="Update" href="#">Update</a>'.
          '    <a class="submitForm button" id="Delete" href="#">Delete</a>'.
-	 '    <a class="toggleDialog button" href="#favorites">Close</a>'.
+	 '    <a class="toggleDialog button" href="#">Close</a>'.
 	 '  </div>'.
 	 '</form>';
 }
@@ -319,33 +321,6 @@ function display_favorites() {
 	             '</div>';
 }
 
-/* Needs to be re-integrated somewhere, javascript?
-	if($_SERVER['REMOTE_ADDR'] == "127.0.0.1")
-		$host = '127.0.0.1';
-	else if(!empty($_SERVER['SERVER_NAME']))
-		$host = $_SERVER['SERVER_NAME'];
-	else
-		$host = platform_getHostname();
-
-	switch($config_values['Settings']['Client']) {
-		case 'btpd':
-			$html_out .= "<li id='webui'><a href='http://$host:8883/torrent/bt.cgi'>BitTorrent WebUI</a></li>";
-			break;
-		case 'transmission1.3x':
-		case 'transmission1.32':
-			$html_out .= "<li id='webui'><a href='http://$host:9091/transmission/web/'>Transmission</a></li>";
-			break;
-		case 'transmission1.22':
-			$html_out .= "<li id='webui'><a href='http://$host:8077/'>Clutch</a></li>";
-			break;
-		case 'nzbget':
-			$html_out .= "<li id='webui'><a href='http://$host:8066/'>NZB</a></li>";
-			break;
-		case 'sabnzbd':
-			$html_out .= "<li id='webui'><a href='http://$host:8080/sabnzbd/'>SabNZBd</a></li>";
-			break;
-	} */
-
 function display_history() {
 	global $html_out, $config_values;
 
@@ -360,7 +335,7 @@ function display_history() {
 		}
 	}
 	$html_out .= $html_tmp.'</ul>';;
-	$html_out .= "<a class='toggleDialog button' href='#history'>Close</a>".
+	$html_out .= "<a class='toggleDialog button' href='#'>Close</a>".
                      '<a class="button" id="clearhistory" href="'.$_SERVER['PHP_SELF'].'/clearHistory">Clear</a>'.
 	             "</div>";
 }
@@ -368,9 +343,9 @@ function display_history() {
 function display_clear_cache() {
 	global $html_out;
 	$html_out .= 
-   '<div class="dialog_window" id="clear_cache">'.
+	 '<div class="dialog_window" id="clear_cache">'.
 	 '  <h2 class="dialog_heading">Which Cache</h2>'.
-	 '  <a class="toggleDialog" href="#clear_cache">Close</a>'.
+	 '  <a class="toggleDialog" href="#">Close</a>'.
 	 '  <a href="'.$_SERVER['PHP_SELF'].'/clearCache?type=feeds">Feeds</a>'.
 	 '  <a href="'.$_SERVER['PHP_SELF'].'/clearCache?type=torrents">Torrents</a>'.
 	 '  <a href="'.$_SERVER['PHP_SELF'].'/clearCache?type=all">All</a>'.

@@ -54,30 +54,37 @@ $(function() {
     $("select#client").live('change', function() {
         $(".favorite_seedratio").css("display", "none");
         $("#torrent_settings").css("display", "block");
+        var target = 'http://'+location.hostname;
         switch ($(this).val()) {
         case 'transmission1.3x':
             $("#config_downloaddir, #config_watchdir, #config_savetorrent, #config_deepdir, div.favorite_seedratio, div.favorite_savein").css("display", "block");
             $("form.favinfo, ul.favorite").css("height", 214);
+            target += ':9091/web/trasmission/';
             break;
         case 'transmission1.22':
             $("#config_downloaddir, #config_deepdir, div.favorite_savein").css("display", "none");
             $("#config_watchdir, #config_savetorrent").css("display", "block");
             $("form.favinfo, ul.favorite").css("height", 166);
+            target += ':8077/';
             break;
         case 'btpd':
             $("#config_downloaddir, #config_watchdir, #config_savetorrent, #config_deepdir, div.favorite_savein").css("display", "block");
             $("ul.favorite, form.favinfo").css("height", 190);
+            target += ':8883/torrent/bt.cgi';
             break;
         case 'nzbget':
             $("#config_watchdir").css("display", "block");
             $("#config_downloaddir, #config_savetorrent, #config_deepdir, div.favorite_savein").css("display", "none");
             $("ul.favorite, form.favinfo").css("height", 166);
+            target += ':8066/';
             break;
         case 'sabnzbd':
             $("#config_downloaddir, #config_watchdir, #config_savetorrent, #config_deepdir, div.favorite_savein,#torrent_settings").css("display", "none");
             $("ul.favorite, form.favinfo").css("height", 166);
+            target += ':8080/sabnzbd/';
             break;
         }
+        $("#webui a").text($(this).val())[0].href = target;
     }); 
     // Perform the first load of the dynamic information
     $.get('index.cgi', '', loadDynamicData, 'html');
@@ -108,11 +115,12 @@ $(function() {
     $.fn.toggleDialog = function() {
         this.each(function() {
             var last = current_dialog;
-            current_dialog = (last === this.hash ? '' : this.hash);
+            var target = this.hash === '#' ? '#'+$(this).closest('.dialog_window').id : this.hash;
+            current_dialog = (last === target ? '' : this.hash);
             if (last) {
                 $(last).fadeOut();
             }
-            if (current_dialog) {
+            if (current_dialog && this.hash != '#') {
                 $(current_dialog).fadeIn();
             }
         });

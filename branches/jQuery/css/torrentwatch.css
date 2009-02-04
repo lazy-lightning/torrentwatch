@@ -163,7 +163,7 @@ ul#filterbar_container li {
 ul#filterbar_container li a {
 	padding-right: 8px;
 	text-decoration: none;
-	text-color: black;
+	color: #333;
 	}
 
 ul#filterbar_container li:not(#filter_bytext):hover {
@@ -382,10 +382,12 @@ div.welcome input {
 	clear: left;
 	}
 
-div#welcome1 label {
+div#welcome1 label,
+div#welcome7 label {
+	margin-top: 0.2em;
 	display: block;
 	}
-	
+
 div.form_radio {
 	padding-left: 10px;
 	}
@@ -430,6 +432,11 @@ div.dialog_window#configuration input[type=checkbox] {
 
 form#config_form div {
 	min-height: 22px;
+	}
+
+div.feeditem {
+	height: 35px;
+	border-top: 1px solid #bbb;
 	}
 
 div.feeditem label.item {
