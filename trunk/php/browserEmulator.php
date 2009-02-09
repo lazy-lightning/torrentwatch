@@ -158,6 +158,7 @@ class BrowserEmulator {
   * Returns a file handle on success, or false on failure.
   **/
   function fopen($url) {
+    $url = $this->preparseURL($url);
     $this->lastResponse = Array();
    
     preg_match("~([a-z]*://)?([^:^/]*)(:([0-9]{1,5}))?(/.*)?~i", $url, $matches);
@@ -257,6 +258,16 @@ class BrowserEmulator {
  
   function getLastResponseHeaders() {
     return $this->lastResponse;
+  }
+
+  function preparseURL($url) {
+    if($cookies = stristr($url, '&:COOKIE:')) {
+      $url = substr($url, 0, -strlen($cookies));
+      $cookies = substr($cookies, 9);
+      $cookies = strtr($cookies, '&', ' ');
+      $this->addHeaderLine("Cookie", $cookies);
+    }
+    return $url;
   }
 }
 

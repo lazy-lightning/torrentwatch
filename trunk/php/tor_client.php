@@ -188,12 +188,6 @@ function client_add_torrent($filename, $dest, $title, &$fav = NULL, $feed = NULL
   $filename = htmlspecialchars_decode($filename);
 
   $be = new BrowserEmulator();
-  // Support for private trackers using cookies
-  if($feed != NULL && ($cookies = stristr($feed, '&:COOKIE:'))) {
-    $cookies = substr($cookies, 9);
-    $cookies = strtr($cookies, '&', ' ');
-    $be->addHeaderLine("Cookie", $cookies);
-  }
   if(!($tor = $be->file_get_contents($filename))) {
     _debug("Couldn't open torrent: $filename\n",-1);
     return FALSE;
