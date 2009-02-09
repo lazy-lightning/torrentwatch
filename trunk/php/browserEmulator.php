@@ -255,14 +255,20 @@ class BrowserEmulator {
 
     return $file;
   }
- 
+
+  function file($url) {
+    if($data = $this->file_get_contents($url))
+      return explode('\n', $data);
+    return FALSE;
+  }
+
   function getLastResponseHeaders() {
     return $this->lastResponse;
   }
 
   function preparseURL($url) {
-    if($cookies = stristr($url, '&:COOKIE:')) {
-      $url = substr($url, 0, -strlen($cookies));
+    if($cookies = stristr($url, ':COOKIE:')) {
+      $url = rtrim(substr($url, 0, -strlen($cookies)), '&');
       $cookies = substr($cookies, 9);
       $cookies = strtr($cookies, '&', ' ');
       $this->addHeaderLine("Cookie", $cookies);
