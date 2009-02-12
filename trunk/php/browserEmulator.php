@@ -269,7 +269,7 @@ class BrowserEmulator {
   function preparseURL($url) {
     if($cookies = stristr($url, ':COOKIE:')) {
       $url = rtrim(substr($url, 0, -strlen($cookies)), '&');
-      $cookies = substr($cookies, 9);
+      $cookies = substr($cookies, 8);
       $cookies = strtr($cookies, '&', ' ');
       $this->addHeaderLine("Cookie", $cookies);
     }

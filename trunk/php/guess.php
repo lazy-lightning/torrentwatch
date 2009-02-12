@@ -59,7 +59,9 @@ function guess_feedtype($feedurl) {
   global $config_values;
   $be = new browserEmulator();
   $content = $be->file($feedurl);
-  for($i = 0;$i < count($content);$i++) {
+  // Should be on the second line, but test the first 5 incase
+  // of doctype etc.
+  for($i = 0;$i < 5;$i++) {
     if(preg_match('/<feed xml/', $content[$i], $regs))
       return 'Atom';
     else if (preg_match('/<rss/', $content[$i], $regs))

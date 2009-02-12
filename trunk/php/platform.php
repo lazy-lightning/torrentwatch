@@ -53,6 +53,10 @@ function platform_getConfigFile() {
 }
 
 function platform_getGunzip() {
+  // not really a valid responce, but browseremulator will try the gzinflate function first
+  if(function_exists('gzinflate'))
+    return 'gzinflate';
+
   global $platform;
   switch($platform) {
     case 'NMT':
