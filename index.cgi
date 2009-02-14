@@ -345,8 +345,9 @@ function display_history() {
 			// History is written to file in reverse order
 			$html_tmp = '<li>'.$item['Date'].' - '.$item['Title'].'</li>'.$html_tmp;
 		}
+                echo $html_tmp;
 	}
-	$html_out .= $html_tmp.'</ul>';;
+	$html_out .= '</ul>';
 	$html_out .= "<a class='toggleDialog button' href='#'>Close</a>".
                      '<a class="button" id="clearhistory" href="'.$_SERVER['PHP_SELF'].'/clearHistory">Clear</a>'.
 	             "</div>";
@@ -354,7 +355,6 @@ function display_history() {
 
 function close_html() {
 	global $html_out, $debug_output, $main_timer;
-	$debug_output .= $verbosity;
 	echo $html_out;
 	$html_out = "";
 }

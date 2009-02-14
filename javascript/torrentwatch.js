@@ -124,9 +124,16 @@ $(function() {
             dynamic.find("ul.favorite > li").initFavorites().end().find("li.torrent").myContextMenu().end()
                     .find("form").initForm().end().initConfigDialog().appendTo("body");
             setTimeout(function() {
-                $("#torrentlist_container").slideDown(400, function() {
-                    if(inspect_status) $(this).css('right', 350)
-                });
+                var container = $("#torrentlist_container");
+                if(container.length == 0) {
+                    current_dialog = '#welcome1';
+                    $(current_dialog).show();
+                } else {
+                    container.slideDown(400, function() {
+                        if(inspect_status)
+                            container.css('right', 350);
+                    });
+                }
             }, 50);
         }, 100);
     };
