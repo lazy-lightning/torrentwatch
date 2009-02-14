@@ -90,6 +90,7 @@ $(function() {
     // Clear History ajax submit
     $("a#clearhistory").live('click', function() {
       $.get(this.href, '', function(html) {
+          // $(html).html() is used to strip the outer tag(<div#history></div>) and get the children
           $("div#history").html($(html).html());
       }, 'html');
       return false;
@@ -123,7 +124,9 @@ $(function() {
             dynamic.find("ul.favorite > li").initFavorites().end().find("li.torrent").myContextMenu().end()
                     .find("form").initForm().end().initConfigDialog().appendTo("body");
             setTimeout(function() {
-                $("#torrentlist_container").slideDown();
+                $("#torrentlist_container").slideDown(400, function() {
+                    if(inspect_status) $(this).css('right', 350)
+                });
             }, 50);
         }, 100);
     };

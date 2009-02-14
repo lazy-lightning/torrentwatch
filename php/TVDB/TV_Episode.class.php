@@ -112,7 +112,7 @@
 			$this->seasonId = (int)$config->seasonId;
 			$this->seriesId = (int)$config->seriesId;
 			$this->productionCode = (string)$config->ProductionCode;
-			$this->language = (string)$config->Language
+			$this->language = (string)$config->Language;
 			$this->image = (string) $config->filename;
 			$this->lastupdated = (string) $config->lastupdated;
 		}

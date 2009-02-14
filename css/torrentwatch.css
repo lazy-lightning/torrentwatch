@@ -226,6 +226,19 @@ h2.inspector_heading {
 	padding-left: 2em;
 	}
 
+div#inspector_container li {
+	padding-top: .7em;
+	}
+
+li#tvshow_rating {
+	float: right;
+	}
+
+div#inspector_container h2 {
+	padding-top: 0.5em;
+	font-size: 1.2em;
+	}
+
 /*--------------------------
  *
  * T O R R E N T   L I S T
