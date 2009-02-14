@@ -1,22 +1,3 @@
-var inspect_status = false;
-function toggleInspector() {
-    inspect_status = !inspect_status;
-    $("div#torrentlist_container,ul#filterbar_container,div#inspector_container").stop(true,true).animate(
-            { right: (inspect_status? '+' : '-') + "=350" },
-            { duration: 600 }
-    );
-}
-// Remove old dynamic content, replace it with passed html(ajax success function)
-var loadDynamicData = function(html) {
-    $("#dynamicdata").remove();
-    var dynamic = $("<div id='dynamicdata'></div>");
-    // Use innerHTML because some browsers choke with $(html) when html is many KB
-    dynamic[0].innerHTML = html;
-    dynamic.find("ul.favorite > li").initFavorites().end().find("li.torrent").myContextMenu().end()
-            .initConfigDialog().appendTo("body");
-    $("#progressbar").hide();
-}; 
-
 $(function() { 
     // Menu Bar, and other buttons which show/hide a dialog
     $("a.toggleDialog").live('click', function() {
@@ -85,33 +66,70 @@ $(function() {
             break;
         }
         $("#webui a").text($(this).val())[0].href = target;
-    }); 
+    });
+    // Ajax progress bar
+    $("#progressbar").ajaxStart(function() {
+      $(this).show();
+    }).ajaxStop(function() {
+      $(this).hide();
+    });
     // Perform the first load of the dynamic information
-    $.get('index.cgi', '', loadDynamicData, 'html');
+    $.get('index.cgi', '', $.loadDynamicData, 'html');
 
-    //  Configuration, wizard, and update/delete favorite ajax submit
-    $("a.submitForm").live('click', function() {
-        $("#progressbar").show();
-        var form = $(this).closest("form");
-        $.get(form.get(0).action, form.buildDataString(this), loadDynamicData, 'html');
-    }); 
+    // Configuration, wizard, and update/delete favorite ajax submit
+    $("a.submitForm").live('click', function(e) {
+        e.stopImmediatePropagation();
+        $.submitForm(this);
+    });
     // Clear History ajax submit
     $("a#clearhistory").live('click', function() {
-      $("#progressbar").show();
       $.get(this.href, '', function(html) {
-          $("#progressbar").hide();
           $("div#history").html($(html).html());
       }, 'html');
       return false;
     });
-      
+    // Clear Cache ajax submit
+    $("#clear_cache a:not(.toggleDialog)").click(function() {
+      $.get(this.href, '', $.loadDynamicData, 'html');
+      return false;
+    });
     // Inspector
-    $("li#inspector a").click(toggleInspector);
+    $("li#inspector a").click($.toggleInspector);
   
 });
 
 (function($) {
-    var current_favorite, current_dialog;
+    var current_favorite, current_dialog, inspect_status;
+    $.toggleInspector = function() {
+        inspect_status = !inspect_status;
+        $("div#torrentlist_container,ul#filterbar_container,div#inspector_container").stop(true,true).animate(
+                { right: (inspect_status? '+' : '-') + "=350" },
+                { duration: 600 }
+        );
+    };
+    // Remove old dynamic content, replace it with passed html(ajax success function)
+    $.loadDynamicData = function(html) {
+        $("#dynamicdata").remove();
+        setTimeout(function() {
+            var dynamic = $("<div id='dynamicdata'/>");
+            // Use innerHTML because some browsers choke with $(html) when html is many KB
+            dynamic[0].innerHTML = html;
+            dynamic.find("ul.favorite > li").initFavorites().end().find("li.torrent").myContextMenu().end()
+                    .find("form").initForm().end().initConfigDialog().appendTo("body");
+            setTimeout(function() {
+                $("#torrentlist_container").slideDown();
+            }, 50);
+        }, 100);
+    };
+    $.submitForm = function(button) {
+        var form;
+        if($(button).is('form')) { // User pressed enter
+            form = $(button);
+            button = form.find('a')[0];
+        } else
+            form = $(button).closest("form");
+        $.get(form.get(0).action, form.buildDataString(button), $.loadDynamicData, 'html');
+    }; 
     $.fn.toggleDialog = function() {
         this.each(function() {
             var last = current_dialog;
@@ -128,12 +146,19 @@ $(function() {
     };
     $.fn.initFavorites = function() {
         var selector = this.selector;
-        this.not(":first").tsort("a").end().click(function() {
-            $(this).find("a").toggleFavorite();
-        });
         setTimeout(function() {
             $(selector + ":first a").toggleFavorite();
         }, 300);
+        return this.not(":first").tsort("a").end().click(function() {
+            $(this).find("a").toggleFavorite();
+        });
+    };
+    $.fn.initForm = function() {
+        this.submit(function(e) {
+            e.stopImmediatePropogation();
+            $.submitForm(this);
+            return false;
+        });
         return this;
     };
     $.fn.toggleFavorite = function() {
@@ -164,24 +189,24 @@ $(function() {
         this.contextMenu("CM1", {
             bindings: {
                 'addToFavorites': function(t) {
-                    $("#progressbar").show();
-                    $.get($(t).find("a.context_link:first").get(0).href, '', loadDynamicData, 'html')
+                    $.get($(t).find("a.context_link:first").get(0).href, '', $.loadDynamicData, 'html')
                 },
                 'startDownloading': function(t) {
-                    $("#progressbar").show();
-                    var link = $(t).find("a.context_link:last")[0];
-                    $.get(link.href, '', function() {
-                        $("#progressbar").hide();
-                    });
+                    $.get($(t).find("a.context_link:last")[0].href);
                 },
                 'inspect': function(t) {
-                    $("#progressbar").show();
                     if (!inspect_status) {
-                        toggleInspector();
+                        $.toggleInspector();
                     }
                     $.get('inspector.cgi', 'title=' + encodeURIComponent($(t).find("span.torrent_name").text()), function(html) {
-                        $("div#inspector_container").html(html);
-			$("#progressbar").hide();
+                        var submitInspector = function(e) {
+                            e.stopImmediatePropagation();
+                            $.get('inspector.cgi', 'title=' + encodeURIComponent($("#inspector_container input").val()), function(html) {
+                                $("div#inspector_container").html(html).find("form").submit(submitInspector);
+                            });
+                            return false;
+                        };
+                        $("div#inspector_container").html(html).find("form").submit(submitInspector);
                     }, 'html');
                 }
             }
@@ -195,14 +220,7 @@ $(function() {
         return this;
     };
     $.fn.buildDataString = function(buttonElement) {
-        var dataString = '';
-        this.find('input,select').each(function() {
-            dataString += (dataString.length == 0 ? '' : '&' ) + this.name + '=';
-            if(this.type == 'checkbox')
-                dataString += (this.checked ? '1' : '0');
-            else
-                dataString += encodeURIComponent(this.value);
-        }); 
+        var dataString = $(this).filter('form').serialize();
         if(buttonElement) {
             dataString += (dataString.length == 0 ? '' : '&' ) + 'button=' + buttonElement.id;
         }

@@ -155,9 +155,8 @@ function update_global_config() {
   // Checkboxs are treated like normal inputs because the ajax submit will always
   // put a 1 or a 0 for the val.
   foreach($checkboxs as $key => $data) 
-    if(isset($_GET[$data]))
-      $config_values['Settings'][$key] = $_GET[$data];
-      
+    $config_values['Settings'][$key] = isset($_GET[$data]);
+
   return;
 }
       
@@ -241,8 +240,9 @@ function updateFavoriteEpisode(&$fav, $title) {
 
 function add_feed() {
   global $config_values;
-
+  _debug('adding feed');
   if(isset($_GET['link']) AND ($tmp = guess_feedtype($_GET['link'])) != 'Unknown') {
+    _debug('really adding feed');
     $link = $_GET['link'];
     $config_values['Feeds'][]['Link'] = $link;
     $idx = end(array_keys($config_values['Feeds']));

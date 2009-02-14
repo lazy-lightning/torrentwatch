@@ -37,7 +37,7 @@ body {
 	}
 
 input, select {
-	margin-left: 10px;
+	margin-left: 2em;
 	display: inline;
 	}
 
@@ -52,21 +52,18 @@ input[type=hidden] {
 label {
 	display: inline;
 	font-size: 0.9em;
-	margin-left: 3px;
+	margin-left: 1em;
 	vertical-align: middle;
 	}
 
 label.category {
 	display: block;
 	font-size: 1.0em;
-	margin-top: 5px;
+	margin-top: 1.5em;
 	}
 
-label.item {
-	margin-left: 20px;
-	}
-
-label.suffix {
+.hidden {
+	display: none;
 	}
 /*-----------------
  *
@@ -77,15 +74,14 @@ ul.mainoptions {
 	background: transparent url('../images/menu_bg.gif') repeat-x;
 	border-bottom: 1px solid #979797;
 	width: 100%;
-	height: 75px;
+	height: 4.7em;
 	z-index: 2;
 	}
 
 ul.mainoptions li {
 	float: left;
-	margin: 15px 0 0 0;
+	margin: 1em 0 0 0;
 	vertical-align: middle;
-	height: 50px;
 	}
 
 ul.mainoptions li#inspector,
@@ -97,7 +93,7 @@ ul.mainoptions li a {
 	color: #030303;
 	font-size: 0.9em;
 	text-decoration: none;
-	padding: 36px 10px 0 10px;
+	padding: 2.5em 0.7em 0 0.7em;
 	display: block;
 	}
 
@@ -130,7 +126,8 @@ ul.mainoptions li#inspector a {
 
 ul.mainoptions li.divider {
 	background: transparent url('../images/menu_divider.png') no-repeat top right;
-	margin: 17px 0 0 0;
+	height: 2.3em;
+	margin: 1.3em 0 0 0;
 	}
 
 /*-----------------
@@ -143,7 +140,7 @@ ul#filterbar_container {
 	position: fixed;
 	background: #C0C8D6 url('../images/filter_bar_bg.png') repeat-x;
 	border-bottom: 1px solid #979797;
-	height: 24px;
+	height: 1.5em;
 	right: 0;
 	left: 0;
 	z-index: 2;
@@ -151,17 +148,16 @@ ul#filterbar_container {
 
 ul#filterbar_container li {
 	float: left;
-	margin: 4px 2px 0 5px;
-	padding-left: 8px;
+	margin: 0.3em 0.5em;
+	padding-left: 0.5em;
 	vertical-align: middle;
-	height: 17px;
+	height: 1.1em;
 	font-size: 0.9em;
 	color: #4E4E4F;
-	margin: 4px 7px; 
 	}
 
 ul#filterbar_container li a {
-	padding-right: 8px;
+	padding-right: 0.5em;
 	text-decoration: none;
 	color: #333;
 	}
@@ -189,18 +185,18 @@ ul#filterbar_container li#filter_bytext {
 	}
 
 input#filter_text_input {
-	height: 16px; 
-	width: 100px; 
+	height: 1.2em; 
+	width: 8em; 
 	border: 1px solid #5D80A1; 
-	padding: 0 10px 2px 18px;
-	margin: 2px 5px 0 0;
+	padding: 0.1em 0.5em 0.15em 1.5em;
+	margin: 0.1em 0.5em;
 	border-radius: 10px;
 	background: #FFF url('../images/filter_icon.png') top left no-repeat;
-	-o-border-radius: 10px; 
-	-icab-border-radius: 10px;
-	-khtml-border-radius: 10px;
-	-moz-border-radius: 10px;
-	-webkit-border-radius: 10px; 
+	-o-border-radius: 1em; 
+	-icab-border-radius: 1em;
+	-khtml-border-radius: 1em;
+	-moz-border-radius: 1em;
+	-webkit-border-radius: 1em; 
 	outline-style: none;
 	}
 
@@ -218,16 +214,16 @@ div#inspector_container {
 	background-color: #DBDBDB;
 	position: fixed;
 	overflow: auto;
-	border-left: 1px solid #888888;
-	top: 76px;
-	right: -350px;
+	border: 1px solid #888888;
+	top: 4.7em;
+	right: -22em;
 	bottom: 0;
-	width: 350px;
+	width: 22em;
 	z-index: 2;
 	}
 
 h2.inspector_heading {
-	padding-left: 10px;
+	padding-left: 2em;
 	}
 
 /*--------------------------
@@ -236,60 +232,55 @@ h2.inspector_heading {
  *
  * ------------------------*/
 div#torrentlist_container {
+	display: none;
 	position: fixed;
 	overflow: auto;
-	top: 101px;
-	bottom: 0px;
-	left: 0px;
-	right: 0px;
-	}
-ul.torrentlist li {
-	height: 31px;
+	top: 6.3em;
+	bottom: 0;
+	left: 0;
+	right: 0;
 	}
 
 ul.torrentlist li.header {
 	border-bottom: 1px solid #ccc;
 	font-size: 1.4em;
+	height: 1.2em;
 	text-align: center;
 	}
 
 ul.torrentlist li.torrent {
 	border-bottom: 1px solid #ccc;
-	padding: 3px 16px 3px 28px;
+	padding: 0.2em 0.5em 0.3em 30px;
 	font-size: 0.9em;
+	height: 2.3em;
 	}
 
-li.torrent.hidden_bytext,
-li.torrent.hidden {
+li.torrent.hidden_bytext {
 	display: none;
 	}
 
-ul.torrentlist li.torrent.alt {
-	background: #afdbff;
-	}
-
 ul.torrentlist li.torrent.match_nomatch {
-	background: transparent url('../images/nuvola_ledred.png') no-repeat 3px center;
+	background: transparent url('../images/nuvola_ledred.png') no-repeat 0.2em center;
 	}
 
 ul.torrentlist li.torrent.match_match {
-	background: transparent url('../images/nuvola_ledorange.png') no-repeat 3px center;
+	background: transparent url('../images/nuvola_ledorange.png') no-repeat 0.2em center;
 	}
 
 ul.torrentlist li.torrent.match_cachehit {
-	background: transparent url('../images/nuvola_ledgreen.png') no-repeat 3px center;
+	background: transparent url('../images/nuvola_ledgreen.png') no-repeat 0.2em center;
 	}
 
 ul.torrentlist li.torrent.match_duplicate {
-	background: transparent url('../images/nuvola_ledyellow.png') no-repeat 3px center;
+	background: transparent url('../images/nuvola_ledyellow.png') no-repeat 0.2em center;
 	}
 
 ul.torrentlist li.torrent.match_old {
-	background: transparent url('../images/nuvola_ledlightblue.png') no-repeat 3px center;
+	background: transparent url('../images/nuvola_ledlightblue.png') no-repeat 0.2em center;
 	}
 
 ul.torrentlist li.torrent.match_test {
-	background: transparent url('../images/nuvola_ledpurple.png') no-repeat 3px center;
+	background: transparent url('../images/nuvola_ledpurple.png') no-repeat 0.2em center;
 	}
 
 ul.torrentlist li.torrent.alt {
@@ -322,7 +313,7 @@ div.dialog_window {
 	left: 50%;
 	z-index: 3;
 	background-color: #DBDBDB;
-	margin: -3px auto 0 auto;
+	margin: -0.2em auto 0 auto;
 	filter: alpha(opacity=95);
 	-moz-opacity: .95;
 	opacity: .95;
@@ -374,7 +365,7 @@ input[type=submit] {
  *
  *******************************/
 div.welcome {
-	margin: -3px auto 0 -300px;
+	margin: -0.2em auto 0 -300px;
 	width: 600px;
 	}
 
@@ -405,7 +396,7 @@ div.form_radio {
 	overflow: hidden;
 	z-index: 5;
 	width: 300px;
-	margin: -3px auto 0 -150px;
+	margin: -0.2em auto 0 -150px;
 	}
 
 #progressbar span {
@@ -546,15 +537,15 @@ div#history ul li{
 
 div#history a {
 	position: inherit;
-	bottom: 3px;
+	bottom: 0.2em;
 	}
 
 div#history a#clearhistory {
-	right: 0px;
+	right: 0;
 	}
 
 div#history a.toggleDialog {
-	right: 70px;
+	right: 5.2em;
 	}
 
 /**************************
@@ -565,8 +556,8 @@ div#history a.toggleDialog {
 div.context_menu {
 	display: none;
 	position: absolute;
-	margin: 0px;
-	padding: 0px;
+	margin: 0;
+	padding: 0;
 	border: 1px solid rgb(119, 119, 119);
 	background-color: white;
 	z-index: 500;
@@ -575,7 +566,7 @@ div.context_menu {
 
 div.context_menu ul {
 	border: medium none;
-	margin: 0px;
+	margin: 0;
 	padding: 5px 0pt;
 	list-style-type: none;
 	list-style-image: none;
@@ -585,7 +576,7 @@ div.context_menu ul {
 
 div.context_menu ul li a {
 	display: block;
-	padding: 0px 10px 2px 20px;
+	padding: 0 10px 2px 20px;
 	color: #000000;
 	text-decoration: none;
 	}
