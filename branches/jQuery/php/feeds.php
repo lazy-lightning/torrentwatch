@@ -43,6 +43,7 @@ function check_for_torrent(&$item, $key, $opts) {
       break;
   }
   if($hit) {
+    $matched = 'match';
     if(check_cache($rs['title'])) {
       $guess = guess_match($title, TRUE);
       if(_isset($config_values['Settings'], 'Only Newer') == 1) {
@@ -67,7 +68,7 @@ function check_for_torrent(&$item, $key, $opts) {
         if(stripos($config_values['Settings']['Client'],'nzb') !== FALSE) {
           if(client_add_nzb($link, $title, $item, $opts['URL']))
             add_cache($rs['title']);
-        } else if(client_add_torrent($link, NULL, $item, $opts['URL'])) {
+        } else if(client_add_torrent($link, NULL, $rs['title'], $item, $opts['URL'])) {
           add_cache($rs['title']);
         } else {
           _debug("Failed adding torrent $link\n", -1);
@@ -137,6 +138,9 @@ function rss_perform_matching($rs, $idx) {
       array_walk($config_values['Favorites'], 'check_for_torrent', 
                  array('Obj' =>$item, 'URL' => $rs['URL']));
     _Debug("$matched: $item[title]\n", 1);
+    if($matched != "match" && $matched != 'cachehit' &&
+       file_exists($config_values['Settings']['Cache Dir'].'rss_dl_'.filename_encode($item['title'])))
+      $matched = 'downloaded';
     if(isset($config_values['Global']['HTMLOutput'])) {
       show_torrent_html($item, $rs['URL'], $alt);
     }

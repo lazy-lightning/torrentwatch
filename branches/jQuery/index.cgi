@@ -67,7 +67,8 @@ function parse_options() {
 			if(stripos($config_values['Settings']['Client'], 'nzb') !== FALSE) 
 				$r = client_add_nzb(urldecode($_GET['link']),$_GET['title']);
 			else
-				$r = client_add_torrent(trim(urldecode($_GET['link'])), $config_values['Settings']['Download Dir']);
+				$r = client_add_torrent(trim(urldecode($_GET['link'])), $config_values['Settings']['Download Dir'], $_GET['title']);
+                        if($r) add_cache($_GET['title']);
 			display_history();
 			close_html();
 			exit(0);
@@ -102,7 +103,7 @@ function display_global_config() {
 	$savetorrent=$nzbget=$trans122=$trans13x=$btpd="";
 	$deepfull=$deeptitle=$deepoff=$verifyepisode="";
 	$matchregexp=$matchglob=$matchsimple=$sabnzbd="";
-	$onlynewer="";
+	$onlynewer=$folderclient="";
 
 	switch($config_values['Settings']['Client']) {
 		case 'btpd':
@@ -121,6 +122,12 @@ function display_global_config() {
 		case 'sabnzbd':
 			$sabnzbd = 'selected="selected"';
 			break;
+                case 'folder':
+                        $folderclient = 'selected="selected"';
+                        break;
+                case 'folder':
+                        $folderclient = 'selected="selected"';
+                        break;
 		default:
 			// Shouldn't happen
 			break;
@@ -160,8 +167,13 @@ function display_global_config() {
 	 '        <option value="transmission1.3x" '.$trans13x.'>Transmission &gt;= 1.30</option>'.
 	 '        <option value="nzbget" '.$nzbget.'>NZBGet</option>'.
 	 '        <option value="sabnzbd" '.$sabnzbd.'>SabNZBd</option>'.
+         '        <option value="folder" '.$folderclient.'>Simple Folder</option>'.
 	 '      </select>'.
 	 '    </div>'.
+         '    <div id="config_folderclient">'.
+         '      <label class="item">File Extension</label>'.
+         '      <input type="text" name="extension" value='.$config_values['Settings']['Extension'].'>'.
+         '    </div>'.
 	 '    <div id="config_downloaddir" title="Default directory to start items in">'.
 	 '      <label class="item textinput">Download Directory:</label>'.
 	 '      <input type="text" name="downdir" value='.$config_values['Settings']['Download Dir'].'>'.
@@ -340,18 +352,6 @@ function display_history() {
 	             "</div>";
 }
 
-function display_clear_cache() {
-	global $html_out;
-	$html_out .= 
-	 '<div class="dialog_window" id="clear_cache">'.
-	 '  <h2 class="dialog_heading">Which Cache</h2>'.
-	 '  <a class="toggleDialog" href="#">Close</a>'.
-	 '  <a href="'.$_SERVER['PHP_SELF'].'/clearCache?type=feeds">Feeds</a>'.
-	 '  <a href="'.$_SERVER['PHP_SELF'].'/clearCache?type=torrents">Torrents</a>'.
-	 '  <a href="'.$_SERVER['PHP_SELF'].'/clearCache?type=all">All</a>'.
-	 '</div>';
-}
-
 function close_html() {
 	global $html_out, $debug_output, $main_timer;
 	$debug_output .= $verbosity;
@@ -377,24 +377,8 @@ $verbosity = 0;
 
 parse_options();
 
-// Main Menu
-//display_topmenu();
-//display_filter_bar();
-//$html_out .= file_get_contents('html/welcome.html');
-
-//display_progress_bar();
-//echo $html_out;
-//ob_flush();flush();
-//$html_out = "";
-
-
-// Hidden DIV's
-//display_context_menu();
 display_global_config();
 display_favorites();
-//display_clear_cache();
-//display_hidden_iframe();
-
 echo $html_out;
 $html_out = "";
 ob_flush();flush();
@@ -407,9 +391,6 @@ if(isset($config_values['Feeds'])) {
 
 // Comes later incase we just added a torrent	
 display_history();
-//display_inspector();
-
-//set_default_div();
 
 close_html();
 unlink_temp_files();

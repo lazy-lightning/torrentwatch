@@ -74,6 +74,13 @@ function get_deep_dir($dest, $tor_name) {
     return $dest;
 }
 
+function folder_add_torrent($tor, $dest, $title) {
+  global $config_values;
+  $dest = "$dest/$title.".$config_values['Settings']['Extension'];
+  file_put_contents($dest, $tor);
+  return 0;
+}
+
 function btpd_add_torrent($tor, $dest) {
   global $config_values;
   $btcli = '/mnt/syb8634/bin/btcli';
@@ -120,7 +127,7 @@ function transmission13x_add_torrent($tor, $dest, $seedRatio = -1) {
     if(!isset($responce['result']))
       return "Failure connecting to Transmission >= 1.30";
     else
-      return "Transmission RPC Error: ".print_r($responce);
+      return "Transmission RPC Error: ".print_r($responce, TRUE);
   }
 }
 
@@ -175,26 +182,19 @@ function client_add_nzb($filename, $title = NULL, &$fav = NULL, $feed = NULL) {
   return ($return === 0);
 }
   
-function client_add_torrent($filename, $dest, &$fav = NULL, $feed = NULL) {
+function client_add_torrent($filename, $dest, $title, &$fav = NULL, $feed = NULL) {
   global $config_values, $hit;
   $hit = 1;
   $filename = htmlspecialchars_decode($filename);
 
   $be = new BrowserEmulator();
-  // Support for private trackers using cookies
-  if($feed != NULL && ($cookies = stristr($feed, '&:COOKIE:'))) {
-    $cookies = substr($cookies, 9);
-    $cookies = strtr($cookies, '&', ' ');
-    $be->addHeaderLine("Cookie", $cookies);
-  }
   if(!($tor = $be->file_get_contents($filename))) {
     _debug("Couldn't open torrent: $filename\n",-1);
     return FALSE;
   }
   $tor_info = new BDecode("", $tor);
   if(!($tor_name = $tor_info->{'result'}['info']['name'])) {
-    _debug("Couldn't parse torrent: $filename\n", -1);
-    return FALSE;
+    $tor_name = $title;
   }
 
   if(!isset($dest)) {
@@ -224,6 +224,9 @@ function client_add_torrent($filename, $dest, &$fav = NULL, $feed = NULL) {
       // Doesn't support setting dest, so here change dest to transmissons
       $tr_state = new BDecode('/share/.transmission/daemon/state');
       $dest = $tr_state->{'result'}['default-directory'];
+      break;
+    case 'folder':
+      $return = folder_add_torrent($tor, $dest, $tor_name);
       break;
     default:
       _debug("Invalid Torrent Client: ".$config_values['Settings']['Client']."\n",-1);

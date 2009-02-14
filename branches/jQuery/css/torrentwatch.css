@@ -267,6 +267,10 @@ ul.torrentlist li.torrent.match_match {
 	background: transparent url('../images/nuvola_ledorange.png') no-repeat 0.2em center;
 	}
 
+ul.torrentlist li.torrent.match_downloaded {
+        background: transparent url('../images/nuvola_ledlightgreen.png') no-repeat 0.2em center;
+        }
+
 ul.torrentlist li.torrent.match_cachehit {
 	background: transparent url('../images/nuvola_ledgreen.png') no-repeat 0.2em center;
 	}

@@ -33,10 +33,16 @@ $(function() {
     });
     // Switching visible items for different clients
     $("select#client").live('change', function() {
-        $(".favorite_seedratio").css("display", "none");
+        $(".favorite_seedratio, #config_folderclient").css("display", "none");
         $("#torrent_settings").css("display", "block");
         var target = 'http://'+location.hostname;
         switch ($(this).val()) {
+        case 'folder':
+            $("#config_watchdir, #config_savetorrent, #config_deepdir, #torrent_settings, div.favorite_savein").css("display", "none");
+            $("#config_folderclient, #config_downloaddir").css("display", "block");
+            $("form.favinfo, ul.favorite").css("height", 166);
+            target = '#';
+            break;
         case 'transmission1.3x':
             $("#config_downloaddir, #config_watchdir, #config_savetorrent, #config_deepdir, div.favorite_seedratio, div.favorite_savein").css("display", "block");
             $("form.favinfo, ul.favorite").css("height", 214);

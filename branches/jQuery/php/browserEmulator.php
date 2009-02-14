@@ -151,13 +151,27 @@ class BrowserEmulator {
   function resetPort() {
     $this->port = 80;
   }
- 
+
+  /**
+   * Parse any cookies set in the URL, and return the trimed string
+   **/
+  function preparseURL($url) {
+    if($cookies = stristr($url, ':COOKIE:')) {
+      $url = rtrim(substr($url, 0, -strlen($cookies)), '&');
+      $cookies = substr($cookies, 8);
+      $cookies = strtr($cookies, '&', ' ');
+      $this->addHeaderLine("Cookie", $cookies);
+    }
+    return $url;
+  }
+
   /**
   * Make an fopen call to $url with the parameters set by previous member
   * method calls. Send all set headers, post data and user authentication data.
   * Returns a file handle on success, or false on failure.
   **/
   function fopen($url) {
+    $url = $this->preparseURL($url);
     $this->lastResponse = Array();
    
     preg_match("~([a-z]*://)?([^:^/]*)(:([0-9]{1,5}))?(/.*)?~i", $url, $matches);
@@ -225,7 +239,7 @@ class BrowserEmulator {
     return $socket;
   }
   
-/**
+  /**
   * Make an file call to $url with the parameters set by previous member
   * method calls. Send all set headers, post data and user authentication data.
   * Returns the requested file as a string on success, or false on failure.
@@ -253,6 +267,16 @@ class BrowserEmulator {
     }
 
     return $file;
+  }
+
+  /**
+   * Simulate a file() call by exploding file_get_contents()
+   **/
+  function file($url) {
+    $data = $this->file_get_contents($url);
+    if($data)
+      return explode('\n', $data);
+    return False;
   }
  
   function getLastResponseHeaders() {
