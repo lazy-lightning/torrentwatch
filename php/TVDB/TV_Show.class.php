@@ -144,6 +144,13 @@
 			$this->rating = (string)$config->Rating;
 			$this->imdbId = (string)$config->IMDB_ID;
 			$this->zap2ItId = (string)$config->zap2it_id;
+			$this->seriesId = (string)$config->SeriesID;
+			$this->contentRating = (string)$config->ContentRating;
+			$this->language = (string)$config->Language;
+			$this->banner = (string)$config->banner;
+			$this->fanart = (string)$config->fanart;
+			$this->lastupdated = (string)$config->lastupdated;
+
 		}
 		
 		

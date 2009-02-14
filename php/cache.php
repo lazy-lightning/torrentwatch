@@ -97,7 +97,6 @@ function check_cache($title)
   if (isset($config_values['Settings']['Cache Dir'])) {
     $cache_file = $config_values['Settings']['Cache Dir'].'/rss_dl_'.filename_encode($title);
     if (!file_exists($cache_file)) {
-      $matched = "match";
       if($config_values['Settings']['Verify Episode']) {
         return check_cache_episode($title);
       } else {
@@ -109,7 +108,6 @@ function check_cache($title)
     }
   } else {
     // No Cache, Always download
-    $matched = "match";
     return 1;
   }
 }

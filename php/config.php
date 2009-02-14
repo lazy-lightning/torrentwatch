@@ -26,6 +26,7 @@ function setup_default_config() {
   _default('History', $basedir."/rss_dl.history");
   _default('MatchStyle',"simple");
   _default('FirstRun',"1");
+  _default('Extension',"torrent");
 }
 
 // This function is from
@@ -144,7 +145,8 @@ function update_global_config() {
                  'Deep Directories' => 'deepdir',
                  'Client'           => 'client',
                  'MatchStyle'       => 'matchstyle',
-                 'Only Newer'       => 'onlynewer');
+                 'Only Newer'       => 'onlynewer',
+                 'Extension'        => 'extension');
   $checkboxs = array('Verify Episode' => 'verifyepisodes',
                      'Save Torrents'  => 'savetorrents',
                      'Only Newer'     => 'onlynewer');
@@ -152,8 +154,6 @@ function update_global_config() {
     if(isset($_GET[$data]))
       $config_values['Settings'][$key] = $_GET[$data];
 
-  // Checkboxs are treated like normal inputs because the ajax submit will always
-  // put a 1 or a 0 for the val.
   foreach($checkboxs as $key => $data) 
     $config_values['Settings'][$key] = isset($_GET[$data]);
 
