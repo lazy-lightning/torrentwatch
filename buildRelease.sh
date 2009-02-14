@@ -1,6 +1,6 @@
 #!/bin/sh
 
-EXE_FILES="index.cgi rss_dl.php inspector.cgi"
+EXE_FILES="index.cgi rss_dl.php inspector.cgi index.html"
 DOC_FILES="changelog CREDITS LICENSE TODO"
 RELEASE_FILES="$EXE_FILES $DOC_FILES .htaccess css/ images/ javascript/ php/ html/"
 RELEASE=torrentwatch-dev-$1
