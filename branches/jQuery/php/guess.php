@@ -57,7 +57,8 @@ function guess_match($title, $normalize = FALSE) {
 
 function guess_feedtype($feedurl) {
   global $config_values;
-  $content = file($feedurl);
+  $be = new browserEmulator();
+  $content = explode('\n', $be->file_get_contents($feedurl));
   for($i = 0;$i < count($content);$i++) {
     if(preg_match('/<feed xml/', $content[$i], $regs))
       return 'Atom';

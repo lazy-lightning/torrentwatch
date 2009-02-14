@@ -6,19 +6,22 @@ require_once('guess.php');
 
 function _die($errmsg) {
 ?>
-<div id='inspector_container'>
-  <div class='tvshow'>
-    <h2 id='tvshow_title' class='inspector_heading'><?php echo $errmsg; ?></h2>
-  </div>
+<div class='tvshow'>
+  <h2 id='tvshow_title' class='inspector_heading'><?php echo $errmsg; ?></h2>
+  <form action="inspector.cgi" type="get">
+    <input type="text" name="title" value="<?php echo $_GET['title'] ?>">
+  </form>
 </div>
 <?php die();
 }
 
 if(!isset($_GET['title']))
 	_die("Bad Query");
+file_put_contents('/tmp/twlog', 'Inspecto Called: '.$_GET['title']."\n", FILE_APPEND);
 $guess = guess_match($_GET['title'], TRUE);
 if($guess === False)
-	_die("Couldn't guess ".$_GET['title']);
+	$guess = array('key' =>$_GET['title']);
+	//_die("Couldn't guess ".$_GET['title']);
 
 if(stristr($guess['key'], 'and') !== FALSE)
 	$guess2 = strtr(strtolower($guess['key']), array("and" => '&'));
