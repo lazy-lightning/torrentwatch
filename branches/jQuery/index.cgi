@@ -340,12 +340,12 @@ function display_history() {
 	if(file_exists($config_values['Settings']['History'])) {
 		$history = unserialize(file_get_contents($config_values['Settings']['History']));
 
-		$html_tmp = '';
-		foreach($history as $item) {
-			// History is written to file in reverse order
-			$html_tmp = '<li>'.$item['Date'].' - '.$item['Title'].'</li>'.$html_tmp;
+		$html_tmp = array();
+		// History is written to file in reverse order
+		foreach(array_reverse($history) as $item) {
+			$html_tmp[] = '<li>'.$item['Date'].' - '.$item['Title'].'</li>';
 		}
-                echo $html_tmp;
+                $html_out .= implode($html_tmp);
 	}
 	$html_out .= '</ul>';
 	$html_out .= "<a class='toggleDialog button' href='#'>Close</a>".
