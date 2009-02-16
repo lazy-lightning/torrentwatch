@@ -1,0 +1,637 @@
+/*
+	Name: PCH Torrent RSS Config
+	Description: Stylistic update of the TorrentWatch (http://code.google.com/p/torrentwatch/) config interface.
+	Version: 1.0
+	Author: Keith Solomon
+	Author URI: http://reciprocity.be/
+	
+	License: GNU General Public License v2
+*/
+
+/* Modifications by Erik Bernhardson
+ * inspired by Clutch
+ */
+
+/*---------------------
+ * Some debugging info
+ * --------------------*/
+div.rss_debug {
+	display: none;
+}
+
+/*-----------------
+ *
+ * G L O B A L
+ *
+ * ---------------*/
+
+html {
+	height: 100%;
+	}
+
+body {
+	font: 100% "lucida grande", Tahoma, Verdana, Arial, Helvetica, sans-serif;
+	color: #323232 !important;
+	text-align: left;
+	overflow: hidden;
+	}
+
+input, select {
+	margin-left: 2em;
+	display: inline;
+	}
+
+input[type=text] {
+	border: 1px solid #787878;
+	}
+
+input[type=hidden] {
+	display: none;
+	}
+
+label {
+	display: inline;
+	font-size: 0.9em;
+	margin-left: 1em;
+	vertical-align: middle;
+	}
+
+label.category {
+	display: block;
+	font-size: 1.0em;
+	margin-top: 1.5em;
+	}
+
+.hidden {
+	display: none;
+	}
+/*-----------------
+ *
+ * T O P   M E N U
+ *
+ * ----------------*/
+ul.mainoptions {
+	background: transparent url('../images/menu_bg.gif') repeat-x;
+	border-bottom: 1px solid #979797;
+	width: 100%;
+	height: 4.7em;
+	z-index: 2;
+	}
+
+ul.mainoptions li {
+	float: left;
+	margin: 1em 0 0 0;
+	vertical-align: middle;
+	}
+
+ul.mainoptions li#inspector,
+ul.mainoptions li#webui {
+	float: right;
+	}
+
+ul.mainoptions li a {
+	color: #030303;
+	font-size: 0.9em;
+	text-decoration: none;
+	padding: 2.5em 0.7em 0 0.7em;
+	display: block;
+	}
+
+ul.mainoptions li#refresh a {
+	background: url(../images/nuvola_refresh.png) no-repeat center 0;
+	}
+
+ul.mainoptions li#favoritesMenu a {
+	background: url(../images/nuvola_bookmark.png) no-repeat center 0;
+	}
+ul.mainoptions li#config a {
+	background: url(../images/nuvola_configure.png) no-repeat center 0;
+	}
+
+ul.mainoptions li#view a {
+	background: url(../images/nuvola_history.png) no-repeat center 0;
+	}
+
+ul.mainoptions li#empty a {
+	background: url(../images/remove.png) no-repeat center 0;
+	}
+
+ul.mainoptions li#webui a {
+	background: url(../images/webui.png) no-repeat center 0;
+	}
+
+ul.mainoptions li#inspector a {
+	background: url('../images/info.png') no-repeat center 0;
+	}
+
+ul.mainoptions li.divider {
+	background: transparent url('../images/menu_divider.png') no-repeat top right;
+	height: 2.3em;
+	margin: 1.3em 0 0 0;
+	}
+
+/*-----------------
+ *
+ * F I L T E R	 B A R
+ *
+ * ---------------*/
+
+ul#filterbar_container {
+	position: fixed;
+	background: #C0C8D6 url('../images/filter_bar_bg.png') repeat-x;
+	border-bottom: 1px solid #979797;
+	height: 1.5em;
+	right: 0;
+	left: 0;
+	z-index: 2;
+	}
+
+ul#filterbar_container li {
+	float: left;
+	margin: 0.3em 0.5em;
+	padding-left: 0.5em;
+	vertical-align: middle;
+	height: 1.1em;
+	font-size: 0.9em;
+	color: #4E4E4F;
+	}
+
+ul#filterbar_container li a {
+	padding-right: 0.5em;
+	text-decoration: none;
+	color: #333;
+	}
+
+ul#filterbar_container li:not(#filter_bytext):hover {
+	background: transparent url('../images/filter_hover_left.png') no-repeat top left;
+	}
+
+ul#filterbar_container li:hover a {
+	background: transparent url('../images/filter_hover_right.png') no-repeat top right;
+	}
+
+
+ul#filterbar_container li.selected {
+	background: transparent url('../images/filter_selected_left.png') no-repeat top left;
+	}
+
+ul#filterbar_container li.selected a {
+	background: transparent url('../images/filter_selected_right.png') no-repeat top right;
+	}
+
+ul#filterbar_container li#filter_bytext {
+	float: right;
+	margin: 0;
+	}
+
+input#filter_text_input {
+	height: 1.2em; 
+	width: 8em; 
+	border: 1px solid #5D80A1; 
+	padding: 0.1em 0.5em 0.15em 1.5em;
+	margin: 0.1em 0.5em;
+	border-radius: 10px;
+	background: #FFF url('../images/filter_icon.png') top left no-repeat;
+	-o-border-radius: 1em; 
+	-icab-border-radius: 1em;
+	-khtml-border-radius: 1em;
+	-moz-border-radius: 1em;
+	-webkit-border-radius: 1em; 
+	outline-style: none;
+	}
+
+input#filter_text_input.blur {
+	border-color: #CCC;
+	}
+
+/*--------------------------
+ *
+ * I N S P E C T O R
+ *
+ * ------------------------*/
+
+div#inspector_container {
+	background-color: #DBDBDB;
+	position: fixed;
+	overflow: auto;
+	border: 1px solid #888888;
+	top: 4.7em;
+	right: -22em;
+	bottom: 0;
+	width: 22em;
+	z-index: 2;
+	}
+
+h2.inspector_heading {
+	padding-left: 2em;
+	}
+
+div#inspector_container li {
+	padding-top: .7em;
+	}
+
+li#tvshow_rating {
+	float: right;
+	}
+
+div#inspector_container h2 {
+	padding-top: 0.5em;
+	font-size: 1.2em;
+	}
+
+/*--------------------------
+ *
+ * T O R R E N T   L I S T
+ *
+ * ------------------------*/
+div#torrentlist_container {
+	display: none;
+	position: fixed;
+	overflow: auto;
+	top: 6.3em;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	}
+
+ul.torrentlist li.header {
+	border-bottom: 1px solid #ccc;
+	font-size: 1.4em;
+	height: 1.2em;
+	text-align: center;
+	}
+
+ul.torrentlist li.torrent {
+	border-bottom: 1px solid #ccc;
+	padding: 0.2em 0.5em 0.3em 30px;
+	font-size: 0.9em;
+	height: 2.3em;
+	}
+
+li.torrent.hidden_bytext {
+	display: none;
+	}
+
+ul.torrentlist li.torrent.match_nomatch {
+	background: transparent url('../images/nuvola_ledred.png') no-repeat 0.2em center;
+	}
+
+ul.torrentlist li.torrent.match_match {
+	background: transparent url('../images/nuvola_ledorange.png') no-repeat 0.2em center;
+	}
+
+ul.torrentlist li.torrent.match_downloaded {
+        background: transparent url('../images/nuvola_ledlightgreen.png') no-repeat 0.2em center;
+        }
+
+ul.torrentlist li.torrent.match_cachehit {
+	background: transparent url('../images/nuvola_ledgreen.png') no-repeat 0.2em center;
+	}
+
+ul.torrentlist li.torrent.match_duplicate {
+	background: transparent url('../images/nuvola_ledyellow.png') no-repeat 0.2em center;
+	}
+
+ul.torrentlist li.torrent.match_old {
+	background: transparent url('../images/nuvola_ledlightblue.png') no-repeat 0.2em center;
+	}
+
+ul.torrentlist li.torrent.match_test {
+	background: transparent url('../images/nuvola_ledpurple.png') no-repeat 0.2em center;
+	}
+
+ul.torrentlist li.torrent.alt {
+	background-color: #EDF3FE;
+	}
+
+span.torrent_name {
+	margin-right: 10px;
+	}
+
+span.torrent_pubDate {
+	float: right;
+	}	
+
+a.context_link {
+	display: none;
+	}
+
+/*--------------------------
+ *
+ * D I A L O G S
+ *
+ * ---------------------*/
+
+div.dialog_window {
+	display: none;
+	position: absolute;
+	margin-left: auto;
+	margin-right: auto;
+	left: 50%;
+	z-index: 3;
+	background-color: #DBDBDB;
+	margin: -0.2em auto 0 auto;
+	filter: alpha(opacity=95);
+	-moz-opacity: .95;
+	opacity: .95;
+	border: 1px solid #B5B5B5;
+	top: 30px;
+	width: 410px;
+	margin-left: -205px;
+	padding: 5px;
+	}
+
+h2.dialog_heading {
+	font-size: 1.3em;
+	text-align: center;
+	}
+
+div.buttonContainer {
+	width: 100%;
+	border-top: 1px solid gray;
+	margin-top: 2px;
+	}
+
+a.button,
+input[type=submit] {
+	float: right;
+	margin: 5px 10px 0 0;
+	padding: 5px;
+	background-color: #EEE;
+	border: 1px solid #787878;
+	font-size: 0.8em;
+	color: #323232;
+	clear: left;
+	cursor: pointer;
+	}
+
+a.button {
+	width: 50px;
+	text-align: center;
+	text-decoration: none;
+	}
+
+input[type=submit] {
+	width: 62px;
+	height: 28px;
+	}
+
+/********************************
+ *
+ * W I Z A R D   D I A L O G S
+ *
+ *******************************/
+div.welcome {
+	margin: -0.2em auto 0 -300px;
+	width: 600px;
+	}
+
+div.welcome input {
+	clear: left;
+	}
+
+div#welcome1 label,
+div#welcome7 label {
+	margin-top: 0.2em;
+	display: block;
+	}
+
+div.form_radio {
+	padding-left: 10px;
+	}
+
+/***************************
+ *
+ * P R O G R E S S   B A R
+ *
+ ***************************/
+#progressbar {
+	background: #DBDBDB url('../images/ajaxload.gif') no-repeat center bottom;
+	display: block;
+	height: 30px;
+	top: 150px;
+	overflow: hidden;
+	z-index: 5;
+	width: 300px;
+	margin: -0.2em auto 0 -150px;
+	}
+
+#progressbar span {
+	text-align: center;
+	font-size: 1.2em;
+	padding-left: 125px;
+	}
+
+/*****************************
+ *
+ * C O N F I G   D I A L O G 
+ *
+ ****************************/
+div.dialog_window#configuration select,
+div.dialog_window#configuration input[type=text] {
+	position: absolute;
+	right: 30px;
+	width: 225px;
+	}
+
+div.dialog_window#configuration input[type=checkbox] {
+	margin: 4px 5px 0 22px;
+	}
+
+form#config_form div {
+	min-height: 22px;
+	}
+
+div.feeditem {
+	height: 35px;
+	border-top: 1px solid #bbb;
+	}
+
+div.feeditem label.item {
+	white-space: nowrap;
+	min-width: 95px;
+	max-width: 350px;
+	overflow: hidden;
+	width: auto;
+	padding: 5px;
+	margin: 5px 0 0 0;
+	}
+
+div.feeditem input[type=text] {
+	width: 220px;
+	margin: 11px 0;
+	}
+
+/***********************************
+ *
+ * F A V O R I T E S   D I A L O G
+ *`
+ **********************************/
+div.dialog_window#favorites {
+	margin-left:287;
+	}
+
+ul.favorite {
+	height: 230px;
+	float: left;
+	clear: left;
+	border: 1px solid gray;
+	padding: 5px 0 5px 5px;
+	margin: 5px 0 5px 5px;
+	width: 180px;
+	font-size: 120%;
+	overflow: auto;
+	}
+
+ul.favorite li {
+	overflow: hidden;
+	cursor: pointer;
+	}
+
+ul.favorite li a {
+	vertical-align: top;
+	font-size: 0.8em;
+	text-decoration: none;
+	color: #000000;
+	overflow: none;
+	}
+
+ul.favorite li:hover {
+	background-color: #3879D7;
+	}
+
+form.favinfo {
+	height: 230px;
+	display: none;
+	padding: 5px 0;
+	margin: 5px 0;
+	width: 380px;
+	float: right;
+	}
+
+form.favinfo div {
+	height: 24px;
+	}
+
+form.favinfo input#mode,
+form.favinfo input#idx {
+	display: none;
+	}
+
+form.favinfo select,
+form.favinfo input[type=text] {
+	position: absolute;
+	right: 45px;
+	width: 240px;
+	}
+/******************************
+ *
+ * H I S T O R Y   D I A L O G
+ *
+ *****************************/
+div#history {
+	height: 250px;
+	}
+
+ul#historyItems {
+	position: inherit;
+	top: 0;
+	bottom: 35px;
+	left: 0;
+	right: 0;
+	height: 222px;
+	overflow: auto;
+	border-bottom: 1px solid #979797;
+	padding: 2px 0 0 10px;
+	}
+
+div#history ul li{
+	white-space: nowrap;
+	overflow: hidden;
+	font-size: 0.9em
+	}
+
+
+div#history a {
+	position: inherit;
+	bottom: 0.2em;
+	}
+
+div#history a#clearhistory {
+	right: 0;
+	}
+
+div#history a.toggleDialog {
+	right: 5.2em;
+	}
+
+/**************************
+ *
+ * C O N T E X T   M E N U
+ *
+ *************************/
+div.context_menu {
+	display: none;
+	position: absolute;
+	margin: 0;
+	padding: 0;
+	border: 1px solid rgb(119, 119, 119);
+	background-color: white;
+	z-index: 500;
+	width: 190px;
+	}
+
+div.context_menu ul {
+	border: medium none;
+	margin: 0;
+	padding: 5px 0pt;
+	list-style-type: none;
+	list-style-image: none;
+	list-style-position: outside;
+	font-size: 14px;
+}
+
+div.context_menu ul li a {
+	display: block;
+	padding: 0 10px 2px 20px;
+	color: #000000;
+	text-decoration: none;
+	}
+
+div.context_menu ul li a:hover {
+	background-color: #3879D7;
+	color: #FFFFFF;
+	}
+
+/*-----------------
+ *
+ * O L D   C S S   S T U F F
+ *
+ * ----------------*/
+
+
+.clear { clear: both; }
+
+div.dialog_window#history,
+div.dialog_window#favorites {
+	width: 575px;
+	margin-left: -288;
+}
+
+div.timer {
+	font-size: 8pt;
+	text-align: right;
+	margin-right: 5px;
+	bottom: 0;
+	right: 0;
+}
+
+
+.favorite li {
+	background: url(../images/favorites.png) no-repeat left center;
+	height: 20px;
+	margin-bottom: 5px;
+	padding-left: 24px;
+	overflow: hidden;
+}
+
