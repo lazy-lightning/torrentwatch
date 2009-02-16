@@ -187,8 +187,13 @@ function client_add_torrent($filename, $dest, $title, &$fav = NULL, $feed = NULL
   $hit = 1;
   $filename = htmlspecialchars_decode($filename);
 
+  // Detect and append cookies from the feed url
+  $url = $filename;
+  if($feed && $cookies = stristr($feed, ':COOKIE:')) {
+    $url .= $cookies
+
   $be = new BrowserEmulator();
-  if(!($tor = $be->file_get_contents($filename))) {
+  if(!($tor = $be->file_get_contents($url))) {
     _debug("Couldn't open torrent: $filename\n",-1);
     return FALSE;
   }
