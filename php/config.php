@@ -231,9 +231,10 @@ function updateFavoriteEpisode(&$fav, $title) {
     return;
   if(!preg_match('/(\d+)x(\d+)/i', $guess['episode'], $regs))
     return;
-  if(!isset($fav['Season']) || $regs[1] > $fav['Season'])
+  if(!isset($fav['Season'],$fav['Episode']) || $regs[1] > $fav['Season']) {
     $fav['Season'] = $regs[1];
-  if(!isset($fav['Episode']) || $regs[2] > $fav['Episode'])
+    $fav['Episode'] = $regs[2];
+  } else if($regs[1] == $fav['Season'] && $regs[2] > $fav['Episode'])
     $fav['Episode'] = $regs[2];
   write_config_file();
 } 
