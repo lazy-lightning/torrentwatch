@@ -165,7 +165,6 @@ function display_global_config() {
 
 function display_favorites_info($item, $key) {
 	global $config_values, $html_out;
-
 	$feed_options = '<option value="all">All</option>';
 	if(isset($config_values['Feeds'])) {
 		foreach($config_values['Feeds'] as $feed) {
