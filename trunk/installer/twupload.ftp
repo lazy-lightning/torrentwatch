@@ -1,8 +1,0 @@
-open popcorn
-ftpuser
-1234
-put torrentwatch-installer.cgi
-binary
-put tw.scripts.tar
-literal chmod 755 torrentwatch-installer.cgi
-quit
