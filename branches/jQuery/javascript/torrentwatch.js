@@ -16,7 +16,7 @@ $(function() {
                 tor.filter(".match_nomatch").addClass('hidden');
                 break;
             case 'filter_downloaded':
-                tor.not('.match_cachehit, .match_match').addClass('hidden');
+                tor.not('.match_cachehit, .match_match, .match_downloaded').addClass('hidden');
                 break;
             }
             tor.markAlt().closest("#torrentlist_container").slideDown(400);
@@ -148,9 +148,9 @@ $(function() {
     }; 
     $.fn.toggleDialog = function() {
         this.each(function() {
-            var last = current_dialog;
+            var last = current_dialog === '#' ? '' : current_dialog;
             var target = this.hash === '#' ? '#'+$(this).closest('.dialog_window').id : this.hash;
-            current_dialog = (last === target ? '' : this.hash);
+            current_dialog = last === target ? '' : this.hash;
             if (last) {
                 $(last).fadeOut();
             }

@@ -91,8 +91,18 @@ check_has_hdd()
 
 autostart_add()
 {	 
-	/bin/cat "$STARTER" | /bin/grep -q "$START_SCRIPT"
-	if [ $? == 0 ]; then
+	/bin/grep -q "$START_SCRIPT" "$STARTER"
+        ret=$?
+        if [ $ret == 2 ]; then
+		echo "Fatal error adding to starter script!!<br> TorrentWatch will not start on reboot<br>"
+                echo "Fatal command: /bin/grep -q &quot;$START_SCRIPT&quot; &quot;$STARTER&quot;<br>"
+		if [ ! -f "$STARTER" ]; then
+			echo "$STARTER does not exist<br>"
+                else
+			echo "$STARTER exists<br>"
+                fi
+		return;
+	elif [ $ret == 0 ]; then
 		echo "$START_SCRIPT already set to start on boot, skipping <br>"
 	else
 		echo "Adding $START_SCRIPT to community agreed startup script.<br>"
@@ -113,8 +123,14 @@ autostart_add()
 	fi
 
 
-	/bin/cat "$STARTER" | /bin/grep -q "php-cgi"
-	if [ $? == 0 ]; then
+	# Having php second here will make it show up first in the file
+	/bin/grep -q "php-cgi" "$STARTER"
+        ret=$?
+        if [ $ret == 2 ]; then
+		echo "Fatal error adding to starter script!!<br>TorrentWatch will not autostart<br>"
+                echo "Fatal command: /bin/grep -q &quot;php-cgi&quot; &quot;$STARTER&quot;<br>"
+		return
+	elif [ $ret == 0 ]; then
 		echo "PHP already linked into place.<br>";
 	else
 		echo "Adding link to php in /usr/bin/php-cgi <br>"
@@ -124,7 +140,6 @@ autostart_add()
 		do
 			echo "$line" >> /tmp/.starter.tmp
 			if [ x"$line" == x"$MARKER" ]; then
-				# echo "cd ${DEST}/ && ./telnetd -l /bin/sh &" >> /tmp/.starter
 				echo "ln -s ${PHP} /usr/bin/php-cgi" >> /tmp/.starter.tmp
 			fi
 		done
@@ -132,6 +147,32 @@ autostart_add()
 		chmod 755 "$STARTER"
 		rm -f /tmp/.starter.tmp
 	fi
+
+        /bin/grep -q "LD_LIBRARY_PATH" "$STARTER"
+        ret=$?
+        if [ $ret == 2 ]; then
+                echo "Fatal error adding to starter script!!<br>TorrentWatch will not autostart<br>"
+                echo "Fatal command: /bin/grep -q &quot;LD_LIBRARY_PATH&quot; &quot;$STARTER&quot;<br>"
+                return
+        elif [ $ret == 0 ]; then
+                echo "LD_LIBRARY_PATH already set.<br>";
+        else
+                echo "Setting LD_LIBRARY_PATH<br>"
+                rm -f /tmp/.starter.tmp
+                IFS=""
+                cat "$STARTER" | while read line
+                do
+                        echo "$line" >> /tmp/.starter.tmp
+                        if [ x"$line" == x"$MARKER" ]; then
+                                echo "export LD_LIBRARY_PATH=/mnt/syb8634/lib" >> /tmp/.starter.tmp
+                        fi
+                done
+                cat < /tmp/.starter.tmp > "$STARTER"
+                chmod 755 "$STARTER"
+                rm -f /tmp/.starter.tmp
+        fi
+
+
 }
 
 autostart_setup()
@@ -269,7 +310,7 @@ install_harddisk()
 	echo "Success..<br>"
 
 	echo 'Please procede to the';
-	echo '<a href="http://popcorn:8883/torrentwatch/index.cgi">Configuration Interface</a> in a PC Browser.<br>'
+	echo '<a href="http://popcorn:8883/torrentwatch/index.html">Configuration Interface</a> in a PC Browser.<br>'
 	# Remove the tarball
 	rm -f "$INSTA"
 
