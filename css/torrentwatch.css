@@ -30,7 +30,7 @@ html {
 	}
 
 body {
-	font: 100% "lucida grande", Tahoma, Verdana, Arial, Helvetica, sans-serif;
+	font: 85% "lucida grande", Tahoma, Verdana, Arial, Helvetica, sans-serif;
 	color: #323232 !important;
 	text-align: left;
 	overflow: hidden;
@@ -74,13 +74,13 @@ ul.mainoptions {
 	background: transparent url('../images/menu_bg.gif') repeat-x;
 	border-bottom: 1px solid #979797;
 	width: 100%;
-	height: 4.7em;
+	height: 68px;
 	z-index: 2;
 	}
 
 ul.mainoptions li {
 	float: left;
-	margin: 1em 0 0 0;
+	margin: 12px 0 0 0;
 	vertical-align: middle;
 	}
 
@@ -93,7 +93,7 @@ ul.mainoptions li a {
 	color: #030303;
 	font-size: 0.9em;
 	text-decoration: none;
-	padding: 2.5em 0.7em 0 0.7em;
+	padding: 33px 0.7em 0 0.7em;
 	display: block;
 	}
 
@@ -140,7 +140,7 @@ ul#filterbar_container {
 	position: fixed;
 	background: #C0C8D6 url('../images/filter_bar_bg.png') repeat-x;
 	border-bottom: 1px solid #979797;
-	height: 1.5em;
+	height: 23px;
 	right: 0;
 	left: 0;
 	z-index: 2;
@@ -215,7 +215,7 @@ div#inspector_container {
 	position: fixed;
 	overflow: auto;
 	border: 1px solid #888888;
-	top: 4.7em;
+	top: 68px;
 	right: -22em;
 	bottom: 0;
 	width: 22em;
@@ -248,7 +248,7 @@ div#torrentlist_container {
 	display: none;
 	position: fixed;
 	overflow: auto;
-	top: 6.3em;
+	top: 91px;
 	bottom: 0;
 	left: 0;
 	right: 0;

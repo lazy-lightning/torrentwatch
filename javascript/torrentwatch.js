@@ -3,11 +3,27 @@ $(function() {
     $("a.toggleDialog").live('click', function() {
         $(this).toggleDialog();
     });
+    // Vary the font-size
+    $("select#config_webui").live('change', function() {
+        var f = $(this).val();
+        $.cookie('twFontSize', f);
+        switch (f) {
+        case 'Small':
+            $("body").css('font-size', '75%');
+            break;
+        case 'Medium':
+            $("body").css('font-size', '85%');
+            break;
+        case 'Large':
+            $("body").css('font-size', '100%');
+            break;
+        }
+    });
     // Filter Bar - Buttons
     $("ul#filterbar_container li:not(#filter_bytext)").click(function() {
-	if($(this).is('.selected'))
+        if($(this).is('.selected'))
             return;
-	$(this).addClass('selected').siblings().removeClass("selected");
+        $(this).addClass('selected').siblings().removeClass("selected");
         var filter = this.id;
         $("div#torrentlist_container").slideUp(400, function() {
             var tor = $("li.torrent").removeClass('hidden');
@@ -46,7 +62,7 @@ $(function() {
         case 'transmission1.3x':
             $("#config_downloaddir, #config_watchdir, #config_savetorrent, #config_deepdir, div.favorite_seedratio, div.favorite_savein").css("display", "block");
             $("form.favinfo, ul.favorite").css("height", 214);
-            target += ':9091/web/trasmission/';
+            target += ':9091/transmission/web/';
             break;
         case 'transmission1.22':
             $("#config_downloaddir, #config_deepdir, div.favorite_savein").css("display", "none");
@@ -175,6 +191,9 @@ $(function() {
             $.submitForm(this);
             return false;
         });
+        var f = $.cookie('twFontSize');
+        if(f)
+            this.find("#config_webui").val(f).change();
         return this;
     };
     $.fn.toggleFavorite = function() {

@@ -17,7 +17,12 @@ function show_torrent_html($item, $feed, $alt) {
   $title = preg_replace('/\./', '.&shy;', $item['title']);
   // prepare items for use in a url
   $utitle = rawurlencode($item['title']);
-  $ulink = rawurlencode(get_torrent_link($item));
+  // Copy feed cookies to item
+  $ulink = get_torrent_link($item);
+  if(($pos = strpos($feed, ':COOKIE:')) !== False) {
+    $ulink .= substr($feed, $pos);
+  }
+  $ulink = rawurlencode($ulink);
   $feed = urlencode($feed);
 
   ob_start();
