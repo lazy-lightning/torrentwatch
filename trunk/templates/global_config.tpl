@@ -1,6 +1,15 @@
 <div class="dialog_window" id="configuration">
   <h2 class="dialog_heading">Configuration</h2>
   <form action="<?php echo $_SERVER['PHP_SELF']; ?>/setGlobals" id="config_form">
+    <label class="category">Web UI Settings</label>
+    <div id="config_webui">
+      <label class="item select">Font Size:</label>
+      <select name="webui" id="config_webui">
+        <option value="Small">Small</option>
+        <option value="Medium" selected>Medium</option>
+        <option value="Large">Large</option>
+      </select>
+    </div>
     <label class="category">Client Settings</label>
     <div id="config_torrentclient">
       <label class="item select" title="Which torrent client to use">Client:</label>

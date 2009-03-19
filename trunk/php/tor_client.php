@@ -6,7 +6,7 @@
 
 
 function sabnzbd_addurl($url) {
-  $Host = "127.0.0.1";
+  $Host = "192.168.1.121";
   $Port = "8080";
   $URI = "sabnzbd/api";
 
@@ -190,10 +190,12 @@ function client_add_torrent($filename, $dest, $title, &$fav = NULL, $feed = NULL
   // Detect and append cookies from the feed url
   $url = $filename;
   if($feed && $cookies = stristr($feed, ':COOKIE:')) {
-    $url .= $cookies
+    $url .= $cookies;
+  }
 
   $be = new BrowserEmulator();
   if(!($tor = $be->file_get_contents($url))) {
+  print '<pre>'.print_r($_GET, TRUE).'</pre>';
     _debug("Couldn't open torrent: $filename\n",-1);
     return FALSE;
   }

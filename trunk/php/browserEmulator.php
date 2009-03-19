@@ -78,7 +78,7 @@ class BrowserEmulator {
   var $authPass = "";
   var $port;
   var $lastResponse = '';
-  var $debug = false;
+  var $debug = true;
  
   function BrowserEmulator() {
     $this->resetHeaderLines();
@@ -158,9 +158,13 @@ class BrowserEmulator {
   function preparseURL($url) {
     if($cookies = stristr($url, ':COOKIE:')) {
       $url = rtrim(substr($url, 0, -strlen($cookies)), '&');
-      $cookies = substr($cookies, 8);
-      $cookies = strtr($cookies, '&', ' ');
-      $this->addHeaderLine("Cookie", $cookies);
+      $cookies = explode('&', substr($cookies, 8));
+      $out = '';
+      foreach($cookies as $cookie) {
+        list($key, $val) = explode('=', $cookie);
+        $out[] = "$key=\"$val\"";
+      }
+      $this->addHeaderLine("Cookie", '$Version=1; '.implode('; ', $out));
     }
     return $url;
   }
@@ -260,9 +264,10 @@ class BrowserEmulator {
     fclose($socket);
 
     if(strstr($this->lastResponse, 'Content-Encoding: gzip') !== FALSE) {
-      if(function_exists('gzinflate'))
+      if(function_exists('gzinflate')) {
         $file = gzinflate(substr($file,10));
-      else
+        if($this->debug) echo "Result file: ".$file;
+      } else
         $file = my_gzinflate($file);
     }
 
