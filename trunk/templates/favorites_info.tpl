@@ -1,5 +1,5 @@
 <form action="<?php echo $_SERVER['PHP_SELF']; ?>/updateFavorite" 
-      class="favinfo" id="favorite-<?php echo $key ?>" <?php echo $style; ?>>
+      class="favinfo" id="favorite_<?php echo $key ?>" <?php echo $style; ?>>
   <input type="hidden" name="idx" id="idx" value="<?php echo $key; ?>">
   <div class="favorite_name">
     <label class="item" title="Name of the Favorite">Name:</label>

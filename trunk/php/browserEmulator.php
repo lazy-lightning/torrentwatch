@@ -78,7 +78,7 @@ class BrowserEmulator {
   var $authPass = "";
   var $port;
   var $lastResponse = '';
-  var $debug = true;
+  var $debug = false;
  
   function BrowserEmulator() {
     $this->resetHeaderLines();
