@@ -26,8 +26,10 @@ function parse_options() {
 	file_put_contents('/tmp/twlog', 'TorrentWatch: '.$_SERVER['PATH_INFO']."\n".print_r($_GET, TRUE), FILE_APPEND);
 	switch($commands[1]) {
 		case 'firstRun':
-			if(isset($_GET['link']))
+			if(isset($_GET['link'])) {
+        $_GET['button'] = 'Add';
 				update_feed();
+      }
 			update_global_config();
 			$config_values['Settings']['FirstRun'] = FALSE;
 			write_config_file();

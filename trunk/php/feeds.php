@@ -52,7 +52,7 @@ function episode_filter($item, $filter) {
 function check_for_torrent(&$item, $key, $opts) {
   global $matched, $test_run, $config_values;
 
-  if(!(strtolower($item['Feed']) == 'all' || $item['Feed'] == '' || $item['Feed'] == $opts['URL'])) {
+  if(!(strtolower($item['Feed']) == 'all' || $item['Feed'] === '' || $item['Feed'] == $opts['URL'])) {
     return;
   }
 
@@ -76,7 +76,8 @@ function check_for_torrent(&$item, $key, $opts) {
        ($item['Quality'] == 'All' OR $item['Quality'] == '' OR preg_match('/'.strtolower($item['Quality']).'/', $title)));
       break;
   }
-  $guess = guess_match($title, TRUE);
+  if($hit)
+    $guess = guess_match($title, TRUE);
    
   if($hit && episode_filter($guess, $item['Episodes'])) {
     $matched = 'match';
