@@ -106,6 +106,8 @@ function array_change_key_case_ext($array, $case = ARRAY_KEY_LOWERCASE) {
 
 function _debug($string, $lvl = 1) {
   global $config_values, $verbosity, $debug_output;
+  file_put_contents('/tmp/twlog', $string, FILE_APPEND);
+
   if($verbosity >= $lvl) {
     if(isset($config_values['Global']['HTMLOutput'])) {
       if($lvl == -1)  {
