@@ -134,6 +134,8 @@ $(function() {
     $.loadDynamicData = function(html) {
         $("#dynamicdata").remove();
         setTimeout(function() {
+            $(current_dialog).toggleDialog();
+            current_dialog = '';
             var dynamic = $("<div id='dynamicdata'/>");
             // Use innerHTML because some browsers choke with $(html) when html is many KB
             dynamic[0].innerHTML = html;
