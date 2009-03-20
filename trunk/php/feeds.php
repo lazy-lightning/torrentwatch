@@ -13,11 +13,48 @@
   return html_entity_decode($link);
 }
 
+function episode_filter($item, $filter) {
+ // Perform episode filter
+  if(empty($filter)) {
+    return True; // no filter, accept all
+  }
+
+  // the following reg accepts the 10-14 or just 10
+  $validateReg = '([0-9]+)(?:-([0-9]+))?';
+  if(preg_match("/^{$validateReg}x{$validateReg}$/", $filter) === 0) {
+    _debug('bad episode filter: '.$filter);
+    return True; // bad filter, just accept all
+  }
+
+  list($itemS, $itemE) = explode('x', $item['episode']);
+
+  // Split the filter(ex. 3x4-15 into 3,3 4,15).  @ to suppress error when no seccond item
+  list($season, $episode) = explode('x',  $filter, 2);
+  @list($seasonLow,$seasonHigh) = explode('-', $season, 2);
+  @list($episodeLow,$episodeHigh) = explode('-', $episode, 2);
+
+  if(!isset($seasonHigh))
+    $seasonHigh = $seasonLow;
+  if(!isset($episodeHigh))
+    $episodeHigh = $episodeLow;
+
+  // Episode filter mis-match
+  if(!($episodeLow <= $itemE && $itemE <= $episodeHigh)) {
+    return False;
+  }
+  // Season filter mis-match
+  if(!($seasonLow <= $itemS && $itemS <= $seasonHigh)) {
+    return False;
+  }
+  return True;
+}
+
 function check_for_torrent(&$item, $key, $opts) {
   global $matched, $test_run, $config_values;
 
-  if(!($item['Feed'] == 'all' || $item['Feed'] == $opts['URL']))
+  if(!(strtolower($item['Feed']) == 'all' || $item['Feed'] == '' || $item['Feed'] == $opts['URL'])) {
     return;
+  }
 
   $rs = $opts['Obj'];
   $title = strtolower($rs['title']);
@@ -25,27 +62,25 @@ function check_for_torrent(&$item, $key, $opts) {
     case 'simple':  
       $hit = (($item['Filter'] != '' && strpos($title, strtolower($item['Filter'])) === 0) &&
        ($item['Not'] == '' OR my_strpos($title, strtolower($item['Not'])) === FALSE) &&
-       ($item['Quality'] == 'All' OR $item['Quality'] == '' OR my_strpos($title, strtolower($item['Quality'])) !== FALSE) &&
-       ($item['Episodes'] == '' OR preg_match('/^'.strtolower($item['Episodes']).'$/', $guess['episode'])) );
+       ($item['Quality'] == 'All' OR $item['Quality'] == '' OR my_strpos($title, strtolower($item['Quality'])) !== FALSE));
       break;
     case 'glob':
       $hit = (($item['Filter'] != '' && fnmatch(strtolower($item['Filter']), $title)) &&
        ($item['Not'] == '' OR !fnmatch(strtolower($item['Not']), $title)) &&
-       ($item['Quality'] == 'All' OR $item['Quality'] == '' OR strpos($title, strtolower($item['Quality'])) !== FALSE) &&
-       ($item['Episodes'] == '' OR preg_match('/^'.strtolower($item['Episodes']).'$/', $guess['episode'])) );
+       ($item['Quality'] == 'All' OR $item['Quality'] == '' OR strpos($title, strtolower($item['Quality'])) !== FALSE));
       break;
     case 'regexp':
     default:
       $hit = (($item['Filter'] != '' && preg_match('/'.strtolower($item['Filter']).'/', $title)) &&
        ($item['Not'] == '' OR !preg_match('/'.strtolower($item['Not']).'/', $title)) &&
-       ($item['Quality'] == 'All' OR $item['Quality'] == '' OR preg_match('/'.strtolower($item['Quality']).'/', $title)) &&
-       ($item['Episodes'] == '' OR preg_match('/^'.strtolower($item['Episodes']).'$/', $guess['episode'])) );
+       ($item['Quality'] == 'All' OR $item['Quality'] == '' OR preg_match('/'.strtolower($item['Quality']).'/', $title)));
       break;
   }
-  if($hit) {
+  $guess = guess_match($title, TRUE);
+   
+  if($hit && episode_filter($guess, $item['Episodes'])) {
     $matched = 'match';
     if(check_cache($rs['title'])) {
-      $guess = guess_match($title, TRUE);
       if(_isset($config_values['Settings'], 'Only Newer') == 1) {
         if(!empty($guess['episode']) && preg_match('/(\d+)x(\d+)/i',$guess['episode'],$regs)) {
           if($item['Season'] > $regs[1]) {

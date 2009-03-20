@@ -1,6 +1,12 @@
 #!/usr/bin/php-cgi
 <?php
 
+// disable any kind of caching
+header( "Expires: Mon, 20 Dec 2000 01:00:00 GMT" );
+header( "Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT" );
+header( "Cache-Control: no-cache, must-revalidate" );
+header( "Pragma: no-cache" );
+
 ini_set('include_path', '.:./php');
 $test_run = 0;
 $firstrun = 0;
