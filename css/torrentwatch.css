@@ -182,21 +182,22 @@ ul#filterbar_container li.selected a {
 ul#filterbar_container li#filter_bytext {
 	float: right;
 	margin: 0;
+  border: 0;
 	}
 
 input#filter_text_input {
-	height: 1.2em; 
+	height: 1.5em; 
 	width: 8em; 
 	border: 1px solid #5D80A1; 
 	padding: 0.1em 0.5em 0.15em 1.5em;
 	margin: 0.1em 0.5em;
 	border-radius: 10px;
 	background: #FFF url('../images/filter_icon.png') top left no-repeat;
-	-o-border-radius: 1em; 
-	-icab-border-radius: 1em;
-	-khtml-border-radius: 1em;
-	-moz-border-radius: 1em;
-	-webkit-border-radius: 1em; 
+	-o-border-radius: 8px; 
+	-icab-border-radius: 8px;
+	-khtml-border-radius: 8px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px; 
 	outline-style: none;
 	}
 
@@ -355,8 +356,8 @@ div.buttonContainer {
 a.button,
 input[type=submit] {
 	float: right;
-	margin: 5px 10px 0 0;
-	padding: 5px;
+	margin: .5em 1em 0 0;
+	padding: .5em;
 	background-color: #EEE;
 	border: 1px solid #787878;
 	font-size: 0.8em;
@@ -562,7 +563,7 @@ div#history a#clearhistory {
 	}
 
 div#history a.toggleDialog {
-	right: 5.2em;
+	right: 6.5em;
 	}
 
 /**************************
