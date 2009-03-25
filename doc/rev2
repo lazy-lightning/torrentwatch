@@ -1,0 +1,54 @@
+Progress of a Feed Item
+
+Feed Creates new Item
+  - Event::run(nmtdvr.newFeedItem)
+    - Picked up by activeItems array to save
+    - Picked up by history first to set initial status
+    - Picked up by favorites array to run $feedItem->compareFavorite() with each
+
+Favorite Changes
+  - Event::run(nmtdvr.modifiedFavorite)
+    - Picked up by feedItems array.  $feedItem->compareFavorite() with each
+
+feedItem->compareFavorite()
+  - if(matchingFav && matchingFav != fav) return
+  - reset previous fav matching state
+  - if(!fav->isMatching()) return
+  - if(status ~= download) status = automatedDownload
+  - if(status !== 'nomatch') return
+  - save matchingFav
+  - status = automatedDownload
+  - if status === automatedDownload
+    - fav->updateRecent()
+
+Controller starts new download
+  - feedItem->status = 'manualDownload';
+
+Favorite Deleted
+  - Event::run(nmtdvr.deletedFavorite)
+    - Picked up by feedItems array. get(favId, matchingFav), 
+      if status !~ 'download'
+        feedItem->status = 'previouslyDownloaded'
+      else
+        feedItem->status = 'nomatch'
+ 
+feedItem->setStatus()
+  - verify status against whitelist
+  - if (oldstatus !~ download && newstatus == automatedDownload) || status === 'manualDownload'
+    - history::startFeedItem
+  - if (newstatus === 'nomatch')
+    -  matchingFav = ''
+
+history::startFeedItem
+  - checks history if this same title has been downloaded
+    - status = 'previouslyDownloaded' && return
+  - checks history if the same episode of same season(diff title) has been downloaded
+    - status = 'previouslyDownloaded' && return
+  - if !client->addByUrl()
+    - status = 'failedDownload' && return
+  - add historyItem
+  - record in ep history
+
+
+
+   

@@ -1,0 +1,7 @@
+Much of the framework is borrowed from the Kohana framework(http://kohanaphp.com)
+Unfortunatly, Kohana was way too heavy for the NMT platform.
+
+Tw with a exceptionally basic  framework took roughly .7secconds and 650k of memory on NMT
+Kohana took just over 1s and 780k of memory just to display the welcome page(no real controller)
+
+As such i tried to find a happy medium by using the Koahana basic setup and a few of their classes

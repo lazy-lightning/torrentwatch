@@ -1,0 +1,14 @@
+Feed
+ Requirements
+  - Recognize new feedItems
+  - call feedItem factory to make a tv/movie/etc. feed item
+  - fire nmtdvr.newFeedItem event
+
+Active Items
+ Requirements
+  - Maintain list of currently active feed items
+  - Prune old items
+
+abstract Favorite
+ Requirements 
+  - Ability to match a feed item

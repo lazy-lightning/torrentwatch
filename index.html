@@ -1,20 +1,20 @@
 <html>
 <head>
   <title>Torrentwatch</title>
-  <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" ></link>
-  <link rel="Stylesheet" type="text/css" href="css/reset.css"></link>
-  <link rel="Stylesheet" type="text/css" href="css/torrentwatch.css"></link>
+  <link rel="shortcut icon" href="static/images/favicon.ico" type="image/x-icon" ></link>
+  <link rel="Stylesheet" type="text/css" href="static/css/reset.css"></link>
+  <link rel="Stylesheet" type="text/css" href="static/css/torrentwatch.css"></link>
   <!--[if IE]>
-    <link rel="Stylesheet" type="text/css" href="css/ie.css"></link>
+    <link rel="Stylesheet" type="text/css" href="static/css/ie.css"></link>
   <![endif]-->
   <!--
-  <script type="text/javascript" src="javascript/all.min.js"></script>
+  <script type="text/javascript" src="static/javascript/all.min.js"></script>
   -->
-  <script type="text/javascript" src="javascript/jquery-1.3.1.js"></script>
-  <script type="text/javascript" src="javascript/jquery.contextmenu.r2.js"></script>
-  <script type="text/javascript" src="javascript/jquery.cookie.js"></script>
-  <script type="text/javascript" src="javascript/jquery.tinysort.js"></script>
-  <script type="text/javascript" src="javascript/torrentwatch.js"></script>
+  <script type="text/javascript" src="static/javascript/jquery-1.3.1.js"></script>
+  <script type="text/javascript" src="static/javascript/jquery.contextmenu.r2.js"></script>
+  <script type="text/javascript" src="static/javascript/jquery.cookie.js"></script>
+  <script type="text/javascript" src="static/javascript/jquery.tinysort.min.js"></script>
+  <script type="text/javascript" src="static/javascript/torrentwatch.js"></script>
 </head>
 <body>
 <ul class="mainoptions" id="mainoptions">
@@ -51,12 +51,11 @@
 <div class="dialog_window" id="clear_cache"> 
   <h2 class="dialog heading">Which Cache</h2>
   <a class="toggleDialog button" href="#">Close</a>
-  <a class="button" href="index.cgi/clearCache?type=feeds">Feeds</a>
-  <a class="button" href="index.cgi/clearCache?type=torrents">Torrents</a>
-  <a class="button"href="index.cgi/clearCache?type=all">All</a>
+  <a class="button" href="index.cgi/ajax/clearCache/feeds">Feeds</a>
+  <a class="button" href="index.cgi/ajax/clearCache/torrents">Torrents</a>
+  <a class="button"href="index.cgi/ajax/clearCache/all">All</a>
 </div> 
-<form id="welcome_form" action="index.cgi/firstRun">
-  <input type="hidden" name="firstRun" value="1">
+<form id="welcome_form" action="index.cgi/ajax/firstRun">
   <input type="hidden" name="button" value="Add">
   <div id="welcome1" class="dialog_window welcome">
     <h2 class="dialog_heading">Welcome to torrentwatch</h2>

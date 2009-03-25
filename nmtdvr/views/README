@@ -1,0 +1,3 @@
+This folder contains a seperate directory for each controller.
+The directories contain the complete responce .php files, otherwise
+known as what the user will see.
