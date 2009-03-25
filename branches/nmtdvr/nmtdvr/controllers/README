@@ -1,0 +1,9 @@
+All controller classes are stored in this directory
+
+Assuming your controller is named welcome, then your class goes in a file
+welcome.php and your class must be named welcomeController
+
+It can then be accessed with index.cgi/welcome
+
+
+

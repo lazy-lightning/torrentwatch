@@ -1,0 +1,179 @@
+Notes on reimplementation
+--------------------------
+Attempt to do TDD for the model
+
+The single responsibility principle states that every object should have a single responsibility, and that all
+its services should be narrowly aligned with that responsibility.
+
+Define a required attribute in this file, write a test, and then implement the most
+basic functionality that will pass the test.
+
+Keep in mind this is to run on a 300Mhz Mips processor, *not* a multi-core multi-ghz PC CPU
+Interactivity is key, total run time by php-cgi should be < 1s when rendering a view
+  - This is roughly equivilent to somewhere between 0.05 and 0.10s on a modern(<=3Ghz c2d) cpu
+
+This implementation also has the goal of more strictly following OO design principles
+for example: Goal of breaking apart the interconnection between the objects to allow them to be complete and
+             independant testable models.  The models will register callbacks with the static Event object when
+             interaction is required between models
+
+An example of seperation:
+  For feed matching to occur create a favorite object, which will insert itself into the events queue, then 
+  initialize a feed class and any new feed item will get triggered through the events queue.  This prevents any strict
+  relationship between feed and favorite.  The favorite will be unseperably linked to the feedItems, but this makes
+  sense as the feedItem is the only thing the favorite will work with
+
+------
+The following is the list of Objects and their requirements
+------
+
+CachedArray
+ Responsibility
+  - Persist an array of same objects between script runs
+ Requirements
+  - must do obj->setId($key) so the object knows its unique ID
+  - $arr->add($bar)
+    - only allows one type of object in the array, disallow non-objects
+  - constructor takes 2 arguments, class and key
+    - class is used to only allow one type 
+    - if key is not specified, its set to class
+      - key is used to identify seperate persisted arrays
+ - get($id, $key = NULL, $firstOnly = True)
+   - $key allows one time get() checking the $key property in each obj to match $id
+   - if firstOnly is set false, will return an array of all matching items, otherwise only first item
+ - must be able to determine if the array has changed and should be re-serialized for persistance
+   - delegated mostly to abstract cachedObject function
+
+IndexedCachedArray
+ Responsibility
+  - Ability to index the the cached objects multiple ways, through references in a multi-dim array
+    - For the history, to quickly find for example: historyItems from same feed, or same favorite.
+    - premature optimization? get($id,$key) above implements similar but with a loop for each get() call
+ Requirements
+  - add($obj)
+    - $arr[0][] = $obj
+    - foreach($this->indexes as $idx => $key) $arr[$idx+1][$obj->$key][] = $obj
+  - addIndex($key)
+    - adds to $this->indexes and loops through $arr[0] initializing the new index
+  - getIndex($key)
+    - find maching $idx in $this->indexes, return $arr[$idx]
+ 
+FeedAdapter
+ Responsibility
+   - Interface with SimplePie
+   - Trigger nmtdvr.initFeedItem event when found
+ Requirements
+   - Needs the ability to remember what the previous newest item was
+     - Use the published date if available, if not avaible use link?
+   - Needs to call Event::run('nmtdvr.initFeedItem', array()) for each
+     newer feed item with an array of info about the item
+   - Ability to parse the feedItem names and return the series name and season/ep #
+     - Ability to recognize sports in tvbinz.net feed?
+     - Should also accept date formats for content like daily show/sports/etc.
+
+Favorite
+ Responsibility
+   - Compare a title against a set of rules
+   * Receive nmtdvr.newFeedItem event,  and trigger nmtdvr.matchingFeedItem event
+     on successfull compare
+   * Trigger nmtdvr.favoriteChanged event on change with $this and matching function
+     as argument
+     - Issue, Feed and Tv Show History array must first be initialized when calling this event or it wont
+       do anything.  Not this objects problem though.
+     - Perhaps a bootstrap object seperate from all the classes which will insert initializer
+       callbacks to run first in the event to initialize the feed cached array?
+     - Or could be in a controller __construct() that gets extended into the nmt and ajax controllers
+ Requirements
+   * add to the event nmtdvr.newFeedItem 
+     * run $this->matchingFunction(Event::$data)
+     - Method to stop the event loop from running the rest of the callbacks if a 
+       match is found(this is low priority)
+       - Add a public static variable to Event, continue?  sets to true when the callbacks
+         start, and keeps going as long as continue is set true.
+   - Ability to 'match' a feed item
+     * If the item matches, call Event::run('nmtdvr.matchingFeedItem')
+   * Ability to re-compare to all active feed items when changed
+     Event::run('nmtdvr.changedFavorite', array($this, 'matchingFunction')))
+     * Has to verify a feeds has been initialized and has registered its callbacks,
+       or just       *pretend*the*controller*has*done*this*
+   - Ability to match feed items with simple episode filtering, no regular expressions
+     - Must accept SSxEE (2x4-18)
+     - Must accept YYYY/MM/DD  (2009/02/01-30)
+
+Client
+ Rensponsibility
+   - Allow the user to start downloads
+   - Report on whats currently downloading
+ Requirements
+   - Ability to add a file to the client by url or local file
+   - Some method to compare downloading list to the history and determine which items
+     were started by nmtdvr(might belong in new class?)
+     - File may not have exactly the same name in the client
+
+Active Feed Item
+ Responsibility
+   - Keep track of individual feed item status/rawtitle/season/episode/tv show
+   - matchingFavorite function
+   - Receive nmtdvr.runAgainstFeedItems event to run a callback on all feed items
+   - Receive nmtdvr.changedFavorite event 
+ Requirements
+   - client to be passed in constructor
+   - receive the event nmtdvr.initFeedItem
+     - Save the item in an internal array
+     - Send out nmtdvr.newFeedItem
+   - receive the event nmtdvr.matchingFeedItem
+     - favorites should have seen the newFeedItem call to, and will respond with
+       nmtdvr.matchingFeedItem if there is a match.
+     - client will also respond with this event if it tries to download an item
+     - If status is download then its no-longer active, send nmtdvr.activeFeedItemRemove event and
+       unset it.
+     - update the status of the feed item
+   - receive the event nmtdvr.favoriteChanged
+     - clear an item status info if it is attached to this favorite and status != downloaded
+     - run the callback in Event::$data on all feeditems status != downloaded
+   - Ability to check if a particular item was previously matched
+     - Should recognize different but similar(Penn & Teller vs Penn and Teller)
+     - Should also check FeedItemHistory, how to prevent interdependancy? maybee not possible
+   - Concept of a 'live item timeout'
+     - How long a feed item is live, and can be downloaded
+     - sends nmtdvr.activeFeedItemRemove event on purge 
+   - Should re-attempt to download items with status = failedStart
+     - Does that belong here?
+
+Feed Item History
+ Responsibility
+   - Keep track of feed items which have timed out of the active feed
+ Requirements
+   - Receives nmtdvr.activeFeedItemRemove (longwinded?)
+     - If the item has status=downloaded save it in this array
+
+TV Show History
+ Responsibility
+   - Keep track of what series titles show up in the feed at approximatly what time
+   - Be able to predict what will come out tonight or tomorrow
+ Requirements
+   - Receive the nmtdvr.newFeedItem event
+   - Store one record per tv show, not per feed item
+   - find and keep a reference to a tvdb_series record for each show?
+   - Must understand difference between a new episode and a re-run, and not predict based on
+     re-run frequency.
+
+----------------
+Other Thoughts
+---------------
+Who decides what the client should be, the controller, or am i going to use a bootstrap class?
+Related to that, what insures that the Events will be properly initialized without individual controller
+methods pre-intializing whichever models might be used
+  -  controller __construct() that gets extended into the nmt and ajax controllers
+    - __construct() would register various callbacks as the first event in each nmtdvr.* event to
+     verify the necessary cachedArrays have been loaded so as to register their callbacks
+    - does this force an unneccessary coupling?  how else can it be done
+
+Extend favorites to seperate  MovieFavorite, TvShowFavorite ?
+Related, mark feeds as movie, tvshow?  Usually they are seperate feeds, could force it
+
+----------------
+Ajax Controller
+----------------
+combines information from history and feeds to build feedItem list
+
