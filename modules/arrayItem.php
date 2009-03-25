@@ -7,7 +7,6 @@ abstract class arrayItem {
   }
 
   public function __get($name) {
-    echo '<pre>__get('.$name.'): '.print_r($name, TRUE).'</pre>';
     $func = 'get'.ucfirst($name);
     if(method_exists($this, $func)) {
       return $this->$func();
