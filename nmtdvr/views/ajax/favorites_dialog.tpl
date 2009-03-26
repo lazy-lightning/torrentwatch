@@ -7,7 +7,7 @@
    <?php endforeach;?>
   <?php endif; ?>
  </ul>
- <?php $i=1;$favorite = new favorite(array('name'=>'New Favorite')); include 'views/ajax/favorite.tpl'; ?>
+ <?php $i=1;$favorite = new tvFavorite(array('name'=>'New Favorite')); include 'views/ajax/favorite.tpl'; ?>
  <?php if($tw->favorites->get() !== False): ?>
   <?php foreach($tw->favorites->get() as $favorite) include 'views/ajax/favorite.tpl'; ?>
  <?php endif; ?>

@@ -66,12 +66,12 @@ class feedItem extends cacheItem {
   // This gets called when a favorite is updated or deleted
   function resetHistory($favId = '') {
     // If no options then we were called by an event
-    if($favId == '') {
+    if($favId === '') {
       $favId = Event::$data;
     }
 
     // If this is the same favorite that matched before
-    if($this->matchingFavorite == $favId) {
+    if($this->matchingFavorite === $favId) {
       // If the status isn't downloaded, then reset the item.  Otherwise just change the status
       SimpleMvc::log('Resetting match to id '.$favId);
       if(stristr($this->status, 'download') === False) {

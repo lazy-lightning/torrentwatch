@@ -235,6 +235,7 @@ class BrowserEmulator {
   function file_get_contents($url) {
     if(file_exists($url)) // local file
       return file_get_contents($url);
+    Benchmark::start('browserEmulator.'.$url);
     $file = '';
     $socket = $this->fopen($url);
     if ($socket) {
@@ -242,7 +243,8 @@ class BrowserEmulator {
           $file .= fgets($socket, 10000);
         }
     } else {
-	_debug('Browser Emulator: file_get_contents bad socket', -1);
+      SimpleMvc::log('Browser Emulator: file_get_contents bad socket', -1);
+        Benchmark::stop('browserEmulator.'.$url);
         return FALSE;
     }
     fclose($socket);
@@ -250,10 +252,13 @@ class BrowserEmulator {
     if(strstr($this->lastResponse, 'Content-Encoding: gzip') !== FALSE) {
       if(function_exists('gzinflate'))
         $file = gzinflate(substr($file,10));
-      else
+      else {
+        Benchmark::stop('browserEmulator.'.$url);
         return False;
+      }
     }
 
+    Benchmark::stop('browserEmulator.'.$url);
     return $file;
   }
 

@@ -72,14 +72,17 @@ class feed extends cacheItem {
     SimpleMvc::log(__CLASS__."::".__FUNCTION__);
     if($this->needsUpdate()) {
       SimpleMvc::log('needsUpdate');
+
       if($this->updateReal()) {
         SimpleMvc::log('updateReal succeded');
         $this->lastUpdate = time();
         $this->changed = True;
-        return True;
-      } else SimpleMvc::log('updateReal Failed');
+      } else {
+        SimpleMvc::log('updateReal Failed');
+        return False;
+      }
     } else SimpleMvc::log('no update needed');
-    return False;
+    return True;
   }
 
 }

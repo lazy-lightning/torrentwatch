@@ -48,8 +48,13 @@ class feeds extends cachedArray {
   }
 
   public function update() {
-    foreach($this->get() as $feed)
-      $feed->updateItems();
+    $success = True;
+    foreach($this->get() as $feed) {
+      if(!$feed->updateItems())
+        $success = False;
+    }
+
+    return $success;
   }
 
 }

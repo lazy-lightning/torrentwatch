@@ -6,13 +6,12 @@ class cachedArray extends uniqueArray {
 
   public function __construct($requiredClass, $uniqueId = '') {
     parent::__construct($requiredClass);
-    $this->uniqueId = empty($uniqueId) ? $requiredClass : $uniqueId;
+    $this->uniqueId = $uniqueId === '' ? $requiredClass : $uniqueId;
     $this->label = $requiredClass;
     $this->load();
   }
 
   public function __destruct() {
-    SimpleMvc::log("Considering save of ".get_class($this).": {$this->label} - {$this->uniqueId}");
     if($this->changed)
       return $this->save();
     // Split because you cant guarantee the order php runs the compares
