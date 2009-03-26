@@ -127,8 +127,10 @@ class feedItem extends cacheItem {
     $data = array($this, $feedId, $fav);
     Event::run('nmtdvr.matchingFeedItem', $data);
 
-    if(stripos($this->status, 'download') !== False) {
-      $fav->updateRecent($this);
+    // If the callback initated a download let the favorite know
+    if(stripos($this->status, 'download') !== False &&
+       $this->status !== 'failedDownload') {
+      $fav->matched($this);
     }
 
     return True;

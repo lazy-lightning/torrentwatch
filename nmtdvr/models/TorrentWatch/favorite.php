@@ -1,11 +1,15 @@
 <?php
-bstract class favorite extends filter {
+abstract class favorite extends filter {
   // Common propertys between favorites
   protected $feed = '';
   protected $name = '';
   protected $seedRatio = -1;
   protected $saveIn = '';
 
+
+  // Called by feedItem if this favorite initiated a download
+  // use this to record information about the last item if neccessary
+  abstract function matched($feedItem);
 
   public function __construct($options) {
     parent::__construct($options);
