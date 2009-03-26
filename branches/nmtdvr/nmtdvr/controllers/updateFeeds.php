@@ -10,11 +10,14 @@ class updateFeedsController extends Controller {
 
     // Get our model
     $this->tw = $this->_newModel('TorrentWatch');
+    Event::add('system.post_controller', array($this, '_render'));
+  }
+
+  function _render() {
+    echo date('Y M D h:m a')."\n".($this->success ? 'Success' : 'Failure');
   }
 
   function index() {
-    // This function is a no-op
-    // because we have a default view
     $this->tw->feeds->update();
     $this->success = True;
     return;

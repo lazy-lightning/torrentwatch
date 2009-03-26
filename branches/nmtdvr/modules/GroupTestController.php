@@ -2,7 +2,13 @@
 
 abstract class GroupTestController extends Controller {
 
-  public $test;
+  protected $test;
+
+  public function __construct($groupTest) {
+    $this->test = $groupTest;
+
+    Event::add('system.post_controller', array($this, '_run'));
+  }
 
   public function __call($method, $arguments) {
     $tests = is_array($arguments[0]) ? $arguments[0] : array();
@@ -19,7 +25,7 @@ abstract class GroupTestController extends Controller {
     }
   }
 
-  public function __destruct() {
+  public function _run() {
     $this->test->run(new HtmlReporter);
   }
 

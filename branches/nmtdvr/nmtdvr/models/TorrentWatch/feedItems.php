@@ -25,9 +25,12 @@ class feedItems extends cachedArray {
   }
 
   function compareFavorite($fav, $feedId) {
+    $start = microtime(TRUE);
     foreach($this->get() as $feedItem) {
       $feedItem->compareFavorite($fav, $feedId);
+      SimpleMvc::log(microtime(TRUE)-$start);
     }
+    SimpleMvc::log(microtime(TRUE)-$start);
   }
 
   function updatedFavoriteCallback() {

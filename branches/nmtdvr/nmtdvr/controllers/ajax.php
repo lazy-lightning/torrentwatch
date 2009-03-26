@@ -55,7 +55,7 @@ class ajaxController extends templateController {
 
     SimpleMvc::log('Creating new favorite: '.$this->options['name']);
 
-    $this->success = $this->tw->favorites->add(new favorite($this->options));
+    $this->success = $this->tw->favorites->add(new tvFavorite($this->options));
   }
 
   function clearCache($cmds) {
@@ -170,7 +170,6 @@ class ajaxController extends templateController {
       SimpleMvc::Log('Not found '.$cmds[0]);
       return;
     }
-     
     $fav->update($this->options);
     $this->success = True;
   }

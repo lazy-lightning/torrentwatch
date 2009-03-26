@@ -74,22 +74,14 @@ class uniqueArray {
     foreach($this->array as $idx => $obj) {
       if(is_array($obj->$key)) {
         if(in_array($id, $obj->$key)) {
-          if($onlyFirst)
-            return $obj;
-          else
-            $output[$idx] = $obj;
+          if($onlyFirst) { return $obj; } else { $output[$idx] = $obj; }
         }
       }  else if($obj->$key == $id) {
-        if($onlyFirst)
-          return $obj;
-        else
-          $output[$idx] = $obj;
+          if($onlyFirst) { return $obj; } else { $output[$idx] = $obj; }
       }
     }
-    if($onlyFirst)
-      return False;
-    else
-      return $output;
+
+    return $onlyFirst ? False : $output;
   }
 
   // Returns the reverse of above with 2 or 3 options

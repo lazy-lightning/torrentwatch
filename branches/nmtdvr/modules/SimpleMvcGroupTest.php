@@ -9,11 +9,11 @@ Controller::_addModel('feedAdapter');
 
 abstract class SimpleMvcGroupTest extends GroupTest {
 
+  // implementing classs should use
+  // $this->testDir = dirname(realpath(__FILE__));
   var $testDir;
 
   public function __construct() {
-    // implementing classs should use the following
-    // $this->testDir = dirname(realpath(__FILE__));
     parent::__construct();
   }
 
