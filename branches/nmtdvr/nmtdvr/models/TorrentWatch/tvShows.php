@@ -13,10 +13,7 @@ class tvShows extends cachedArray {
     return False;
   }
 
-  function get($shortTitle) {
-    return parent::get(strtr(strtolower($shortTitle), '_.', '  '));
-  }
-
+  // needs more rethinking to prevent duplicates
   function addEpisode($feedItem) {
     $show = $this->get($feedItem->shortTitle);
     if(!$show) {
@@ -30,8 +27,7 @@ class tvShows extends cachedArray {
   }
 
   function newFeedItemCallback() {
-    list($feedItem, $feedUrl) = Event::$data;
-    $this->addEpisode($feedItem);
+    $this->addEpisode(Event::$data[0]);
   }
 
 }

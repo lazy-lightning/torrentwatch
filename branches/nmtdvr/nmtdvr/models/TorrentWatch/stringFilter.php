@@ -1,3 +1,4 @@
+<?php
 class stringFilter extends favFilterItem {
   static public function favFilter($favorite, $feedItem, $feedId) {
 

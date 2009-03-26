@@ -34,16 +34,12 @@ class ajaxController extends templateController {
     if(empty($this->options['link']))
       return;
 
-    $newFeed = new rss(array('url' => $this->options['link']));
+    $newFeed = factory::feed($this->options['link']);
     $this->success = $this->tw->feeds->add($newFeed);
 
     if($this->success === False) {
       SimpleMvc::log('Failure adding new feed');
-      return;
     }
-
-    SimpleMvc::log('running first update on new feed');
-    $newFeed->updateItems();
   }
 
   function addFavorite() {
