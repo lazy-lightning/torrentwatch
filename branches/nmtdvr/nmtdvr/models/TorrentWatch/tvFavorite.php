@@ -49,10 +49,7 @@ class tvFavorite extends favorite {
 
   // Called every time a new feed item is started by this favorite
   // update our information about the most recent episode
-  //
-  // Needs a better method than just trusting this to b called as nececessary
-  // another event? when everythings a hammer . . . what else can be done?
-  public function updateRecent($feedItem) {
+  public function matched($feedItem) {
     if($feedItem->season === 0 && !is_numeric($feedItem->episode)) {
       // Date based episode
       $date = strtotime(strtr($feedItem->episode, '.', '/'));
@@ -64,7 +61,7 @@ class tvFavorite extends favorite {
       if($this->recentEpisode < 10000) {
         SimpleMvc::log('flipflop between date and episode based releases');
       } elseif($this->recentEpisode >= $date) {
-          return False;
+          return;
       }
     } else {
       // SxxExx based episode
@@ -72,7 +69,7 @@ class tvFavorite extends favorite {
         SimpleMvc::log('flipflop between date and episode based releases');
       } elseif($this->recentSeason > $feedItem->season OR
               ($this->recentSeason === $feedItem->season && $this->recentEpisode > $feedItem->episode)) {
-        return False;
+        return;
       }
     }
     $this->changed       = True;
