@@ -16,6 +16,15 @@ class feeds extends cachedArray {
       $feed->compareFavorite($fav);
   }
 
+  public function add($feed) {
+    if(($idx = parent::add($feed)) !== False) {
+      SimpleMvc::log('running first update on new feed');
+      $feed->updateItems();
+      return $idx;
+    }
+    return False;
+  }
+
   public function del($idx) {
     $feed = $this->get($idx);
     if(parent::del($idx)) {
