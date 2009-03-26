@@ -21,8 +21,25 @@ class rss extends feed {
       )));
   }
 
+  function getFeed() {
+    // setup $data and make sure its valid
+    $lastRss = $this->setupLastRss();
+    $data = $lastRss->Get($this->url);
+    if(!$data) {
+      SimpleMvc::log("Error starting rss parser.");
+      SimpleMvc::log($this);
+      return False;
+    }
+
+    if(empty($data['items'])) {
+      SimpleMvc::log("No items in rss feed: ".$this->url);
+      return False;
+    }
+    return $data;
+  }
+
   // Returns the content link(.torrent or .nzb) inside an rssItem
-  function getLink($rssItem) {
+  protected function getLink($rssItem) {
     if(isset($rssItem['enclosure']['url']))
       $link = $rssItem['enclosure']['url'];
     else {
@@ -34,6 +51,26 @@ class rss extends feed {
       }
     }
     return html_entity_decode($link);
+  }
+
+  function getNewItems($allItems) {
+    // Find the oldest new item.  Remember items start with newest first
+    $i = 0;
+    foreach($allItems as $rssItem) {
+      if($this->latestItemId === $this->getRssItemId($rssItem)) {
+        $i--; // Remove self from valid items and break out
+        break;
+      }
+      $i++;
+    }
+
+    // No new items will leave $i === -1
+    if($i === -1) {
+      return False;
+    }
+
+    SimpleMvc::log('Items to add: '.$i);
+    return array_slice($data['items'], 0, $i);
   }
 
   // returns a hopefully unique identifier of this rss item
@@ -58,17 +95,7 @@ class rss extends feed {
   protected function updateReal() {
     SimpleMvc::log(__FUNCTION__);
 
-    // setup $data and make sure its valid
-    $lastRss = $this->setupLastRss();
-    $data = $lastRss->Get($this->url);
-    if(!$data) {
-      SimpleMvc::log("Error starting rss parser.");
-      SimpleMvc::log($this);
-      return False;
-    }
-
-    if(empty($data['items'])) {
-      SimpleMvc::log("No items in rss feed: ".$this->url);
+    if(($items = $this->getFeed()) === False) {
       return False;
     }
 
@@ -83,31 +110,17 @@ class rss extends feed {
     // Hardcoded for now, should be changeable.  Maybee by age instead of count
     $this->feedItems->setMaxItems($data['items_count']);
 
-    // Find the oldest new item.  Remember items start with newest first
-    $i = 0;
-    foreach($data['items'] as $rssItem) {
-      if($this->latestItemId === $this->getRssItemId($rssItem)) {
-        $i--; // Remove self from valid items and break out
-        break;
-      }
-      $i++;
+    if(($items = $this->getNewItems($data['items'])) === False) {
+      SimpleMvc::log('No items to add');
+      return True;
     }
 
-    // No new items will leave $i === -1
-    if($i >= 0) {
-      // Setup the array of verified new items
-      SimpleMvc::log('Items to add: '.$i);
-      $items = array_slice($data['items'], 0, $i);
+    // Reverse the array so as to start with the oldest item and add them
+    foreach(array_reverse($items) as $rssItem)
+      $this->addRssItem($rssItem);
 
-      // Reverse the array so as to start with the oldest item and add them
-      foreach(array_reverse($items) as $rssItem)
-        $this->addRssItem($rssItem);
-
-      // get the first(newest) item off the array and save its itemId
-      $this->latestItemId = $this->getRssItemId(reset($items));
-    } else {
-      SimpleMvc::log('No new items: '.$this->url);
-    }
+    // get the first(newest) item off the array and save its itemId
+    $this->latestItemId = $this->getRssItemId(reset($items));
 
     return True;
   }
