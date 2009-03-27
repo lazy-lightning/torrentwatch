@@ -1,6 +1,17 @@
 <?php
 class feedItem extends cacheItem {
 
+  private static $statusWhitelist = array(
+      'nomatch',
+      'oldEpisode',
+      'duplicateEpisode',
+      'previouslyDownloaded',
+      'automatedDownload',
+      'manualDownload',
+      'failedStart',
+      'noCallback',
+  );
+
   // Raw feed data
   private $title = '';
   private $link = '';
@@ -131,8 +142,12 @@ class feedItem extends cacheItem {
   }
 
   function setStatus($status) {
-    $this->changed = True;
-    $this->status = $status;
+    if(in_array(self::$statusWhitelist, $status)) {
+      $this->changed = True;
+      $this->status = $status;
+    } else {
+      SimpleMvc::log('Invalid status passed to feedItem: '.$status);
+    }
   }
 
 }
