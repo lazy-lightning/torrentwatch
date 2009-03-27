@@ -14,5 +14,24 @@ class factory {
     }
   }
 
+  static protected $clients = array(
+   // client option   Class
+      'btpd'      => 'clientBTPD',
+      'nzbget'    => 'clientNzbGet',
+      'sabnzbd'   => 'clientSabNzbd',
+      'trans1.22' => 'clientTransmission122',
+      'transRPC'  => 'clientTransmissionRPC',
+      'folder'    => 'clientSimpleFolder',
+  );
+
+  static public function client() {
+    $client = TwConfig::getInstance()->client;
+    if(isset(self::$clients[$client])) {
+      return new self::$clients[$client];
+    }
+    SimpleMvc::log('Invalid client while initializing: '.$client);
+    return NULL;
+  }
+
 }
 
