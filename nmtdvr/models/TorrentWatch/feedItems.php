@@ -9,6 +9,9 @@ class feedItems extends cachedArray {
     // Receive an event when a favorite changes to recompare all the items
     // Could be moved up into feedItem class
     Event::add('nmtdvr.updatedFavorite', array($this, 'updatedFavoriteCallback'));
+    // Receive an event what a favorite is deleted to reset the history of
+    // all matching items
+    Event::add('nmtdvr.deletedFavorite', array($this, 'deletedFavoriteCallback'));
   }
 
   function __sleep() {
@@ -31,6 +34,13 @@ class feedItems extends cachedArray {
       SimpleMvc::log(microtime(TRUE)-$start);
     }
     SimpleMvc::log(microtime(TRUE)-$start);
+  }
+
+  function deletedFavoriteCallback() {
+    $favId = Event::$data;
+    foreach($this->get($favId, 'matchingFavorite') as $feedItem) {
+      $feedItem->resetHistory($favId);
+    }
   }
 
   function updatedFavoriteCallback() {

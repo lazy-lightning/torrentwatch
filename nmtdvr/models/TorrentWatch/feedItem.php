@@ -7,7 +7,7 @@ class feedItem extends cacheItem {
   private $pubDate = '';
   private $description = '';
 
-  // detected from title in guessTvData()
+  // detected from title
   private $shortTitle = '';
   private $season = '';
   private $episode = '';
@@ -31,8 +31,6 @@ class feedItem extends cacheItem {
       $this->season = $guess['season'];
       $this->episode = $guess['episode'];
     }
-
-    $this->initEvents();
 
     parent::__construct(array());
   }
@@ -60,27 +58,25 @@ class feedItem extends cacheItem {
   }
 
   function __wakeup() {
-    $this->initEvents();
+    parent::__wakeup();
   }
 
   // This gets called when a favorite is updated or deleted
   function resetHistory($favId = '') {
-    // If no options then we were called by an event
-    if($favId === '') {
-      $favId = Event::$data;
+    // If this is the same favorite that matched before
+    if($this->matchingFavorite !== $favId) {
+      return;
     }
 
-    // If this is the same favorite that matched before
-    if($this->matchingFavorite === $favId) {
-      // If the status isn't downloaded, then reset the item.  Otherwise just change the status
-      SimpleMvc::log('Resetting match to id '.$favId);
-      if(stristr($this->status, 'download') === False) {
-        // Wasn't downloaded
-        $this->matchingFavorite = '';
-        $this->setStatus('nomatch');
-      } else {
-        $this->setStatus('previouslyDownloaded');
-      }
+    // If the status isn't downloaded, then reset the item.
+    // Otherwise just change the status
+    SimpleMvc::log('Resetting match to id '.$favId);
+    if(stripos($this->status, 'download') === False) {
+      // Wasn't downloaded
+      $this->matchingFavorite = '';
+      $this->setStatus('nomatch');
+    } else {
+      $this->setStatus('previouslyDownloaded');
     }
   }
 
@@ -115,11 +111,9 @@ class feedItem extends cacheItem {
     if($this->status != 'nomatch')
       return False;
 
-    // Feed Item is now verified downloadable
-    SimpleMvc::log('Found matching favorite: '.$fav->name);
-
-    // Record which fav matched and 
+    // Feed Item is now verified downloadable.  Record which fav matched and 
     // set status to noCallback to indicate if the following event fails to update it
+    SimpleMvc::log('Found matching favorite: '.$fav->name);
     $this->matchingFavorite = $fav->id;
     $this->setStatus('noCallback');
 
@@ -134,12 +128,6 @@ class feedItem extends cacheItem {
     }
 
     return True;
-  }
-
-  function initEvents() {
-    // Receive deleted Favorite event to unset if we were matched
-    // by that favorite
-    Event::add('nmtdvr.deletedFavorite', array($this, 'resetHistory'));
   }
 
   function setStatus($status) {
