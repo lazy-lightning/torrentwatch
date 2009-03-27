@@ -34,25 +34,23 @@ class history extends cachedArray {
       $item = $feedItem;
     } else {
       // This should provably be put elsewhere
-      $item = new historyItem(array(
+      $options = array(
           'title'      => $feedItem->title,
           'shortTitle' => $feedItem->shortTitle,
           'season'     => $feedItem->season,
           'episode'    => $feedItem->episode,
-      ));
-      if($feed !== NULL) {
-        $item->update(array(
-          'feedId'     => $feed->id,
-          'feedTitle'  => $feed->title
-        ));
-      }
+          'feedId'     => $feedItem->feedId,
+          'feedTitle'  => feeds::getInstance()->get($feedItem->feedId)->title,
+      );
+
       if($fav !== NULL) {
-        $item->update(array(
-            'favId'      => $fav->id,
-            'favName'    => $fav->name,
-        ));
+        $options['favId'] = $fav->id;
+        $options['favName'] = $fav->name;
       }
+
+      $item = new historyItem($options);
     }
+
     if(($id = parent::add($item)) !== FALSE) {
       if(!(empty($item->season) || empty($item->episode) || empty($item->shortTitle)))
         $this->epHistory[strtolower($item->shortTitle)][$item->season][$item->episode] = $id;

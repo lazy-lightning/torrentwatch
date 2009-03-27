@@ -2,7 +2,7 @@
 class onlyNewFilter extends favFilterItem {
   // Return true or false if the given season/episode would be newer than the last
   // episode downloaded by this favorite
-  static public function favFilter($favorite, $feedItem, $feedId) {
+  static public function favFilter($favorite, $feedItem) {
     if($favorite->onlyNewer === False)
       return True;
 

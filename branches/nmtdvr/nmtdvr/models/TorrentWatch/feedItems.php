@@ -22,7 +22,7 @@ class feedItems extends cachedArray {
     SimpleMvc::log(__CLASS__."->".__FUNCTION__.'()');
     if(parent::add($newArrayItem)) {
       $feed = feeds::getInstance()->get($this->url, 'url');
-      $data = array($newArrayItem, $feed->id);
+      $data = array($newArrayItem);
       Event::run('nmtdvr.newFeedItem', $data);
     }
   }

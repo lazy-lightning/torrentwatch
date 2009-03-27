@@ -97,7 +97,7 @@ class feedItem extends cacheItem {
 
   // This function is the common denominator to compare and start
   // an item between adding new feedItems and updating a favorite
-  function compareFavorite($fav, $feedId) {
+  function compareFavorite($fav) {
     SimpleMvc::log("Comparing {$fav->name} with {$this->title}");
 
     $favId = $fav->id;
@@ -114,7 +114,7 @@ class feedItem extends cacheItem {
     $this->resetHistory($favId);
 
     // Do the actual comparison in the favorite
-    if(!$fav->isMatching($this, $feedId))
+    if(!$fav->isMatching($this))
       return False;
 
     // reset item from previous or manual to automated download
@@ -133,7 +133,7 @@ class feedItem extends cacheItem {
     $this->setStatus('noCallback');
 
     // To be picked up by the history to initiate download
-    $data = array($this, $feedId, $fav);
+    $data = array($this, $fav);
     Event::run('nmtdvr.matchingFeedItem', $data);
 
     // If the callback initated a download let the favorite know
@@ -144,7 +144,7 @@ class feedItem extends cacheItem {
   }
 
   function setStatus($status) {
-    if(in_array(self::$statusWhitelist, $status)) {
+    if(in_array($status, self::$statusWhitelist)) {
       $this->changed = True;
       $this->status = $status;
     } else {

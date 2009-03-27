@@ -1,7 +1,7 @@
 <?php
 class feedFilter extends favFilterItem {
-  static public function favFilter($favorite, $feedItem, $feedId) {
-    return ($favorite->feed === $feedId || $favorite->feed === '');
+  static public function favFilter($favorite, $feedItem) {
+    return ($favorite->feed === $feedItem->feedId || $favorite->feed === '');
   }
 }
 
