@@ -14,6 +14,7 @@ class rss extends feed {
   function addRssItem($rssItem) {
       $this->addFeedItem(new feedItem(array
       (
+       'feedId'      => $this->id,
        'title'       => $rssItem['title'], 
        'link'        => $this->getLink($rssItem), 
        'pubDate'     => empty($rssItem['pubDate']) ? time() : $rssItem['pubDate'], 

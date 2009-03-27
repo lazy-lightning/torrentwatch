@@ -1,6 +1,7 @@
 <?php
 class feedItem extends cacheItem {
 
+  // Valid item status, const instead?
   private static $statusWhitelist = array(
       'nomatch',
       'oldEpisode',
@@ -13,6 +14,7 @@ class feedItem extends cacheItem {
   );
 
   // Raw feed data
+  private $feedId;
   private $title = '';
   private $link = '';
   private $pubDate = '';
@@ -26,13 +28,14 @@ class feedItem extends cacheItem {
 
   // Related to favorite matching
   private $matchingFavorite = '';
-  private  $status = 'nomatch';
+  private $status = 'nomatch';
 
   function __construct($options) {
     $this->title = isset($options['title']) ? $options['title'] : '';
     $this->link = isset($options['link']) ? $options['link'] : '';
     $this->pubDate = isset($options['pubDate']) ? $options['pubDate'] : '';
     $this->description = isset($options['description']) ? $options['pubDate'] : '';
+    $this->feedId = isset($options['feedId']) ? $options['feedId'] : '';
 
     // Try and parse some data out of the title
     $guess = guess::episodeDataFromTitle($this->title, True);
@@ -55,6 +58,7 @@ class feedItem extends cacheItem {
 
   function __sleep() {
     return array_merge(parent::__sleep(), array(
+      "\x00feedItem\x00feedId",
       "\x00feedItem\x00title",
       "\x00feedItem\x00link",
       "\x00feedItem\x00pubDate",
@@ -82,7 +86,7 @@ class feedItem extends cacheItem {
     // If the status isn't downloaded, then reset the item.
     // Otherwise just change the status
     SimpleMvc::log('Resetting match to id '.$favId);
-    if(stripos($this->status, 'download') === False) {
+    if(strpos($this->status, 'Download') === False) {
       // Wasn't downloaded
       $this->matchingFavorite = '';
       $this->setStatus('nomatch');
@@ -114,12 +118,12 @@ class feedItem extends cacheItem {
       return False;
 
     // reset item from previous or manual to automated download
-    if(stripos($this->status, 'download') !== False)
+    if(strpos($this->status, 'Download') !== False)
       $this->setStatus('automatedDownload');
 
     // Only start items of un-determined status
     // comes after isMatching() to allow above status revert
-    if($this->status != 'nomatch')
+    if($this->status !== 'nomatch')
       return False;
 
     // Feed Item is now verified downloadable.  Record which fav matched and 
@@ -133,10 +137,8 @@ class feedItem extends cacheItem {
     Event::run('nmtdvr.matchingFeedItem', $data);
 
     // If the callback initated a download let the favorite know
-    if(stripos($this->status, 'download') !== False &&
-       $this->status !== 'failedDownload') {
+    if(strpos($this->status, 'Download') !== False)
       $fav->matched($this);
-    }
 
     return True;
   }
