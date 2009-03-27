@@ -65,12 +65,17 @@ class feed extends cacheItem {
   }
 
   public function needsUpdate() {
-    return (time() > $this->lastUpdate + $this->minFeedUpdate);
+    $nextUpdate = $this->lastUpdate + $this->minFeedUpdate;
+    $time = time();
+    if($time > $nextUpdate)
+      return True;
+    else
+      return $nextUpdate-$time;
   }
 
   public function updateItems() {
     SimpleMvc::log(__CLASS__."::".__FUNCTION__);
-    if($this->needsUpdate()) {
+    if(($timeLeft = $this->needsUpdate()) === True) {
       SimpleMvc::log('needsUpdate');
 
       if($this->updateReal()) {
@@ -81,7 +86,7 @@ class feed extends cacheItem {
         SimpleMvc::log('updateReal Failed');
         return False;
       }
-    } else SimpleMvc::log('no update needed');
+    } else SimpleMvc::log("no update needed for $timeLeft secconds");
     return True;
   }
 
