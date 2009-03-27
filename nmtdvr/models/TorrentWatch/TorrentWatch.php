@@ -52,14 +52,14 @@ class TorrentWatch {
 
   public function matchingFeedItemCallback() {
     SimpleMvc::log(__FUNCTION__);
-    list($feedItem, $feedId, $fav) = Event::$data;
+    list($feedItem, $fav) = Event::$data;
 
     // incase another event already handled this
     if($feedItem->status !== 'noCallback') {
       return;
     }
     
-    $feed = $this->feeds->get($feedId);
+    $feed = $this->feeds->get($feedItem->feedId);
 
     if($this->downloadFeedItem($feed->url, $feedItem)) {
       $this->history->add($feedItem, $feed, $fav);

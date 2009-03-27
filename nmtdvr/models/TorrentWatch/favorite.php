@@ -44,13 +44,13 @@ abstract class favorite extends filter {
     Event::add('nmtdvr.newFeedItem', array($this, 'newFeedItemCallback'));
   }
 
-  public function isMatching($feedItem, $feedId) {
-    return $this->runFilter(array($feedItem, $feedId));
+  public function isMatching($feedItem) {
+    return $this->runFilter(array($feedItem));
   }
 
   public function newFeedItemCallback() {
-    list($feedItem, $feedId) = Event::$data;
-    $feedItem->compareFavorite($this, $feedId);
+    $feedItem = Event::$data[0];
+    $feedItem->compareFavorite($this);
   }
 
   public function setFeed($value) {

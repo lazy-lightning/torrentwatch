@@ -1,6 +1,6 @@
 <?php
 class episodeFilter extends favFilterItem {
-  static public function favFilter($favorite, $feedItem, $feedId) {
+  static public function favFilter($favorite, $feedItem) {
     if($favorite->episodes == '') {
       return True;
     }

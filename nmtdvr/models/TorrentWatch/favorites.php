@@ -34,9 +34,9 @@ class favorites extends cachedArray {
     return self::$instance;
   }
 
-  function compareFeedItem($feedItem, $feedId) {
+  function compareFeedItem($feedItem) {
     foreach($this->array as $fav)
-      if($feedItem->compareFavorite($fav, $feedId))
+      if($feedItem->compareFavorite($fav, $feedItem->feedId))
         return True;
     return False;
   }

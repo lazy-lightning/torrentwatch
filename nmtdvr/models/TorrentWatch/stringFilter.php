@@ -1,6 +1,6 @@
 <?php
 class stringFilter extends favFilterItem {
-  static public function favFilter($favorite, $feedItem, $feedId) {
+  static public function favFilter($favorite, $feedItem) {
 
     $title = strtolower($feedItem->title);
     // Use the normalized short title against main filter where possible
