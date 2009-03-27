@@ -70,7 +70,7 @@ class rss extends feed {
     }
 
     SimpleMvc::log('Items to add: '.$i);
-    return array_slice($data['items'], 0, $i);
+    return array_slice($allItems, 0, $i);
   }
 
   // returns a hopefully unique identifier of this rss item
@@ -95,7 +95,7 @@ class rss extends feed {
   protected function updateReal() {
     SimpleMvc::log(__FUNCTION__);
 
-    if(($items = $this->getFeed()) === False) {
+    If(($data = $this->getFeed()) === False) {
       return False;
     }
 
