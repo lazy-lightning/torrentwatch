@@ -39,7 +39,7 @@ final class SimpleMvc {
     self::$bufferLevel = ob_get_level();
 
     //set_error_handler(array(__CLASS__, 'exceptionHandler'));
-    //set_exception_handler(array(__CLASS__, 'exceptionHandler'));
+    set_exception_handler(array(__CLASS__, 'exceptionHandler'));
 
     header('Content-Type: text/html; charset=UTF-8');
 
@@ -71,8 +71,6 @@ final class SimpleMvc {
       self::$current_uri = $_SERVER['PHP_SELF'];
     }
 
-    // sybhttpd doesnt have a SCRIPT_FILENAME
-    // but we already know PATH_INFO is correct
     if(isset($_SERVER['SCRIPT_FILENAME'])) {
       // The front controller directory and filename
       $fc = substr(realpath($_SERVER['SCRIPT_FILENAME']), strlen(DOCROOT));
@@ -80,17 +78,22 @@ final class SimpleMvc {
       if (($strpos_fc = strpos(self::$current_uri, $fc)) !== FALSE) {
         // Remove the front controller from the current uri
         self::$current_uri = substr(self::$current_uri, $strpos_fc + strlen($fc));
+        if(self::$current_uri === False)
+          self::$current_uri = '';
       }
     }
 
+    // If no uri use the default or 404
+    if(self::$current_uri === '' OR self::$current_uri === '/') {
 
-    // Remove slashes from the start and end of the URI
-    self::$current_uri = trim(self::$current_uri, '/');
+      if(defined('DEFAULT_CONTROLLER'))
+        throw new SimpleMvc_301_Exception(DEFAULT_CONTROLLER);
+
+      Event::run('system.404');
+    }
 
     // Clean up any double slashes
-    if (self::$current_uri !== '') {
-      self::$current_uri = preg_replace('#//+#', '/', self::$current_uri);
-    }
+    self::$current_uri = preg_replace('#//+#', '/', self::$current_uri);
 
   }
 
@@ -99,16 +102,19 @@ final class SimpleMvc {
       self::$query_string = '?'.trim($_SERVER['QUERY_STRING'], '&/');
     }
 
-    if(self::$current_uri === '') {
-      Event::run('system.404');
+    self::$complete_uri = self::$current_uri.self::$query_string;
+    $segments = explode('/', trim(self::$current_uri, '/'));
+    self::$controller = $segments[0];
+
+    // Redirect to prevent accessing controllers without trailing slash
+    if(!isset($segments[1]) && substr(self::$current_uri, -1) !== '/') {
+      throw new SimpleMvc_301_Exception(self::$controller);
     }
 
-    self::$complete_uri = self::$current_uri.self::$query_string;
-    $segments = explode('/', self::$current_uri);
-    self::$controller = $segments[0];
     self::$method = isset($segments[1]) ? $segments[1] : 'index';
     if(isset($segments[2]))
       self::$arguments = array_slice($segments, 2);
+
   }
 
   // This function is called as part of system.ready
@@ -136,8 +142,17 @@ final class SimpleMvc {
       Benchmark::start('controller_execution');
 
       $method = self::$method;
-      self::log("Calling $class -> $method with command: ".implode('/', self::$arguments).
-                "\nOptions: ".print_r($_GET, TRUE));
+
+      // Uglyness below
+      $append = '';
+      if(count(self::$arguments) !== 0) {
+        $append = 'with command: '.implode('/', self::$arguments);
+      }
+      if(count($_GET) !== 0) {
+        $append .= "\nOptions: ".print_r($_GET, TRUE);
+      }
+      self::log("Calling $class -> $method $append");
+      // end Ugly
 
       try {
         $controller->$method(self::$arguments);
@@ -166,7 +181,7 @@ final class SimpleMvc {
   }
 
   public static function saveLog() {
-    $logfile=USERPATH.self::$controller.'.'.date('m.d.y').'.log';
+    $logfile=USERPATH.self::$controller.'.'.date('y.m.d').'.log';
 
     $count = 0;
     $output = array();
@@ -322,16 +337,31 @@ class SimpleMvcException extends Exception {
 class SimpleMvc_404_Exception extends SimpleMvcException {
   public function __construct($page = False, $template = False) {
     if($page === False) {
-      $page = $_SERVER['SCRIPT_NAME'].$_SERVER['PATH_INFO'];
+      $page = SimpleMvc::$base_uri.'/'.SimpleMvc::$complete_uri;
     }
+    echo '<pre>'; 
+    print_r(debug_backtrace());
+    echo '</pre>'; 
 
-    Exception::__construct('Page Not Found: '.$page);
-
-    $this->template = $template;
+    Exception::__construct("Page Not Found: $page\n<pre>$trace</pre>");
+    if($template)
+      $this->template = $template;
   }
 
   public function sendHeaders() {
     header('HTTP/1.1 404 File Not Found');
+  }
+}
+
+class SimpleMvc_301_Exception extends SimpleMvcException {
+  public function __construct($controller, $method = '') {
+    $this->url = SimpleMvc::$base_uri.'/'.$controller.'/'.$method;
+    $this->template = '';
+    Exception::__construct('foobar');
+  }
+
+  public function sendHeaders() {
+    header("Location: {$this->url}", TRUE, 301);
   }
 }
 
