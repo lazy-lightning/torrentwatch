@@ -7,6 +7,18 @@ require_once('client.php');
 date_default_timezone_set('America/Los_Angeles');
 DataCache::setStore(USERPATH.'DataCache/');
 
+// Hack to lock all reasources to a single instance
+$file = '/tmp/nmtdvr.lock';
+if(!file_exists($file))
+  touch($file);
+$_lock = fopen($file, 'a');
+
+// Lock now, will be released when the script ends
+// Should just block untill lock is made rather than throwing exception
+if(flock($_lock, LOCK_EX) === False)
+  throw new Exception();
+unset($file);
+
 class TorrentWatch {
   var $client;
   var $config;
@@ -23,11 +35,12 @@ class TorrentWatch {
     $this->favorites = favorites::getInstance();
     $this->feeds = feeds::getInstance();
     $this->history = history::getInstance();
-    $this->client = $this->initClient();
+    $this->client = factory::client();
   } 
 
   public function downloadFeedItem($feedUrl, $feedItem) {
     // If the feed has cookies set, transfer them to the link
+    // Perhaps this should be done when the feeditem is created
     $link = $feedItem->link;
     if(($p = strpos($feedUrl, ':COOKIES:')) !== False) {
       $link .= substr($feedUrl, $p);
@@ -35,34 +48,6 @@ class TorrentWatch {
     // Run the link through to the users client
     // title is passed incase the link needs to be saved to disk
     return ($this->client->addByUrl($link, $feedItem->title) === True);
-  }
-
-  function initClient() {
-    switch($this->config->client) {
-      case 'btpd':
-        $client = new clientBTPD();
-        break;
-      case 'nzbget':
-        $client = new clientNzbGet();
-        break;
-      case 'sabnzbd':
-        $client = new clientSabNZBd();
-        break;
-      case 'trans1.22':
-        $client = new clientTransmission122();
-        break;
-      case 'transRPC':
-        $client = new clientTransmissionRPC();
-        break;
-      case 'folder':
-        $client = new clientSimpleFolder();
-        break;
-      default:
-        SimpleMvc::log('Invalid client while initializing: '.$this->config->client);
-        $client = Null;
-        break;
-    }
-    return $client;
   }
 
   public function matchingFeedItemCallback() {
