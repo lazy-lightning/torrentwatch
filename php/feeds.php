@@ -10,6 +10,13 @@
   } else {  // Standard RSS
     $link = $rs['link'];
   }
+
+  if(strpos($link, 'newzleech.com') !== False) {
+    // Special handling for newzleech
+    $tmp = explode('=', $link);
+    $link='http://newzleech.com/?m=gen&dl=1&post='.$tmp[1];
+  }
+
   return html_entity_decode($link);
 }
 

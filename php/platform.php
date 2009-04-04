@@ -65,8 +65,8 @@ function platform_getGunzip() {
       if(file_exists('/bin/gunzip'))
         return "/bin/gunzip";
       else if(file_exists('/bin/busybox')) {
-	exec('/bin/busybox gunzip 2>&1', $output);
-	if($output[0] == 'busybox: applet not found')
+        exec('/bin/busybox gunzip 2>&1', $output);
+        if($output[0] == 'busybox: applet not found')
           return FALSE;
         else
           return "/bin/busybox gunzip";
@@ -130,7 +130,7 @@ function platform_getInstallRoot() {
 
 function platform_getTransmissionRemote() {
   if(file_exists('/usr/bin/transmission-remote'))
-    return '/usr/bin/transmission/remote';
+    return '/usr/bin/transmission-remote';
   else if(file_exists('/mnt/syb8634/bin/transmission-remote'))
     return '/mnt/syb8634/bin/transmission-remote';
   return FALSE;
