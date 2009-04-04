@@ -90,7 +90,7 @@ function parse_options() {
 			exit(0);
 			break;
 		default:
-			$output = "<script type='text/javascript'>alert('Bad Paramaters passed to ".$_SERVER['PHP_SELF'].":  ".$_SERVER['PATH_INFO']."');</script>";
+			$output = "<script type='text/javascript'>alert('Bad Paramaters passed to ".$_SERVER['PHP_SELF'].":  no ".$commands[1]."');</script>";
 	}
 
 	if(isset($exec))

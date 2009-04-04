@@ -76,7 +76,11 @@ function get_deep_dir($dest, $tor_name) {
 
 function folder_add_torrent($tor, $dest, $title) {
   global $config_values;
+  // remove invalid chars
+  $title = strtr($title, '/', '_');
+  // add the directory and extension
   $dest = "$dest/$title.".$config_values['Settings']['Extension'];
+  // save it
   file_put_contents($dest, $tor);
   return 0;
 }
@@ -175,7 +179,7 @@ function client_add_nzb($filename, $title = NULL, &$fav = NULL, $feed = NULL) {
     add_history($title);
     if(!empty($fav))
       updateFavoriteEpisode($fav, $title);
-    _debug("Starting: $title\n",0);
+    _debug("Started: $title\n",0);
   } else {
     _debug("Failed Starting $title. Error: $return",-1);
   }
@@ -241,7 +245,7 @@ function client_add_torrent($filename, $dest, $title, &$fav = NULL, $feed = NULL
   }
   if($return === 0) {
     add_history($tor_name);
-    _debug("Starting: $tor_name in $dest\n",0);
+    _debug("Started: $tor_name in $dest\n",0);
     if(isset($fav))
       updateFavoriteEpisode($fav, $tor_name);
     if($config_values['Settings']['Save Torrents'])

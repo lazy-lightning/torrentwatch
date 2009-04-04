@@ -107,7 +107,7 @@ class BrowserEmulator {
     /* which means Internet Explorer 6.0 on WinXP                       */
    
     $this->headerLines["User-Agent"] = "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)";
-   
+
     /*******************************************************************************/
     /**
     * Set default to accept gzip encoded files
@@ -158,13 +158,7 @@ class BrowserEmulator {
   function preparseURL($url) {
     if($cookies = stristr($url, ':COOKIE:')) {
       $url = rtrim(substr($url, 0, -strlen($cookies)), '&');
-      $cookies = explode('&', substr($cookies, 8));
-      $out = '';
-      foreach($cookies as $cookie) {
-        list($key, $val) = explode('=', $cookie);
-        $out[] = "$key=\"$val\"";
-      }
-      $this->addHeaderLine("Cookie", '$Version=1; '.implode('; ', $out));
+      $this->addHeaderLine("Cookie", '$Version=1; '.strtr(substr($cookies, 8), '&', ';'));
     }
     return $url;
   }
