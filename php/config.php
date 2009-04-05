@@ -178,23 +178,16 @@ function update_favorite() {
 }
 
 function update_feed() {
-  if(!isset($_GET['button']))
-    return;
-  switch($_GET['button']) {
-    case 'Add':
-    case 'Update':
-      add_feed();
-      break;
-    case 'Delete':
+  if(isset($_GET['idx'])) {
       del_feed();
-      break;
+  } else {
+      add_feed();
   }
   write_config_file();
 }
 
 function add_favorite() {
   global $config_values;
-  $i = 0;
   if(isset($_GET['idx']) && $_GET['idx'] != 'new') {
     $idx = $_GET['idx'];
   } else if(isset($_GET['name'])) {
@@ -203,13 +196,14 @@ function add_favorite() {
     $_GET['idx'] = $idx; // So display_favorite_info() can see it
   } else
     return; // Bad form data
+
   $list = array("name"      => "Name",
                 "filter"    => "Filter",
                 "not"       => "Not",
                 "savein"    => "Save In",
                 "episodes"  => "Episodes",
                 "feed"      => "Feed",
-                "quality"    => "Quality",
+                "quality"   => "Quality",
                 "seedratio" => "seedRatio");
   foreach($list as $key => $data) {
     if(isset($_GET[$key]))
