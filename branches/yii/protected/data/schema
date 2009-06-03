@@ -1,0 +1,248 @@
+CREATE TABLE dvrConfig ( 
+    key TEXT, 
+    value TEXT
+);
+
+CREATE TABLE favoriteMovies (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    genre_id INTEGER NOT NULL DEFAULT 0,
+    quality_id INTEGER NOT NULL DEFAULT 0,
+    rating NUMERIC NOT_NULL DEFAULT 10,
+    FOREIGN KEY (genre_id) REFERENCES genre(id)
+    FOREIGN KEY (quality_id) REFERENCES quality(id)
+);
+
+CREATE TABLE favoriteTvShows (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  tvShow_id INTEGER NOT NULL,
+  quality_id INTEGER NOT NULL,
+  feed_id INTEGER,
+  saveIn TEXT,
+  seedRatio REAL,
+  onlyNewer integer NOT NULL DEFAULT 0,
+  FOREIGN KEY (tvShow_id) REFERENCES tvShow(id),
+  FOREIGN KEY (quality_id) REFERENCES quality(id)
+);
+
+CREATE TABLE feed (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  title VARCHAR(128),
+  description TEXT,
+  url VARCHAR(256) NOT NULL,
+  status NOT NULL DEFAULT 0, 
+  lastUpdated INTEGER NOT NULL DEFAULT 0
+);
+INSERT INTO feed VALUES (0, 'All Feeds', '', '', 0, 0);
+
+CREATE TABLE feedItem (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  feed_id INTEGER NOT NULL,
+  tvEpisode_id INTEGER,
+  url VARCHAR(256),
+  title VARCHAR(128),
+  description TEXT,
+  status INTEGER NOT NULL,
+  pubDate INTEGER NOT NULL,
+  lastUpdated INTEGER NOT NULL, hash VARCHAR(32),
+  FOREIGN KEY (feed_id) REFERENCES feed(id),
+  FOREIGN KEY (tvEpisode_id) REFERENCES tvEpisode(id)
+);
+
+CREATE TABLE feedItem_quality (
+  feedItem_id INTEGER NOT NULL,
+  quality_id INTEGER NOT NULL,
+  FOREIGN KEY (feedItem_id) REFERENCES feedItem(id),
+  FOREIGN KEY (quality_id) REFERENCES quality(id)
+);
+
+CREATE TABLE genre (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  title VARCHAR(128) NOT NULL
+);
+INSERT INTO genre VALUES (0, 'All Genres');
+
+CREATE TABLE network (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  title VARCHAR(128) NOT NULL
+);
+
+CREATE TABLE quality (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  title VARCHAR(128) NOT NULL
+);
+INSERT INTO quality VALUES (0, 'All Qualitys');
+
+CREATE TABLE tvEpisode (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  tvShow_id INTEGER,
+  season INTEGER, 
+  episode INTEGER,
+  title varchar(128),
+  description TEXT,
+  lastUpdated INTEGER,
+  status INTEGER,
+  FOREIGN KEY (tvShow_id) REFERENCES tvShow(id)
+);
+
+CREATE TABLE tvShow (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  network_id INTEGER,
+  title VARCHAR(128),
+  description TEXT,
+  FOREIGN KEY (network_id) REFERENCES network(id)
+);
+
+CREATE TABLE tvShow_genre (
+  tvShow_id INTEGER NOT NULL,
+  genre_id INTEGER NOT NULL,
+  FOREIGN KEY (tvShow_id) REFERENCES tvShow(id),
+  FOREIGN KEY (genre_id) REFERENCES genre(id)
+);
+
+CREATE VIEW matchingFavoriteTvShows AS
+SELECT favoriteTvShows.id favoriteTvShows_id,
+       favoriteTvShows.saveIn favorite_saveIn,
+       favoriteTvShows.onlyNewer favorite_onlyNewer,
+       feedItem.id feedItem_id,
+       feedItem.title feedItem_title,
+       feed.id feed_id,
+       tvShow.id tvShow_id,
+       tvEpisode.id tvEpisode_id,
+       tvEpisode.season season,
+       tvEpisode.episode episode,
+       favoriteTvShows.quality_id quality_id,
+       tvEpisode.status tvEpisode_status,
+       feedItem.status feedItem_status,
+       feedItem.url feedItem_url,
+       feed.url feed_url
+  FROM favoriteTvShows, tvShow, tvEpisode, feed, feedItem, feedItem_quality
+  WHERE tvShow.id = favoriteTvShows.tvShow_id
+  AND   tvEpisode.tvShow_id=tvShow.id
+  AND   feedItem.tvEpisode_id=tvEpisode.id
+  AND   feedItem_quality.feedItem_id=feedItem.id
+  AND   feed.id=feedItem.feed_id
+  AND   ( favoriteTvShows.feed_id=feed.id OR favoriteTvShows.feed_id=0 )
+  AND   ( favoriteTvShows.quality_id=feedItem_quality.quality_id OR favoriteTvShows.quality_id=0 );
+
+CREATE VIEW newestTvEpisode AS 
+SELECT *
+  FROM tvEpisode new 
+ WHERE NOT EXISTS(
+          SELECT * 
+            FROM tvEpisode old 
+           WHERE ( 
+                     new.tvShow_id = old.tvShow_id 
+                 AND (new.season < old.season OR (new.season = old.season AND new.episode < old.episode))
+           )
+       );
+
+CREATE VIEW recentTvShows AS 
+SELECT DISTINCT tvShow.*,
+                pubDate
+  FROM (
+          SELECT tvEpisode.tvShow_id tvShow_id,
+                 feedItem.pubDate pubDate 
+            FROM tvEpisode, feedItem 
+           WHERE feedItem.tvEpisode_id=tvEpisode.id 
+           ORDER BY feedItem.pubDate DESC
+  ), 
+       tvShow 
+ WHERE tvShow.id = tvShow_id 
+ ORDER BY pubDate DESC;
+
+CREATE VIEW matchingFavoriteTvShows AS 
+SELECT i.feedItem_id feedItem_id,
+       i.feedItem_title feedItem_title,
+       i.feedItem_status feedItem_status,
+       i.feedItem_url feedItem_url,
+       i.feed_id feed_id,
+       i.feed_url feed_url,
+       i.tvEpisode_id tvEpisode_id,
+       i.tvEpisode_season tvEpisode_season,
+       i.tvEpisode_episode tvEpisode_episode,
+       i.tvEpisode_status tvEpisode_status,
+       i.tvShow_id tvShow_id,
+       i.tvShow_title tvShow_title,
+       f.id favoriteTvShows_id,
+       f.saveIn favorite_saveIn,
+       f.seedRatio favorite_seedRatio,
+       f.onlyNewer favorite_onlyNewer
+  FROM tvFeedItem i, favoriteTvShows f
+  WHERE i.tvShow_id = f.tvShow_id
+    AND (f.feed_id = i.feed_id OR f.feed_id = 0)
+    AND (  SELECT COUNT(feedItem_quality.quality_id)
+             FROM feedItem_quality, favoriteTvShows_quality
+            WHERE feedItem_quality.feedItem_id = i.feedItem_id
+              AND feedItem_quality.quality_id = favoriteTvShows_quality.quality_id
+        ) = 
+        ( SELECT COUNT(favoriteTvShows.id)
+            FROM favoriteTvShows, favoriteTvShows_quality
+           WHERE favoriteTvShows.id = favoriteTvShows_quality.favoriteTvShows_id
+             AND favoriteTvShows.id = f.id
+        );
+
+CREATE VIEW tvFeedItem AS
+SELECT feedItem.id feedItem_id,
+       feedItem.title feedItem_title,
+       feedItem.status feedItem_status,
+       feedItem.url feedItem_url,
+       feedItem.feed_id feed_id,
+       feed.url feed_url,
+       tvEpisode.id tvEpisode_id,
+       tvEpisode.season tvEpisode_season,
+       tvEpisode.episode tvEpisode_episode,
+       tvEpisode.status tvEpisode_status,
+       tvShow.id tvShow_id,
+       tvShow.title tvShow_title
+  FROM feed, feedItem, tvEpisode, tvShow
+ WHERE feedItem.tvEpisode_id = tvEpisode.id
+   AND tvEpisode.tvShow_id = tvShow.id
+   AND feed.id = feedItem.feed_id;
+
+CREATE VIEW otherFeedItem AS
+SELECT feedItem.id feedItem_id,
+       feedItem.title feedItem_title,
+       feedItem.status feedItem_status,
+       feedItem.url feedItem_url,
+       feedItem.feed_id feed_id,
+       feed.url feed_url,
+       other.id as other_id,
+       other.title as other_title
+  FROM feed, feedItem, other
+ WHERE feedItem.other_id = other.id
+   AND feedItem.feed_id = feed.id;
+
+CREATE VIEW movieFeedItem AS
+SELECT feedItem.id feedItem_id,
+       feedItem.title feedItem_title,
+       feedItem.status feedItem_status,
+       feedItem.url feedItem_url,
+       feedItem.feed_id feed_id,
+       feed.url feed_url,
+       movie.id as movie_id,
+       movie.title as movie_title,
+       movie.imdbId as movie_imdbId
+  FROM feed, feedItem, movie
+ WHERE feedItem.movie_id = movie.id
+   AND feedItem.feed_id = feed.id;
+
+CREATE VIEW matchingFavoriteStrings AS
+SELECT *
+  FROM favoriteStrings, feedItem, feed
+ WHERE favoriteStrings.filter LIKE feedItem.title
+   AND NOT favoriteStrings.notFilter LIKE feedItem.title
+   AND (favoriteStrings.feed_id = feedItem.feed_id OR favoriteStrings.feed_id = 0);
+
+// Marks Duplicate tvEpisodes(that have already been downloaded)
+UPDATE TABLE feedItem 
+   SET feedItem.status = feedItem::STATUS_DUPLICATE
+ WHERE feedItem.id IN ( SELECT feedItem_id 
+                          FROM matchingFavoriteTvShows m
+                         WHERE m.tvEpisode_status = tvEpisode::STATUS_DOWNLOADED
+                      )
+  
+SELECT tvShow.id
+  FROM tvShow
+ WHERE  description IS NULL;
+ 

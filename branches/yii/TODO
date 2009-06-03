@@ -1,0 +1,4 @@
+Fix LED colors in webui
+Make proper list and show views for all the AR classes
+Fix css selectors in javascript to point to correct items
+
