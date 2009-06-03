@@ -1,4 +1,23 @@
+Test Release Goals
+--------------------
+Completed classic webui to work with the new backend
+NMT view to be partially completed, but not fully usable in first release
+
+TODO
+-----
+Write inspector ajax action to get specific data from database
 Fix LED colors in webui
-Make proper list and show views for all the AR classes
 Fix css selectors in javascript to point to correct items
+Create download history table and link it to downloadManager
+Debug download clients
+Finish webui interface for multiple favorite types (tabs?)
+Better handling of multiple qualitys
+Write DB Maintinance scripts
+
+Future TODO's after first release
+-----------------------------------
+Split configuration into categorys and allow much more to be configured?
+Make proper list and show views for all the AR classes
+favoriteTvShow quality fallback.  example: if set to hdtv, but we only know about a 720p release allow that to go through after X(4?) hours of not seeing an hdtv release
+
 
