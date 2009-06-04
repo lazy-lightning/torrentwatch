@@ -22,10 +22,10 @@
   <?php echo CHtml::dropDownList('favoriteTvShow[feed_id]', $favorite->feed_id, CHtml::listData($feeds, 'id', 'title')); ?>
  </div>
  <div class="favorite_quality">
-  <?php foreach($favorite->quality as $quality): ?>
-    <?php echo CHtml::activeLabel($favorite, 'quality').': '.
-               CHtml::dropDownList('quality_id[]', $quality->id, CHtml::listData($qualitys, 'id', 'title')); ?><br>
-  <?php endforeach; ?>
+    <?php echo CHtml::activeLabel($favorite, 'quality'); ?>:
+  <?php foreach($favorite->quality as $quality) {
+          echo CHtml::dropDownList('quality_id[]', $quality->id, CHtml::listData($qualitys, 'id', 'title'));
+        } ?>
  </div>
  <div class="favorite_seedratio">
   <?php echo CHtml::activeLabel($favorite, 'seedRatio').': '.

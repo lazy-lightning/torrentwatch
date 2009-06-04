@@ -23,16 +23,12 @@ class SiteController extends BaseController
 	 */
 	public function actionIndex()
 	{
-		// renders the view file 'protected/views/site/index.php'
-		// using the default layout 'protected/views/layouts/main.php'
-    
     $items = $this->prepareListItems(array(
           array('label'=>'Feed Items', 'url'=>array('feed/list')),
           array('label'=>'TV Shows', 'url'=>array('tvShow/list')),
           array('label'=>'Movies', 'url'=>array('movie/list')),
           array('label'=>'Other', 'url'=>array('other/list')),
     ));
-
 		$this->render('index_'.$this->resolution,array('items'=>$items, 'firstLine'=>$items[0]['index']));
 	}
 
@@ -54,6 +50,20 @@ class SiteController extends BaseController
 			}
 		}
 		$this->render('contact',array('contact'=>$contact));
+	}
+
+  /**
+   * This is the action called from the sidebar to list
+   * the types of favorites available.
+   */
+  public function actionFavorites()
+  {
+    $items = $this->prepareListItems(array(
+          array('label'=>'Tv Shows', 'url'=>array('favoriteTvShows/list')),
+          array('label'=>'Movies', 'url'=>array('favoriteMovies/list')),
+          array('label'=>'String Matching', 'url'=>array('favoriteStrings/list')),
+    ));
+		$this->render('index_'.$this->resolution,array('items'=>$items, 'firstLine'=>$items[0]['index']));
 	}
 
 	/**

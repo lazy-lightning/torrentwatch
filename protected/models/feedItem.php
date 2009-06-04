@@ -129,92 +129,6 @@ class feedItem extends CActiveRecord
     parent::afterSave();
   }
 
-  public function loadMovie($imdbId, $title) {
-    $record = movie::model()->find(array(
-          'select' => 'id',
-          'condition' => 'imdbId = :imdbId',
-          'params' => array(':imdbId'=>$imdbId)
-    ));
-    if($record === Null) {
-      $record = new movie;
-      $record->title = $title;
-      $record->imdbId = $imdbId;
-      if(!$record->save()) {
-        throw new CException('Failed to save new other');
-      }
-    }
-    return $record;
-  }
-
-  public function loadOther($title) {
-    $record = other::model()->find(array(
-          'select' => 'id',
-          'condition' => 'title LIKE :title',
-          'params' => array(':title'=>$title)
-    ));
-    if($record === Null) {
-      $record = new other;
-      $record->title = $title;
-      if(!$record->save()) {
-        throw new CException('Failed to save new other');
-      }
-    }
-    return $record;
-  }
-
-  public function loadQualityByTitle($title) {
-    $record = quality::model()->find(array(
-          'select' => 'id',
-          'condition' => 'title LIKE :quality',
-          'params' => array(':quality'=>$title)
-    ));
-    if($record === Null) {
-      $record = new quality;
-      $record->title = $title;
-      if(!$record->save()) {
-        throw new CException('Failed to save new quality');
-      }
-    }
-    return $record;
-  }
-
-  public function loadTvShowByTitle($title) {
-    $tvShow = tvShow::model()->find(array(
-          'select'=>'id',
-          'condition' => 'title LIKE :title',
-          'params' => array(':title'=>$title)
-    ));
-    if($tvShow === Null) {
-      $tvShow = new tvShow;
-      $tvShow->title = $title;
-      if(!$tvShow->save()) {
-        throw new CException('Failed to add new tvShow');
-      }
-    }
-    return $tvShow;
-  }
-
-  public function loadTvEpisodeByEpisode($tvShow, $season, $episode) {
-    if(is_string($tvShow)) {
-      $tvShow = $this->loadTvShowByTitle($tvShow);
-    }
-    $tvEpisode = tvEpisode::model()->find(array(
-          'select' => 'id',
-          'condition' => 'tvShow_id=:id AND season=:season AND episode=:episode',
-          'params' => array(':id'=>$tvShow->id, ':season'=>$season, ':episode'=>$episode)
-    ));
-    if($tvEpisode === Null) {
-      $tvEpisode = new tvEpisode;
-      $tvEpisode->tvShow_id = $tvShow->id;
-      $tvEpisode->season = $season;
-      $tvEpisode->episode = $episode;
-      if(!$tvEpisode->save()) {
-        throw new CException('Failed to add new tvEpisode');
-      }
-    }
-    return $tvEpisode;
-  }
-
   public function beforeValidate($type) {
     $this->lastUpdated = time();
 
@@ -226,10 +140,10 @@ class feedItem extends CActiveRecord
       
         $qualityIds = array();
         if(is_array($quality) && count($quality) === 0) {
-          $quality = array('None');
+          $quality = array('Unknown');
         }
         foreach($quality as $item) {
-          $record = $this->loadQualityByTitle($item);
+          $record = factory::qualityByTitle($item);
           $qualityIds[] = $record->id;
         }
         $this->qualityIds = $qualityIds;
@@ -250,14 +164,14 @@ class feedItem extends CActiveRecord
           // This is either movie or other
           // the fact of having imdbId isn't best differentiator
           if($this->imdbId > 1000) {
-            $movie = $this->loadMovie($this->imdbId, $shortTitle);
+            $movie = factory::movieByImdbId($this->imdbId, $shortTitle);
             $this->movie_id = $movie->id;
           } else {
-            $other = $this->loadOther($shortTitle);
+            $other = factory::otherByTitle($shortTitle);
             $this->other_id = $other->id;
           }
         } else {
-          $tvEpisode = $this->loadTvEpisodeByEpisode($shortTitle, $season, $episode);
+          $tvEpisode = factory::tvEpisodeByEpisode($shortTitle, $season, $episode);
           $this->tvEpisode_id = $tvEpisode->id;
         }
       } else
@@ -288,24 +202,30 @@ class feedItem extends CActiveRecord
     $qual_reg ='(DVB' .'|'
              .'720p'   .'|'
              .'DSR(ip)?|'
-             .'DVBRip' .'|'
+             .'DVBRip'  .'|'
              .'DVDR(ip)?|'
-             .'DVDScr' .'|'
-             .'HR.HDTV'.'|'
-             .'HDTV'   .'|'
-             .'HR.PDTV'.'|'
-             .'PDTV'   .'|'
-             .'SatRip' .'|'
-             .'SVCD'   .'|'
-             .'TVRip'  .'|'
-             .'WebRip' .'|'
-             .'WS'     .'|'
-             .'1080i'  .'|'
-             .'1080p'  .'|'
-             .'DTS'    .'|'
-             .'x264'   .'|'
+             .'DVDScr'  .'|'
+             .'HR.HDTV' .'|'
+             .'HDTV'    .'|'
+             .'HR.PDTV' .'|'
+             .'PDTV'    .'|'
+             .'SatRip'  .'|'
+             .'SVCD'    .'|'
+             .'TVRip'   .'|'
+             .'WebRip'  .'|'
+             .'WS'      .'|'
+             .'1080i'   .'|'
+             .'1080p'   .'|'
+             .'DTS'     .'|'
+             .'AC3'     .'|'
+             .'internal'.'|'
+             .'limited' .'|'
+             .'proper'  .'|'
+             .'repack'  .'|'
+             .'subbed'  .'|'
+             .'x264'    .'|'
              .'Blue?Ray)';
-  
+ 
     $quality = array('Unknown');
     if(preg_match_all("/$qual_reg/i", $this->title, $qregs)) {
       $q = array_change_key_case(array_flip($qregs[1]));

@@ -217,11 +217,16 @@ div#inspector_container {
 	overflow: auto;
 	border: 1px solid #888888;
 	top: 68px;
-	right: -22em;
+	right: -350px;
 	bottom: 0;
-	width: 22em;
+	width: 350px;
 	z-index: 2;
 	}
+
+div#inspector_loading {
+  margin: 20px;
+  text-align: center;
+  }
 
 h2.inspector_heading {
 	padding-left: 2em;
@@ -542,6 +547,14 @@ form.favinfo input[type=text] {
 	right: 45px;
 	width: 240px;
 	}
+
+div.favorite_quality select {
+  margin: 0 -25px 0 33px;
+  position: relative;
+  right: auto;
+  width: 74px;
+  }
+
 /******************************
  *
  * H I S T O R Y   D I A L O G
