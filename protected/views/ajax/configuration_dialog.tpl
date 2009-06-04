@@ -32,15 +32,6 @@
       <?php echo CHtml::activeCheckBox($config, 'saveFile').' '.
                  CHtml::activeLabel($config, 'saveFile', array('class'=>'item checkbox')); ?>
     </div>
-    <label class="category">Favorites Settings</label>
-    <div id="config_seedratio">
-      <?php echo CHtml::activeLabel($config, 'seedRatio', array('class'=>'item textinput')).': '.
-                 CHtml::activeTextField($config, 'seedRatio'); ?>
-    </div>
-    <div id="config_matchstyle">
-      <?php echo CHtml::activeLabel($config, 'matchStyle', array('class'=>'item select')).': '.
-                 CHtml::dropDownList('dvrConfig[matchStyle]', $config->matchStyle, array('regexp', 'glob', 'simple')); ?>
-    </div>
     <div class="buttonContainer">
       <a class="submitForm button" id="Save" href="#">Save</a>
       <a class='toggleDialog button' href='#'>Close</a>

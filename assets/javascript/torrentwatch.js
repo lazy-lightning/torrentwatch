@@ -140,7 +140,7 @@ $(function() {
             // Use innerHTML because some browsers choke with $(html) when html is many KB
             dynamic[0].innerHTML = html;
             dynamic.find("ul.favorite > li").initFavorites().end().find("li.torrent").myContextMenu().end()
-                    .find("form").initForm().end().initConfigDialog().appendTo("body");
+                    .find("form").initForm().end().find("div#favorites").tabs({ fxAutoHeight: true }).end().initConfigDialog().appendTo("body");
             setTimeout(function() {
                 var container = $("#feedItems_container");
                 if(container.length == 0) {

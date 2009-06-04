@@ -162,18 +162,25 @@ class AjaxController extends CController
   {
     $app = Yii::app();
     $config = $app->dvrConfig;
-    $favorites = favoriteTvShow::model()->with('tvShow','quality')->findAll();
+    $favoriteTvShows = favoriteTvShow::model()->with('tvShow','quality')->findAll();
     $feeds = feed::model()->findAll(); // not id 0, which is 'All'
     $qualitys = quality::model()->findAll();
+    // prepend a blank quality to the list 
+    $q = new quality;
+    $q->title='';
+    $q->id=-1;
+    array_unshift($qualitys, $q);
     
     $feedItems = $this->loadFeedItems($feeds);
 
     $this->render('fullResponce', array(
           'availClients'=>$app->dlManager->availClients,
           'config'=>$config,
-          'favorites'=>$favorites,
+          'favoriteTvShows'=>$favoriteTvShows,
+          'favoriteMovies'=>favoriteMovies::model()->findAll(),
           'feeds'=>$feeds,
           'feedItems'=>$feedItems,
+          'genres'=>genre::model()->findAll(),
           'qualitys'=>$qualitys,
     ));
   }

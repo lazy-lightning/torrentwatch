@@ -450,11 +450,15 @@ div.form_radio {
  * C O N F I G   D I A L O G 
  *
  ****************************/
+div.dialog_window#configuration {
+  width: 410px;
+  }
+
 div.dialog_window#configuration select,
 div.dialog_window#configuration input[type=text] {
 	position: absolute;
 	right: 30px;
-	width: 225px;
+	width: 195px;
 	}
 
 div.dialog_window#configuration input[type=checkbox] {
@@ -549,7 +553,7 @@ form.favinfo input[type=text] {
 	}
 
 div.favorite_quality select {
-  margin: 0 -25px 0 33px;
+  margin: 0 -35px 0 43px;
   position: relative;
   right: auto;
   width: 74px;
@@ -645,8 +649,8 @@ div.context_menu ul li a:hover {
 
 div.dialog_window#history,
 div.dialog_window#favorites {
-	width: 575px;
-	margin-left: -288;
+	width: 600px;
+	margin-left: -300;
 }
 
 div.timer {

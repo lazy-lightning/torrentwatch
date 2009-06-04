@@ -1,4 +1,4 @@
-<?php echo CHtml::beginForm(array('updateFavorite', 'id'=>$favorite->id), 'post', array('class'=>'favinfo', 'id'=>'favorite-'.$i++)); ?>
+<?php echo CHtml::beginForm(array('updateFavorite', 'id'=>$favorite->id), 'post', array('class'=>'favinfo', 'id'=>'favoriteTvShows-'.$i++)); ?>
  <div class="favorite_name">
   <?php 
     echo CHtml::activeLabel($favorite, 'tvShow').': ';
@@ -23,13 +23,12 @@
  </div>
  <div class="favorite_quality">
     <?php echo CHtml::activeLabel($favorite, 'quality'); ?>:
-  <?php foreach($favorite->quality as $quality) {
-          echo CHtml::dropDownList('quality_id[]', $quality->id, CHtml::listData($qualitys, 'id', 'title'));
-        } ?>
- </div>
- <div class="favorite_seedratio">
-  <?php echo CHtml::activeLabel($favorite, 'seedRatio').': '.
-             CHtml::activeTextField($favorite, 'seedRatio'); ?>
+  <?php $j=0;foreach($favorite->quality as $quality) {
+          echo CHtml::dropDownList('quality_id['.++$j.']', $quality->id, CHtml::listData($qualitys, 'id', 'title'));
+        } 
+        for(;$j<3;++$j)
+          echo CHtml::dropDownList('quality_id['.$j.']', -1, CHtml::listData($qualitys, 'id', 'title'));
+  ?>
  </div>
  <div class="favorite_onlynewer">
   <?php echo CHtml::activeCheckBox($favorite, 'onlyNewer').' '.
