@@ -35,6 +35,8 @@ class favoriteMovies extends CActiveRecord
 	public function relations()
 	{
 		return array(
+        'qualitys' => array(self::MANY_MANY, 'quality', 'favoriteMovies_quality(favoriteMovies_id, quality_id)'),
+        'genre' => array(self::BELONGS_TO, 'genre', 'genre_id'),
 		);
 	}
 
