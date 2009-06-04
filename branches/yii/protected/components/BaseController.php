@@ -7,7 +7,7 @@ abstract class BaseController extends CController {
   public function getMainMenuItems() {
     return array(
         array('name'=>'index', 'label'=>'NMTDVR Home', 'url'=>array('site/index')),
-        array('name'=>'favorites', 'label'=>'Favorites', 'url'=>array('favorite/list')),
+        array('name'=>'favorites', 'label'=>'Favorites', 'url'=>array('site/favorites')),
         array('name'=>'config', 'label'=>'Configuration', 'url'=>array('configuration/list')),
     );
   }
