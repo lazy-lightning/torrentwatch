@@ -93,6 +93,8 @@ class AjaxController extends CController
 
       if(favoriteTvShow::model()->deleteByPk($id))
       {
+        // Delete related many_many relationship
+        favoriteTvShow_quality::deleteByAttributes('favoriteTvShow_id=:id', array(':id'=>$id));
         // Reset feedItem status on anything this was matching, then rerun matching routine incase something else matches the reset items
         $ids = array();
         foreach($reader as $row) {

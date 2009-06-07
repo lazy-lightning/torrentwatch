@@ -295,7 +295,7 @@ class IMDbFetch {
 class IMDBFinder {
   static public function find($title) {
     //
-    $findUrl = 'http://www.imdb.com/find?s=tt&q='.$title.'&x=0&y=0'
+    $findUrl = 'http://www.imdb.com/find?s=tt&q='.$title.'&x=0&y=0';
     //
     $file = new feedAdapter_File($this->findUrl, 10, 0);
     $this->success = $file->success;
@@ -326,7 +326,7 @@ class IMDBFinder {
 
       // Add to final array
       $imdbFindArray2[] = array('id'=>$id, 'title'=>$title);
-      
+    }
     //
   }
 }

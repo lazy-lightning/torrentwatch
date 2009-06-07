@@ -10,7 +10,7 @@ class clientSABnzbd extends baseClient {
     $be->addPostData('pp', '-1');
     $result = $be->file_get_contents($this->config->baseApi.'addFile');
 
-    $successString = 'This resource resides temporarily at'
+    $successString = 'This resource resides temporarily at';
     return substr($result, 0, strlen($successString)) == $successString ? True : False;
   }
 

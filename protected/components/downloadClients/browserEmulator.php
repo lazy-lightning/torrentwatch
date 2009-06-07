@@ -68,7 +68,7 @@ class BrowserEmulator {
   var $authPass = "";
   var $port;
   var $lastResponse = '';
-  var $debug = true;
+  var $debug = false;
  
   function BrowserEmulator() {
     $this->resetHeaderLines();
@@ -251,15 +251,15 @@ class BrowserEmulator {
           $request .= $PostString;
         }
     }
+    // small block size.  When letting php decide previously sometimes the full upload on larger(100kb+)
+    // uploads didn't make it.
+    $bs = 4096;
     for ($written = 0; $written < strlen($PostString); $written += $fwrite) {
-      $string = substr($request, $written, 4096);
-      echo "Writing to socket\n".$string;
-      $fwrite = fwrite($socket, $string, 4096);
+      $fwrite = fwrite($socket, substr($request, $written, $bs), $bs);
       if (!$fwrite) {
         break;
       }
     }
-    echo "Reading from socket";
     if ($this->debug) echo "\n";
     if ($socket) {
       $line = fgets($socket, 1000);
@@ -275,7 +275,6 @@ class BrowserEmulator {
         }
       }
     }
-    echo "Socket Open";
     return $socket;
   }
   
