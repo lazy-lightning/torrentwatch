@@ -277,13 +277,6 @@ div#feedItems_container {
 	right: 0;
 	}
 
-ul.feedItems li.header {
-	border-bottom: 1px solid #ccc;
-	font-size: 1.4em;
-	height: 1.2em;
-	text-align: center;
-	}
-
 ul.feedItems li.torrent {
 	border-bottom: 1px solid #ccc;
 	padding: 0.2em 0.5em 0.3em 30px;

@@ -87,6 +87,10 @@ class feed extends CActiveRecord
     return parent::beforeValidate($type);
   }
 
+  public function getTitle() {
+    return empty($this->userTitle) ? $this->title : $this->userTitle;
+  }
+
   /**
    * updates the database with latest items from this feed
    * some inspiration from http://simplepie.org/wiki/tutorial/how_to_display_previous_feed_items_like_google_reader

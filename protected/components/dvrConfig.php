@@ -15,7 +15,6 @@ class dvrConfig extends BaseDvrConfig {
     // pull in the various categorys and initialize them
     parent::init();
     foreach($this as $id => $title) {
-      Yii::log("initializing category $id: $title", CLogger::LEVEL_ERROR);
       $this->add($title, new dvrConfigCategory($this, $id, $title));
     }
     // Flip state to dvrConfig table and contain any values with null category id

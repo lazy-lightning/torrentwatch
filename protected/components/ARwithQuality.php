@@ -25,13 +25,15 @@ abstract class ARwithQuality extends CActiveRecord {
     return $this->_qualityIds;
   }
 
-  public function setQualityIds($value) {
-    $tmp = array();
-    foreach($value as $val) {
+  public function setQualityIds($in) {
+    $out = array();
+    Yii::log("quality ids in: ".print_r($in, true), CLogger::LEVEL_ERROR);
+    foreach($in as $val) {
       if($val >= 0)
-        $tmp[] = $val;
+        $out[] = $val;
     }
-    $this->_qualityIds = $tmp;
+    Yii::log("quality ids out: ".print_r($out, true), CLogger::LEVEL_ERROR);
+    $this->_qualityIds = $out;
   }
 
   public function afterSave() {
@@ -48,6 +50,7 @@ abstract class ARwithQuality extends CActiveRecord {
 
     // set quality relations
     foreach($this->qualityIds as $qualityId) {
+      Yii::log("load $class and set $id = {$this->id} and quality_id = $qualityId", CLogger::LEVEL_ERROR);
       $relation = new $class;
       $relation->$id = $this->id;
       $relation->quality_id = $qualityId;

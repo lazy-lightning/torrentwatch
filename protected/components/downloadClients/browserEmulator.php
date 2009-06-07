@@ -336,4 +336,3 @@ $response = $be->getLastResponseHeaders();
 echo $output;
 */
 
-?> 
