@@ -1,6 +1,32 @@
 <?php
 
+// The factory is used to fetch items by information other than their id
+// if an item doesn't exist it is created.  This is mostly used when initializing
+// new feedItems and their related models
+
 class factory {
+  public static function genreByTitle($title) {
+    $genre = genre::model()->find('title LIKE :title', array(':title'=>$title));
+    if($genre === null) {
+      $genre = new genre;
+      $genre->title = $title;
+      if(!$genre->save())
+        throw new CException("New genre failed to save");
+    }
+    return $genre;
+  }
+
+  public static function networkByTitle($title) {
+    $network = network::model()->find('title LIKE :title', array(':title'=>$name));
+    if($network === null) {
+      $network = new network;
+      $network->title = $title;
+      if(!$network->save())
+        throw new CException("New network failed to save");
+    }
+    return $network;
+  }
+
   public static function tvEpisodeByEpisode($tvShow, $season, $episode) {
     if(is_string($tvShow)) {
       $tvShow = self::tvShowByTitle($tvShow);
@@ -65,7 +91,7 @@ class factory {
       $record->title = $title;
       $record->imdbId = $imdbId;
       if(!$record->save()) {
-        throw new CException('Failed to save new other');
+        throw new CException('Failed to save new movie');
       }
     }
     return $record;

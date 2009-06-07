@@ -1,23 +1,35 @@
+
+
 Test Release Goals
 --------------------
+Completed backend 
+  Will read feeds, organize items into tvShows, movies, and other.
+  Will have favorites to start tvShows, movies, and items that match strings.
+  Will be able to start nzb's and torrents from the same instance and allow
+  configuration of the way the clients are used(executables, config files, etc)
+  Will be able to remember when, why, and how feedItems were started regardless of other
+  models continued existance in the database
 Completed classic webui to work with the new backend
 NMT view to be partially completed, but not fully usable in first release
 
 TODO
 -----
+on feedItem creation if tv_episode.status = downloaded, set status to duplicate
+when tv_episode.status changes to downloaded, change all feedItems pointing to it of nomatch to duplicate
 Write inspector ajax action to get specific data from database
-Fix LED colors in webui
+Fix and Document LED colors in webui
 Fix css selectors in javascript to point to correct items
-Create download history table and link it to downloadManager
+Create download history table and add to it from downloadManager
 Debug download clients
 Finish webui interface for multiple favorite types (tabs?)
 Better handling of multiple qualitys
-Write DB Maintinance scripts
 
 Future TODO's after first release
 -----------------------------------
-Split configuration into categorys and allow much more to be configured?
 Make proper list and show views for all the AR classes
 favoriteTvShow quality fallback.  example: if set to hdtv, but we only know about a 720p release allow that to go through after X(4?) hours of not seeing an hdtv release
+new version of deep directories that takes a user formatted string (like mp3 renamers) and string replacement to generate the title
+
+
 
 

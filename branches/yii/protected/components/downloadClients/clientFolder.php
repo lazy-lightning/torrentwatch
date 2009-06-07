@@ -1,20 +1,30 @@
 <?php
 
-class clientFolder extends clientExecutable {
+class clientFolder extends BaseClient {
 
-  public function addByData($data, $opts) {
-    $saveIn = $this->getSaveInDirectory($opts);
-    $title = $this->getTitle($opts);
-    $extension = Yii::app()->dvrConfig->fileExtension;
+  public function addByData($data) {
+    $saveIn = $this->getSaveInDirectory();
+    $title = strtr('/', '_', $this->manager->title);
 
-    $filename = $orig = $saveIn.'/'.$title.'.'.$extension;
+    $extension = $this->manager->downloadType == feedItem::TYPE_NZB ? 'nzb' : 'torrent';
 
-    $i = 0;
-    while(file_exists($filename)) {
-        $filename = $orig.'.'.++$i;
+    $filename = "$saveIn/$title.$extension";
+
+    if(file_exists($filename)) {
+      for($i=0;file_exists($filename);$i++) {
+          $filename = "$saveIn/$title.$i.$extension";
+      }
     }
-    Yii::log("Saving $title to $filename", CLogger::LEVEL_ERROR);
-    return file_put_contents($filename, $data);
+
+    $return = file_put_contents($filename, $data);
+    if(!$return)
+        $this->_error = 'Unable to write to file: $filename';
+
+    return $return;
+  }
+
+  public function getClassName() {
+    return __CLASS__;
   }
 }
 

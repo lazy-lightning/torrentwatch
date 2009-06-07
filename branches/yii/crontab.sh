@@ -1,3 +1,4 @@
 protected/yiic updateFeeds
-protected/yiic updateTVDB
 protected/yiic dbMaintinance
+protected/yiic updateTVDB
+protected/yiic updateIMDB

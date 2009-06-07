@@ -1,13 +1,17 @@
 <?php
 
 class clientNzbGet extends clientExecutable {
-  public function addByData($data, $opts) {
-    $filename = $this->saveTemp($data, $opts);
+
+  public function addByData($data) {
+    $filename = $this->saveTemp($data);
 
     $this->execClient(
-        '/mnt/syb8634/bin/nzbget',
-        '-c /share/.nzbget/nzbget.conf -A '.escapeshellarg($filename)
+        '-c '.escapeshellarg($this->client->nzbgetConf).' -A '.escapeshellarg($filename)
     );
+  }
+
+  public function getClassName() {
+    return __CLASS__;
   }
 }
 

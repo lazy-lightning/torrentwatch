@@ -1,6 +1,6 @@
 <?php
 
-class favoriteTvShow extends CActiveRecord
+class favoriteTvShow extends ARwithQuality
 {
 	/**
 	 * Returns the static model of the specified AR class.
@@ -50,7 +50,7 @@ class favoriteTvShow extends CActiveRecord
 
   public function afterSave()
   {
-
+    parent::afterSave();
     Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NOMATCH);
   }
 
