@@ -139,8 +139,11 @@ $(function() {
             var dynamic = $("<div id='dynamicdata'/>");
             // Use innerHTML because some browsers choke with $(html) when html is many KB
             dynamic[0].innerHTML = html;
-            dynamic.find("div#favorites").initFavorites().end().find("li.torrent").myContextMenu().end()
-                    .find("form").initForm().end().find("div#configuration").initConfigDialog().end()
+            dynamic.find("div#favorites").initFavorites().end()
+                    .find("li.torrent").myContextMenu().end()
+                    .find("form").initForm().end()
+                    .find("div#configuration").initConfigDialog().end()
+                    .find("#feedItems_container").tabs().end()
                     .appendTo("body");
             setTimeout(function() {
                 var container = $("#feedItems_container");

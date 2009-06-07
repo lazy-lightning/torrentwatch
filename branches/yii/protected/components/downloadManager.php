@@ -76,7 +76,8 @@ abstract class favoriteManager extends CComponent {
         '   SET status='.feedItem::STATUS_OLD.
         ' WHERE feedItem.status = '.$itemStatus.
         '   AND feedItem.id IN ( SELECT feedItem_id'.
-                                '  FROM onlyNewerFeedItemFilter)'
+                              '    FROM onlyNewerFeedItemFilter'.
+                              ')'
     )->execute();
 
     // get any matching items with the right itemStatus
@@ -91,6 +92,7 @@ abstract class favoriteManager extends CComponent {
     foreach($reader as $row) {
       $toStart[$row['tvEpisode_id']][] = $row;
     }
+    unset($row);
 
     foreach($toStart as $items) {
       // For now just take the first item of each tvepisode, but this
@@ -99,9 +101,9 @@ abstract class favoriteManager extends CComponent {
       $success = false;
       foreach($items as $item) {
         if($success) {
-          $duplicates = $row['tvEpisode_id'];
+          $duplicates[] = $item['feedItem_id'];
         } else {
-          $success = $this->startDownload($row, feedItem::STATUS_AUTO_DL);
+          $success = $this->startDownload($item, feedItem::STATUS_AUTO_DL);
         }
       }
     }

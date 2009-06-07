@@ -26,7 +26,7 @@
   <?php $j=0;foreach($favorite->quality as $quality) {
           echo CHtml::dropDownList('quality_id['.++$j.']', $quality->id, CHtml::listData($qualitys, 'id', 'title'));
         } 
-        for(;$j<3;++$j)
+        for(++$j;$j<4;++$j)
           echo CHtml::dropDownList('quality_id['.$j.']', -1, CHtml::listData($qualitys, 'id', 'title'));
   ?>
  </div>
