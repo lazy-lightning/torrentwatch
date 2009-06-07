@@ -1,0 +1,43 @@
+-- Default username/pass
+INSERT INTO users (id, username, password) VALUES(1,'admin','admin');
+
+-- Generic all_something identifiers
+INSERT INTO feed (id, title, description, url, status, lastUpdated) VALUES (0, 'All Feeds', '', '', 0, 0);
+INSERT INTO genre (id, title) VALUES (0, 'All Genres');
+
+-- Configuration Categorys
+INSERT INTO dvrConfigCategory (id, title) VALUES(1,'clientFolder');
+INSERT INTO dvrConfigCategory (id, title) VALUES(2,'clientBTPD');
+INSERT INTO dvrConfigCategory (id, title) VALUES(3,'clientCTorrent');
+INSERT INTO dvrConfigCategory (id, title) VALUES(4,'clientTrans122');
+INSERT INTO dvrConfigCategory (id, title) VALUES(5,'clientTransRPC');
+INSERT INTO dvrConfigCategory (id, title) VALUES(6,'clientNZBGet');
+INSERT INTO dvrConfigCategory (id, title) VALUES(7,'clientSABnzbd');
+
+-- Global Options
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('client','clientFolder',NULL);
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('downloadDir','/home/xbmc/NZB/',NULL);
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('watchDir','/home/xbmc/',NULL);
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('saveFile',1,NULL);
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('tempDir','/tmp',NULL);
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('feedItemLifetime',7,NULL);
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('torClient','clientNZBGet',NULL);
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('nzbClient','clientTrans122',NULL);
+-- BTPD
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('executable','/mnt/syb8634/bin/btcli',2);
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('directory','/share/.btpd',2);
+-- Transmission 1.22
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('executable','/mnt/syb8634/bin/transmission-remote',4);
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('directory','/share/.transmission',4);
+-- nzbget
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('executable','/mnt/syb8634/bin/nzbget',6);
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('nzbgetConf','/share/.nzbget/nzbget.conf',6);
+-- Transmission RPC
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('baseApi','http://localhost:9000/transmission/',5);
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('seedRatio',0,5);
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('username','',5);
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('password','',5);
+-- SABnzbd+
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('category','',7);
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('baseApi','http://127.0.0.1:8080/sabnzbd/',7);
+
