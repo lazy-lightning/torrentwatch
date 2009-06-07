@@ -1,11 +1,19 @@
 <?php
 
+// many of the ar classes have a many_many relationship
+// with the quality table.  This standardizes their setting
+// and getting
+
 abstract class ARwithQuality extends CActiveRecord {
   private $_qualityIds;
 
   public function getQualityIds() {
     if($this->_qualityIds === null) {
-      $relations = feedItem_quality::model()->findAllByAttributes(array('quality_id' => $this->id));
+      // cant use the class::model()-> syntax with a dynamic
+      // class name
+      $class = $this->tableName().'_quality';
+      $model = new $class;
+      $relations = $model->findAllByAttributes(array('quality_id' => $this->id));
 
       $ids = array();
       foreach($relations as $record) {
@@ -19,19 +27,17 @@ abstract class ARwithQuality extends CActiveRecord {
 
   public function setQualityIds($value) {
     $tmp = array();
-    Yii::log(print_r($value, TRUE), CLogger::LEVEL_ERROR);
     foreach($value as $val) {
-      if($val != -1)
+      if($val >= 0)
         $tmp[] = $val;
     }
-    Yii::log(print_r($tmp, TRUE), CLogger::LEVEL_ERROR);
-    if(count($tmp) !== 0)
-      $this->_qualityIds = $value;
+    $this->_qualityIds = $tmp;
   }
 
   public function afterSave() {
     // update scenario
     // Clean out any quality relations if this isn't new
+    // cant use class::model() syntax with dynamic class name
     $table = $this->tableName();
     $class = $table.'_quality';
     $id = $table.'_id';
