@@ -2,36 +2,16 @@
 
 class updateTVDBCommand extends CConsoleCommand {
 
-  protected function loadGenreByName($name) {
-    $genre = genre::model()->find('title = :title', array(':title'=>$name));
-    if($genre === null) {
-      $genre = new genre;
-      $genre->title = $name;
-      if(!$genre->save())
-        return False;
-    }
-    return $genre;
-  }
-
-  protected function loadNetworkByName($name) {
-    $network = network::model()->find('title LIKE :title', array(':title'=>$name));
-    if($network === null) {
-      $network = new network;
-      $network->title = $name;
-      if(!$network->save())
-        return False;
-    }
-    return $network;
-  }
+  // array of loaded tvShows indexed by tvdbid
+  private $tvShows = array();
 
   public function run($args) {
     require_once('TVDB.php');
-    // array of loaded tvShows passed arround to load fewer times if possible
-    $tvShows = $this->updateTvShows();
-    $this->updateTvEpisodes($tvShows);
+    $this->updateTvShows();
+    $this->updateTvEpisodes();
   }
 
-  protected function updateTvEpisodes($tvShows) {
+  protected function updateTvEpisodes() {
     $db = Yii::app()->db;
     $now=time();
     $scanned = array();
@@ -51,11 +31,11 @@ class updateTVDBCommand extends CConsoleCommand {
       }
 
       echo "Looking for tvdbId ".$row['tvdbId']."\n";
-      if(!isset($tvShows[$row['tvdbId']])) {
-        $tvShows[$row['tvdbId']] = TV_Shows::findById($row['tvdbId']);
+      if(!isset($this->tvShows[$row['tvdbId']])) {
+        $this->tvShows[$row['tvdbId']] = TV_Shows::findById($row['tvdbId']);
       }
 
-      $tvdbShow = $tvShows[$row['tvdbId']];
+      $tvdbShow = $this->tvShows[$row['tvdbId']];
 
       if(!$tvdbShow) {
         continue;
@@ -81,7 +61,6 @@ class updateTVDBCommand extends CConsoleCommand {
     $db = Yii::app()->db;
     $scanned = array();
     $now = time();
-    $tvShows = array();
 
     $reader = $db->createCommand('SELECT id,title FROM tvShow'.
                                  ' WHERE description IS NULL'.
@@ -95,17 +74,19 @@ class updateTVDBCommand extends CConsoleCommand {
         continue;
       }
       $data = $tvdbShows[0];
+      $this->tvShows[$data->tvdbId] = $data;
 
       echo "Found data for ".$data->seriesName."\n";
       $tvShow = tvShow::model()->findByPk($row['id']);
       $tvShow->title = $data->seriesName;
-      $tvShow->network_id = $this->loadNetworkByName($data->network)->id;
+      $tvShow->network_id = factory::networkByTitle($data->network)->id;
       $tvShow->rating = $data->rating;
       $tvShow->description = $data->overview;
       $tvShow->tvdbId = $data->id;
 
-      if($tvShow->save()) {
-        $tvShows[$data->tvdbId] = $tvShow;
+      // Throw exception instead?  or Log it?
+      if(!$tvShow->save()) {
+        continue;
       }
 
       if(!empty($data->genres)) {
@@ -121,7 +102,7 @@ class updateTVDBCommand extends CConsoleCommand {
 
         // Loopthrough the genres linking them all to the tvShow
         foreach($data->genres as $genre) {
-          $g = $this->loadGenreByName($genre);
+          $g = factory::genreByTitle($genre);
           $genre_id = $g->id;
           if(is_numeric($genre_id)) {
             $addGenre->execute();

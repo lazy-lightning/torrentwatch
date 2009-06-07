@@ -57,31 +57,18 @@ v1.0
 ***************************************************************************/
 
 /**
-* Hack to enable gzip support without php help(for example, on the NMT)
-* This differs from gzinflate() in that it wants the magic numbers that 
-* are usually stripped.
-**/
-function my_gzinflate($string) {
-	$tmp = tempnam("", "browserEmulator");
-	file_put_contents($tmp, $string);
-	$cmd = "cat $tmp | ".platform_getGunzip();	
-	exec($cmd, $output, $return);
-	return implode($output, "\n");
-}
-
-/**
 * BrowserEmulator class. Provides methods for opening urls and emulating
 * a web browser request.
 **/
 class BrowserEmulator {
- 
   var $headerLines = Array();
   var $postData = Array();
+  var $multiPartPost = False;
   var $authUser = "";
   var $authPass = "";
   var $port;
   var $lastResponse = '';
-  var $debug = false;
+  var $debug = true;
  
   function BrowserEmulator() {
     $this->resetHeaderLines();
@@ -109,15 +96,13 @@ class BrowserEmulator {
     /* default is "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)",         */
     /* which means Internet Explorer 6.0 on WinXP                       */
    
-    $this->headerLines["User-Agent"] = "UniversalFeedParser/4.01 +http://feedparser.org";
+    $this->headerLines["User-Agent"] = 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.10) Gecko/2009042315 Firefox/3.0.10';
 
     /*******************************************************************************/
     /**
     * Set default to accept gzip encoded files
     */
     $this->headerLines["Accept-Encoding"] = "*/*";
-    if(platform_getGunzip())
-      $this->headerLines["Accept-Encoding"] .= ",gzip,deflate";
   }
  
   /**
@@ -133,7 +118,37 @@ class BrowserEmulator {
   function resetPostData() {
     $this->postData = Array();
   }
- 
+
+  function handleMultiPart() {
+    $boundry = '----------------------------795088511166260704540879626';
+
+    $this->headerLines["Accept"] = ' text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
+    $this->headerLines["Accept-Language"] = "en-us,en;q=0.5";
+    $this->headerLines["Accept-Charset"] = "ISO-8859-1,utf-8;q=0.7,*;q=0.7";
+    $this->headerLines["Keep-Alive"] = 300;
+    $this->headerLines["Connection"] = 'keep-alive';
+    $this->headerLines["Referer"] = 'http://192.168.1.121:8080/sabnzbd/';
+    $this->headerLines["Cookie"] = 'session_id=a5c9c9851b9e633a8a852f9cf22db5490a271c21; PHPSESSID=86a3ea31ed4e2360b41a2bcbd2eef4de';
+    $this->headerLines["Content-Type"] = "multipart/form-data; boundary=$boundry";
+    $out = '';
+    foreach($this->postData as $item => $data) {
+      if(is_array($data)) {
+        $out .= "--$boundry\r\n"
+               ."Content-Disposition: form-data; name=\"$item\"; filename=\"{$data['filename']}\"\r\n"
+               ."Content-Type: application/octet-stream\r\n"
+               ."\r\n"
+               .$data['contents']."\r\n";
+      } else {
+        $out .= "--$boundry\r\n"
+               ."Content-Disposition: form-data; name=\"$item\"\r\n"
+               ."\r\n"
+               .$data."\r\n";
+      }
+    }
+    $out .= "--{$boundry}--\r\n";
+    return $out;
+  }
+
   /**
   * Sets an auth user and password to use for the request.
   * Set both as empty strings to disable authentication.
@@ -201,8 +216,6 @@ class BrowserEmulator {
     $socket = false;
     $socket = fsockopen($server, $this->port);
     if ($socket) {
-        $this->headerLines["Host"] = $parts['host'];
-       
         if ($this->authUser!="" && $this->authPass!="") {
           $this->headerLines["Authorization"] = "Basic ".base64_encode($this->authUser.":".$this->authPass);
         }
@@ -210,46 +223,59 @@ class BrowserEmulator {
         if (count($this->postData)==0) {
           $request = "GET $path HTTP/1.0\r\n";
         } else {
-          $request = "POST $path HTTP/1.0\r\n";
+          $request = "POST $path HTTP/1.1\r\nHost: {$parts['host']}\r\n";
         }
        
         if ($this->debug) echo $request;
-        fputs ($socket, $request);
         if (count($this->postData)>0) {
-          $PostStringArray = Array();
-          foreach ($this->postData AS $key=>$value) {
-            $PostStringArray[] = "$key=$value";
+          if($this->multiPartPost) {
+            $PostString = $this->handleMultiPart();
+          } else {
+            $PostStringArray = Array();
+            foreach ($this->postData AS $key=>$value) {
+              $PostStringArray[] = "$key=$value";
+            
+            }
+            $PostString = join("&", $PostStringArray);
           }
-          $PostString = join("&", $PostStringArray);
           $this->headerLines["Content-Length"] = strlen($PostString);
         }
        
         foreach ($this->headerLines AS $key=>$value) {
           if ($this->debug) echo "$key: $value\n";
-          fputs($socket, "$key: $value\r\n");
+          $request .= "$key: $value\r\n";
         }
         if ($this->debug) echo "\n";
-        fputs($socket, "\r\n");
+        $request .= "\r\n";
         if (count($this->postData)>0) {
-          if ($this->debug) echo "$PostString";
-          fputs($socket, $PostString."\r\n");
+          $request .= $PostString;
         }
     }
+    for ($written = 0; $written < strlen($PostString); $written += $fwrite) {
+      $string = substr($request, $written, 4096);
+      echo "Writing to socket\n".$string;
+      $fwrite = fwrite($socket, $string, 4096);
+      if (!$fwrite) {
+        break;
+      }
+    }
+    echo "Reading from socket";
     if ($this->debug) echo "\n";
     if ($socket) {
       $line = fgets($socket, 1000);
-        if ($this->debug) echo $line;
+      if ($this->debug) echo $line;
+      $this->lastResponse .= $line;
+      $status = substr($line,9,3);
+      while (trim($line = fgets($socket, 1000)) != ""){
+        if ($this->debug) echo "$line";
         $this->lastResponse .= $line;
-        $status = substr($line,9,3);
-        while (trim($line = fgets($socket, 1000)) != ""){
-          if ($this->debug) echo "$line";
-          $this->lastResponse .= $line;
-          if ($status=="401" AND strpos($line,"WWW-Authenticate: Basic realm=\"")===0) {
-            fclose($socket);
-            return FALSE;
-          }
+        if ($status=="401" AND strpos($line,"WWW-Authenticate: Basic realm=\"")===0) {
+          fclose($socket);
+          return FALSE;
         }
+      }
     }
+    echo "Socket Open";
     return $socket;
   }
   
@@ -268,7 +294,7 @@ class BrowserEmulator {
           $file .= fgets($socket, 10000);
         }
     } else {
-	_debug('Browser Emulator: file_get_contents bad socket', -1);
+      	_debug('Browser Emulator: file_get_contents bad socket', -1);
         return FALSE;
     }
     fclose($socket);
@@ -277,8 +303,7 @@ class BrowserEmulator {
       if(function_exists('gzinflate')) {
         $file = gzinflate(substr($file,10));
         if($this->debug) echo "Result file: ".$file;
-      } else
-        $file = my_gzinflate($file);
+      }
     }
 
     file_put_contents('/tmp/fsockopen.'.rand(), $file);

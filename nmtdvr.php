@@ -1,5 +1,7 @@
 <?php
 
+date_default_timezone_set('America/Los_Angeles');
+
 // change the following paths if necessary
 $yii=dirname(__FILE__).'/yii_framework/yii.php';
 $config=dirname(__FILE__).'/protected/config/main.php';

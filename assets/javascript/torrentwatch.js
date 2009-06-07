@@ -99,7 +99,7 @@ $(function() {
     $.get('nmtdvr.php?r=ajax/fullResponce', '', $.loadDynamicData, 'html');
 
     // Configuration, wizard, and update/delete favorite ajax submit
-    $("a.submitForm").live('click', function(e) {
+    $("a.submitForm,input.submitForm").live('click', function(e) {
         e.stopImmediatePropagation();
         $.submitForm(this);
     });
@@ -139,11 +139,12 @@ $(function() {
             var dynamic = $("<div id='dynamicdata'/>");
             // Use innerHTML because some browsers choke with $(html) when html is many KB
             dynamic[0].innerHTML = html;
-            dynamic.find("ul.favorite > li").initFavorites().end().find("li.torrent").myContextMenu().end()
-                    .find("form").initForm().end().find("div#favorites").tabs({ fxAutoHeight: true }).end().initConfigDialog().appendTo("body");
+            dynamic.find("div#favorites").initFavorites().end().find("li.torrent").myContextMenu().end()
+                    .find("form").initForm().end().find("div#configuration").initConfigDialog().end()
+                    .appendTo("body");
             setTimeout(function() {
                 var container = $("#feedItems_container");
-                if(container.length == 0) {
+                if(container.length == 0 && $(".login_form").length == 0) {
                     current_dialog = '#welcome1';
                     $(current_dialog).show();
                 } else {
@@ -159,7 +160,10 @@ $(function() {
         var form;
         if($(button).is('form')) { // User pressed enter
             form = $(button);
-            button = form.find('a')[0];
+            button = form.find('a');
+            if(button.length == 0)
+              button = form.find('input[type=submit]');
+            button = button[0];
         } else
             form = $(button).closest("form");
         $.post(form.get(0).action, form.buildDataString(button), $.loadDynamicData, 'html');
@@ -179,17 +183,15 @@ $(function() {
         return this;
     };
     $.fn.initFavorites = function() {
-        var selector = this.selector;
-        setTimeout(function() {
-            $(selector + ":first a").toggleFavorite();
-        }, 300);
-        return this.not(":first").tsort("a").end().click(function() {
-            $(this).find("a").toggleFavorite();
+      this.find("ul.favorite > li").not(":first").tsort("a").end().click(function() {
+          $(this).find("a").toggleFavorite();
         });
+
+      return this.tabs({ fxAutoHeight: true }).find("input#favoriteMovies_rating").spin({ interval: 0.1, min: 0, max: 10 }).end();
     };
+
     $.fn.initForm = function() {
         this.submit(function(e) {
-            e.stopImmediatePropogation();
             $.submitForm(this);
             return false;
         });
@@ -205,8 +207,8 @@ $(function() {
             if (!last) {
                 $(current_favorite).show();
             } else {
-                $(last).fadeOut(400, function() {
-                    $(current_favorite).fadeIn(400);
+                $(last).fadeOut(600, function() {
+                    $(current_favorite).fadeIn(600);
                 });
             }
         });
@@ -251,6 +253,7 @@ $(function() {
         return this;
     };
     $.fn.initConfigDialog = function() {
+        this.tabs({fxAutoHeight: true });
         setTimeout(function() {
             $('select#client').change();
         }, 500);

@@ -12,6 +12,8 @@ class feedItem extends CActiveRecord
   const STATUS_DUPLICATE = 6;
   const STATUS_OLD = 7;
 
+  const TYPE_TORRENT = 0;
+  const TYPE_NZB = 1;
 
   private $_qualityIds;
 
@@ -80,6 +82,19 @@ class feedItem extends CActiveRecord
     return $this->_qualityIds;
   }
 
+  public function getDownloadTypeOptions() {
+    return array(
+        self::TYPE_TORRENT=>'Torrent',
+        self::TYPE_NZB=>'NZB',
+    );
+  }
+
+  public function getDownloadTypeText() {
+    $options=$this->getDownloadTypeOptions();
+    return isset($options[$this->downloadType]) ? $options[$this->downloadType]
+        : "unknown ({$this->downloadType})";
+  }
+
   public function getStatusOptions() {
     return array(
         self::STATUS_NEW=>'New',
@@ -134,7 +149,7 @@ class feedItem extends CActiveRecord
 
     if($this->isNewRecord) {
       $this->status = self::STATUS_NEW;
-
+      
       if($options = $this->detectTitleParams()) {
         list($shortTitle, $quality, $season, $episode) = $options;
       

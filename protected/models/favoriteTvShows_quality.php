@@ -1,11 +1,7 @@
 <?php
 
-class other extends CActiveRecord
+class favoriteTvShows_quality extends CActiveRecord
 {
-
-  const STATUS_NEW = 0;
-  const STATUS_DOWNLOADED = 1;
-
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @return CActiveRecord the static model class
@@ -20,7 +16,7 @@ class other extends CActiveRecord
 	 */
 	public function tableName()
 	{
-		return 'other';
+		return 'favoriteTvShows_quality';
 	}
 
 	/**
@@ -47,8 +43,8 @@ class other extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'id'=>'Id',
-			'title'=>'Title',
+			'favoriteTvShows_id'=>'Favorite Tv Shows ',
+			'quality_id'=>'Quality ',
 		);
 	}
 }

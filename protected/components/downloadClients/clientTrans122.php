@@ -2,14 +2,17 @@
 
 class clientTrans122 extends clientExecutable {
 
-  public function addByData($data, $opts) {
-    $filename = $this->saveTemp($data, $opts);
-    $saveIn = $this->getSaveInDirectory($data, $opts);
+  public function addByData($data) {
+    $filename = $this->saveTemp($data);
+    $saveIn = $this->getSaveInDirectory();
 
     return $this->execClient(
-        '/mnt/syb8634/bin/transmission-remote',
-        '-g /share/.transmission -a '.escapeshellarg($filename)
+        '-g '.escapeshellarg($this->config->directory).' -a '.escapeshellarg($filename)
     );
+  }
+
+  public function getClassName() {
+    return __CLASS__;
   }
 }
 

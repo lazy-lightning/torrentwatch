@@ -1,15 +1,17 @@
 <?php
 
 class clientBTPD extends clientExecutable {
-  public function addByData($data, $opts) {
-    $filename = $this->saveTemp($data, $opts);
-    $saveIn = $this->getSaveInDirectory($data, $opts);
+  public function addByData($data) {
+    $filename = $this->saveTemp($data);
+    $saveIn = $this->getSaveInDirectory($data);
 
     return $this->execClient(
-        '/mnt/syb8634/bin/btcli',
-        '-d /share/.btpd add -d '.escapeshellarg($saveIn).' '.escapeshellarg($filename)
+        '-d '.escapeshellarg($this->config->directory).' add -d '.escapeshellarg($saveIn).' '.escapeshellarg($filename)
     );
   }
 
+  public function getClassName() {
+    return __CLASS__;
+  }
 }
 

@@ -38,6 +38,7 @@ class feedAdapter extends SimplePie {
         feedItem::factory(array(
               'hash'        => $hash,
               'feed_id'     => $this->_feedAR->id,
+              'downloadType'=> $this->_feedAR->downloadType
               'imdbId'      => $item->get_imdbId(),
               'title'       => $item->get_title(),
               'url'         => $item->get_link(),
@@ -57,27 +58,6 @@ class feedAdapter_Item extends SimplePie_Item {
       return $regs[1];
     else
       return 0;
-  }
-}
-
-class feedAdapter_File extends SimplePie_File {
-  function feedAdapter_File($url, $timeout = 10, $redirects = 5, $headers = null,
-                            $useragent = null, $force_fsockopen = false) {
-    // pretend for the sake of tvbinz.net
-    $useragent = 'UniversalFeedParser/4.01 +http://feedparser.org/';
-
-    Yii::log("Starting url: $url", CLogger::LEVEL_ERROR);
-    // Translate :COOKIE: into http headers
-    if($cookies = stristr($url, ':COOKIE:')) {
-      $url = rtrim(substr($url, 0, -strlen($cookies)), "&");
-      $headers['Cookie'] = '$Version=1; '.strtr(substr($cookies, 8), '&', ';');
-    }
-    // convert &amp; into & because simplepie_file preserves it?
-    $url = str_replace('&amp;', '&', $url);
-    if($headers !== null)
-      Yii::log("Final url: $url\nHeaders:  \n".implode("\n", $headers), CLogger::LEVEL_ERROR);
-    parent::SimplePie_File($url, $timeout, $redirects, $headers, $useragent, $force_fsockopen);
-    file_put_contents('/tmp/'.__FUNCTION__, serialize($this));
   }
 }
 

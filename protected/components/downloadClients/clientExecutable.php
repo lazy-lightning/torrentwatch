@@ -3,15 +3,22 @@
 abstract class clientExecutable extends baseClient {
 
   // save the file to a temporary directory so it can be passed by commandline
-  function saveTemp($data, $opts) {
-    $filename = tempnam(Yii::app()->dvrConfig->tempDir, $this->getTitle($opts));
+  function saveTemp($data) {
+    $filename = tempnam(Yii::app()->dvrConfig->tempDir, $this->manager->title);
     file_put_contents($filename, $data);
     return $filename;
   }
 
   function execClient($cmd, $options) {
-    if(!file_exists($cmd))
-      return "client executable does not exist: $cmd";
+    $cmd = $this->config->executable;
+    if(!file_exists($cmd)) {
+      $this->_error = "client executable does not exist: $cmd";
+      return False;
+    }
+    if(!is_executable($cmd)) {
+      $this->_error = "client exutable does not have the right permissions: $cmd";
+      return False;
+    }
 
     exec($cmd.' '.$options, $output, $return);
     if($return == 0)

@@ -34,7 +34,7 @@ class AjaxController extends CController
 				'users'=>array('*'),
 			), */
 			array('allow', // allow authenticated user
-				'actions'=>array('fullResponce', 'dlFeedItem', 'saveConfig', 'addFeed', 'addFavorite', 'updateFavorite'),
+				'actions'=>array('fullResponce', 'dlFeedItem', 'saveConfig', 'addFeed', 'addFavorite', 'updateFavoriteTvShow', 'updateFavoriteMovies', 'updateFavoriteStrings'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user 
@@ -52,26 +52,35 @@ class AjaxController extends CController
   {
     if(isset($_GET['feedItem_id']) && is_numeric($_GET['feedItem_id']))
     {
-      $feedItem = feedItem::model()->with('tvEpisode', 'quality')->findByPk($_GET['feedItem_id']);
-      $fav=new favoriteTvShow;
+      $feedItem = feedItem::model()->with('quality')->findByPk($_GET['feedItem_id']);
+      if(!empty($feedItem->tvEpisode_id)) {
+        $fav=new favoriteTvShow;
+        $fav->tvShow_id = $feedItem->tvEpisode->tvShow_id;
+      } elseif(!empty($feedItem->movie_id)) {
+        $fav=new favoriteMovies;
+        $fav->genre = $feedItem->movie->genre;
+        $fav->name = $feedItem->title;
+      } elseif(!empty($feedItem->other_id)) {
+        $fav = new favoriteStrings;
+        $fav->filter = $feedItem->title;
+        $fav->name = $feedItem->title;
+      }
       $fav->feed_id = 0;
-      $fav->tvShow_id = $feedItem->tvEpisode->tvShow_id;
+
+      $ids = array();
+      foreach($feedItem->quality as $quality) {
+        $ids[] = $quality->id;
+      }
+      $fav->qualityIds = $ids;
+
       if($fav->save()) {
-        $qualId=0;
-        $cmd = $this->dbConnection->createCommand('INSERT INTO favoriteTvShows_quality VALUES (:favId, :qualId)');
-        $cmd->bindValue(':favId', $fav->id);
-        $cmd->bindParam(':qualId', $qualId);
-        foreach($feedItem->quality as $quality) {
-          $qualId = $quality->id;
-          $cmd->execute();
-        }
       }
     }
     // should have another else to direct to an error, also if ->save() fails
     $this->redirect(array('fullResponce'));
   }
 
-  public function actionUpdateFavorite()
+  public function actionUpdateFavoriteTvShow()
   {
     Yii::log(print_r($_POST, TRUE), CLogger::LEVEL_ERROR);
     if(isset($_GET['id'], $_POST['button']) && is_numeric($_GET['id']) && $_POST['button'] === 'Delete') {
@@ -79,8 +88,8 @@ class AjaxController extends CController
       Yii::log("deleting favoriteTvShow $id", CLogger::LEVEL_ERROR);
       // Have to get the matching information before deleting the row
       // Is casting id to integer enough to make it safe without bindValue?
-      $reader = Yii::app()->db->CreateCommand("SELECT feedItem_id FROM matchingFavoriteTvShows WHERE favoriteTvShows_id = $id AND feedItem.status NOT IN".
-                                                      "('".feedItem::STATUS_AUTO_DL."', '".feedItem::STATUS_MANUAL_DL.");")->query();
+      $reader = Yii::app()->db->CreateCommand("SELECT feedItem_id FROM matchingFavoriteTvShows WHERE favoriteTvShows_id = $id AND feedItem_status NOT IN".
+                                                      "('".feedItem::STATUS_AUTO_DL."', '".feedItem::STATUS_MANUAL_DL."');")->query();
 
       if(favoriteTvShow::model()->deleteByPk($id))
       {
@@ -104,6 +113,7 @@ class AjaxController extends CController
       }
       if(isset($_POST['favoriteTvShow']))
       {
+        $favorite->qualityIds = $_POST['quality_id'];
         $favorite->attributes = $_POST['favoriteTvShow'];
         $favorite->save();
       }
@@ -150,7 +160,7 @@ class AjaxController extends CController
       if($feedItem === null) {
         $error = 'Unable to load feed item '.$_GET['id'];
       } elseif(Yii::app()->dlManager->startDownload($feedItem, feedItem::STATUS_MANUAL_DL) === False) {
-        $error = 'Failed: '.client::$errorMessage;
+        $error = 'Failed: '.Yii::app()->dlManager->getErrors();
       }
     } else
       $error = 'No id given';

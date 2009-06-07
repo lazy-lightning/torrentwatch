@@ -2,6 +2,10 @@
 
 class movie extends CActiveRecord
 {
+
+  const STATUS_NEW = 0;
+  const STATUS_DOWNLOADED = 1;
+
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @return CActiveRecord the static model class
