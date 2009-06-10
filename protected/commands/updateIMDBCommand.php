@@ -24,8 +24,10 @@ class updateIMDBCommand extends CConsoleCommand {
       $url = sprintf('http://www.imdb.com/title/tt%07d/', $row['imdbId']);
       $scraper = new imdbFetch($url);
 
-      if(!$scraper->success)
+      if(!$scraper->success) {
+        echo "Failed scrape\n";
         continue;
+      }
 
       echo "Found! Updating ".$scraper->name."\n";
       $movie = movie::model()->findByPk($row['id']);

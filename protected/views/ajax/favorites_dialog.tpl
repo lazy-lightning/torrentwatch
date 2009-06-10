@@ -7,7 +7,7 @@
  <div id="favoriteTvShows">
   <ul class="favorite">
    <li><a href="#favoriteTvShows-1">New Favorite</a></li>
-   <?php if($favorites !== False): ?>
+   <?php if($favoriteTvShows !== False): ?>
     <?php $i=2;foreach($favoriteTvShows as $fav): ?>
      <li><a href="#favoriteTvShows-<?php echo $i++;?>"><?php echo $fav->tvShow->title;?></a></li>
     <?php endforeach;?>

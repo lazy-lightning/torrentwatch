@@ -25,7 +25,8 @@ abstract class baseClient {
   }
 
   protected function getFile() {
-    $file = new feedAdapter_File($this->manager->getUrl(), 10, 0);
+    // fake the useragent for the sake of a particular private feed
+    $file = new feedAdapter_File($this->manager->getUrl(), 10, 0, null, 'Python-urllib/1.17');
 
     if($file->success) {
       return $file->body;

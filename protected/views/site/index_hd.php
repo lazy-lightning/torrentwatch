@@ -30,7 +30,7 @@
                       'onkeyleftset'=>$this->mainMenuItems[0]['name'],
                       'onkeyrightset'=> $item['index'],
                       'tvid' => $item['tvid'],
-                      'alt'=>$item['alt'],
+                      'alt'=>isset($item['alt']) ? $item['alt'] : '',
                     )); ?>
             </td>
             <td width="10"></td>

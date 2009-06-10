@@ -79,7 +79,8 @@ class updateTVDBCommand extends CConsoleCommand {
       echo "Found data for ".$data->seriesName."\n";
       $tvShow = tvShow::model()->findByPk($row['id']);
       $tvShow->title = $data->seriesName;
-      $tvShow->network_id = factory::networkByTitle($data->network)->id;
+      if(!empty($data->network))
+        $tvShow->network_id = factory::networkByTitle($data->network)->id;
       $tvShow->rating = $data->rating;
       $tvShow->description = $data->overview;
       $tvShow->tvdbId = $data->id;
