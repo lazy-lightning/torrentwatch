@@ -173,9 +173,13 @@ class AjaxController extends CController
   public function actionFullResponce()
   {
     $app = Yii::app();
+    $logger = Yii::getLogger();
+    Yii::log("start controller responce: ".$logger->getExecutionTime()."\n", CLogger::LEVEL_ERROR);
     $config = $app->dvrConfig;
+    $favoriteMovies = favoriteMovies::model()->findAll();
     $favoriteTvShows = favoriteTvShow::model()->with('tvShow','quality')->findAll();
     $feeds = feed::model()->findAll(); // not id 0, which is 'All'
+    $availClients = $app->dlManager->availClients;
     $qualitys = quality::model()->findAll();
     // prepend a blank quality to the list 
     $q = new quality;
@@ -185,16 +189,18 @@ class AjaxController extends CController
     
     $feedItems = $this->loadFeedItems($feeds);
 
+    Yii::log("pre-render: ".$logger->getExecutionTime()."\n", CLogger::LEVEL_ERROR);
     $this->render('fullResponce', array(
-          'availClients'=>$app->dlManager->availClients,
+          'availClients'=>$availClients,
           'config'=>$config,
           'favoriteTvShows'=>$favoriteTvShows,
-          'favoriteMovies'=>favoriteMovies::model()->findAll(),
+          'favoriteMovies'=>$favoriteMovies,
           'feeds'=>$feeds,
           'feedItems'=>$feedItems,
           'genres'=>genre::model()->findAll(),
           'qualitys'=>$qualitys,
     ));
+    Yii::log("post-render: ".$logger->getExecutionTime()."\n", CLogger::LEVEL_ERROR);
   }
 
   public function actionSaveConfig()

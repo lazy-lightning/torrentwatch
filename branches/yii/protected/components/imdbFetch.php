@@ -181,7 +181,7 @@ class IMDbFetch {
         $imdbGenreEndTag   = '</div>';
         $this->genre = cleanString(strip_tags(extractStringFromString($searchPage, $imdbGenreStartTag, $imdbGenreEndTag)));
         //
-        if ($this->genre === false) {
+        if ($this->genre === false || substr($this->genre, 0, 6) == '-//W3C' || substr($this->genre, 0, 6) == 'PUBLIC') {
             $this->genre = $this->notavailable;;
         }
         //
@@ -192,7 +192,7 @@ class IMDbFetch {
         $this->rating = cleanString(strip_tags(extractStringFromString($searchPage, $imdbRatingStartTag, $imdbRatingEndTag)));
         //
         if ($this->rating === false ||
-            substr($this->rating, 1, 9) === 'awaiting') {
+            substr($this->rating, 1, 8) === 'awaiting') {
             $this->rating = '0/10';
         }
         //

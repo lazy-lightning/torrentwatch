@@ -48,7 +48,7 @@ class MainMenu extends CWidget
 			$items[]=$last=$item2;
 		}
 		$this->render('mainMenu_'.$this->resolution,array(
-          'onKeyRight'=>$this-onKeyRight,
+          'onKeyRight'=>$this->onKeyRight,
           'icon'=>'side_server.png',
           'imageRoot'=>$controller->imageRoot, 
           'items'=>$items,

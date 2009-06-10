@@ -18,7 +18,8 @@ class feedAdapterRouter {
         return new $class($feed);
       }
     }
-    return new feedAdapter($feed);
+    $x = new feedAdapter($feed);
+    return $x; 
   }
 }
 

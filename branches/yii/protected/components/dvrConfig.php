@@ -72,7 +72,6 @@ abstract class BaseDvrConfig extends CAttributeCollection {
     $sql = "SELECT {$this->_key},{$this->_value} FROM ".$this->tableName();
     if($where !== null)
       $sql .= ' WHERE '.$where;
-    yii::log($sql, CLogger::LEVEL_ERROR);
 
     $reader = Yii::app()->db->createCommand($sql)->query();
     $data = array();

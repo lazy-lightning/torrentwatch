@@ -38,7 +38,7 @@ class feedAdapter extends SimplePie {
         feedItem::factory(array(
               'hash'        => $hash,
               'feed_id'     => $this->_feedAR->id,
-              'downloadType'=> $this->_feedAR->downloadType
+              'downloadType'=> $this->_feedAR->downloadType,
               'imdbId'      => $item->get_imdbId(),
               'title'       => $item->get_title(),
               'url'         => $item->get_link(),
