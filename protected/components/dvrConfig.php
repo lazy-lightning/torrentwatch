@@ -2,6 +2,11 @@
 
 abstract class BaseDvrConfig extends CAttributeCollection {
   protected $_changed;
+  protected $_id = null;
+
+  public function __construct() {
+    $this->caseSensitive = true;
+  }
 
   public function init() {
     $this->_changed = array();
@@ -18,15 +23,18 @@ abstract class BaseDvrConfig extends CAttributeCollection {
 
   public function save() {
     $key = $value = 0;
-    $cmd = Yii::app()->db->createCommand('UPDATE dvrConfig SET value = :value WHERE key = :key');
+    $cmd = Yii::app()->db->createCommand('UPDATE dvrConfig SET value = :value WHERE key = :key AND dvrConfigCategory_id = :catId');
     $cmd->bindParam(':key', $key);
     $cmd->bindParam(':value', $value);
+    $cmd->bindValue(':catId', $this->_id === null ? 'NULL' : $this->_id);
+
     foreach($this->_changed as $key => $foo) {
       $value = $this->$key;
       if(is_object($value))
         $value->save();
-      else
+      else {
         $cmd->execute();
+      }
     }
     $this->_changed = array();
   }
@@ -66,9 +74,11 @@ class dvrConfigCategory extends BaseDvrConfig {
    * @param string the title of this category
    * @param array an array of key=>value pairs to fill the array
    */
-  public function __construct($parent, $title, $values) {
+  public function __construct($parent, $id, $title, $values) {
+    parent::__construct();
     $this->_parent = $parent;
     $this->_title = $title;
+    $this->_id = $id;
     foreach($values as $row) {
       $this->add($row['key'], $row['value']);
     }
@@ -120,7 +130,7 @@ class dvrConfig extends BaseDvrConfig {
     foreach($reader as $row) {
       $id = $row['id'];
       $title = $row['title'];
-      $c = new dvrConfigCategory($this, $title, empty($data[$id]) ? array() : $data[$id]);
+      $c = new dvrConfigCategory($this, $id, $title, empty($data[$id]) ? array() : $data[$id]);
       // dvrConfigCategory will add to parent on successfull init
       $c->init();
     }
