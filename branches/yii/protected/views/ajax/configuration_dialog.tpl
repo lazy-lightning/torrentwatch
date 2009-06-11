@@ -41,35 +41,47 @@
     <?php echo CHtml::activeLabel($config, 'torClient', array('class'=>'item select')).': '.
                CHtml::dropDownList('dvrConfig[torClient]', $config->torClient, $availClients[feedItem::TYPE_TORRENT]);
     foreach($availClients[feedItem::TYPE_TORRENT] as $client => $title): ?>
-      <div class="config" id="<?php echo $client ?>">
+      <?php echo CHtml::beginForm(array('saveConfig'), 'post', array('id'=>$client, 'class'=>'config')); ?>
+        <input type="hidden" name="category" value="<?php echo $client; ?>">
+        <input type="hidden" name="type" value="torClient" >
         <?php 
           $clientConfig = $config->$client;
           $htmlAttrs = array('class'=>'item');
           foreach($clientConfig as $key => $value) {
-            echo '<div id="config_'.$client.'_'.$key.'">'.
-                 CHtml::activeLabel($clientConfig, $key, $htmlAttrs).': '.
-                 CHtml::activeTextField($clientConfig, $key).
+            echo '<div>'.
+                   CHtml::activeLabel($clientConfig, $key, $htmlAttrs).': '.
+                   CHtml::activeTextField($clientConfig, $key).
                  '</div>';
           }
         ?>
-      </div>
+        <div class="buttonContainer">
+          <a class="submitForm button" id="Save" href="#">Save</a>
+          <a class='toggleDialog button' href='#'>Close</a>
+        </div>
+      </form>
     <?php endforeach; ?>
   </div>
   <div class="client_config" id="nzbClient">
     <?php echo CHtml::activeLabel($config, 'nzbClient', array('class'=>'item select')).': '.
                CHtml::dropDownList('dvrConfig[nzbClient]', $config->nzbClient, $availClients[feedItem::TYPE_NZB]);
     foreach($availClients[feedItem::TYPE_NZB] as $client => $title): ?>
-      <div class="config" id="<?php echo $client ?>">
+      <?php echo CHtml::beginForm(array('saveConfig'), 'post', array('id'=>$client, 'class'=>'config')); ?>
+        <input type="hidden" name="category" value="<?php echo $client; ?>">
+        <input type="hidden" name="type" value="nzbClient" >
         <?php 
           $clientConfig = $config->$client;
           foreach($clientConfig as $key => $value) {
-            echo '<div id="config_'.$client.'_'.$key.'">'.
-                 CHtml::activeLabel($clientConfig, $key, $htmlAttrs).': '.
-                 CHtml::activeTextField($clientConfig, $key).
+            echo '<div>'.
+                   CHtml::activeLabel($clientConfig, $key, $htmlAttrs).': '.
+                   CHtml::activeTextField($clientConfig, $key).
                  '</div>';
           }
         ?>
-      </div>
+        <div class="buttonContainer">
+          <a class="submitForm button" id="Save" href="#">Save</a>
+          <a class='toggleDialog button' href='#'>Close</a>
+        </div>
+      </form>
     <?php endforeach; ?>
   </div>
   <div id="feeds">
@@ -88,6 +100,9 @@
         <a class="submitForm button" id="Add" href="#">Add</a>
         <label class="item">New Feed</label>
         <input type="text" name="feed[url]" id="feed_url">
+        <div class="buttonContainer">
+          <a class='toggleDialog button' href='#'>Close</a>
+        </div>
       </form>
     </div>
   </div>

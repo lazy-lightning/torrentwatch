@@ -34,7 +34,7 @@ class AjaxController extends CController
 				'users'=>array('*'),
 			), */
 			array('allow', // allow authenticated user
-				'actions'=>array('fullResponce', 'dlFeedItem', 'saveConfig', 'addFeed', 'addFavorite', 'updateFavoriteTvShow', 'updateFavoriteMovies', 'updateFavoriteStrings'),
+				'actions'=>array('fullResponce', 'dlFeedItem', 'saveConfig', 'addFeed', 'addFavorite', 'updateFavorite'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user 
@@ -80,43 +80,44 @@ class AjaxController extends CController
     $this->redirect(array('fullResponce'));
   }
 
-  public function actionUpdateFavoriteTvShow()
+  public function actionUpdateFavorite()
   {
-    Yii::log(print_r($_POST, TRUE), CLogger::LEVEL_ERROR);
-    if(isset($_GET['id'], $_POST['button']) && is_numeric($_GET['id']) && $_POST['button'] === 'Delete') {
-      $id = (integer)$_GET['id'];
-      Yii::log("deleting favoriteTvShow $id", CLogger::LEVEL_ERROR);
-      // Have to get the matching information before deleting the row
-      // Is casting id to integer enough to make it safe without bindValue?
-      $reader = Yii::app()->db->CreateCommand("SELECT feedItem_id FROM matchingFavoriteTvShows WHERE favoriteTvShows_id = $id AND feedItem_status NOT IN".
-                                                      "('".feedItem::STATUS_AUTO_DL."', '".feedItem::STATUS_MANUAL_DL."');")->query();
+    foreach(array('favoriteTvShow', 'favoriteMovie', 'favoriteOther') as $item) 
+    {
+      if(isset($_POST[$item])) 
+      {
+        $class = $item;
+        break;
+      }
+    }
 
-      if(favoriteTvShow::model()->deleteByPk($id))
+    if($class !== null) 
+    {
+      $model = new $class;
+
+      if(isset($_GET['id'], $_POST['button']) && is_numeric($_GET['id']) && $_POST['button'] === 'Delete') 
       {
-        // Delete related many_many relationship
-        favoriteTvShow_quality::deleteByAttributes('favoriteTvShow_id=:id', array(':id'=>$id));
-        // Reset feedItem status on anything this was matching, then rerun matching routine incase something else matches the reset items
-        $ids = array();
-        foreach($reader as $row) {
-          $ids[] = $row['feedItem_id'];
+        $this->deleteFavorite($model, $class);
+      } 
+      else 
+      {
+        if(isset($_GET['id'])) 
+        {
+          Yii::log('updating favorite', CLogger::LEVEL_ERROR);
+          $favorite = $model->findByPk($_GET['id']);
+          if($favorite === null)
+            throw new CException("Unable to load $class: bad id ".$_GET['id']);
+        } 
+        else 
+        {
+          Yii::log('creating favorite', CLogger::LEVEL_ERROR);
+          $favorite = $model;
         }
-        feedItem::model()->updateByPk($ids, array('status'=>feedItem::STATUS_NEW));
-        Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NEW);
-      }
-    } else {
-      if(isset($_GET['id'])) {
-        Yii::log('updating favorite', CLogger::LEVEL_ERROR);
-        $favorite = favoriteTvShow::model()->findByPk($_GET['id']);
-        if($favorite === null)
-          throw new CException("Unable to load favorite: bad id ".$_GET['id']);
-      } else {
-        Yii::log('creating favorite', CLogger::LEVEL_ERROR);
-        $favorite = new favoriteTvShow;
-      }
-      if(isset($_POST['favoriteTvShow']))
-      {
-        $favorite->qualityIds = $_POST['quality_id'];
-        $favorite->attributes = $_POST['favoriteTvShow'];
+
+        if(isset($_POST['quality_id']))
+          $favorite->qualityIds = $_POST['quality_id'];
+
+        $favorite->attributes = $_POST[$class];
         $favorite->save();
       }
     }
@@ -159,9 +160,12 @@ class AjaxController extends CController
     {
       // $feedItem->status gets set by the downloadmanager
       $feedItem=feedItem::model()->findByPk($_GET['id']);
-      if($feedItem === null) {
+      if($feedItem === null) 
+      {
         $error = 'Unable to load feed item '.$_GET['id'];
-      } elseif(Yii::app()->dlManager->startDownload($feedItem, feedItem::STATUS_MANUAL_DL) === False) {
+      } 
+      elseif(False === Yii::app()->dlManager->startDownload($feedItem, feedItem::STATUS_MANUAL_DL)) 
+      {
         $error = 'Failed: '.Yii::app()->dlManager->getErrors();
       }
     } else
@@ -178,7 +182,7 @@ class AjaxController extends CController
     $config = $app->dvrConfig;
     $favoriteMovies = favoriteMovies::model()->findAll();
     $favoriteTvShows = favoriteTvShow::model()->with('tvShow','quality')->findAll();
-    $feeds = feed::model()->findAll(); // not id 0, which is 'All'
+    $feeds = feed::model()->findAll(); // todo: not id 0, which is 'All'
     $availClients = $app->dlManager->availClients;
     $genres = genre::model()->findAll();
     $qualitys = quality::model()->findAll();
@@ -190,13 +194,13 @@ class AjaxController extends CController
     
 
     $tvEpisodes = $app->db->createCommand(
-        'SELECT feedItem_status, feedItem_description, feedItem_id, feedItem_title, feedItem_pubDate from tvFeedItem ORDER BY feedItem_pubDate DESC LIMIT '.$config->webItemsPerLoad
+        'SELECT feedItem_status, feedItem_description, feedItem_id, feedItem_title, feedItem_pubDate from tvFeedItem LIMIT '.$config->webItemsPerLoad
     )->queryAll(); 
     $movies = $app->db->createCommand(
-        'SELECT feedItem_status, feedItem_description, feedItem_id, feedItem_title, feedItem_pubDate from movieFeedItem ORDER BY feedItem_pubDate DESC LIMIT '.$config->webItemsPerLoad
+        'SELECT feedItem_status, feedItem_description, feedItem_id, feedItem_title, feedItem_pubDate from movieFeedItem LIMIT '.$config->webItemsPerLoad
     )->queryAll(); 
     $others = $app->db->createCommand(
-        'SELECT feedItem_status, feedItem_description, feedItem_id, feedItem_title, feedItem_pubDate from otherFeedItem ORDER BY feedItem_pubDate DESC LIMIT '.$config->webItemsPerLoad
+        'SELECT feedItem_status, feedItem_description, feedItem_id, feedItem_title, feedItem_pubDate from otherFeedItem LIMIT '.$config->webItemsPerLoad
     )->queryAll();
 
     Yii::log("pre-render: ".$logger->getExecutionTime()."\n", CLogger::LEVEL_ERROR);
@@ -217,33 +221,60 @@ class AjaxController extends CController
 
   public function actionSaveConfig()
   {
-    Yii::log("Saving Config", CLogger::LEVEL_ERROR);
-    $config = Yii::app()->dvrConfig;
-    Yii::log(print_r($_POST, TRUE), CLogger::LEVEL_ERROR);
-    if(isset($_POST['dvrConfig']))
+    $index = 'dvrConfig';
+    $config = null;
+    if(isset($_POST['dvrConfigCategory'], $_POST['category'], $_POST['type'])) 
     {
-      foreach($_POST['dvrConfig'] as $key => $value) {
-        Yii::log($key,' => '.$value, CLogger::LEVEL_ERROR);
+      if(in_array($_POST['type'], array('torClient', 'nzbClient'))) 
+      {
+        $c = Yii::app()->dvrConfig;
+        $index = 'dvrConfigCategory';
+        if($c->contains($_POST['category']))
+        {
+          $c->$_POST['type'] = $_POST['category'];
+          $config = $c->$_POST['category'];
+        }
+      }
+    }
+    elseif(isset($_POST['dvrConfig']))
+    {
+      $config = Yii::app()->dvrConfig;
+    }
+
+    if($config !== null) 
+    {
+      foreach($_POST[$index] as $key => $value) 
+      {
         if($config->contains($key))
           $config->$key = $value;
       }
-      $config->save();
+      // Should add some sort of validation in the dvrConfig class
+      Yii::app()->dvrConfig->save();
     }
     $this->redirect(array('fullResponce'));
   }
 
-  public function loadFeedItems($feeds = null) {
-    $feedItems = array();
-    $criteria = new CDbCriteria(array(
-          'condition'=>'feed_id=:id',
-          'order'=>'pubDate DESC',
-          'limit'=>50,
-          ));
-    foreach($feeds as $feed) {
-      $criteria->params = array(':id'=>$feed->id);
-      $feedItems[$feed->id] = feedItem::model()->with('tvEpisode')->findAll($criteria);
+  // the core of this logic might be better served in a different class
+  public function deleteFavorite($model, $class) {
+    $id = (integer)$_GET['id'];
+    Yii::log("deleting $class $id", CLogger::LEVEL_ERROR);
+    // Have to get the matching information before deleting the row
+    // Is casting id to integer enough to make it safe without bindValue?
+    $reader = Yii::app()->db->CreateCommand("SELECT feedItem_id FROM matching${class}s WHERE ${class}s_id = $id AND feedItem_status NOT IN".
+                                                    "('".feedItem::STATUS_AUTO_DL."', '".feedItem::STATUS_MANUAL_DL."');")->query();
+ 
+    if($model->deleteByPk($id))
+    {
+      // Delete related many_many relationship
+      favoriteTvShow_quality::deleteByAttributes('favoriteTvShow_id=:id', array(':id'=>$id));
+      // Reset feedItem status on anything this was matching, then rerun matching routine incase something else matches the reset items
+      $ids = array();
+      foreach($reader as $row) {
+        $ids[] = $row['feedItem_id'];
+      }
+      feedItem::model()->updateByPk($ids, array('status'=>feedItem::STATUS_NEW));
+      Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NEW);
     }
-    return $feedItems;
   }
 
 }
