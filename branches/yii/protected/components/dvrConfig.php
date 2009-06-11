@@ -1,83 +1,9 @@
 <?php
 
-class dvrConfig extends BaseDvrConfig {
-
-  private $_state = True;
-
-  protected $_key = 'id';
-  protected $_value = 'title';
-
-  public function tableName() {
-    return $this->_state ?  'dvrConfigCategory' : 'dvrConfig';
-  }
-
-  public function init() {
-    // pull in the various categorys and initialize them
-    parent::init();
-    foreach($this as $id => $title) {
-      $this->add($title, new dvrConfigCategory($this, $id, $title));
-    }
-    // Flip state to dvrConfig table and contain any values with null category id
-    $this->_state = false;
-    $this->_key = 'key';
-    $this->_value = 'value';
-    parent::init('dvrConfigCategory_id IS NULL');
-  }
-
-}
-
-class dvrConfigCategory extends BaseDvrConfig {
-  private $_id;
-  private $_title;
-  private $_parent;
-
-  protected $_key = 'key';
-  protected $_value = 'value';
-
-  public function __construct($parent, $id, $title) {
-    $this->_title = $title;
-    $this->_id = $id;
-    $this->_parent = $parent;
-    parent::__construct();
-    $this->init();
-  }
-
-  public function tableName() {
-    return 'dvrConfig';
-  }
-
-  public function add($key, $value) {
-    parent::add($key, $value);
-    $this->_parent->setChanged($this->_title);
-  }
-
-  public function init() {
-    parent::init('dvrConfigCategory_id = '.$this->_id);
-  }
-
-  public function getTitle() {
-    return $this->_title;
-  }
-}
-
 abstract class BaseDvrConfig extends CAttributeCollection {
-  protected $_changed, $_key, $_value;
+  protected $_changed;
 
-  abstract public function tableName();
-
-  public function init($where = null) {
-    if($this->_key === null OR $this->_value === null)
-      throw new CException(__CLASS__." initialized without proper key/value pair");
-
-    $sql = "SELECT {$this->_key},{$this->_value} FROM ".$this->tableName();
-    if($where !== null)
-      $sql .= ' WHERE '.$where;
-
-    $reader = Yii::app()->db->createCommand($sql)->query();
-    $data = array();
-    foreach($reader as $row) {
-      $this->add($row[$this->_key], $row[$this->_value]);
-    }
+  public function init() {
     $this->_changed = array();
   }
 
@@ -92,7 +18,7 @@ abstract class BaseDvrConfig extends CAttributeCollection {
 
   public function save() {
     $key = $value = 0;
-    $cmd = Yii::app()->db->createCommand('UPDATE '.$this->tableName()." SET {$this->_value} = :value WHERE {$this->_key} = :key");
+    $cmd = Yii::app()->db->createCommand('UPDATE dvrConfig SET value = :value WHERE key = :key');
     $cmd->bindParam(':key', $key);
     $cmd->bindParam(':value', $value);
     foreach($this->_changed as $key => $foo) {
@@ -128,5 +54,79 @@ abstract class BaseDvrConfig extends CAttributeCollection {
   {
     return ucwords(trim(strtolower(str_replace(array('-','_'),' ',preg_replace('/(?<![A-Z])[A-Z]/', ' \0', $name)))));
   }
+}
+
+class dvrConfigCategory extends BaseDvrConfig {
+  private $_parent;
+  private $_title;
+
+  /**
+   *
+   * @param dvrConfig the parent dvrClass instantiating this class
+   * @param string the title of this category
+   * @param array an array of key=>value pairs to fill the array
+   */
+  public function __construct($parent, $title, $values) {
+    $this->_parent = $parent;
+    $this->_title = $title;
+    foreach($values as $row) {
+      $this->add($row['key'], $row['value']);
+    }
+  }
+
+  /**
+   * Notifies parent of any add events to propogate save
+   * @param mixed the key to be added
+   * @param mixed the value to be associated with said key
+   */
+  public function add($key, $value) {
+    parent::add($key, $value);
+    $this->_parent->setChanged($this->_title);
+  }
+
+  public function init() {
+    parent::init();
+    $this->_parent->add($this->_title, $this);
+  }
+
+  public function getTitle() {
+    return $this->_title;
+  }
+
+}
+
+class dvrConfig extends BaseDvrConfig {
+
+  public function init() {
+    $db = Yii::app()->db;
+    // Get our configuration information out of the database
+    $reader = Yii::app()->db->createCommand(
+        "SELECT key,value,dvrConfigCategory_id FROM dvrConfig"
+    )->query();
+    // add anything not in a group to the main config, organize anything else into groups to be added
+    $data = array();
+    foreach($reader as $row) {
+      if($row['dvrConfigCategory_id'] === null) 
+        $this->add($row['key'], $row['value']);
+      else {
+        $data[$row['dvrConfigCategory_id']][] = $row;
+      }
+    }
+    // get all the category names
+    $reader = $db->createCommand(
+        "SELECT id, title FROM dvrConfigCategory"
+    )->query();
+    // loop through and create categories
+    foreach($reader as $row) {
+      $id = $row['id'];
+      $title = $row['title'];
+      $c = new dvrConfigCategory($this, $title, empty($data[$id]) ? array() : $data[$id]);
+      // dvrConfigCategory will add to parent on successfull init
+      $c->init();
+    }
+
+    parent::init();
+  }
+
 }
 
