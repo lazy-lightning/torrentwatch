@@ -180,6 +180,7 @@ class AjaxController extends CController
     $favoriteTvShows = favoriteTvShow::model()->with('tvShow','quality')->findAll();
     $feeds = feed::model()->findAll(); // not id 0, which is 'All'
     $availClients = $app->dlManager->availClients;
+    $genres = genre::model()->findAll();
     $qualitys = quality::model()->findAll();
     // prepend a blank quality to the list 
     $q = new quality;
@@ -187,7 +188,16 @@ class AjaxController extends CController
     $q->id=-1;
     array_unshift($qualitys, $q);
     
-    $feedItems = $this->loadFeedItems($feeds);
+
+    $tvEpisodes = $app->db->createCommand(
+        'SELECT feedItem_status, feedItem_description, feedItem_id, feedItem_title, feedItem_pubDate from tvFeedItem ORDER BY feedItem_pubDate DESC LIMIT '.$config->webItemsPerLoad
+    )->queryAll(); 
+    $movies = $app->db->createCommand(
+        'SELECT feedItem_status, feedItem_description, feedItem_id, feedItem_title, feedItem_pubDate from movieFeedItem ORDER BY feedItem_pubDate DESC LIMIT '.$config->webItemsPerLoad
+    )->queryAll(); 
+    $others = $app->db->createCommand(
+        'SELECT feedItem_status, feedItem_description, feedItem_id, feedItem_title, feedItem_pubDate from otherFeedItem ORDER BY feedItem_pubDate DESC LIMIT '.$config->webItemsPerLoad
+    )->queryAll();
 
     Yii::log("pre-render: ".$logger->getExecutionTime()."\n", CLogger::LEVEL_ERROR);
     $this->render('fullResponce', array(
@@ -196,9 +206,11 @@ class AjaxController extends CController
           'favoriteTvShows'=>$favoriteTvShows,
           'favoriteMovies'=>$favoriteMovies,
           'feeds'=>$feeds,
-          'feedItems'=>$feedItems,
-          'genres'=>genre::model()->findAll(),
+          'genres'=>$genres,
+          'movies'=>$movies,
+          'others'=>$others,
           'qualitys'=>$qualitys,
+          'tvEpisodes'=>$tvEpisodes,
     ));
     Yii::log("post-render: ".$logger->getExecutionTime()."\n", CLogger::LEVEL_ERROR);
   }

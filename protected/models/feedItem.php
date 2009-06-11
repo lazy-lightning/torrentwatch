@@ -95,7 +95,7 @@ class feedItem extends CActiveRecord
         : "unknown ({$this->downloadType})";
   }
 
-  public function getStatusOptions() {
+  public static function getStatusOptions() {
     return array(
         self::STATUS_NEW=>'New',
         self::STATUS_NOMATCH=>'Unmatched',
@@ -108,10 +108,13 @@ class feedItem extends CActiveRecord
     );
   }
 
-  public function getStatusText() {
-    $options=$this->getStatusOptions();
-    return isset($options[$this->status]) ? $options[$this->status]
-        : "unknown ({$this->status})";
+  // static to allow translation directly from ql row in a view
+  public static function getStatusText($status = null) {
+    if($status === null)
+      $status = $this->status;
+    $options=self::getStatusOptions();
+    return isset($options[$status]) ? $options[$status]
+        : "unknown ({$status})";
   }
       
   public function getQualityString() {
