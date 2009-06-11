@@ -1,9 +1,9 @@
 <div class="dialog_window" id="configuration">
   <ul>
    <li><a href="#global_config"><span>Main</span></a></li>
-   <li><a href="#torClient_config"><span>Torrent Client</span></a></href>
-   <li><a href="#nzbClient_config"><span>NZB Client</span></a></href>
-   <li><a href="#feed_config"><span>Feeds</span></a></li>
+   <li><a href="#torClient"><span>Torrent Client</span></a></href>
+   <li><a href="#nzbClient"><span>NZB Client</span></a></href>
+   <li><a href="#feeds"><span>Feeds</span></a></li>
   </ul>
   <div id="global_config">
     <?php echo CHtml::beginForm(array('saveConfig'), 'post', array('id'=>'config_form')); ?>
@@ -37,17 +37,17 @@
       </div>
     </form>
   </div>
-  <div id="torClient_config">
+  <div class="client_config" id="torClient">
     <?php echo CHtml::activeLabel($config, 'torClient', array('class'=>'item select')).': '.
                CHtml::dropDownList('dvrConfig[torClient]', $config->torClient, $availClients[feedItem::TYPE_TORRENT]);
     foreach($availClients[feedItem::TYPE_TORRENT] as $client => $title): ?>
-      <div id="<?php echo $client ?>">
-        <h3><?php echo $client;  ?></h3>
+      <div class="config" id="<?php echo $client ?>">
         <?php 
           $clientConfig = $config->$client;
+          $htmlAttrs = array('class'=>'item');
           foreach($clientConfig as $key => $value) {
             echo '<div id="config_'.$client.'_'.$key.'">'.
-                 CHtml::activeLabel($clientConfig, $key).': '.
+                 CHtml::activeLabel($clientConfig, $key, $htmlAttrs).': '.
                  CHtml::activeTextField($clientConfig, $key).
                  '</div>';
           }
@@ -55,17 +55,16 @@
       </div>
     <?php endforeach; ?>
   </div>
-  <div id="nzbClient_config">
+  <div class="client_config" id="nzbClient">
     <?php echo CHtml::activeLabel($config, 'nzbClient', array('class'=>'item select')).': '.
                CHtml::dropDownList('dvrConfig[nzbClient]', $config->nzbClient, $availClients[feedItem::TYPE_NZB]);
     foreach($availClients[feedItem::TYPE_NZB] as $client => $title): ?>
-      <div id="<?php echo $client ?>">
-        <h3><?php echo $client;  ?></h3>
+      <div class="config" id="<?php echo $client ?>">
         <?php 
           $clientConfig = $config->$client;
           foreach($clientConfig as $key => $value) {
             echo '<div id="config_'.$client.'_'.$key.'">'.
-                 CHtml::activeLabel($clientConfig, $key).': '.
+                 CHtml::activeLabel($clientConfig, $key, $htmlAttrs).': '.
                  CHtml::activeTextField($clientConfig, $key).
                  '</div>';
           }
@@ -73,18 +72,18 @@
       </div>
     <?php endforeach; ?>
   </div>
-  <div id="feed_config">
+  <div id="feeds">
     <h2 class="dialog_heading">Feeds</h2>
     <?php if($feeds): ?>
       <?php foreach($feeds as $feed):
               if($feed->id === '0') continue; // the generic 'all' feeds ?>
-      <div class="feeditem" title="<?php echo CHtml::encode($feed->url); ?>">
+      <div class="activeFeed" title="<?php echo CHtml::encode($feed->url); ?>">
         <?php echo CHtml::link('Delete', array('deleteFeed', 'id'=>$feed->id), array('class'=>'button', 'id'=>'Delete')); ?>
         <?php echo CHtml::encode($feed->title); ?>
       </div>
      <?php endforeach; ?>
     <?php endif; ?>
-    <div class="feeditem">
+    <div class="activeFeed">
       <?php echo CHtml::beginForm(array('addFeed'), 'post', array('class'=>'feedform')); ?>
         <a class="submitForm button" id="Add" href="#">Add</a>
         <label class="item">New Feed</label>

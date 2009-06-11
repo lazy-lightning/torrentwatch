@@ -35,12 +35,12 @@
   </ul>
   <?php 
     $i=1;
-    $favorite = new favoriteMovies;
-    include VIEWPATH.'favoriteMovie.tpl';
-    if($favoriteMovies !== null) {
-      foreach($favoriteMovies as $favorite) 
-        include VIEWPATH.'favoriteMovie.tpl';
-    }
+//    $favorite = new favoriteMovies;
+//    include VIEWPATH.'favoriteMovie.tpl';
+//    if($favoriteMovies !== null) {
+//      foreach($favoriteMovies as $favorite) 
+//        include VIEWPATH.'favoriteMovie.tpl';
+//    }
   ?>
   <div class="clear"></div>
  </div>
