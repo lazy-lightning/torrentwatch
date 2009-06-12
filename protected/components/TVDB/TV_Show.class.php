@@ -170,11 +170,12 @@
 			$data = self::request($params);
 			
 			if ($data) {
+        libxml_use_internal_errors(true);
 				$xml = simplexml_load_string($data);
-				return new TV_Episode($xml->Episode);
-			} else {
-				return false;
+        if($xml)
+  				return new TV_Episode($xml->Episode);
 			}
+			return false;
 		}
 	}
 ?>
