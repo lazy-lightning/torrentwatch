@@ -7,7 +7,7 @@ class dbMaintinanceCommand extends CConsoleCommand {
     $querys = array(
         //  Delete items more than the configured  days old
         'DELETE FROM feedItem'.
-        ' WHERE feedItem.pubDate < '.(time()-3600*24*Yii::app()->dvrConfig->feedItemLifetime).';',
+        ' WHERE feedItem.pubDate < '.(time()-(3600*24*Yii::app()->dvrConfig->feedItemLifetime)).';',
         // Delete others that dont point to a feed item anymore
         // Unless they have been marked downloaded, so it doesn't download same title in future
         'DELETE FROM other'.

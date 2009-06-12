@@ -19,8 +19,9 @@ class updateTVDBCommand extends CConsoleCommand {
                                  '  FROM tvEpisode,tvShow'.
                                  ' WHERE tvShow.id = tvEpisode.tvShow_id'.
                                  '   AND tvShow.tvdbId NOT NULL'.
+                                 '   AND tvEpisode.id IN ( SELECT tvEpisode_id from feedItem)'.
                                  '   AND tvEpisode.description IS NULL'.
-                                 '   AND tvEpisode.lastTvdbUpdate <'.($now-(3600*24)).';' // one update per 24hrs
+                                 '   AND tvEpisode.lastTvdbUpdate <'.($now-(3600*48)).';' // one update per 48hrs if it fails
 
     )->query();
     foreach($reader as $row) {
@@ -64,7 +65,7 @@ class updateTVDBCommand extends CConsoleCommand {
 
     $reader = $db->createCommand('SELECT id,title FROM tvShow'.
                                  ' WHERE description IS NULL'.
-                                 '   AND lastTvdbUpdate < '.($now-(3600*24))
+                                 '   AND lastTvdbUpdate < '.($now-(3600*48))
     )->query();
     foreach($reader as $row) {
       $scanned[]= $row['id'];
