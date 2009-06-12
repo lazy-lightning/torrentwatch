@@ -56,6 +56,8 @@ class feedItem extends CActiveRecord
         'feed'=>array(self::BELONGS_TO, 'feed', 'feed_id'),
         'quality'=>array(self::MANY_MANY, 'quality', 'feedItem_quality(feedItem_id, quality_id)'),
         'tvEpisode'=>array(self::BELONGS_TO, 'tvEpisode', 'tvEpisode_id'),
+        'movie'=>array(self::BELONGS_TO, 'movie', 'movie_id'),
+        'other'=>array(self::BELONGS_TO, 'other', 'other_id'),
 		);
 	}
 

@@ -34,7 +34,7 @@ class AjaxController extends CController
 				'users'=>array('*'),
 			), */
 			array('allow', // allow authenticated user
-				'actions'=>array('fullResponce', 'dlFeedItem', 'saveConfig', 'addFeed', 'addFavorite', 'updateFavorite'),
+				'actions'=>array('fullResponce', 'dlFeedItem', 'saveConfig', 'addFeed', 'addFavorite', 'updateFavorite', 'inspect'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user 
@@ -219,6 +219,34 @@ class AjaxController extends CController
     Yii::log("post-render: ".$logger->getExecutionTime()."\n", CLogger::LEVEL_ERROR);
   }
 
+  public function actionInspect()
+  {
+    $view = 'inspectError';
+    $item = null;
+    if(isset($_GET['feedItem_id']) && is_numeric($_GET['feedItem_id']))
+    {
+      $item = feedItem::model()->findByPk($_GET['feedItem_id']);
+      if($item !== null) {
+        if(!empty($item->tvEpisode_id)) 
+        {
+          $view = 'inspectTvEpisode';
+          $opts=array('tvEpisode' => $item->tvEpisode);
+        }
+        elseif(!empty($item->movie_id))
+        {
+          $view = 'inspectMovie';
+          $opts = array('movie' => $item->movie);
+        }
+        elseif(!empty($item->other_id)) 
+        {
+          $view = 'inspectOther';
+          $opts = array('other' => $item->other);
+        }
+      }
+    }
+    $this->render($view, $opts);
+  }
+
   public function actionSaveConfig()
   {
     $index = 'dvrConfig';
@@ -260,18 +288,19 @@ class AjaxController extends CController
     Yii::log("deleting $class $id", CLogger::LEVEL_ERROR);
     // Have to get the matching information before deleting the row
     // Is casting id to integer enough to make it safe without bindValue?
-    $reader = Yii::app()->db->CreateCommand("SELECT feedItem_id FROM matching${class}s WHERE ${class}s_id = $id AND feedItem_status NOT IN".
-                                                    "('".feedItem::STATUS_AUTO_DL."', '".feedItem::STATUS_MANUAL_DL."');")->query();
+    $sql = "SELECT feedItem_id FROM matching${class}s WHERE ${class}s_id = $id AND feedItem_status NOT IN".
+                  "('".feedItem::STATUS_AUTO_DL."', '".feedItem::STATUS_MANUAL_DL."');";
+    $reader = Yii::app()->db->CreateCommand($sql)->query();
+    $ids = array();
+    foreach($reader as $row) {
+      $ids[] = $row['feedItem_id'];
+    }
  
     if($model->deleteByPk($id))
     {
       // Delete related many_many relationship
-      favoriteTvShow_quality::deleteByAttributes('favoriteTvShow_id=:id', array(':id'=>$id));
+      favoriteTvShows_quality::model()->deleteAll('favoriteTvShows_id=:id', array(':id'=>$id));
       // Reset feedItem status on anything this was matching, then rerun matching routine incase something else matches the reset items
-      $ids = array();
-      foreach($reader as $row) {
-        $ids[] = $row['feedItem_id'];
-      }
       feedItem::model()->updateByPk($ids, array('status'=>feedItem::STATUS_NEW));
       Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NEW);
     }
