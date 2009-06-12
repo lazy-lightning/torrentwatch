@@ -25,7 +25,7 @@ $(function() {
             return;
         $(this).addClass('selected').siblings().removeClass("selected");
         var filter = this.id;
-        $("div#feedItems_container").slideUp(400, function() {
+        $("div#feedItems_container > div:visible").slideUp(400, function() {
             var tor = $("li.torrent").removeClass('hidden');
             switch (filter) {
             case 'filter_matching':
@@ -35,7 +35,7 @@ $(function() {
                 tor.not('.match_cachehit, .match_match, .match_downloaded').addClass('hidden');
                 break;
             }
-            tor.markAlt().closest("#feedItems_container").slideDown(400);
+            tor.markAlt().closest("#feedItems_container > div").slideDown(400);
         });
     });
     // Filter Bar -- By Text
@@ -125,7 +125,7 @@ $(function() {
     var current_favorite, current_dialog, inspect_status;
     $.toggleInspector = function() {
         inspect_status = !inspect_status;
-        $("div#feedItems_container,ul#filterbar_container,div#inspector_container").stop(true,true).animate(
+        $("div#feedItems_container,div#feedItems_container > div,ul#filterbar_container,div#inspector_container").stop(true,true).animate(
                 { right: (inspect_status? '+' : '-') + "=350" },
                 { duration: 600 }
         );
@@ -146,7 +146,7 @@ $(function() {
                     .find("#feedItems_container").tabs().end()
                     .appendTo("body");
             setTimeout(function() {
-                var container = $("#feedItems_container");
+                var container = $("#feedItems_container > div");
                 if(container.length == 0 && $(".login_form").length == 0) {
                     current_dialog = '#welcome1';
                     $(current_dialog).show();
@@ -231,24 +231,20 @@ $(function() {
         this.contextMenu("CM1", {
             bindings: {
                 'addToFavorites': function(t) {
-                    $.get($(t).find("a.context_link:first").get(0).href, '', $.loadDynamicData, 'html')
+                    url = 'nmtdvr.php?r=ajax/addFavorite&feedItem_id='+$(t).find(".itemId").val();
+                    $.get(url, '', $.loadDynamicData, 'html')
                 },
                 'startDownloading': function(t) {
-                    $.get($(t).find("a.context_link:last")[0].href);
+                    url = 'nmtdvr.php?r=ajax/dlFeedItem&feedItem_id='+$(t).find(".itemId").val();
+                    $.get(url); // Should make a responce and do something with it
                 },
                 'inspect': function(t) {
-                    if (!inspect_status) {
-                        $.toggleInspector();
-                    }
-                    $.get('inspector.cgi', 'title=' + encodeURIComponent($(t).find("span.torrent_name").text()), function(html) {
-                        var submitInspector = function(e) {
-                            e.stopImmediatePropagation();
-                            $.get('inspector.cgi', 'title=' + encodeURIComponent($("#inspector_container input").val()), function(html) {
-                                $("div#inspector_container").html(html).find("form").submit(submitInspector);
-                            });
-                            return false;
-                        };
-                        $("div#inspector_container").html(html).find("form").submit(submitInspector);
+                    $.get('nmtdvr.php', 'r=ajax/inspect&feedItem_id='+$(t).find(".itemId").val()+'&title='+
+                          encodeURIComponent($(t).find("span.torrent_name").text()), function(html) {
+                        $("div#inspector_container").html(html);
+                        if (!inspect_status) {
+                            $.toggleInspector();
+                        }
                     }, 'html');
                 }
             }
@@ -257,6 +253,10 @@ $(function() {
     };
     $.fn.initConfigDialog = function() {
         this.tabs({fxAutoHeight: true });
+        this.find('.client_config select').change(function() {
+            $(this).closest('.client_config').find('.config').hide().end()
+              .find('#'+$(this).val()).show();
+        }).change();
         setTimeout(function() {
             $('select#client').change();
         }, 500);

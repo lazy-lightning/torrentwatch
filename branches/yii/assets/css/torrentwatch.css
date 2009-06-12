@@ -143,6 +143,7 @@ ul#filterbar_container {
 	height: 23px;
 	right: 0;
 	left: 0;
+  top: 94px;
 	z-index: 2;
 	}
 
@@ -262,22 +263,28 @@ div.login_form {
 
 div.yiiForm {
 }
-/*--------------------------
+/*------------------------------
  *
- * T O R R E N T   L I S T
+ * F E E D   I T E M   L I S T
  *
- * ------------------------*/
+ * ----------------------------*/
 div#feedItems_container {
-	display: none;
+  }
+
+div#feedItems_container > ul {
+  background: #e9e9e9;
+  }
+
+div#feedItems_container > div {
 	position: fixed;
 	overflow: auto;
-	top: 91px;
+	top: 117px;
 	bottom: 0;
 	left: 0;
 	right: 0;
 	}
 
-ul.feedItems li.torrent {
+ul li.torrent {
 	border-bottom: 1px solid #ccc;
 	padding: 0.2em 0.5em 0.3em 30px;
 	font-size: 0.9em;
@@ -288,35 +295,35 @@ li.torrent.hidden_bytext {
 	display: none;
 	}
 
-ul.feedItems li.torrent.match_Unmatched {
+ul li.torrent.match_Unmatched {
 	background: transparent url('../images/nuvola_ledred.png') no-repeat 0.2em center;
 	}
 
-ul.feedItems li.torrent.match_Failed {
+ul li.torrent.match_Failed {
 	background: transparent url('../images/nuvola_ledorange.png') no-repeat 0.2em center;
 	}
 
-ul.feedItems li.torrent.match_Manual {
+ul li.torrent.match_Manual {
   background: transparent url('../images/nuvola_ledlightgreen.png') no-repeat 0.2em center;
   }
 
-ul.feedItems li.torrent.match_Automatic {
+ul li.torrent.match_Automatic {
 	background: transparent url('../images/nuvola_ledgreen.png') no-repeat 0.2em center;
 	}
 
-ul.feedItems li.torrent.match_Duplicate {
+ul li.torrent.match_Duplicate {
 	background: transparent url('../images/nuvola_ledyellow.png') no-repeat 0.2em center;
 	}
 
-ul.feedItems li.torrent.match_Old {
+ul li.torrent.match_Old {
 	background: transparent url('../images/nuvola_ledlightblue.png') no-repeat 0.2em center;
 	}
 
-ul.feedItems li.torrent.match_New {
+ul li.torrent.match_New {
 	background: transparent url('../images/nuvola_ledpurple.png') no-repeat 0.2em center;
 	}
 
-ul.feedItems li.torrent.alt {
+ul li.torrent.alt {
 	background-color: #EDF3FE;
 	}
 
@@ -458,16 +465,19 @@ div.dialog_window#configuration input[type=checkbox] {
 	margin: 4px 5px 0 22px;
 	}
 
-form#config_form div {
+div.dialog_window#configuration div {
 	min-height: 22px;
 	}
 
-div.feeditem {
+/* Client Config */
+
+/* Feeds */
+div.activeFeed {
 	height: 35px;
 	border-top: 1px solid #bbb;
 	}
 
-div.feeditem label.item {
+div.activeFeed label.item {
 	white-space: nowrap;
 	min-width: 95px;
 	max-width: 350px;
@@ -477,10 +487,12 @@ div.feeditem label.item {
 	margin: 5px 0 0 0;
 	}
 
-div.feeditem input[type=text] {
-	width: 220px;
-	margin: 11px 0;
+div#configuration.dialog_window div.activeFeed #feed_url[type=text] {
+  position: relative;
+	width: 215px;
+	margin-top: 6px;
 	}
+
 
 /***********************************
  *
