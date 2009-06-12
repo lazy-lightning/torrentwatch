@@ -100,6 +100,7 @@
         <a class="submitForm button" id="Add" href="#">Add</a>
         <label class="item">New Feed</label>
         <input type="text" name="feed[url]" id="feed_url">
+        <?php echo CHtml::dropDownList('feed[downloadType]', 0, array(feedItem::TYPE_NZB=>'NZB', feedItem::TYPE_TORRENT=>'Torrent')); ?>
         <div class="buttonContainer">
           <a class='toggleDialog button' href='#'>Close</a>
         </div>

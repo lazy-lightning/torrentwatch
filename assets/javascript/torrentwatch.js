@@ -146,7 +146,7 @@ $(function() {
                     .find("#feedItems_container").tabs().end()
                     .appendTo("body");
             setTimeout(function() {
-                var container = $("#feedItems_container > div");
+                var container = $("#feedItems_container > div:first");
                 if(container.length == 0 && $(".login_form").length == 0) {
                     current_dialog = '#welcome1';
                     $(current_dialog).show();
