@@ -1,4 +1,4 @@
-<?php echo CHtml::beginForm(array('updateFavoriteMovie', 'id'=>$favorite->id), 'post', array('class'=>'favinfo', 'id'=>'favoriteMovies-'.$i++)); ?>
+<?php echo CHtml::beginForm(array('updateFavorite', 'id'=>$favorite->id), 'post', array('class'=>'favinfo', 'id'=>'favoriteMovies-'.$i++)); ?>
  <div class="favorite_name">
   <?php 
     echo CHtml::activeLabel($favorite, 'name').': ';
