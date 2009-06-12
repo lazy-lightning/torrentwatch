@@ -156,13 +156,14 @@ class AjaxController extends CController
   public function actionDlFeedItem()
   {
     $error = False;
-    if(isset($_GET['id']))
+    if(isset($_GET['feedItem_id']) && is_numeric($_GET['feedItem_id']))
     {
+      $id = (integer)$_GET['feedItem_id'];
       // $feedItem->status gets set by the downloadmanager
-      $feedItem=feedItem::model()->findByPk($_GET['id']);
+      $feedItem=feedItem::model()->findByPk($id);
       if($feedItem === null) 
       {
-        $error = 'Unable to load feed item '.$_GET['id'];
+        $error = 'Unable to load feed item '.$id;
       } 
       elseif(False === Yii::app()->dlManager->startDownload($feedItem, feedItem::STATUS_MANUAL_DL)) 
       {
@@ -185,23 +186,24 @@ class AjaxController extends CController
     $feeds = feed::model()->findAll(); // todo: not id 0, which is 'All'
     $availClients = $app->dlManager->availClients;
     $genres = genre::model()->findAll();
+
+    // get qualitys for use in forms and prepend a blank quality to the list 
     $qualitys = quality::model()->findAll();
-    // prepend a blank quality to the list 
     $q = new quality;
     $q->title='';
     $q->id=-1;
     array_unshift($qualitys, $q);
-    
 
-    $tvEpisodes = $app->db->createCommand(
-        'SELECT feedItem_status, feedItem_description, feedItem_id, feedItem_title, feedItem_pubDate from tvFeedItem LIMIT '.$config->webItemsPerLoad
-    )->queryAll(); 
-    $movies = $app->db->createCommand(
-        'SELECT feedItem_status, feedItem_description, feedItem_id, feedItem_title, feedItem_pubDate from movieFeedItem LIMIT '.$config->webItemsPerLoad
-    )->queryAll(); 
-    $others = $app->db->createCommand(
-        'SELECT feedItem_status, feedItem_description, feedItem_id, feedItem_title, feedItem_pubDate from otherFeedItem LIMIT '.$config->webItemsPerLoad
-    )->queryAll();
+    // Query the various feeditems from the database
+    // not AR classes because it takes too much time on the NMT
+    $group = '';
+    if(true) // change to dvrConfig variable
+      $group = 'GROUP BY feedItem_title';
+    $sql= 'SELECT feedItem_status, feedItem_description, feedItem_id, feedItem_title, feedItem_pubDate from {table} '.$group.' LIMIT '.$config->webItemsPerLoad;
+//    $tvEpisodes = $app->db->createCommand(str_replace('{table}', 'tvFeedItem', $sql))->queryAll();
+    $tvEpisodes = $this->prepareFeedItems('tvFeedItem');
+    $movies = $app->db->createCommand(str_replace('{table}', 'movieFeedItem', $sql))->queryAll();
+    $others = $app->db->createCommand(str_replace('{table}', 'otherFeedItem', $sql))->queryAll();
 
     Yii::log("pre-render: ".$logger->getExecutionTime()."\n", CLogger::LEVEL_ERROR);
     $this->render('fullResponce', array(
@@ -216,7 +218,7 @@ class AjaxController extends CController
           'qualitys'=>$qualitys,
           'tvEpisodes'=>$tvEpisodes,
     ));
-    Yii::log("post-render: ".$logger->getExecutionTime()."\n", CLogger::LEVEL_ERROR);
+    Yii::log("end controller: ".$logger->getExecutionTime()."\n", CLogger::LEVEL_ERROR);
   }
 
   public function actionInspect()
@@ -249,17 +251,20 @@ class AjaxController extends CController
 
   public function actionSaveConfig()
   {
-    $index = 'dvrConfig';
-    $config = null;
-    if(isset($_POST['dvrConfigCategory'], $_POST['category'], $_POST['type'])) 
+    $config = $index = null;
+    Yii::log(print_r($_POST, TRUE), CLogger::LEVEL_ERROR);
+    if(isset($_POST['category'], $_POST['type'])) 
     {
       if(in_array($_POST['type'], array('torClient', 'nzbClient'))) 
       {
         $c = Yii::app()->dvrConfig;
-        $index = 'dvrConfigCategory';
+        if(isset($_POST['dvrConfigCategory']))
+          $index = 'dvrConfigCategory';
         if($c->contains($_POST['category']))
         {
-          $c->$_POST['type'] = $_POST['category'];
+          if(substr($_POST['category'], 0, 6) === 'client') {
+            $c->$_POST['type'] = $_POST['category'];
+          }
           $config = $c->$_POST['category'];
         }
       }
@@ -267,19 +272,63 @@ class AjaxController extends CController
     elseif(isset($_POST['dvrConfig']))
     {
       $config = Yii::app()->dvrConfig;
+      $index = 'dvrConfig';
     }
 
-    if($config !== null) 
+    // $index === null allows for categorys with no values to still set client type
+    if($config !== null && $index !== null) 
     {
       foreach($_POST[$index] as $key => $value) 
       {
         if($config->contains($key))
           $config->$key = $value;
       }
-      // Should add some sort of validation in the dvrConfig class
-      Yii::app()->dvrConfig->save();
     }
+    // Should add some sort of validation in the dvrConfig class
+    Yii::app()->dvrConfig->save();
     $this->redirect(array('fullResponce'));
+  }
+
+  private function prepareFeedItems($table) 
+  {
+    $db = Yii::app()->db;
+    $config = Yii::app()->dvrConfig;
+
+    // First get a listing if the first group of items, and put them in an array indexed by title
+    $sql= 'SELECT feedItem_status, feedItem_description, feedItem_id, feedItem_title, feedItem_pubDate '.
+          '  FROM '.$table.' LIMIT '.($config->webItemsPerLoad*2);
+    $reader = $db->createCommand($sql)->query();
+    $items = array();
+    foreach($reader as $row) 
+    {
+      $items[$row['feedItem_title']][] = $row;
+    }
+    // Then get a listing with a group by clause on the title to get distinct titles, and a count to let us know when
+    // to look for extras in the first array
+    $sql= 'SELECT count(*) as count, * '.
+          '  FROM ( SELECT feedItem_status, feedItem_description, feedItem_id, feedItem_title, feedItem_pubDate '.
+                 '    FROM '.$table.' LIMIT '.($config->webItemsPerLoad*2).
+                 ')'.
+          ' GROUP BY feedItem_title LIMIT '.$config->webItemsPerLoad; 
+    $reader = $db->createCommand($sql)->query();
+    $output = array();
+    foreach($reader as $row) 
+    {
+      if($row['count'] == 1)
+        $output[] = $row;
+      else {
+        // use reference to prevent making aditional copy of array
+        $data =& $items[$row['feedItem_title']];
+        usort($data, array($this, 'cmpItemStatus'));
+        $output[] = $data;
+      }
+    }
+    return $output;
+  }
+
+  public static function cmpItemStatus($a, $b) {
+    
+    return($a['feedItem_status'] < $b['feedItem_status']);
   }
 
   // the core of this logic might be better served in a different class

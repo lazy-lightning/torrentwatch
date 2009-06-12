@@ -10,13 +10,19 @@
         $n=0;
         $dlFeedItemLink = CHtml::link('', array('dlFeedItem', 'id'=>'{id}'), array('class'=>'context_link'));
         $addFavoriteLink =  CHtml::link('', array('addFavorite', 'feedItem_id'=>'{id}'), array('class'=>'context_link'));
-        foreach($tvEpisodes as $tvEpisode) {
-          echo "<li class='torrent match_".reset(explode(' ', feedItem::getStatusText($tvEpisode['feedItem_status']))).(++$n%2?' alt':'')."' ".
-               "    title='".CHtml::encode($tvEpisode['feedItem_description'])."'>".
-               "  <input type='hidden' name='itemId' class='itemId' value='".$tvEpisode['feedItem_id']."'>".
-               "  <span class='torrent_name'>".CHtml::encode($tvEpisode['feedItem_title'])."</span>".
-               "  <span class='torrent_pubDate'>".CHtml::encode(date("Y M d h:i a", $tvEpisode['feedItem_pubDate']))."</span>".
-               "</li>";
+        foreach($tvEpisodes as $foo) {
+          // Ugly method to show grouped items
+          if(isset($foo['feedItem_title'])) {
+            $foo = array($foo);
+          }
+          foreach($foo as $tvEpisode) {
+            echo "<li class='torrent match_".strtok(feedItem::getStatusText($tvEpisode['feedItem_status']), ' ').(++$n%2?' alt':'')."' ".
+                 "    title='".CHtml::encode($tvEpisode['feedItem_description'])."'>".
+                 "  <input type='hidden' name='itemId' class='itemId' value='".$tvEpisode['feedItem_id']."'>".
+                 "  <span class='torrent_name'>".CHtml::encode($tvEpisode['feedItem_title'])."</span>".
+                 "  <span class='torrent_pubDate'>".CHtml::encode(date("Y M d h:i a", $tvEpisode['feedItem_pubDate']))."</span>".
+                 "</li>"; 
+          }
         } ?>
     </ul>
   </div>

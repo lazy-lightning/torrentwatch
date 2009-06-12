@@ -6,11 +6,12 @@ class feedItem extends CActiveRecord
   const STATUS_NEW = 0;
   const STATUS_NOMATCH = 1;
   const STATUS_MATCH = 2;
-  const STATUS_AUTO_DL = 3;
-  const STATUS_MANUAL_DL = 4;
   const STATUS_FAILED_DL = 5;
   const STATUS_DUPLICATE = 6;
   const STATUS_OLD = 7;
+  // Higher numbers so they can be sorted as "better" matches
+  const STATUS_AUTO_DL = 20;
+  const STATUS_MANUAL_DL = 21;
 
   const TYPE_TORRENT = 0;
   const TYPE_NZB = 1;
