@@ -123,12 +123,7 @@ class BrowserEmulator {
     $boundry = '----------------------------795088511166260704540879626';
 
     $this->headerLines["Accept"] = ' text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
-    $this->headerLines["Accept-Language"] = "en-us,en;q=0.5";
-    $this->headerLines["Accept-Charset"] = "ISO-8859-1,utf-8;q=0.7,*;q=0.7";
-    $this->headerLines["Keep-Alive"] = 300;
-    $this->headerLines["Connection"] = 'keep-alive';
-    $this->headerLines["Referer"] = 'http://192.168.1.121:8080/sabnzbd/';
-    $this->headerLines["Cookie"] = 'session_id=a5c9c9851b9e633a8a852f9cf22db5490a271c21; PHPSESSID=86a3ea31ed4e2360b41a2bcbd2eef4de';
+    $this->headerLines["Connection"] = 'Close';
     $this->headerLines["Content-Type"] = "multipart/form-data; boundary=$boundry";
     $out = '';
     foreach($this->postData as $item => $data) {
@@ -251,9 +246,9 @@ class BrowserEmulator {
           $request .= $PostString;
         }
     }
-    // small block size.  When letting php decide previously sometimes the full upload on larger(100kb+)
+    // specific block size.  When letting php decide previously sometimes the full upload on larger(100kb+)
     // uploads didn't make it.
-    $bs = 4096;
+    $bs = 16384; // 16KB
     for ($written = 0; $written < strlen($PostString); $written += $fwrite) {
       $fwrite = fwrite($socket, substr($request, $written, $bs), $bs);
       if (!$fwrite) {

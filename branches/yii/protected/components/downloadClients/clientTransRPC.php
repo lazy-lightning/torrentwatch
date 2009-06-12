@@ -1,6 +1,6 @@
 <?php
 
-class clientTransmissionRPC extends baseClient {
+class clientTransmissionRPC extends BaseClient {
 
   function addByData($data) {
     $dest = $this->getSaveInDirectory($data);

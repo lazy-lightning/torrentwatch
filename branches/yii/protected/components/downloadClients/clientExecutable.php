@@ -1,6 +1,6 @@
 <?php
 
-abstract class clientExecutable extends baseClient {
+abstract class clientExecutable extends BaseClient {
 
   // save the file to a temporary directory so it can be passed by commandline
   function saveTemp($data) {
