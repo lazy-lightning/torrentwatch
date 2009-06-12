@@ -23,6 +23,7 @@ INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('tempDir','/tmp'
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('feedItemLifetime',7,NULL);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('torClient','clientNZBGet',NULL);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('nzbClient','clientTrans122',NULL);
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('webItemsPerLoad', 50, NULL);
 -- BTPD
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('executable','/mnt/syb8634/bin/btcli',2);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('directory','/share/.btpd',2);
