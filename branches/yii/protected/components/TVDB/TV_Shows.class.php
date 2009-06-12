@@ -21,12 +21,16 @@
 			$data = self::request($params);
 			
 			if($data) {
-				$xml = simplexml_load_string($data);
-				$shows = array();
-				foreach($xml->Series as $show) {
-					$shows[] = self::findById((string)$show->seriesid);
-				}
-		
+        libxml_use_internal_errors(true);
+  			$xml = simplexml_load_string($data);
+        if($xml) {
+  				$shows = array();
+  				foreach($xml->Series as $show) {
+  					$shows[] = self::findById((string)$show->seriesid);
+  				}
+        } else {
+          Yii::log("Invalid XML when loading $showName from TVDB", CLogger::LEVEL_ERROR);
+        }
 				return $shows;
 			}
 		}
@@ -42,12 +46,12 @@
 		
 			
 			if ($data) {
+        libxml_use_internal_errors(true);
 				$xml = simplexml_load_string($data);
-				$show = new TV_Show($xml->Series);
-				return $show;
-			} else {
-				return false;
+        if($xml)
+  				return new TV_Show($xml->Series);
 			}
+  		return false;
 		}
 	}
 
