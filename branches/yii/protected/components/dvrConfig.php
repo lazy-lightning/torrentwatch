@@ -23,16 +23,24 @@ abstract class BaseDvrConfig extends CAttributeCollection {
 
   public function save() {
     $key = $value = 0;
-    $cmd = Yii::app()->db->createCommand('UPDATE dvrConfig SET value = :value WHERE key = :key AND dvrConfigCategory_id = :catId');
+    $sql = 'UPDATE dvrConfig SET value = :value WHERE key = :key AND dvrConfigCategory_id';
+    if($this->_id === null)
+      $sql .= ' IS NULL';
+    else
+      $sql .= ' = :catId';
+
+    $cmd = Yii::app()->db->createCommand($sql);
     $cmd->bindParam(':key', $key);
     $cmd->bindParam(':value', $value);
-    $cmd->bindValue(':catId', $this->_id === null ? 'NULL' : $this->_id);
+    if($this->_id !== null)
+      $cmd->bindValue(':catId', $this->_id);
 
     foreach($this->_changed as $key => $foo) {
       $value = $this->$key;
       if(is_object($value))
         $value->save();
       else {
+        Yii::log("update dvrConfig set value = $value where key = $key and dvrConfigCategory_id = ".($this->_id === null ? 'null' : $this->_id), CLogger::LEVEL_ERROR);
         $cmd->execute();
       }
     }
