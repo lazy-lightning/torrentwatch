@@ -1,8 +1,13 @@
 <?php
 
-class clientFolder extends BaseClient {
+class clientFolder extends BaseClient 
+{
+  public function __construct($manager) {
+    parent::__construct($manager);
+  }
 
-  public function addByData($data) {
+  public function addByData($data) 
+  {
     $saveIn = $this->getSaveInDirectory();
     $title = strtr('/', '_', $this->manager->title);
 
@@ -10,8 +15,10 @@ class clientFolder extends BaseClient {
 
     $filename = "$saveIn/$title.$extension";
 
-    if(file_exists($filename)) {
-      for($i=0;file_exists($filename);$i++) {
+    if(file_exists($filename)) 
+    {
+      for($i=0;file_exists($filename);$i++) 
+      {
           $filename = "$saveIn/$title.$i.$extension";
       }
     }
@@ -23,7 +30,8 @@ class clientFolder extends BaseClient {
     return $return;
   }
 
-  public function getClassName() {
+  public function getClassName() 
+  {
     return __CLASS__;
   }
 }

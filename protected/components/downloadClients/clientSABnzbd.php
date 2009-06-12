@@ -1,5 +1,5 @@
 <?
-class clientSABnzbd extends baseClient {
+class clientSABnzbd extends BaseClient {
 
   function addByData($data) {
     // Emulate submitting the add file box on the sabnzbd+ home page
@@ -11,6 +11,7 @@ class clientSABnzbd extends baseClient {
     $result = $be->file_get_contents($this->config->baseApi.'addFile');
 
     $successString = 'This resource resides temporarily at';
+    Yii::log("title: ".$this->manager->title, CLogger::LEVEL_ERROR);
     return substr($result, 0, strlen($successString)) == $successString ? True : False;
   }
 
