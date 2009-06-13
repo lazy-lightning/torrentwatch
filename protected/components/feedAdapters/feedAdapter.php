@@ -1,6 +1,7 @@
 <?php
 
 require_once('SimplePie_1.1.3/simplepie.inc');
+require_once('feedAdapter_File');
 
 class feedAdapter extends SimplePie {
   // the feed active record class the adapter is to work with
