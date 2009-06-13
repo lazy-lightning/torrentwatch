@@ -309,7 +309,9 @@ class AjaxController extends CController
           '  FROM ( SELECT feedItem_status, feedItem_description, feedItem_id, feedItem_title, feedItem_pubDate '.
                  '    FROM '.$table.' LIMIT '.($config->webItemsPerLoad*2).
                  ')'.
-          ' GROUP BY feedItem_title LIMIT '.$config->webItemsPerLoad; 
+          ' GROUP BY feedItem_title'.
+          ' ORDER BY feedItem_pubDate DESC'.
+          ' LIMIT '.$config->webItemsPerLoad; 
     $reader = $db->createCommand($sql)->query();
     $output = array();
     foreach($reader as $row) 
