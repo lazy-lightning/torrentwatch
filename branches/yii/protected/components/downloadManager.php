@@ -30,25 +30,70 @@ abstract class favoriteManager extends CComponent {
    * @param integer a feeditem status to limit the search to
    */
   public function checkMovieFavorites($itemStatus = feedItem::STATUS_NEW) {
+    Yii::log('Looking for movie favorites', CLogger::LEVEL_ERROR);
+    $db = Yii::app()->db;
+    $toStart = array();
+    $duplicates = array();
+
+    // Mark any previously downloaded movies that are now matching
+    $db->createCommand(
+      'UPDATE feedItem'.
+      '   SET status='.feedItem::STATUS_DUPLICATE.
+      ' WHERE feedItem.status = '.$itemStatus.
+      '   AND feedItem.id IN ( SELECT feedItem_id'.
+                            '    FROM matchingFavoriteMovies m'.
+                            '   WHERE m.movie_status = '.movie::STATUS_DOWNLOADED.
+                            ');'
+    )->execute();
+
+    // Get any matching items from the db
+    $reader = $db->createCommand(
+        'SELECT * FROM matchingFavoriteMovies'.
+        ' WHERE feedItem_status='.$itemStatus.
+        '   AND movie_status='.movie::STATUS_NEW
+    )->query();
+
+    foreach($reader as $row) {
+      $toStart[$row['movie_id']][] = $row;
+    }
+    
+    foreach($toStart as $items) {
+      // For now just take the first feedItem for each movie, but this
+      // structure allows there to be a decision making process inserted
+      // here to decide which item based on feed priority or something.
+      $success = false;
+      foreach($items as $item) {
+        if($success) {
+          $duplicates[] = $item['feedItem_id'];
+        } else {
+          $success = $this->startDownload($item, feedItem::STATUS_AUTO_DL);
+        }
+      }
+    }
+
+    // After matching has occured, updated item statuses
+    if(count($duplicates) !== 0) // mark feedItems as duplicate if another feedItem of the same season and episode
+      feedItem::model()->updateByPk($duplicates, array('status'=>feedItem::STATUS_DUPLICATE)); // has been downloaded
   }
 
   /**
    * looks for feedItems that matching a favoriteString in the database
+   * and starts them.   Needs some work to prevent duplicate downloads
    * @param integer a feeditem status to limit the search to
    */
   public function checkStringFavorites($itemStatus = feedItem::STATUS_NEW) {
-    // db view not completed
-    return;
+    Yii::log('Looking for string favorites', CLogger::LEVEL_ERROR);
+    $db = Yii::app()->db;
+    $toStart = array();
 
-    $dldEpisodes = array();
-
-    $reader = Yii::app()->db->createCommand(
+    $reader = $db->createCommand(
         'SELECT * FROM matchingFavoriteStrings'.
         '  WHERE feedItem_status='.$itemStatus)->query();
 
     foreach($reader as $row) {
-      $this->startDownload($row, feedItem::STATUS_AUTO_DL);
+      $this->startDownload($item, feedItem::STATUS_AUTO_DL);
     }
+    
   }
 
   /**
@@ -56,6 +101,7 @@ abstract class favoriteManager extends CComponent {
    * @param integer a feeditem status to limit the search to
    */
   public function checkTvShowFavorites($itemStatus = feedItem::STATUS_NEW) {
+    Yii::log('Looking for TvShow favorites', CLogger::LEVEL_ERROR);
     $duplicates = $old = $dldEpisodes = array();
     $db = Yii::app()->db;
 
@@ -84,7 +130,9 @@ abstract class favoriteManager extends CComponent {
     $season = $episode = 0;
     $reader = $db->createCommand(
         'SELECT * FROM matchingFavoriteTvShows'.
-        '  WHERE feedItem_status='.$itemStatus)->query();
+        ' WHERE feedItem_status='.$itemStatus.
+        '   AND tvEpisode_status='.tvEpisode::STATUS_NEW
+    )->query();
 
     // loop through the matching items
     // and group the duplicates by tvEpisode_id
@@ -262,6 +310,7 @@ class downloadManager extends favoriteManager {
    * @param integer the status to set related feeditem to on successfull start,.  from feedItem::STATUS_*
    */
   public function startDownload($opts, $status) {
+    Yii::log('Starting download', CLogger::LEVEL_ERROR);
     $error = False;
     // $opts is used in the various get functions to make the following code cleaner
     $this->opts = $opts;
@@ -271,6 +320,7 @@ class downloadManager extends favoriteManager {
     // Update status as neccessary
     if($success) {
       if(is_numeric($tvEpisode_id = $this->tvEpisodeId)) {
+        Yii::log("Setting tvEpisode $tvEpisodeId to STATUS_DOWNLOADED", CLogger::LEVEL_ERROR);
         tvEpisode::model()->updateByPk(
             $tvEpisodeId, array('status'=>tvEpisode::STATUS_DOWNLOADED)
         );

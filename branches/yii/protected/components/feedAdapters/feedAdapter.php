@@ -32,10 +32,8 @@ class feedAdapter extends SimplePie {
     $items = $this->get_items();
     Yii::log(count($items)." items to consider", CLogger::LEVEL_ERROR);
     foreach($items as $item) {
-      Yii::log("Testing item: ".$item->get_title(), CLogger::LEVEL_ERROR);
       $hash = md5($item->get_id());
       if(false === feedItem::model()->exists('hash=:hash', array(':hash'=>$hash))) {
-        Yii::log("Creating item from ".get_class($item), CLogger::LEVEL_ERROR);
         feedItem::factory(array(
               'hash'        => $hash,
               'feed_id'     => $this->_feedAR->id,
