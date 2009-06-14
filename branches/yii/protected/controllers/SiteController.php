@@ -52,6 +52,13 @@ class SiteController extends BaseController
 		$this->render('contact',array('contact'=>$contact));
 	}
 
+  public function actionErrors()
+  {
+    if($errors = Yii::app()->errorHandler->error)
+      $this->render('error', $error);
+    else
+      throw new CHttpException('404', 'The specified page could not be found');
+  }
   /**
    * This is the action called from the sidebar to list
    * the types of favorites available.

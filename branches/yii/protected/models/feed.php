@@ -101,7 +101,6 @@ class feed extends CActiveRecord
       Yii::log("Skip all feeds placeholder");
       return;
     }
-
     // initialize the adapter
 
     // Chooses and returns the proper feedAapter for this feed
