@@ -308,7 +308,10 @@ class YiiBase
 		else
 		{
       // ERIK remove error suppression
-			include($className.'.php');
+      if(NMTDVR_DISPLAY_INCLUDE_ERRORS)
+  			include($className.'.php');
+      else
+        @include($className.'.php');
 			return class_exists($className,false);
 		}
 		return true;
