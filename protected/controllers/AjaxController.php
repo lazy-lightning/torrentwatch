@@ -53,26 +53,33 @@ class AjaxController extends CController
     if(isset($_GET['feedItem_id']) && is_numeric($_GET['feedItem_id']))
     {
       $feedItem = feedItem::model()->with('quality')->findByPk($_GET['feedItem_id']);
-      if(!empty($feedItem->tvEpisode_id)) {
+      if(!empty($feedItem->tvEpisode_id)) 
+      {
         $fav=new favoriteTvShow;
         $fav->tvShow_id = $feedItem->tvEpisode->tvShow_id;
-      } elseif(!empty($feedItem->movie_id)) {
+      } 
+      elseif(!empty($feedItem->movie_id)) 
+      {
         $fav=new favoriteMovie;
         $fav->genre = $feedItem->movie->genre;
         $fav->name = $feedItem->title;
-      } elseif(!empty($feedItem->other_id)) {
+      } 
+      elseif(!empty($feedItem->other_id)) 
+      {
         $fav = new favoriteString;
         $fav->filter = $fav->name = $feedItem->title;
       }
       $fav->feed_id = 0;
 
       $ids = array();
-      foreach($feedItem->quality as $quality) {
+      foreach($feedItem->quality as $quality) 
+      {
         $ids[] = $quality->id;
       }
       $fav->qualityIds = $ids;
 
-      if($fav->save()) {
+      if($fav->save()) 
+      {
       }
     }
     // should have another else to direct to an error, also if ->save() fails
