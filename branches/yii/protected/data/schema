@@ -123,47 +123,16 @@ SELECT feedItem.id feedItem_id,
    AND tvEpisode.tvShow_id = tvShow.id
    AND feed.id = feedItem.feed_id
  ORDER BY feedItem.pubDate DESC;
-CREATE VIEW matchingFavoriteTvShows AS
-SELECT i.feedItem_id feedItem_id,
-       i.feedItem_title feedItem_title,
-       i.feedItem_status feedItem_status,
-       i.feedItem_downloadType as feedItem_downloadType,
-       i.feedItem_url feedItem_url,
-       i.feed_id feed_id,
-       i.feed_url feed_url,
-       i.tvEpisode_id tvEpisode_id,
-       i.tvEpisode_season tvEpisode_season,
-       i.tvEpisode_episode tvEpisode_episode,
-       i.tvEpisode_status tvEpisode_status,
-       i.tvShow_id tvShow_id,
-       i.tvShow_title tvShow_title,
-       f.id favoriteTvShows_id,
-       f.saveIn favorite_saveIn,
-       f.seedRatio favorite_seedRatio,
-       f.onlyNewer favorite_onlyNewer
-  FROM tvFeedItem i, favoriteTvShows f
-  WHERE i.tvShow_id = f.tvShow_id
-    AND (f.feed_id = i.feed_id OR f.feed_id = 0)
-    AND (  SELECT COUNT(feedItem_quality.quality_id)
-             FROM feedItem_quality, favoriteTvShows_quality
-            WHERE feedItem_quality.feedItem_id = i.feedItem_id
-              AND feedItem_quality.quality_id = favoriteTvShows_quality.quality_id
-              AND favoriteTvShows_quality.favoriteTvShows_id = f.id
-        ) =
-        ( SELECT COUNT(favoriteTvShows.id)
-            FROM favoriteTvShows, favoriteTvShows_quality
-           WHERE favoriteTvShows.id = favoriteTvShows_quality.favoriteTvShows_id
-             AND favoriteTvShows.id = f.id
-        );
 CREATE VIEW matchingFavoriteMovies AS
 SELECT i.id feedItem_id,
        i.title feedItem_title,
        i.status feedItem_status,
        i.downloadType as feedItem_downloadType,
-       i.movie_id as movie_id,
        i.url feedItem_url,
        feed.id feed_id,
        feed.url feed_url,
+       m.id movie_id,
+       m.status movie_status,
        f.id favoriteMovies_id,
        f.saveIn favorite_saveIn
   FROM favoriteMovies f, movie m, feedItem i
@@ -221,6 +190,38 @@ SELECT i.id feedItem_id,
         )
     AND i.title LIKE f.filter
     AND i.title NOT LIKE f.notFilter;
+CREATE VIEW matchingFavoriteTvShows AS
+SELECT i.feedItem_id feedItem_id,
+       i.feedItem_title feedItem_title,
+       i.feedItem_status feedItem_status,
+       i.feedItem_downloadType as feedItem_downloadType,
+       i.feedItem_url feedItem_url,
+       i.feed_id feed_id,
+       i.feed_url feed_url,
+       i.tvEpisode_id tvEpisode_id,
+       i.tvEpisode_season tvEpisode_season,
+       i.tvEpisode_episode tvEpisode_episode,
+       i.tvEpisode_status tvEpisode_status,
+       i.tvShow_id tvShow_id,
+       i.tvShow_title tvShow_title,
+       f.id favoriteTvShows_id,
+       f.saveIn favorite_saveIn,
+       f.seedRatio favorite_seedRatio,
+       f.onlyNewer favorite_onlyNewer
+  FROM tvFeedItem i, favoriteTvShows f
+  WHERE i.tvShow_id = f.tvShow_id
+    AND (f.feed_id = i.feed_id OR f.feed_id = 0)
+    AND (  SELECT COUNT(feedItem_quality.quality_id)
+             FROM feedItem_quality, favoriteTvShows_quality
+            WHERE feedItem_quality.feedItem_id = i.feedItem_id
+              AND feedItem_quality.quality_id = favoriteTvShows_quality.quality_id
+              AND favoriteTvShows_quality.favoriteTvShows_id = f.id
+        ) =
+        ( SELECT COUNT(favoriteTvShows.id)
+            FROM favoriteTvShows, favoriteTvShows_quality
+           WHERE favoriteTvShows.id = favoriteTvShows_quality.favoriteTvShows_id
+             AND favoriteTvShows.id = f.id
+        );
 CREATE VIEW movieFeedItem AS
 SELECT feedItem.id feedItem_id,
        feedItem.title feedItem_title,
