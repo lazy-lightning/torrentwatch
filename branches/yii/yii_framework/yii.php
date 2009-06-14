@@ -26,29 +26,5 @@ require(dirname(__FILE__).'/YiiBase.php');
  */
 class Yii extends YiiBase
 {
-  /**
-   * Class autoload loader.
-   * This method is provided to be invoked within an __autoload() magic method.
-   * This is extended to remove the @ sign hiding errors in my php after the last
-   * else statement
-   * @param string class name
-   * @return boolean whether the class has been loaded successfully
-   */
-  public static function autoload($className)
-  {
-    // use include so that the error PHP file may appear
-    if(isset(self::$_coreClasses[$className]))
-      include(YII_PATH.self::$_coreClasses[$className]);
-    else if(isset(self::$_classes[$className]))
-      include(self::$_classes[$className]);
-    else
-    {
-      include($className.'.php');
-      return class_exists($className,false);
-    }
-    return true;
-  }
-
 }
 
-spl_autoload_register(array('Yii', 'autoload'));
