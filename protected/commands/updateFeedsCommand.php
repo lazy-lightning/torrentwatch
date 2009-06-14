@@ -2,6 +2,7 @@
 
 class updateFeedsCommand extends CConsoleCommand {
   public function run($args) {
+
     $feeds = feed::model()->findAll();
    
     foreach($feeds as $feed) {
