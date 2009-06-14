@@ -10,7 +10,7 @@
       <label class="category">Web UI Settings</label>
       <div id="config_webui"> <!-- Only used by the javascript, selected via cookie -->
         <label class="item select">Font Size:</label>
-        <select name="webui" id="config_webui">
+        <select name="webui">
           <option value="Small">Small</option>
           <option value="Medium" selected>Medium</option>
           <option value="Large">Large</option>
@@ -20,11 +20,6 @@
       <div id="config_downloaddir" title="Default directory to start items in">
         <?php echo CHtml::activeLabel($config, 'downloadDir', array('class'=>'item')).': '.
                    CHtml::activeTextField($config, 'downloadDir'); ?>
-      </div>
-      <label class="category" id="torrent_settings">Torrent Settings</label>
-      <div id="config_watchdir">
-        <?php echo CHtml::activeLabel($config, 'watchDir', array('class'=>'item textinput')).': '.
-                   CHtml::activeTextField($config, 'watchDir'); ?>
       </div>
       <div id="config_savetorrent">
         <?php echo CHtml::activeCheckBox($config, 'saveFile').' '.
@@ -98,9 +93,13 @@
     <div class="activeFeed">
       <?php echo CHtml::beginForm(array('addFeed'), 'post', array('class'=>'feedform')); ?>
         <a class="submitForm button" id="Add" href="#">Add</a>
-        <label class="item">New Feed</label>
-        <input type="text" name="feed[url]" id="feed_url">
-        <?php echo CHtml::dropDownList('feed[downloadType]', 0, array(feedItem::TYPE_NZB=>'NZB', feedItem::TYPE_TORRENT=>'Torrent')); ?>
+        <div>
+          <label class="item">New Feed</label>
+          <?php echo CHtml::dropDownList('feed[downloadType]', 0, array(feedItem::TYPE_NZB=>'NZB', feedItem::TYPE_TORRENT=>'Torrent')); ?>
+        </div>
+        <div>
+          <input type="text" name="feed[url]" id="feed_url">
+        </div>
         <div class="buttonContainer">
           <a class='toggleDialog button' href='#'>Close</a>
         </div>

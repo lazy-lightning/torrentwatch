@@ -57,13 +57,12 @@ class AjaxController extends CController
         $fav=new favoriteTvShow;
         $fav->tvShow_id = $feedItem->tvEpisode->tvShow_id;
       } elseif(!empty($feedItem->movie_id)) {
-        $fav=new favoriteMovies;
+        $fav=new favoriteMovie;
         $fav->genre = $feedItem->movie->genre;
         $fav->name = $feedItem->title;
       } elseif(!empty($feedItem->other_id)) {
-        $fav = new favoriteStrings;
-        $fav->filter = $feedItem->title;
-        $fav->name = $feedItem->title;
+        $fav = new favoriteString;
+        $fav->filter = $fav->name = $feedItem->title;
       }
       $fav->feed_id = 0;
 
@@ -82,7 +81,7 @@ class AjaxController extends CController
 
   public function actionUpdateFavorite()
   {
-    foreach(array('favoriteTvShow', 'favoriteMovie', 'favoriteOther') as $item) 
+    foreach(array('favoriteTvShow', 'favoriteMovie', 'favoriteString') as $item) 
     {
       if(isset($_POST[$item])) 
       {
@@ -101,7 +100,7 @@ class AjaxController extends CController
       } 
       else 
       {
-        if(isset($_GET['id'])) 
+        if(isset($_GET['id']) && is_numeric($_GET['id'])) 
         {
           Yii::log('updating favorite', CLogger::LEVEL_ERROR);
           $favorite = $model->findByPk($_GET['id']);
@@ -181,8 +180,9 @@ class AjaxController extends CController
     $logger = Yii::getLogger();
     Yii::log("start controller responce: ".$logger->getExecutionTime()."\n", CLogger::LEVEL_ERROR);
     $config = $app->dvrConfig;
-    $favoriteMovies = favoriteMovies::model()->findAll();
+    $favoriteMovies = favoriteMovie::model()->findAll();
     $favoriteTvShows = favoriteTvShow::model()->with('tvShow','quality')->findAll();
+    $favoriteStrings = favoriteString::model()->findAll();
     $feeds = feed::model()->findAll(); // todo: not id 0, which is 'All'
     $availClients = $app->dlManager->availClients;
     $genres = genre::model()->findAll();
@@ -211,6 +211,7 @@ class AjaxController extends CController
           'config'=>$config,
           'favoriteTvShows'=>$favoriteTvShows,
           'favoriteMovies'=>$favoriteMovies,
+          'favoriteStrings'=>$favoriteStrings,
           'feeds'=>$feeds,
           'genres'=>$genres,
           'movies'=>$movies,
@@ -333,14 +334,14 @@ class AjaxController extends CController
     return($a['feedItem_status'] < $b['feedItem_status']);
   }
 
-  // the core of this logic might be better served in a different class
+  // this logic might be better served in a different class
   public function deleteFavorite($model, $class) {
     $id = (integer)$_GET['id'];
     Yii::log("deleting $class $id", CLogger::LEVEL_ERROR);
     // Have to get the matching information before deleting the row
     // Is casting id to integer enough to make it safe without bindValue?
     $sql = "SELECT feedItem_id FROM matching${class}s WHERE ${class}s_id = $id AND feedItem_status NOT IN".
-                  "('".feedItem::STATUS_AUTO_DL."', '".feedItem::STATUS_MANUAL_DL."');";
+                "('".feedItem::STATUS_AUTO_DL."', '".feedItem::STATUS_MANUAL_DL."');";
     $reader = Yii::app()->db->CreateCommand($sql)->query();
     $ids = array();
     foreach($reader as $row) {
@@ -349,8 +350,6 @@ class AjaxController extends CController
  
     if($model->deleteByPk($id))
     {
-      // Delete related many_many relationship
-      favoriteTvShows_quality::model()->deleteAll('favoriteTvShows_id=:id', array(':id'=>$id));
       // Reset feedItem status on anything this was matching, then rerun matching routine incase something else matches the reset items
       feedItem::model()->updateByPk($ids, array('status'=>feedItem::STATUS_NEW));
       Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NEW);

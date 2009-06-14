@@ -28,9 +28,6 @@ return array(
     'dvrConfig'=>array(
       'class'=>'dvrConfig',
     ),
-    'errorHandler'=>array(
-      'errorAction' => 'site/error',
-    ),
 		'log'=>array(
 			'class'=>'CLogRouter',
 			'routes'=>array(

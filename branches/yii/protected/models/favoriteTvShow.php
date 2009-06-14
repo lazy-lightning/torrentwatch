@@ -34,6 +34,7 @@ class favoriteTvShow extends ARwithQuality
 	public function relations()
 	{
 		return array(
+        'feed' => array(self::BELONGS_TO, 'feed', 'feed_id'),
         'tvShow' => array(self::BELONGS_TO, 'tvShow', 'tvShow_id'),
         'quality' => array(self::MANY_MANY, 'quality', 'favoriteTvShows_quality(favoriteTvShows_id, quality_id)'),
 		);
@@ -69,4 +70,8 @@ class favoriteTvShow extends ARwithQuality
     return parent::beforeSave();
   }
 
+  public function getName()
+  {
+    return $this->tvShow->title;
+  }
 }

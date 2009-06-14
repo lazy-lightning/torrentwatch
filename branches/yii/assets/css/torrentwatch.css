@@ -487,10 +487,16 @@ div.activeFeed label.item {
 	margin: 5px 0 0 0;
 	}
 
+div#configuration.dialog_window .feedForm select {
+  display: inline;
+  margin-left: 80px;
+  position: relative;
+  width: 100px;
+  }
+
 div#configuration.dialog_window div.activeFeed #feed_url[type=text] {
   position: relative;
-	width: 215px;
-	margin-top: 6px;
+	width: 285px;
 	}
 
 
