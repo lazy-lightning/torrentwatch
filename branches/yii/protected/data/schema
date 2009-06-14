@@ -5,7 +5,7 @@ CREATE TABLE favoriteMovies (
     name TEXT NOT NULL,
     genre_id INTEGER NOT NULL DEFAULT 0,
     quality_id INTEGER NOT NULL DEFAULT 0,
-    rating NUMERIC NOT_NULL DEFAULT 10, saveIn TEXT, feedId INTEGER, feed_id INTEGER,
+    rating NUMERIC NOT_NULL DEFAULT 10, saveIn TEXT, feedId INTEGER, feed_id INTEGER, minYear INTEGER NOT NULL DEFAULT 1900, maxYear INTEGER NOT NULL DEFAULT 2012,
     FOREIGN KEY (genre_id) REFERENCES genre(id)
     FOREIGN KEY (quality_id) REFERENCES quality(id)
 );
@@ -18,7 +18,7 @@ CREATE TABLE favoriteStrings (
   seedRatio NUMERIC,
   feed_id INTEGER,
   foo TEX
-);
+, name TEXT);
 CREATE TABLE favoriteStrings_quality ( favoriteStrings_id INTEGER NOT NULL, quality_id INTEGER NOT NULL );
 CREATE TABLE "favoriteTvShows" ("id" INTEGER PRIMARY KEY  NOT NULL ,"tvShow_id" INTEGER NOT NULL ,"feed_id" INTEGER,"saveIn" TEXT,"seedRatio" REAL,"onlyNewer" integer NOT NULL  DEFAULT 0 );
 CREATE TABLE favoriteTvShows_quality (
@@ -102,12 +102,6 @@ CREATE TABLE users (
   username TEXT,
   password TEXT
 );
-CREATE VIEW matchingFavoriteStrings AS
-SELECT *
-  FROM favoriteStrings, feedItem, feed
- WHERE favoriteStrings.filter LIKE feedItem.title
-   AND NOT favoriteStrings.notFilter LIKE feedItem.title
-   AND (favoriteStrings.feed_id = feedItem.feed_id OR favoriteStrings.feed_id = 0);
 CREATE VIEW tvFeedItem AS
 SELECT feedItem.id feedItem_id,
        feedItem.title feedItem_title,
@@ -161,6 +155,72 @@ SELECT i.feedItem_id feedItem_id,
            WHERE favoriteTvShows.id = favoriteTvShows_quality.favoriteTvShows_id
              AND favoriteTvShows.id = f.id
         );
+CREATE VIEW matchingFavoriteMovies AS
+SELECT i.id feedItem_id,
+       i.title feedItem_title,
+       i.status feedItem_status,
+       i.downloadType as feedItem_downloadType,
+       i.movie_id as movie_id,
+       i.url feedItem_url,
+       feed.id feed_id,
+       feed.url feed_url,
+       f.id favoriteMovies_id,
+       f.saveIn favorite_saveIn
+  FROM favoriteMovies f, movie m, feedItem i
+  LEFT OUTER JOIN feed
+    ON feed.id = i.feed_id
+ WHERE ( f.feed_id = 0
+         OR
+         f.feed_id = i.feed_id
+       )
+   AND i.movie_id = m.id
+   AND m.rating >= f.rating
+   AND f.genre_id IN ( SELECT movie_genre.genre_id
+                         FROM movie_genre
+                        WHERE m.id = movie_genre.movie_id
+                     )
+   AND m.year BETWEEN f.minYear AND f.maxYear
+   AND ( SELECT COUNT(fq.quality_id)
+           FROM feedItem_quality iq, favoriteMovies_quality fq
+          WHERE iq.feedItem_id = i.id
+            AND iq.quality_id = fq.quality_id
+            AND fq.favoriteMovies_id = f.id
+        ) =
+        ( SELECT COUNT(f.id)
+            FROM favoriteMovies, favoriteMovies_quality fq
+           WHERE favoriteMovies.id = f.id
+             AND favoriteMovies.id = fq.favoriteMovies_id
+        );
+CREATE VIEW matchingFavoriteStrings AS
+SELECT i.id feedItem_id,
+       i.title feedItem_title,
+       i.status feedItem_status,
+       i.downloadType as feedItem_downloadType,
+       i.url feedItem_url,
+       feed.id feed_id,
+       feed.url feed_url,
+       f.id favoriteStrings_id,
+       f.saveIn favorite_saveIn
+  FROM favoriteStrings f, feedItem i
+  LEFT OUTER JOIN feed
+    ON feed.id = i.feed_id
+ WHERE ( f.feed_id = 0
+         OR
+         f.feed_id = i.feed_id
+       )
+   AND ( SELECT COUNT(fq.quality_id)
+           FROM feedItem_quality iq, favoriteStrings_quality fq
+          WHERE iq.feedItem_id = i.id
+            AND iq.quality_id = fq.quality_id
+            AND fq.favoriteStrings_id = f.id
+        ) =
+        ( SELECT COUNT(f.id)
+            FROM favoriteStrings, favoriteStrings_quality fq
+           WHERE favoriteStrings.id = f.id
+             AND favoriteStrings.id = fq.favoriteStrings_id
+        )
+    AND i.title LIKE f.filter
+    AND i.title NOT LIKE f.notFilter;
 CREATE VIEW movieFeedItem AS
 SELECT feedItem.id feedItem_id,
        feedItem.title feedItem_title,

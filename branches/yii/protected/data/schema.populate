@@ -1,5 +1,6 @@
 -- Default username/pass
 INSERT INTO users (id, username, password) VALUES(1,'admin','admin');
+INSERT INTO users (id, username, password) VALUES(2,'demo','demo');
 
 -- Generic all_something identifiers
 INSERT INTO feed (id, title, description, url, status, lastUpdated) VALUES (0, 'All Feeds', '', '', 0, 0);
