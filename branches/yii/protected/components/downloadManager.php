@@ -174,7 +174,6 @@ class downloadManager extends favoriteManager {
 
     $success = $this->client->addByUrl($this->url);
 
-    // Update status as neccessary
     if($success) 
     {
       $history = new history;
@@ -184,9 +183,10 @@ class downloadManager extends favoriteManager {
       $history->feed_title = $this->feedTitle;
       $history->favorite_name = $this->favoriteName;
       $history->favorite_type = $this->favoriteType;
-
       $history->save();
-      if(is_numeric($tvEpisode_id = $this->tvEpisodeId)) 
+
+      // Update status as neccessary
+      if(is_numeric($tvEpisodeId = $this->tvEpisodeId)) 
       {
         Yii::log("Setting tvEpisode $tvEpisodeId to STATUS_DOWNLOADED", CLogger::LEVEL_ERROR);
         tvEpisode::model()->updateByPk(
@@ -210,7 +210,7 @@ class downloadManager extends favoriteManager {
       } 
       else 
       {
-        Yii::log("Unknown feeditem type in startDownload\n".print_r($this->opts, true), CLogger::LEVEL_ERROR);
+        Yii::log("Success starting, but Unknown feeditem type in startDownload\n".print_r($this->opts, true), CLogger::LEVEL_ERROR);
       }
     } 
     else 
