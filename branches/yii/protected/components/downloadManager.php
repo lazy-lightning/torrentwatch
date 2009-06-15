@@ -1,168 +1,5 @@
 <?php
 
-// client class accessed by controllers to start downloads
-abstract class favoriteManager extends CComponent {
-  abstract function startDownload($opts, $status);
-
-  // there must be a better way than the following for multiple favorites . . .
-  /**
-   * looks for feedItems that matching a favorite in the database
-   * @param integer a feeditem status to limit the search to
-   */
-  public function checkFavorites($itemStatus = feedItem::STATUS_NEW) {
-    $this->checkTvShowFavorites($itemStatus);
-    $this->checkMovieFavorites($itemStatus);
-    $this->checkStringFavorites($itemStatus);
-
-    // if we were checking new items, change all still new to nomatch
-    if($itemStatus === feedItem::STATUS_NEW) {
-      feedItem::model()->updateAll(
-          array('status'=>feedItem::STATUS_NOMATCH),
-          'status = :status',
-          array(':status'=>feedItem::STATUS_NEW)
-      );
-    }
-    
-  }
- 
-  /**
-   * looks for feedItems that matching a favoriteMovie in the database
-   * @param integer a feeditem status to limit the search to
-   */
-  public function checkMovieFavorites($itemStatus = feedItem::STATUS_NEW) {
-    Yii::log('Looking for movie favorites', CLogger::LEVEL_ERROR);
-    $db = Yii::app()->db;
-    $toStart = array();
-    $duplicates = array();
-
-    // Mark any previously downloaded movies that are now matching
-    $db->createCommand(
-      'UPDATE feedItem'.
-      '   SET status='.feedItem::STATUS_DUPLICATE.
-      ' WHERE feedItem.status = '.$itemStatus.
-      '   AND feedItem.id IN ( SELECT feedItem_id'.
-                            '    FROM matchingFavoriteMovies m'.
-                            '   WHERE m.movie_status = '.movie::STATUS_DOWNLOADED.
-                            ');'
-    )->execute();
-
-    // Get any matching items from the db
-    $reader = $db->createCommand(
-        'SELECT * FROM matchingFavoriteMovies'.
-        ' WHERE feedItem_status='.$itemStatus.
-        '   AND movie_status='.movie::STATUS_NEW
-    )->query();
-
-    foreach($reader as $row) {
-      $toStart[$row['movie_id']][] = $row;
-    }
-    
-    foreach($toStart as $items) {
-      // For now just take the first feedItem for each movie, but this
-      // structure allows there to be a decision making process inserted
-      // here to decide which item based on feed priority or something.
-      $success = false;
-      foreach($items as $item) {
-        if($success) {
-          $duplicates[] = $item['feedItem_id'];
-        } else {
-          $success = $this->startDownload($item, feedItem::STATUS_AUTO_DL);
-        }
-      }
-    }
-
-    // After matching has occured, updated item statuses
-    if(count($duplicates) !== 0) // mark feedItems as duplicate if another feedItem of the same season and episode
-      feedItem::model()->updateByPk($duplicates, array('status'=>feedItem::STATUS_DUPLICATE)); // has been downloaded
-  }
-
-  /**
-   * looks for feedItems that matching a favoriteString in the database
-   * and starts them.   Needs some work to prevent duplicate downloads
-   * @param integer a feeditem status to limit the search to
-   */
-  public function checkStringFavorites($itemStatus = feedItem::STATUS_NEW) {
-    Yii::log('Looking for string favorites', CLogger::LEVEL_ERROR);
-    $db = Yii::app()->db;
-    $toStart = array();
-
-    $reader = $db->createCommand(
-        'SELECT * FROM matchingFavoriteStrings'.
-        '  WHERE feedItem_status='.$itemStatus)->query();
-
-    foreach($reader as $row) {
-      $this->startDownload($item, feedItem::STATUS_AUTO_DL);
-    }
-    
-  }
-
-  /**
-   * looks for feedItems that matching a favoriteTvShow in the database
-   * @param integer a feeditem status to limit the search to
-   */
-  public function checkTvShowFavorites($itemStatus = feedItem::STATUS_NEW) {
-    Yii::log('Looking for TvShow favorites', CLogger::LEVEL_ERROR);
-    $duplicates = $old = $dldEpisodes = array();
-    $db = Yii::app()->db;
-
-    // Mark any duplicate episodes
-    $db->createCommand(
-        'UPDATE feedItem'.
-        '   SET status='.feedItem::STATUS_DUPLICATE.
-        ' WHERE feedItem.status = '.$itemStatus.
-        '   AND feedItem.id IN ( SELECT feedItem_id'.
-                              '    FROM matchingFavoriteTvShows m'.
-                              '   WHERE m.tvEpisode_status = '.tvEpisode::STATUS_DOWNLOADED.
-                              ');'
-    )->execute();
-
-    // Mark any old episodes with favorite set to only newer episodes(handled inside the view)
-    $db->createCommand(
-        'UPDATE feedItem'.
-        '   SET status='.feedItem::STATUS_OLD.
-        ' WHERE feedItem.status = '.$itemStatus.
-        '   AND feedItem.id IN ( SELECT feedItem_id'.
-                              '    FROM onlyNewerFeedItemFilter'.
-                              ')'
-    )->execute();
-
-    // get any matching items with the right itemStatus
-    $season = $episode = 0;
-    $reader = $db->createCommand(
-        'SELECT * FROM matchingFavoriteTvShows'.
-        ' WHERE feedItem_status='.$itemStatus.
-        '   AND tvEpisode_status='.tvEpisode::STATUS_NEW
-    )->query();
-
-    // loop through the matching items
-    // and group the duplicates by tvEpisode_id
-    $toStart = array();
-    foreach($reader as $row) {
-      $toStart[$row['tvEpisode_id']][] = $row;
-    }
-    unset($row);
-
-    foreach($toStart as $items) {
-      // For now just take the first item of each tvepisode, but this
-      // structure allows there to be a decision making process inserted
-      // here to decide which item based on feed priority or something.
-      $success = false;
-      foreach($items as $item) {
-        if($success) {
-          $duplicates[] = $item['feedItem_id'];
-        } else {
-          $success = $this->startDownload($item, feedItem::STATUS_AUTO_DL);
-        }
-      }
-    }
-
-    // After matching has occured, updated item statuses
-    if(count($duplicates) !== 0) // mark feedItems as duplicate if another feedItem of the same season and episode
-      feedItem::model()->updateByPk($duplicates, array('status'=>feedItem::STATUS_DUPLICATE)); // has been downloaded
-  }
-
-}
-
 class downloadManager extends favoriteManager {
   private $errors = array();
   private $_nzbClient, $_torClient;
@@ -178,45 +15,40 @@ class downloadManager extends favoriteManager {
   }
 
   /**
-   * finds the feeditem id from the passed download options
-   * @param mixed usually a row from a matchingFavorites view
-   *               it could also be a feed Item
+   * finds the feeditem id of the current item being started
+   * @param none
    */
   public function getFeedItemId() {
     return is_a($this->opts, 'feedItem') ? $this->opts->id : $this->opts['feedItem_id'];
   }
 
   /**
-   * finds the other id from the passed download options
-   * @param mixed usually a row from a matchingFavorites view
-   *               it could also be a feed Item
+   * finds the other id of the current item being started
+   * @param none
    */
   public function getOtherId() {
     return is_a($this->opts, 'feedItem') ? $this->opts->other_id : isset($this->opts['other_id']) ? $this->opts['other_id'] : False;
   }
 
   /**
-   * finds the movie id from the passed download options
-   * @param mixed usually a row from a matchingFavorites view
-   *               it could also be a feed Item
+   * finds the movie id of the current item being started
+   * @param none
    */
   public function getMovieId() {
     return is_a($this->opts, 'feedItem') ? $this->opts->movie_id : isset($this->opts['movie_id']) ? $this->opts['movie_id'] : False;
   }
 
   /**
-   * finds the tvEpisode id from the passed download options
-   * @param mixed usually a row from a matchingFavorites view
-   *               it could also be a feed Item
+   * finds the tvEpisode id of the current item being started
+   * @param none
    */
   public function getTvEpisodeId() {
     return is_a($this->opts, 'feedItem') ? $this->opts->tvEpisode_id : isset($this->opts['tvEpisode_id']) ? $this->opts['tvEpisode_id'] : False;
   }
 
   /**
-   * finds the url from the passed download options
-   * @param mixed usually a row from a matchingFavorites view
-   *               it could also be a feed Item
+   * finds the url of the current item being started
+   * @param none
    */
   public function getUrl() {
     if(is_a($this->opts, 'feedItem')) {
@@ -234,21 +66,40 @@ class downloadManager extends favoriteManager {
   }
 
   /**
-   * finds the title from the passed download options
-   * @param mixed usually a row from a matchingFavorites view
-   *               it could also be a feed Item
+   * finds the title of the current item being started
+   * @param none
    */
   public function getTitle() {
     return is_array($this->opts) ? $this->opts['feedItem_title'] : $this->opts->title;
   }
 
   /**
-   * finds the download type from the passed download options
-   * @param mixed usually a row from a matchingFavorites view
-   *               it could also be a feed Item
+   * finds the download type of the current item being started
+   * @param none
    */
   public function getDownloadType() {
     return is_array($this->opts) ? $this->opts['feedItem_downloadType'] : $this->opts->downloadType;
+  }
+
+  public function getFeedId() {
+    return is_array($this->opts) ? $this->opts['feed_id'] : $this->opts->feed_id;
+  }
+
+  public function getFeedTitle() {
+    return is_array($this->opts) ? $this->opts['feed_title'] : $this->opts->feed->title;
+  }
+
+  public function getFavoriteName() {
+    return is_array($this->opts) ? $this->opts['favorite_name'] : 'Manual DL';
+  }
+
+  public function getFavoriteType() {
+    if(!is_array($this->opts))
+      return null;
+
+    return isset($this->opts['favoriteTvShows_id']) ? 'tvEpisode' :
+           isset($this->opts['favoriteMovies_id']) ? 'Movie' :
+           isset($this->opts['favoriteStrings_id']) ? 'String' : null;
   }
 
   /**
@@ -270,11 +121,14 @@ class downloadManager extends favoriteManager {
     );
   }
 
-  public function getClient() {
+  public function getClient() 
+  {
     $type = $this->downloadType;
-    switch($type) {
+    switch($type) 
+    {
       case feedItem::TYPE_TORRENT:
-        if($this->_torClient === null) {
+        if($this->_torClient === null) 
+        {
           $class = Yii::app()->dvrConfig->torClient;
           if(in_array($class, array_keys($this->availClients[$type])))
             $this->_torClient = new $class($this);
@@ -282,11 +136,11 @@ class downloadManager extends favoriteManager {
         return $this->_torClient;
         break;
       case feedItem::TYPE_NZB:
-        if($this->_nzbClient === null) {
+        if($this->_nzbClient === null) 
+        {
           $class = Yii::app()->dvrConfig->nzbClient;
-          if(in_array($class, array_keys($this->availClients[$type]))) {
+          if(in_array($class, array_keys($this->availClients[$type]))) 
             $this->_nzbClient = new $class($this);
-          }
         }
         return $this->_nzbClient;
         break;
@@ -294,14 +148,16 @@ class downloadManager extends favoriteManager {
     Yii::log("Unknown download type\n".print_r($this->opts, true), CLogger::LEVEL_ERROR);
   }
 
-  public function getErrors() {
+  public function getErrors() 
+  {
     return $this->errors;
   }
 
   /**
    * Required to be initialized as a Yii Component and accessed as Yii::app()->objectname
    */
-  public function init() {
+  public function init() 
+  {
   }
 
   /**
@@ -309,7 +165,8 @@ class downloadManager extends favoriteManager {
    * @param mixed either a feedItem object or a row returned from the various matching views in the db
    * @param integer the status to set related feeditem to on successfull start,.  from feedItem::STATUS_*
    */
-  public function startDownload($opts, $status) {
+  public function startDownload($opts, $status) 
+  {
     Yii::log('Starting download', CLogger::LEVEL_ERROR);
     $error = False;
     // $opts is used in the various get functions to make the following code cleaner
@@ -318,24 +175,46 @@ class downloadManager extends favoriteManager {
     $success = $this->client->addByUrl($this->url);
 
     // Update status as neccessary
-    if($success) {
-      if(is_numeric($tvEpisode_id = $this->tvEpisodeId)) {
+    if($success) 
+    {
+      $history = new history;
+      $history->feedItem_id = $this->feedItemId;
+      $history->feedItem_title = $this->title;
+      $history->feed_id = $this->feedId;
+      $history->feed_title = $this->feedTitle;
+      $history->favorite_name = $this->favoriteName;
+      $history->favorite_type = $this->favoriteType;
+
+      $history->save();
+      if(is_numeric($tvEpisode_id = $this->tvEpisodeId)) 
+      {
         Yii::log("Setting tvEpisode $tvEpisodeId to STATUS_DOWNLOADED", CLogger::LEVEL_ERROR);
         tvEpisode::model()->updateByPk(
             $tvEpisodeId, array('status'=>tvEpisode::STATUS_DOWNLOADED)
         );
-      } elseif(is_numeric($movieId = $this->movieId)) {
+        
+      } 
+      elseif(is_numeric($movieId = $this->movieId)) 
+      {
+        Yii::log("Setting movie $movieId to STATUS_DOWNLOADED", CLogger::LEVEL_ERROR);
         movie::model()->updateByPk(
             $movieId, array('status' => movie::STATUS_DOWNLOADED)
         );
-      } elseif(is_numeric($otherId = $this->otherId)) {
+      } 
+      elseif(is_numeric($otherId = $this->otherId)) 
+      {
+        Yii::log("Setting other $otherId to STATUS_DOWNLOADED", CLogger::LEVEL_ERROR);
         other::model()->updateByPk(
             $otherId, array('status' => other::STATUS_DOWNLOADED)
         );
-      } else {
+      } 
+      else 
+      {
         Yii::log("Unknown feeditem type in startDownload\n".print_r($this->opts, true), CLogger::LEVEL_ERROR);
       }
-    }  else {
+    } 
+    else 
+    {
       $error = $this->errors[] = $this->client->getError();
       $status = feedItem::STATUS_FAILED_DL;
       Yii::log("Failed starting download: ".$error, CLogger::LEVEL_ERROR);
