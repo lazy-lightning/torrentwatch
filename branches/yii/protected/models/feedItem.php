@@ -211,13 +211,13 @@ class feedItem extends CActiveRecord
           .'(?:.+)?'; // Episode title: optinal, length is determined by the episode match
     // Episode
     $episode_reg =
-           '\b('  // must be a word boundry before the episode
-          .'S\d+[. ]?E\d+'.'|'  // S12E1 or S1.E22 or S4 E1
+           '('  // must be a word boundry before the episode
+          .'S\d+[. _]?E\d+'.'|'  // S12E1 or S1.E22 or S4 E1
           .'\d+x\d+' .'|'  // 1x23
           .'\d+[. ]?of[. ]?\d+'.'|'  // 03of18
           .'[\d -.]{10}'   // 2008-03-23 or 07.23.2008 or .20082306. etc
           .')';
-    $episode_reg2 = '\b(\d\d\d)\b'; // three (four hits movie years) with a word boundry on each side, ex: some.show.402.hdtv
+    $episode_reg2 = '\b(\d\d\d)\b'; // three digits (four hits movie years) with a word boundry on each side, ex: some.show.402.hdtv
   
     // Possible Qualitys
     $qual_reg ='(DVB' .'|'
@@ -259,7 +259,6 @@ class feedItem extends CActiveRecord
 
     if(preg_match("/$title_reg$episode_reg/i", $this->title, $regs)) {
       $episode_guess = trim($regs[2]);
-      // Is this str_replace still needed?
       $shortTitle = trim($regs[1]);
       $episode_guess = trim(strtr($episode_guess, $from, $to));
       // if match was a date season will receive it, guaranteed no x in the date from previous regexp so episode will be empty
