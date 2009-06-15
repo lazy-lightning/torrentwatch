@@ -114,7 +114,7 @@ $(function() {
       return false;
     });
     // Clear Cache ajax submit
-    $("#clear_cache a:not(.toggleDialog)").click(function() {
+    $("a.ajaxSubmit").live('click', function() {
       $.get(this.href, '', $.loadDynamicData, 'html');
       return false;
     });

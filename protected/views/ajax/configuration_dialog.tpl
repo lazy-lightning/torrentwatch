@@ -85,7 +85,7 @@
       <?php foreach($feeds as $feed):
               if($feed->id === '0') continue; // the generic 'all' feeds ?>
       <div class="activeFeed" title="<?php echo CHtml::encode($feed->url); ?>">
-        <?php echo CHtml::link('Delete', array('deleteFeed', 'id'=>$feed->id), array('class'=>'button', 'id'=>'Delete')); ?>
+        <?php echo CHtml::link('Delete', array('deleteFeed', 'id'=>$feed->id), array('class'=>'button ajaxSubmit', 'id'=>'Delete')); ?>
         <?php echo CHtml::encode($feed->title); ?>
       </div>
      <?php endforeach; ?>

@@ -22,6 +22,10 @@ class feedAdapter extends SimplePie {
     if($this->error()) {
       $this->_feedAR->status = feed::STATUS_ERROR;
       Yii::log("Error loading feed {$this->_feed->title}: ".$this->error());
+      if(empty($this->_feedAR->title)) {
+        // new record
+        $this->_feedAR->title = 'Error initializing feed';
+      }
       return False;
     }
 
