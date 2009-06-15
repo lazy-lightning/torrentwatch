@@ -173,7 +173,7 @@ class AjaxController extends CController
       } 
       elseif(False === Yii::app()->dlManager->startDownload($feedItem, feedItem::STATUS_MANUAL_DL)) 
       {
-        $error = 'Failed: '.Yii::app()->dlManager->getErrors();
+        $error = 'Failed: '.print_r(Yii::app()->dlManager->getErrors(), true);
       }
     } else
       $error = 'No id given';

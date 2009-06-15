@@ -1,6 +1,8 @@
 <?php
 
-/* Only used for the transmission RPC connection */
+/* used for the transmission RPC connection 
+ * and the SABnzbd+ file submit 
+ */
 
 /***************************************************************************
 
@@ -68,6 +70,7 @@ class BrowserEmulator {
   var $authPass = "";
   var $port;
   var $lastResponse = '';
+  var $lastRequest = '';
   var $debug = false;
  
   function BrowserEmulator() {
@@ -108,7 +111,7 @@ class BrowserEmulator {
   /**
   * Add a post parameter. Post parameters are sent in the body of an HTTP POST request.
   **/
-  function addPostData($name, $value) {
+  function addPostData($name, $value = '') {
     $this->postData[$name] = $value;
   }
  
@@ -228,8 +231,10 @@ class BrowserEmulator {
           } else {
             $PostStringArray = Array();
             foreach ($this->postData AS $key=>$value) {
-              $PostStringArray[] = "$key=$value";
-            
+              if(empty($value))
+                $PostStringArray[] = $key;
+              else
+                $PostStringArray[] = "$key=$value";
             }
             $PostString = join("&", $PostStringArray);
           }
@@ -246,10 +251,12 @@ class BrowserEmulator {
           $request .= $PostString;
         }
     }
+    $this->lastRequest = $request;
+
     // specific block size.  When letting php decide previously sometimes the full upload on larger(100kb+)
     // uploads didn't make it.
     $bs = 16384; // 16KB
-    for ($written = 0; $written < strlen($PostString); $written += $fwrite) {
+    for ($written = 0; $written < strlen($request); $written += $fwrite) {
       $fwrite = fwrite($socket, substr($request, $written, $bs), $bs);
       if (!$fwrite) {
         break;
