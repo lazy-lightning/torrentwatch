@@ -4,7 +4,7 @@
     <li><a href="#movies_container"><span>Movies</span></a></li>
     <li><a href="#others_container"><span>Others</span></a></li>
   </ul>
-  <div id="tvEpisodes_container">
+  <div class="feedItems" id="tvEpisodes_container">
     <ul>
       <?php
         $n=0;
@@ -26,7 +26,7 @@
         } ?>
     </ul>
   </div>
-  <div id="movies_container">
+  <div class="feedItems" id="movies_container">
     <ul>
       <?php
         $n=0;
@@ -40,7 +40,7 @@
         } ?>
     </ul>
   </div>
-  <div id="others_container">
+  <div class="feedItems" id="others_container">
     <ul>
       <?php 
         $n=0;

@@ -19,6 +19,8 @@
       $i=1;
       $favorite = new $class;
       include VIEWPATH.$class.'.tpl';
+      // $$ points to the variable named in the named variable
+      // so $favoriteTvShows, or whatever
       if($$favType !== null) {
         foreach($$favType as $favorite) 
           include VIEWPATH.$class.'.tpl';
