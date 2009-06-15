@@ -56,6 +56,17 @@ CREATE TABLE genre (
   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   title VARCHAR(128) NOT NULL
 );
+CREATE TABLE history (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  feedItem_id INTEGER NOT NULL,
+  feedItem_title TEXT,
+  feed_id INTEGER,
+  feed_title TEXT,
+  favorite_name TEXT,
+  status INTEGER NOT NULL DEFAULT 0,
+  date INTEGER NOT NULL,
+  favorite_type TEXT
+);
 CREATE TABLE "movie" ("id" INTEGER PRIMARY KEY  NOT NULL ,"title" TEXT,"imdbId" INTEGER,"status" INTEGER NOT NULL  DEFAULT 0 ,"name" TEXT,"year" TEXT,"runtime" TEXT,"rating" NUMERIC,"plot" TEXT, "lastImdbUpdate" INTEGER DEFAULT 0);
 CREATE TABLE movie_genre (
   movie_id INTEGER NOT NULL,
@@ -112,6 +123,7 @@ SELECT feedItem.id feedItem_id,
        feedItem.description feedItem_description,
        feedItem.feed_id feed_id,
        feed.url feed_url,
+       feed.title feed_title,
        tvEpisode.id tvEpisode_id,
        tvEpisode.season tvEpisode_season,
        tvEpisode.episode tvEpisode_episode,
@@ -131,8 +143,10 @@ SELECT i.id feedItem_id,
        i.url feedItem_url,
        feed.id feed_id,
        feed.url feed_url,
+       feed.title feed_title,
        m.id movie_id,
        m.status movie_status,
+       f.name favorite_name,
        f.id favoriteMovies_id,
        f.saveIn favorite_saveIn
   FROM favoriteMovies f, movie m, feedItem i
@@ -168,6 +182,8 @@ SELECT i.id feedItem_id,
        i.url feedItem_url,
        feed.id feed_id,
        feed.url feed_url,
+       feed.title feed_title,
+       f.name favorite_name,
        f.id favoriteStrings_id,
        f.saveIn favorite_saveIn
   FROM favoriteStrings f, feedItem i
@@ -198,12 +214,13 @@ SELECT i.feedItem_id feedItem_id,
        i.feedItem_url feedItem_url,
        i.feed_id feed_id,
        i.feed_url feed_url,
+       i.feed_title feed_title,
        i.tvEpisode_id tvEpisode_id,
        i.tvEpisode_season tvEpisode_season,
        i.tvEpisode_episode tvEpisode_episode,
        i.tvEpisode_status tvEpisode_status,
        i.tvShow_id tvShow_id,
-       i.tvShow_title tvShow_title,
+       i.tvShow_title favorite_name,
        f.id favoriteTvShows_id,
        f.saveIn favorite_saveIn,
        f.seedRatio favorite_seedRatio,
@@ -231,7 +248,7 @@ SELECT feedItem.id feedItem_id,
        feedItem.url feedItem_url,
        feedItem.feed_id feed_id,
        feed.url feed_url,
-       movie.id as movie_id,
+       feed.title feed_title,       movie.id as movie_id,
        movie.title as movie_title,
        movie.imdbId as movie_imdbId,
        movie.rating as movie_rating
@@ -261,6 +278,7 @@ SELECT feedItem.id feedItem_id,
        feedItem.url feedItem_url,
        feedItem.feed_id feed_id,
        feed.url feed_url,
+       feed.title feed_title,
        other.id as other_id,
        other.title as other_title
   FROM feed, feedItem, other
