@@ -25,17 +25,19 @@ $(function() {
             return;
         $(this).addClass('selected').siblings().removeClass("selected");
         var filter = this.id;
-        $("div#feedItems_container > div:visible").slideUp(400, function() {
+        var container = $("div#feedItems_container > div:visible");
+        container.slideUp(400, function() {
             var tor = $("li.torrent").removeClass('hidden');
             switch (filter) {
             case 'filter_matching':
-                tor.filter(".match_nomatch").addClass('hidden');
+                tor.filter(".match_New, .match_Unmatched, .match_Auto").addClass('hidden');
                 break;
             case 'filter_downloaded':
-                tor.not('.match_cachehit, .match_match, .match_downloaded').addClass('hidden');
+                tor.not('.match_Automatic, .match_Manual, .match_Failed').addClass('hidden');
                 break;
             }
-            tor.markAlt().closest("#feedItems_container > div").slideDown(400);
+            tor.markAlt();
+            container.slideDown(400);
         });
     });
     // Filter Bar -- By Text
