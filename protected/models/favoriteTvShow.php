@@ -70,6 +70,30 @@ class favoriteTvShow extends ARwithQuality
     return parent::beforeSave();
   }
 
+  public function beforeValidate($type)
+  {
+    if($this->isNewRecord && is_string($this->tvShow_id)) {
+      try {
+        $this->tvShow_id = factory::tvShowByTitle($this->tvShow_id)->id;
+        Yii::log('Set tvShow_id to '.$this->tvShow_id, CLogger::LEVEL_ERROR);
+      } catch ( Exception $e) {
+        Yii::log('Failed adding tvShow for new favorite validation: '.$e->error, CLogger::LEVEL_ERROR);
+        return False;
+      }
+    }
+    return parent::beforeValidate($type);
+  }
+
+  public function deleteByPk($pk,$condition='',$params=array())
+  {
+    if(parent::deleteByPk($pk, $condition, $params))
+    {
+      favoriteTvShows_quality::model()->deleteAll('favoriteTvShows_id = :id', array(':id'=>$pk));
+      return True;
+    }
+    return False;
+  }
+
   public function getName()
   {
     return $this->tvShow->title;
