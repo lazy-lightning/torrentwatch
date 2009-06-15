@@ -35,7 +35,7 @@ INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('directory','/sh
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('executable','/mnt/syb8634/bin/nzbget',6);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('nzbgetConf','/share/.nzbget/nzbget.conf',6);
 -- Transmission RPC
-INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('baseApi','http://localhost:9000/transmission/',5);
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('baseApi','http://localhost:9091/transmission/',5);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('seedRatio',0,5);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('username','',5);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('password','',5);

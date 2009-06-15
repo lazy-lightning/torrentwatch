@@ -1,35 +1,54 @@
 <?php
 
-class clientTransmissionRPC extends BaseClient {
+class clientTransRPC extends BaseClient {
+
+  // browser emulator
+  private $be = null;
 
   function addByData($data) {
     $dest = $this->getSaveInDirectory($data);
     // transmission dies with bad folder if dest doesn't end in a /
-    if(substr($dest, strlen($dest)-1, 1) != '/')
+    if(substr($dest, -1, 1) !== '/')
       $dest .= '/';
+    // transmission also doesn't like a doubled up / in the request uri
+    $api = $this->config->baseApi;
+    if(substr($api, -1, 1) !== '/')
+      $api .= '/';
+    $api .= 'rpc';
 
+    if($this->be === null) {
+      $this->be = new browserEmulator();
+      if(!empty($this->config->username))
+        $this->be->setAuth($this->config->username, $this->config->password);
+      $this->be->addHeaderLine('Content-Type', 'application/json');
+      $this->be->addHeaderLine('Connection', 'Close');
+    }
 
+    $this->be->resetPostData();
     $args = array('download-dir' => $dest, 
                   'metainfo'     => base64_encode($data));
-    // The new transmission doesn't let you set seedratio from the initial add, have to send
-    // a modify request
-    //$seedRatio = $this->config->seedRatio;
-    //if($seedRatio != "" && $seedRatio >= 0)
-    //  $args['ratio-limit'] = $seedRatio;
+    $this->be->addPostData(json_encode(array('method'=>'torrent-add', 'arguments'=>$args)));
 
-    $be = new browserEmulator();
-    if(!empty($this->config->username))
-      $be->setAuth($this->config->username, $this->config->password);
-    $be->addPostData(json_encode(array('method'=>'torrent-add', 'arguments'=>$args)));
-    $be->addHeader('Content-Type', 'application/json');
-    $be->addHeader('Connection', 'Close');
 
-    $responce = json_decode($be->file_get_contents($this->config->api));
-    
-    if(isset($responce['result']) AND ($responce['result'] == 'success' or $responce['result'] == 'duplicate torrent'))
+    $responce = $this->be->file_get_contents($api);
+
+    // Invalid session id, set it and try again
+    if(substr($responce, 0, 7) === '<h1>409')
+    {
+      if(preg_match('/X-Transmission-Session-Id: ([A-Za-z0-9]+)/', $responce, $regs)) {
+        $this->be->addHeaderLine('X-Transmission-Session-Id', $regs[1]);
+        $responce = $this->be->file_get_contents($api);
+      }
+    }
+        
+    $responce = json_decode($responce);
+
+    if(isset($responce->result) AND ($responce->result == 'success' or $responce->result == 'duplicate torrent'))
       return True;
 
-    if(isset($responce['result']))
+    file_put_contents('/tmp/transRpc.Failure', $this->be->lastRequest."\n\n".$this->be->lastResponce);
+
+    if(isset($responce->result))
       $this->_error = "Transmission RPC Error: ".print_r($responce);
     else 
       $this->_error = "Failure connecting to Transmission RPC at ";
