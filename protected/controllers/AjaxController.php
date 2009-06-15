@@ -191,6 +191,7 @@ class AjaxController extends CController
     $favoriteTvShows = favoriteTvShow::model()->with('tvShow','quality')->findAll();
     $favoriteStrings = favoriteString::model()->findAll();
     $feeds = feed::model()->findAll(); // todo: not id 0, which is 'All'
+    $history = history::model()->findAll();
     $availClients = $app->dlManager->availClients;
     $genres = genre::model()->findAll();
 
@@ -221,6 +222,7 @@ class AjaxController extends CController
           'favoriteStrings'=>$favoriteStrings,
           'feeds'=>$feeds,
           'genres'=>$genres,
+          'history'=>$history,
           'movies'=>$movies,
           'others'=>$others,
           'qualitys'=>$qualitys,

@@ -579,24 +579,39 @@ div#history {
 	height: 250px;
 	}
 
-ul#historyItems {
-	position: inherit;
+div#history ul {
+	position: relative;
+  background-color: #FFF;
+  border-width: 1px 1px 0;
 	top: 0;
 	bottom: 35px;
 	left: 0;
 	right: 0;
-	height: 222px;
+	height: 217px;
 	overflow: auto;
-	border-bottom: 1px solid #979797;
-	padding: 2px 0 0 10px;
+	padding: 2px 0 0 3px;
 	}
 
-div#history ul li{
+div#history ul li {
 	white-space: nowrap;
 	overflow: hidden;
 	font-size: 0.9em
-	}
+  background: #e9e9e9;
+  min-height: 22px;
+  }
 
+div#history ul li.alt {
+	background-color: #EDF3FE;
+  }
+
+
+div#history .date {
+  float: right;
+  }
+
+div.hItemDetails {
+  display: none;
+  }
 
 div#history a {
 	position: inherit;
