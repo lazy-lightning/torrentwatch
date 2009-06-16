@@ -76,6 +76,90 @@ function strpos_reverse_way($string,$charToFind,$relativePos = null) {
     }
     //
 }
+
+//
+// next couple functions from swisscenter base/utils.php by robert taylor
+//
+
+// ----------------------------------------------------------------------------------
+// Returns all the hyperlinks that are in the given string that match the specified
+// regular expression ($search) within the href portion of the link.
+// ----------------------------------------------------------------------------------
+
+function get_urls_from_html ($string, $search )
+{
+  preg_match_all ('/<a.*href="(.*'.$search.'[^"]*)"[^>]*>(.*)<\/a>/Ui', $string, &$matches);
+
+  for ($i = 0; $i<count($matches[2]); $i++)
+    $matches[2][$i] = preg_replace('/<[^>]*>/','',$matches[2][$i]);
+
+  return $matches;
+}
+
+// ----------------------------------------------------------------------------------------
+// Removes common parts of filenames that we don't want to search for...
+// (eg: file extension, file suffix ("CD1",etc) and non-alphanumeric chars.
+// ----------------------------------------------------------------------------------------
+function strip_title ($title)
+{
+  $search  = array ( '/\.[^.]*$/U'
+                   , '/\(.*\)/'
+                   , '/\[.*]/'
+                   , '/\s[^\w&$]/'
+                   , '/[^\w&$]\s/'
+                   , '/\sCD[^\w].*/i'
+                   , '/ +$/'
+                   , '/_/'
+                   , '/\./');
+
+  $replace = array ( ''
+                   , ' '
+                   , ' '
+                   , ' '
+                   , ' '
+                   , ' '
+                   , ''
+                   , ' '
+                   , ' ');
+
+  return preg_replace($search, $replace, $title);
+}
+
+// Next function from SwissCenter video_obtain_info.php by robert taylor
+  // ----------------------------------------------------------------------------------------
+  // Given a string to search for ($needle) and an array of possible matches ($haystack) this
+  // function will return the index number of the best match and set $accuracy to the value
+  // determined (0-100). If no match is found, then this function returns FALSE
+  // ----------------------------------------------------------------------------------------
+
+  function best_match ( $needle, $haystack, &$accuracy )
+  {
+    $best_match = array("id" => 0, "chars" => 0, "pc" => 0);
+
+    for ($i=0; $i<count($haystack); $i++)
+    {
+      $chars = similar_text(trim($needle),trim($haystack[$i]),$pc);
+      $haystack[$i] .= " (".round($pc,2)."%)";
+
+      if ( ($chars > $best_match["chars"] && $pc >= $best_match["pc"]) || $pc > $best_match["pc"])
+        $best_match = array("id" => $i, "chars" => $chars, "pc" => $pc);
+    }
+
+    // If we are sure that we found a good result, then get the file details.
+    if ($best_match["pc"] > 75)
+    {
+      Yii::log('Possible matches are:'.implode(', ', $haystack), CLogger::LEVEL_ERROR);;
+      Yii::log('Best guess: ['.$best_match["id"].'] - '.$haystack[$best_match["id"]], CLogger::LEVEL_ERROR);
+      $accuracy = $best_match["pc"];
+      return $best_match["id"];
+    }
+    else
+    {
+      Yii::log("Multiple Matches found, No match > 75%\n".implode(', ', $haystack), CLogger::LEVEL_ERROR);
+      return false;
+    }
+  }
+
 //define imdb fetch class:
 class IMDbFetch {
     var $notavailable =  '- not available at the moment -';
@@ -114,7 +198,7 @@ class IMDbFetch {
         if(!$this->success)
           return;
 
-        $searchPage = $file->body;
+        $searchPage = html_entity_decode($file->body, ENT_QUOTES);
         //
         //IMDB ID:
         //
@@ -289,18 +373,48 @@ class IMDbFetch {
             echo '<img src="'.$this->poster_image_link.'" alt="'.$this->name.'"/>';
         }
     }
+
     //
     static public function find($title) {
-      //
-      $findUrl = 'http://www.imdb.com/find?s=tt&q='.urlencode($title).'&x=0&y=0';
-      //
+      // sometimes 1080 is stuck at the end, should filter it out before the items are created
+      // and ever end up at this function
+      if(substr($title, -4) === '1080')
+        $title = trim(substr($title, 0, -4));
+
+      $title = strip_title($title);
+
+      // If the title contains a year then remove it from search(imdb doesn't like it) and
+      // adjust the returned page to include year in search
+      if(preg_match('/(.*)(\d\d\d\d/)', $title, $regs) != 0)
+      {
+        $title = $regs[1];
+        $title_year = $regs[2];
+      }
+
+      $findUrl = 'http://www.imdb.com/find?s=tt&q='.str_replace('%20', '+', urlencode($title));
       $file = new feedAdapter_File($findUrl, 10, 0);
       if(!$file->success)
         return False;
   
-      $searchPage = $file->body;
-      //
-  
+      $searchPage = html_entity_decode($file->body, ENT_QUOTES);
+
+      if(isset($title_year)) 
+      {
+        $searchPage = preg_replace('/<\/a>\s+\((\d\d\d\d).*\)/Ui', ' ($1)</a>', $searchPage);
+        $title .= " $title_year";
+      }
+
+      // Check if no matches were found
+      if(strpos(strtolower($searchPage), "no matches") !== false)
+        return False;
+
+      $searchPage = substr($searchPage, strpos($searchPage, "Titles"));
+      $matches = get_urls_from_html($searchPage, '\/title\/tt\d+\/');
+      $index = best_match($title, $matches[2], $accuracy);
+
+      if($accuracy <= 75)
+        return False;
+
       $imdbFindStartTag = '<b>Popular Titles';
       $imdbFindEndTag   = '</table>';
       $imdbFindString = extractStringFromString($searchPage, $imdbFindStartTag, $imdbFindEndTag);
@@ -331,6 +445,7 @@ class IMDbFetch {
       }
       return $imdbFindArray2;
       //
+      
   }
 }
 
