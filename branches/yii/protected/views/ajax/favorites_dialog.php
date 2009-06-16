@@ -10,13 +10,13 @@
     <ul class="favorite">
      <li><a href="#<?php echo $favType; ?>-1">New Favorite</a></li>
      <?php if($$favType !== null): 
-            $i=2;foreach($$favType as $fav): ?>
-       <li><a href="#<?php echo $favType.'-'.$i++.'">'.$fav->name;?></a></li>
+            foreach($$favType as $fav): ?>
+       <li><a href="#<?php echo $favType.'-'.$favorite->id.'">'.$fav->name;?></a></li>
       <?php endforeach;
            endif; ?>
     </ul>
     <?php 
-      $i=1;
+      // Empty favorite seen as 'New Favorite' above
       $favorite = new $class;
       include VIEWPATH.$class.'.php';
       // $$ points to the variable named in the named variable
