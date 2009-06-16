@@ -8,10 +8,10 @@
          $class = substr($favType, 0, -1); ?>
    <div id="<?php echo $favType; ?>">
     <ul class="favorite">
-     <li><a href="#<?php echo $favType; ?>-1">New Favorite</a></li>
+     <li><a href="#<?php echo $favType; ?>-">New Favorite</a></li>
      <?php if($$favType !== null): 
             foreach($$favType as $fav): ?>
-       <li><a href="#<?php echo $favType.'-'.$favorite->id.'">'.$fav->name;?></a></li>
+       <li><a href="#<?php echo $favType.'-'.$fav->id.'">'.$fav->name;?></a></li>
       <?php endforeach;
            endif; ?>
     </ul>
