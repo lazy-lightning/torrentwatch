@@ -1,6 +1,6 @@
 <?php
 
-class updateIMDBCommand extends CConsoleCommand {
+class updateIMDbCommand extends CConsoleCommand {
 
   public function run($args) {
     require_once('TVDB.php');
@@ -22,7 +22,7 @@ class updateIMDBCommand extends CConsoleCommand {
 
       echo "Looking for Imdb Id: ".$row['imdbId']."\n";
       $url = sprintf('http://www.imdb.com/title/tt%07d/', $row['imdbId']);
-      $scraper = new imdbFetch($url);
+      $scraper = new IMDbFetch($url);
 
       if(!$scraper->success) {
         echo "Failed scrape\n";
