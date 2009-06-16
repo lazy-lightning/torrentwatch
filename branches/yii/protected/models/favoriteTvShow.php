@@ -72,7 +72,7 @@ class favoriteTvShow extends ARwithQuality
 
   public function beforeValidate($type)
   {
-    if($this->isNewRecord && is_string($this->tvShow_id)) {
+    if($this->isNewRecord && !is_numeric($this->tvShow_id)) {
       try {
         $this->tvShow_id = factory::tvShowByTitle($this->tvShow_id)->id;
         Yii::log('Set tvShow_id to '.$this->tvShow_id, CLogger::LEVEL_ERROR);
