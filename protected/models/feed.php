@@ -121,4 +121,26 @@ class feed extends CActiveRecord
     // update the db with new title/description/update time and status
     $this->save();
   }
+
+  function deleteByPk($pk, $condition='',$params=array())
+  {
+    if(parent::deleteByPk($pk, $condition, $params))
+    {
+      if(!is_array($pk))
+        $pk = array($pk);
+
+      // how can this be done using a 'WHERE feed_id IN :feed_id' clause safely?
+      // $where = "feed_id IN ('".implode("', '", $a)."')";
+      // but not safe at all, must be a better way
+      foreach($pk as $item)
+      {
+        feedItem::model()->deleteAll('feed_id = :feed_id', array(':feed_id'=>$item));
+        favoriteTvShow::model()->updateAll(array('feed_id'=>0), 'feed_id = :feed_id', array('feed_id'=>$item));
+        favoriteMovie::model()->updateAll(array('feed_id'=>0), 'feed_id = :feed_id', array('feed_id'=>$item));
+        favoriteString::model()->updateAll(array('feed_id'=>0), 'feed_id = :feed_id', array('feed_id'=>$item));
+      }
+      return True;
+    }
+    return False;
+  }
 }
