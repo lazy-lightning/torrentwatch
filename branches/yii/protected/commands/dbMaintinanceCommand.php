@@ -7,17 +7,17 @@ class dbMaintinanceCommand extends CConsoleCommand {
     $querys = array(
         //  Delete items more than the configured  days old
         'DELETE FROM feedItem'.
-        ' WHERE feedItem.pubDate < \''.(time()-(3600*24*Yii::app()->dvrConfig->feedItemLifetime)).'\';',
+        ' WHERE feedItem.pubDate < '.(time()-(3600*24*Yii::app()->dvrConfig->feedItemLifetime)).';',
         // Delete others that dont point to a feed item anymore
         // Unless they have been marked downloaded, so it doesn't download same title in future
         'DELETE FROM other'.
         ' WHERE id NOT IN (SELECT other_id FROM feedItem)'.
-        '   AND status = \''.other::STATUS_NEW.'\';',
+        '   AND status = '.other::STATUS_NEW.';',
         // Delete movies that dont point to a feed item anymore
         // Unless they have been marked downloaded, so it doesn't download same title in future
         'DELETE FROM movie'.
         ' WHERE id NOT IN (SELECT movie_id FROM feedItem)'.
-        '   AND status = \''.movie::STATUS_NEW.'\';',
+        '   AND status = '.movie::STATUS_NEW.';',
         // Delete tvShows that dont point to a feed item(indirectly) or a favorite
         'DELETE FROM tvShow'.
         ' WHERE id NOT IN (SELECT tvShow_id FROM tvEpisode WHERE id IN (SELECT tvEpisode_id FROM feedItem))'.
@@ -30,7 +30,7 @@ class dbMaintinanceCommand extends CConsoleCommand {
         '         OR'.
         '         id NOT IN (SELECT tvEpisode_id FROM feedItem)'.
         '       )'.
-        '   AND status = \''.tvEpisode::STATUS_NEW.'\';',
+        '   AND status = '.tvEpisode::STATUS_NEW.';',
         //
     );
     // SQLite doesn't do anything with foreign keys, so clean out MANY_MANY relationships that point to
