@@ -53,6 +53,8 @@ class AjaxController extends CController
   // Adds a favorite given a feedItem_id
   public function actionAddFavorite()
   {
+    $responce = array('dialog'=>array('header'=>'Add Favorite'));
+
     if(isset($_GET['feedItem_id']) && is_numeric($_GET['feedItem_id']))
     {
       $feedItem = feedItem::model()->with('quality')->findByPk($_GET['feedItem_id']);

@@ -45,6 +45,8 @@ abstract class BaseDvrConfig extends CAttributeCollection {
       }
     }
     $this->_changed = array();
+
+    return True;
   }
 
   // attribute label functions copied from CModel since no multi-inheritance
