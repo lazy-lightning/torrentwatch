@@ -5,7 +5,7 @@
     if($favorite->isNewRecord) {
       echo CHtml::activeTextField($favorite, 'tvShow_id');
     } else {
-      echo CHtml::encode($favorite->tvShow->title);
+      echo CHtml::encode($favorite->name);
     }
   ?>
  </div>
