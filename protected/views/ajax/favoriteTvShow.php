@@ -7,7 +7,7 @@
       } ?>
  <div class="favorite_name">
   <?php 
-    echo CHtml::activeLabel($favorite, 'tvShow').': ';
+    echo CHtml::activeLabelEx($favorite, 'tvShow').': ';
     if($favorite->isNewRecord) {
       echo CHtml::activeTextField($favorite, 'tvShow_id');
     } else {
@@ -16,7 +16,7 @@
   ?>
  </div>
  <div class="favorite_savein">
-  <?php echo CHtml::activeLabel($favorite, 'saveIn').': '.
+  <?php echo CHtml::activeLabelEx($favorite, 'saveIn').': '.
              CHtml::activeTextField($favorite, 'saveIn'); ?>
  </div>
  <div class="favorite_episodes">
@@ -24,12 +24,12 @@
   <input type="text" name="favoriteTvShow[episodes]" value="" />
  </div>
  <div class="favorite_feed">
-  <?php echo CHtml::activeLabel($favorite, 'feedId').': '.
+  <?php echo CHtml::activeLabelEx($favorite, 'feedId').': '.
              CHtml::dropDownList('favoriteTvShow[feed_id]', $favorite->feed_id, CHtml::listData($feeds, 'id', 'title')); ?>
  </div>
  <div class="favorite_quality">
   <?php 
-    echo CHtml::activeLabel($favorite, 'quality').': ';
+    echo CHtml::activeLabelEx($favorite, 'quality').': ';
     $j=0;foreach($favorite->quality as $quality) {
       echo CHtml::dropDownList('quality_id['.++$j.']', $quality->id, CHtml::listData($qualitys, 'id', 'title'));
     } 
@@ -39,7 +39,7 @@
  </div>
  <div class="favorite_onlynewer">
   <?php echo CHtml::activeCheckBox($favorite, 'onlyNewer').' '.
-             CHtml::activeLabel($favorite, 'onlyNewer'); ?>
+             CHtml::activeLabelEx($favorite, 'onlyNewer'); ?>
  </div>
  <div class="buttonContainer">
    <a class="submitForm button" id="Update" href="#">Update</a>
