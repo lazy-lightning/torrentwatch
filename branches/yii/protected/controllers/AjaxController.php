@@ -147,17 +147,16 @@ class AjaxController extends CController
           $favorite->qualityIds = $_POST['quality_id'];
 
         $favorite->attributes = $_POST[$class];
-        if($favorite->save())
-        {
-          $responce['dialog']['content'] = "$class {$favorite->name} successfully saved";
-        }
+        if($favorite->save()) 
+          $responce['dialog']['content'] = $favorite->name.' has been saved';
         else
         {
-          $responce['dialog']['error'] = true;
-          $responce['dialog']['content'] = 'Error with validation';
-          // save with the same format as the id in the view, to be detected and show errors
-          // and to bring up the favorites dialog to show them
-          $responce[$class.'s-'.$favorite->id] = $favorite;
+          $htmlId = $class.'s-'.$favorite->id;
+          $responce['showTab'] = "#".$class."s";
+          $responce['showFavorite'] = "#".$htmlId;
+          // favorite view will pick this up and display validation errors
+          $htmlId = $class.'s-'.$favorite->id;
+          $responce[$htmlId] = $favorite;
         }
       }
     }
@@ -185,9 +184,8 @@ class AjaxController extends CController
       }
       else
       {
-        $responce['dialog']['error'] = true;
-        $responce['dialog']['content'] = 'Failure saving new feed';
         $responce['activeFeed-'] = $feed;
+        $responce['showTab'] = '#feeds';
       }
     }
     else
