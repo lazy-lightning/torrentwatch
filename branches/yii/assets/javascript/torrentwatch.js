@@ -232,7 +232,6 @@ $(function() {
     };
 
     $.showFavorite = function(hash) {
-      $.showTab($(hash).closest('form').get(0).id);
       $('<a href="'+hash+'"/>').toggleFavorite();
     };
 

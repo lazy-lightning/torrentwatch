@@ -1,28 +1,28 @@
 <?php echo CHtml::beginForm(array('updateFavorite', 'id'=>$favorite->id), 'post', array('class'=>'favinfo', 'id'=>'favoriteStrings-'.$favorite->id)); ?>
  <div class="favorite_name">
   <?php 
-    echo CHtml::activeLabel($favorite, 'name').': '.
+    echo CHtml::activeLabelEx($favorite, 'name').': '.
          CHtml::activeTextField($favorite, 'name'); ?>
  </div>
  <div class="favorite_savein">
-  <?php echo CHtml::activeLabel($favorite, 'saveIn').': '.
+  <?php echo CHtml::activeLabelEx($favorite, 'saveIn').': '.
              CHtml::activeTextField($favorite, 'saveIn'); ?>
  </div>
  <div class="favorite_feedId">
-  <?php echo CHtml::activeLabel($favorite, 'feedId').': '.
+  <?php echo CHtml::activeLabelEx($favorite, 'feedId').': '.
              CHtml::dropDownList('favoriteString[feed_id]', $favorite->feed_id, CHtml::listData($feeds, 'id', 'title')); ?>
  </div>
  <div class="favorite_filter">
-   <?php echo CHtml::activeLabel($favorite, 'filter').': '.
+   <?php echo CHtml::activeLabelEx($favorite, 'filter').': '.
               CHtml::activeTextField($favorite, 'filter'); ?>
  </div>
  <div class="favorite_notFilter">
-   <?php echo CHtml::activeLabel($favorite, 'notFilter').': '.
+   <?php echo CHtml::activeLabelEx($favorite, 'notFilter').': '.
               CHtml::activeTextField($favorite, 'notFilter'); ?>
  </div>
  <div class="favorite_quality">
   <?php  // show min 3 qualitys always, even if less are set
-    echo CHtml::activeLabel($favorite, 'quality').': ';
+    echo CHtml::activeLabelEx($favorite, 'quality').': ';
     $j=0;foreach($favorite->quality as $quality) {
       echo CHtml::dropDownList('quality_id['.++$j.']', $quality->id, CHtml::listData($qualitys, 'id', 'title'));
     }

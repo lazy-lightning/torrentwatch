@@ -255,6 +255,8 @@ div#inspector_container h2 {
 div.errorSummary {
   border: 1px solid black;
   padding: 0.2em 1em;
+  background-color: #FCFFF0;
+  margin-bottom: 1em;
   }
 
 div.errorSummary ul {
@@ -263,6 +265,10 @@ div.errorSummary ul {
   }
 
 div.errorSummary ul li {
+  }
+
+label.error {
+  font-weight: bold;
   }
 
 /*-------------------------

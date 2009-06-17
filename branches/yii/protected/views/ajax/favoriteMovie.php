@@ -5,36 +5,36 @@
       } ?>
  <div class="favorite_name">
   <?php 
-    echo CHtml::activeLabel($favorite, 'name').': '.
+    echo CHtml::activeLabelEx($favorite, 'name').': '.
          CHtml::activeTextField($favorite, 'name'); ?>
  </div>
  <div class="favorite_savein">
-  <?php echo CHtml::activeLabel($favorite, 'saveIn').': '.
+  <?php echo CHtml::activeLabelEx($favorite, 'saveIn').': '.
              CHtml::activeTextField($favorite, 'saveIn'); ?>
  </div>
  <div class="favorite_feed">
-  <?php echo CHtml::activeLabel($favorite, 'feedId').': '.
+  <?php echo CHtml::activeLabelEx($favorite, 'feedId').': '.
              CHtml::dropDownList('favoriteMovie[feed_id]', $favorite->feed_id, CHtml::listData($feeds, 'id', 'title')); ?>
  </div>
  <div class="favorite_rating">
-   <?php echo CHtml::activeLabel($favorite, 'rating').': '.
+   <?php echo CHtml::activeLabelEx($favorite, 'rating').': '.
               CHtml::activeTextField($favorite, 'rating'); ?>
  </div>
  <div class="favorite_minYear">
-   <?php echo CHtml::activeLabel($favorite, 'minYear').': '.
+   <?php echo CHtml::activeLabelEx($favorite, 'minYear').': '.
               CHtml::activeTextField($favorite, 'minYear'); ?>
  </div>
  <div class="favorite_maxYear">
-   <?php echo CHtml::activeLabel($favorite, 'maxYear').': '.
+   <?php echo CHtml::activeLabelEx($favorite, 'maxYear').': '.
               CHtml::activeTextField($favorite, 'maxYear');?>
  </div>
  <div class="favorite_genre">
-  <?php echo CHtml::activeLabel($favorite, 'genre_id').': '.
+  <?php echo CHtml::activeLabelEx($favorite, 'genre_id').': '.
              CHtml::dropDownList('favoriteMovie[genre_id]', $favorite->genre_id, CHtml::listData($genres, 'id', 'title')); ?>
  </div>
  <div class="favorite_quality">
   <?php  // show min 3 qualitys always, even if less are set
-    echo CHtml::activeLabel($favorite, 'quality').': ';
+    echo CHtml::activeLabelEx($favorite, 'quality').': ';
     $j=0;foreach($favorite->quality as $quality) {
       echo CHtml::dropDownList('quality_id['.++$j.']', $quality->id, CHtml::listData($qualitys, 'id', 'title'));
     }
