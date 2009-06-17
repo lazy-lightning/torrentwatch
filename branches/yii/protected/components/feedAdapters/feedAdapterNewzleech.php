@@ -9,15 +9,34 @@ class feedAdapterNewzleech extends feedAdapter {
   }
 
   // Prune out any feed item less than 100 MB
-  public function get_items($start = 0, $end = 0) {
+  public function get_items($start = 0, $end = 0) 
+  {
     $items = parent::get_items($start, $end);
     $out = array();
+    $types = array('KB'=>1, 'MB'=>2, 'GB'=>3);
 
     foreach($items as $item) {
+      $minSize = '100';
+      $minType = $types['MB'];
+
+      if(preg_match('/720p|1080[pi]/i', $item->get_title(), $quality))
+      {
+        if($quality[0][0] === '7')
+          $minSize = 600;
+        else
+        {
+          $minType = $types['GB'];
+          $minSize = 2;
+        }
+      }
       preg_match('/Size: (\d+)(?:.\d+)? (KB|MB|GB)/', $item->get_description(), $regs);
-      if($regs[2] == 'GB' || ($regs[2] == 'MB' && $regs[1] > 100)) {
+      $type = $types[$regs[2]];
+      if($type > $minType  || ($type == $minType && $regs[1] > $minSize)) 
+      {
         $out[] = $item;
-      } else {
+      } 
+      else 
+      {
         Yii::log('Skipping item, too small: '.$regs[1].' '.$regs[2], CLogger::LEVEL_ERROR);
       }
     }
