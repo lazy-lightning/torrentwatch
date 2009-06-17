@@ -27,7 +27,7 @@ $(function() {
         var filter = this.id;
         var container = $("div#feedItems_container > div:visible");
         container.slideUp(400, function() {
-            var tor = $("li.torrent").removeClass('hidden');
+            var tor = $("li.torrent:not(.duplicate)").removeClass('hidden');
             switch (filter) {
             case 'filter_matching':
                 tor.filter(".match_New, .match_Unmatched, .match_Auto").addClass('hidden');
@@ -43,8 +43,9 @@ $(function() {
     // Filter Bar -- By Text
     $("input#filter_text_input").keyup(function() {
         var filter = $(this).val().toLowerCase();
-        $("li.torrent").addClass('hidden_bytext').each(function() {
-            if ($(this).find("span.torrent_name").text().toLowerCase().match(filter)) {
+        $("li.torrent:not(.duplicate)").addClass('hidden_bytext').each(function() {
+            var item = $(this).find("span.torrent_name");
+            if (item.text().toLowerCase().match(filter)) {
                 $(this).removeClass('hidden_bytext');
             }
         }).markAlt(); 
@@ -106,14 +107,14 @@ $(function() {
         $.submitForm(this);
     });
     // Clear History ajax submit
-    $("a#clearhistory").live('click', function() {
+    $("a.historySubmit").live('click', function() {
       $.get(this.href, '', function(html) {
           // $(html).html() is used to strip the outer tag(<div#history></div>) and get the children
           $("div#history").html($(html).html());
       }, 'html');
       return false;
     });
-    // Clear Cache ajax submit
+    // Standard ajax submit with reload
     $("a.ajaxSubmit").live('click', function() {
       $.get(this.href, '', $.loadDynamicData, 'html');
       return false;
@@ -142,7 +143,9 @@ $(function() {
             // Use innerHTML because some browsers choke with $(html) when html is many KB
             dynamic[0].innerHTML = html;
             dynamic.find("div#favorites").initFavorites().end()
-                    .find("li.torrent").myContextMenu().end()
+                    .find("li.torrent")
+                      .filter(".hasDuplicates").initDuplicates().end()
+                      .not(".hasDuplicates").myContextMenu().end().end()
                     .find("form").initForm().end()
                     .find("div#configuration").initConfigDialog().end()
                     .find("#feedItems_container").tabs().end()
@@ -187,6 +190,14 @@ $(function() {
         });
         return this;
     };
+    $.fn.initDuplicates = function() {
+      this.click(function() {
+
+          $(this).children("ul").toggle(400);
+      });
+      return this;
+    };
+
     $.fn.initFavorites = function() {
       this.find("ul.favorite > li").not(":first").tsort("a").end().click(function() {
           $(this).find("a").toggleFavorite();

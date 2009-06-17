@@ -4,55 +4,42 @@
     <li><a href="#movies_container"><span>Movies</span></a></li>
     <li><a href="#others_container"><span>Others</span></a></li>
   </ul>
-  <div class="feedItems" id="tvEpisodes_container">
+  <?php foreach(array('tvEpisodes', 'movies', 'others') as $type): ?>
+  <div class="feedItems" id="<?php echo $type; ?>_container">
     <ul>
       <?php
         $n=0;
-        $dlFeedItemLink = CHtml::link('', array('dlFeedItem', 'id'=>'{id}'), array('class'=>'context_link'));
-        $addFavoriteLink =  CHtml::link('', array('addFavorite', 'feedItem_id'=>'{id}'), array('class'=>'context_link'));
-        foreach($tvEpisodes as $foo) {
-          // Ugly method to show grouped items
-          if(isset($foo['feedItem_title'])) {
-            $foo = array($foo);
+        foreach($$type as $item1) {
+          if(isset($item1['feedItem_title']))
+          {
+            echo "<li class='torrent match_".strtok(feedItem::getStatusText($item1['feedItem_status']), ' ').(++$n%2?' alt':'')."' ".
+                 "    title='".CHtml::encode($item1['feedItem_description'])."'>".
+                 "  <input type='hidden' name='itemId' class='itemId' value='".$item1['feedItem_id']."'>".
+                 "  <span class='torrent_name'>".CHtml::encode($item1['feedItem_title'])."</span>".
+                 "  <span class='torrent_pubDate'>".CHtml::encode(date("Y M d h:i a", $item1['feedItem_pubDate']))."</span>".
+                 "</li>";
           }
-          foreach($foo as $tvEpisode) {
-            echo "<li class='torrent match_".strtok(feedItem::getStatusText($tvEpisode['feedItem_status']), ' ').(++$n%2?' alt':'')."' ".
-                 "    title='".CHtml::encode($tvEpisode['feedItem_description'])."'>".
-                 "  <input type='hidden' name='itemId' class='itemId' value='".$tvEpisode['feedItem_id']."'>".
-                 "  <span class='torrent_name'>".CHtml::encode($tvEpisode['feedItem_title'])."</span>".
-                 "  <span class='torrent_pubDate'>".CHtml::encode(date("Y M d h:i a", $tvEpisode['feedItem_pubDate']))."</span>".
-                 "</li>"; 
+          else
+          {
+            echo "<li class='torrent hasDuplicates match_".strtok(feedItem::getStatusText($item1[0]['feedItem_status']), ' ').(++$n%2?' alt':'')."' ".
+                 "  <span class='torrent_name'>".CHtml::encode($item1[0]['feedItem_title'])."</span>".
+                 "<ul class='duplicates'>";
+            $m=$n;
+            foreach($item1 as $item2)
+            {
+              echo "<li class='torrent duplicate match_".strtok(feedItem::getStatusText($item2['feedItem_status']), ' ').(++$m%2?' alt':' notalt')."' ".
+                   "    title='".CHtml::encode($item2['feedItem_description'])."'>".
+                   "  <input type='hidden' name='itemId' class='itemId' value='".$item2['feedItem_id']."'>".
+                   "  <span class='torrent_feed'>".CHtml::encode($item2['feed_title'])."</span>".
+                   "  <span class='torrent_pubDate'>".CHtml::encode(date("Y M d h:i a", $item2['feedItem_pubDate']))."</span>".
+                   "</li>";
+            }
+            echo "</ul></li>";
           }
-        } ?>
+        } 
+      ?>
     </ul>
   </div>
-  <div class="feedItems" id="movies_container">
-    <ul>
-      <?php
-        $n=0;
-        foreach($movies as $movie) {
-          echo "<li class='torrent match_".reset(explode(' ', feedItem::getStatusText($movie['feedItem_status']))).(++$n%2?' alt':'')."' ".
-               "    title='".CHtml::encode($movie['feedItem_description'])."'>".
-               "  <input type='hidden' name='itemId' class='itemId' value='".$movie['feedItem_id']."'>".
-               "  <span class='torrent_name'>".CHtml::encode($movie['feedItem_title'])."</span>".
-               "  <span class='torrent_pubDate'>".CHtml::encode(date("Y M d h:i a", $movie['feedItem_pubDate']))."</span>".
-               "</li>";
-        } ?>
-    </ul>
-  </div>
-  <div class="feedItems" id="others_container">
-    <ul>
-      <?php 
-        $n=0;
-        foreach($others as $other) {
-          echo "<li class='torrent match_".reset(explode(' ', feedItem::getStatusText($other['feedItem_status']))).(++$n%2?' alt':'')."' ".
-               "    title='".CHtml::encode($other['feedItem_description'])."'>".
-               "  <input type='hidden' name='itemId' class='itemId' value='".$other['feedItem_id']."'>".
-               "  <span class='torrent_name'>".CHtml::encode($other['feedItem_title'])."</span>".
-               "  <span class='torrent_pubDate'>".CHtml::encode(date("Y M d h:i a", $other['feedItem_pubDate']))."</span>".
-               "</li>";
-        } ?>
-    </ul>
-  </div>
+  <?php endforeach; ?>
 </div>
 

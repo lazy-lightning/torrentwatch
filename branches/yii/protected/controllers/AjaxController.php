@@ -147,14 +147,14 @@ class AjaxController extends CController
           $favorite->qualityIds = $_POST['quality_id'];
 
         $favorite->attributes = $_POST[$class];
-        if($favorite->save() === False)
+        if($favorite->save())
         {
           $responce['dialog']['content'] = "$class {$favorite->name} successfully saved";
         }
         else
         {
           $responce['dialog']['error'] = true;
-          $responce['dialog']['content'] = self::ERROR_INVALID_ID;
+          $responce['dialog']['content'] = 'Error with validation';
           // save with the same format as the id in the view, to be detected and show errors
           // and to bring up the favorites dialog to show them
           $responce[$class.'s-'.$favorite->id] = $favorite;
@@ -266,15 +266,24 @@ class AjaxController extends CController
   {
     $app = Yii::app();
     $logger = Yii::getLogger();
-    Yii::log("start controller responce: ".$logger->getExecutionTime()."\n", CLogger::LEVEL_ERROR);
+    $startTime = microtime(true);
     $config = $app->dvrConfig;
+    $time['dvrConfig'] = microtime(true);
     $favoriteMovies = favoriteMovie::model()->findAll();
-    $favoriteTvShows = favoriteTvShow::model()->with('tvShow','quality')->findAll();
+    $time['favorietMovies'] = microtime(true);
+    $favoriteTvShows = favoriteTvShow::model()->findAll();
+    $time['favoriteTvShows'] = microtime(true);
     $favoriteStrings = favoriteString::model()->findAll();
+    $time['favoriteStrings'] = microtime(true);
     $feeds = feed::model()->findAll(); // todo: not id 0, which is 'All'
+    $time['feeds'] = microtime(true);
     $history = history::model()->findAll();
+    $time['history'] = microtime(true);
     $availClients = $app->dlManager->availClients;
+    $time['availClients'] = microtime(true);
     $genres = genre::model()->findAll();
+    $time['genres'] = microtime(true);
+
 
     // get qualitys for use in forms and prepend a blank quality to the list 
     $qualitys = quality::model()->findAll();
@@ -282,18 +291,23 @@ class AjaxController extends CController
     $q->title='';
     $q->id=-1;
     array_unshift($qualitys, $q);
+    $time['qualitys'] = microtime(true);
 
     // Query the various feeditems from the database
     // not AR classes because it takes too much time on the NMT
-    $group = '';
-    if(true) // change to dvrConfig variable
-      $group = 'GROUP BY feedItem_title';
-    $sql= 'SELECT feedItem_status, feedItem_description, feedItem_id, feedItem_title, feedItem_pubDate from {table} '.$group.' LIMIT '.$config->webItemsPerLoad;
-//    $tvEpisodes = $app->db->createCommand(str_replace('{table}', 'tvFeedItem', $sql))->queryAll();
     $tvEpisodes = $this->prepareFeedItems('tvFeedItem');
-    $movies = $app->db->createCommand(str_replace('{table}', 'movieFeedItem', $sql))->queryAll();
-    $others = $app->db->createCommand(str_replace('{table}', 'otherFeedItem', $sql))->queryAll();
+    $time['tvEpisodes'] = microtime(true);
+    $movies = $this->prepareFeedItems('movieFeedItem');
+    $time['movies'] = microtime(true);
+    $others = $this->prepareFeedItems('otherFeedItem');
+    $time['others'] = microtime(true);
 
+    foreach($time as $key => $value) {
+      $time[$key] = $value-$startTime;
+      $startTime = $value;
+    }
+
+    Yii::log('Database timing '.print_r($time, true), CLogger::LEVEL_ERROR);
     Yii::log("pre-render: ".$logger->getExecutionTime()."\n", CLogger::LEVEL_ERROR);
     $this->render('fullResponce', array(
           'availClients'=>$availClients,
@@ -401,7 +415,7 @@ class AjaxController extends CController
     $config = Yii::app()->dvrConfig;
 
     // First get a listing if the first group of items, and put them in an array indexed by title
-    $sql= 'SELECT feedItem_status, feedItem_description, feedItem_id, feedItem_title, feedItem_pubDate '.
+    $sql= 'SELECT feed_title, feedItem_status, feedItem_description, feedItem_id, feedItem_title, feedItem_pubDate '.
           '  FROM '.$table.' LIMIT '.($config->webItemsPerLoad*2);
     $reader = $db->createCommand($sql)->query();
     $items = array();
@@ -425,7 +439,7 @@ class AjaxController extends CController
       if($row['count'] == 1)
         $output[] = $row;
       else {
-        // use reference to prevent making aditional copy of array
+        // use reference to prevent making aditional copy of array on sort
         $data =& $items[$row['feedItem_title']];
         usort($data, array($this, 'cmpItemStatus'));
         $output[] = $data;
