@@ -284,11 +284,16 @@ div#feedItems_container > div {
 	right: 0;
 	}
 
+ul.duplicates {
+  display: none;
+  }
+
 ul li.torrent {
 	border-bottom: 1px solid #ccc;
 	padding: 0.2em 0.5em 0.3em 30px;
 	font-size: 0.9em;
-	height: 2.3em;
+	min-height: 2.3em;
+  background: #FFF;
 	}
 
 li.torrent.hidden_bytext {
@@ -326,6 +331,10 @@ ul li.torrent.match_New {
 ul li.torrent.alt {
 	background-color: #EDF3FE;
 	}
+
+ul li.torrent.notalt {
+  background-color: #FFFFFF;
+  }
 
 span.torrent_name {
 	margin-right: 10px;
