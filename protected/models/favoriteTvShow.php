@@ -77,8 +77,14 @@ class favoriteTvShow extends ARwithQuality
         $this->tvShow_id = factory::tvShowByTitle($this->tvShow_id)->id;
         Yii::log('Set tvShow_id to '.$this->tvShow_id, CLogger::LEVEL_ERROR);
       } catch ( Exception $e) {
+        $this->addError("tvShow_id", "There was a problem initilizing a tvshow of that title");
         Yii::log('Failed adding tvShow for new favorite validation: '.$e->error, CLogger::LEVEL_ERROR);
-        return False;
+      }
+    }
+    if(!empty($this->saveIn)) {
+      if(!is_dir($this->saveIn))
+      {
+        $this->addError('saveIn', "Save In must be a valid directory");
       }
     }
     return parent::beforeValidate($type);

@@ -5,17 +5,16 @@
   include VIEWPATH.'configuration_dialog.php';
   Yii::log('start favorites_dialog: '.$logger->getExecutionTime(), CLogger::LEVEL_ERROR);
   include VIEWPATH.'favorites_dialog.php';
-//  include VIEWPATH.'feeds_dialog.php';
   Yii::log('start feedItems_dialog: '.$logger->getExecutionTime(), CLogger::LEVEL_ERROR);
   include VIEWPATH.'feedItems_container.php';
   Yii::log('start history_dialog: '.$logger->getExecutionTime(), CLogger::LEVEL_ERROR);
   include VIEWPATH.'history_dialog.php';
 
-  if(isset($responce, $responce['dialog']))
+  if(isset($responce['dialog']))
   {
     $opts = $responce['dialog'];
     ?>
-      <div class="dialog_window" id="actionResponce" style="display: block">
+      <div class="dialog_window" id="actionResponce">
         <h1><?php echo $opts['header']; ?></h1>
         <p><?php echo $opts['content']; ?></p>
         <div class="buttonContainer">
@@ -23,6 +22,20 @@
         </div>
       </div>
     <?php
-
   }
+  if(isset($responce['showDialog']))
+    $hash = $responce['showDialog'];
+  elseif(isset($responce['showTab']))
+    echo '<script type="text/javascript">$.showTab("'.$responce['showTab'].'");</script>';
+  elseif(isset($responce['dialog']))
+    $hash = '#actionResponce';
+  if(isset($hash))
+    echo '<script type="text/javascript">$.showDialog("'.$hash.'");</script>';
+
+  if(isset($responce['showFavorite']))
+    $hash = $responce['showFavorite'];
+  else
+    $hash = '#favoriteTvShows-';
+  echo '<script type="text/javascript">$.showFavorite("'.$hash.'");</script>';
+ 
 

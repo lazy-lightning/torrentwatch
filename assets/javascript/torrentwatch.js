@@ -230,6 +230,22 @@ $(function() {
         });
         return this;
     };
+
+    $.showFavorite = function(hash) {
+      $.showTab($(hash).closest('form').get(0).id);
+      $('<a href="'+hash+'"/>').toggleFavorite();
+    };
+
+    $.showTab = function(hash) {
+      var dialog = $(hash).parent();
+      $.showDialog('#'+dialog.get(0).id)
+      dialog.find('ul.tabs-nav').find("a[href="+hash+"]").click();
+    }
+
+    $.showDialog = function(hash) {
+      $('<a href="'+hash+'"/>').toggleDialog();
+    };
+
     $.contextMenu.defaults({
         menuStyle: {
             textAlign: "left",

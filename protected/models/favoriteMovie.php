@@ -60,4 +60,15 @@ class favoriteMovie extends ARwithQuality
     parent::afterSave();
     Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NOMATCH);
   }
+
+  public function beforeValidate($type)
+  {
+    if($this->rating < 0 OR $this->rating > 100)
+      $this->addError("rating", "Rating must be between 0 and 100");
+
+    if(!empty($this->saveIn) && !is_dir($this->saveIn))
+      $this->addError("saveIn", "Save In must be a valid directory");
+    
+    return parent::beforeValidate($type);
+  }
 }

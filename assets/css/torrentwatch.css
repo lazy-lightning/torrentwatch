@@ -246,6 +246,25 @@ div#inspector_container h2 {
 	font-size: 1.2em;
 	}
 
+/*-----------------------------------
+ *
+ * V A L I D A T I O N   E R R O R S
+ *
+ * -----------------------------------*/
+
+div.errorSummary {
+  border: 1px solid black;
+  padding: 0.2em 1em;
+  }
+
+div.errorSummary ul {
+  list-style-type: disc;
+  padding-left: 2em;
+  }
+
+div.errorSummary ul li {
+  }
+
 /*-------------------------
  *
  * L O G I N   F O R M
@@ -557,7 +576,7 @@ form.favinfo {
 	}
 
 form.favinfo div {
-	height: 24px;
+	min-height: 24px;
 	}
 
 form.favinfo input#mode,
