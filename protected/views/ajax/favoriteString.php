@@ -10,7 +10,7 @@
  </div>
  <div class="favorite_feedId">
   <?php echo CHtml::activeLabelEx($favorite, 'feedId').': '.
-             CHtml::dropDownList('favoriteString[feed_id]', $favorite->feed_id, CHtml::listData($feeds, 'id', 'title')); ?>
+             CHtml::dropDownList('favoriteString[feed_id]', $favorite->feed_id, $feedsListData); ?>
  </div>
  <div class="favorite_filter">
    <?php echo CHtml::activeLabelEx($favorite, 'filter').': '.
@@ -24,10 +24,10 @@
   <?php  // show min 3 qualitys always, even if less are set
     echo CHtml::activeLabelEx($favorite, 'quality').': ';
     $j=0;foreach($favorite->quality as $quality) {
-      echo CHtml::dropDownList('quality_id['.++$j.']', $quality->id, CHtml::listData($qualitys, 'id', 'title'));
+      echo CHtml::dropDownList('quality_id['.++$j.']', $quality->id, $qualitysListData);
     }
     for(++$j;$j<4;++$j)
-      echo CHtml::dropDownList('quality_id['.$j.']', -1, CHtml::listData($qualitys, 'id', 'title'));
+      echo CHtml::dropDownList('quality_id['.$j.']', -1, $qualitysListData);
   ?>
  </div>
  <div class="buttonContainer">

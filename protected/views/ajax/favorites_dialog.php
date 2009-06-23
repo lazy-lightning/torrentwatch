@@ -3,9 +3,15 @@
   <li><a href="#favoriteTvShows"><span>TV Shows</span></a></li>
   <li><a href="#favoriteMovies"><span>Movies</span></a></li>
   <li><a href="#favoriteStrings"><span>Strings</span></a></li>
- </ul>
- <?php foreach(array('favoriteTvShows', 'favoriteMovies', 'favoriteStrings') as $favType):
-         $class = substr($favType, 0, -1); ?>
+ </ul> 
+ <?php
+   // Initialze some listData to be reused by all the favorites
+   $genresListData = CHtml::listData($genres, 'id', 'title');
+   $feedsListData = CHtml::listData($feeds, 'id', 'title');
+   $qualitysListData = CHtml::listData($qualitys, 'id', 'title');
+   // Loop through the 3 favorites and display them all
+   foreach(array('favoriteTvShows', 'favoriteMovies', 'favoriteStrings') as $favType):
+     $class = substr($favType, 0, -1); ?>
    <div id="<?php echo $favType; ?>">
     <ul class="favorite">
      <li><a href="#<?php echo $favType; ?>-">New Favorite</a></li>
