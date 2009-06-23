@@ -13,33 +13,31 @@
              CHtml::activeTextField($favorite, 'saveIn'); ?>
  </div>
  <div class="favorite_feed">
-  <?php echo CHtml::activeLabelEx($favorite, 'feedId').': '.
-             CHtml::dropDownList('favoriteMovie[feed_id]', $favorite->feed_id, CHtml::listData($feeds, 'id', 'title')); ?>
+  <?php echo CHtml::activeLabelEx($favorite, 'feed_id').': '.
+             CHtml::dropDownList('favoriteMovie[feed_id]', $favorite->feed_id, $feedsListData); ?>
  </div>
  <div class="favorite_rating">
    <?php echo CHtml::activeLabelEx($favorite, 'rating').': '.
               CHtml::activeTextField($favorite, 'rating'); ?>
  </div>
- <div class="favorite_minYear">
+ <div class="favorite_Years">
    <?php echo CHtml::activeLabelEx($favorite, 'minYear').': '.
-              CHtml::activeTextField($favorite, 'minYear'); ?>
- </div>
- <div class="favorite_maxYear">
-   <?php echo CHtml::activeLabelEx($favorite, 'maxYear').': '.
-              CHtml::activeTextField($favorite, 'maxYear');?>
+              CHtml::activeTextField($favorite, 'minYear').' '.
+              CHtml::activeLabelEx($favorite, 'maxYear').': '.
+              CHtml::activeTextField($favorite, 'maxYear'); ?>
  </div>
  <div class="favorite_genre">
   <?php echo CHtml::activeLabelEx($favorite, 'genre_id').': '.
-             CHtml::dropDownList('favoriteMovie[genre_id]', $favorite->genre_id, CHtml::listData($genres, 'id', 'title')); ?>
+             CHtml::dropDownList('favoriteMovie[genre_id]', $favorite->genre_id, $genresListData); ?>
  </div>
  <div class="favorite_quality">
   <?php  // show min 3 qualitys always, even if less are set
     echo CHtml::activeLabelEx($favorite, 'quality').': ';
     $j=0;foreach($favorite->quality as $quality) {
-      echo CHtml::dropDownList('quality_id['.++$j.']', $quality->id, CHtml::listData($qualitys, 'id', 'title'));
+      echo CHtml::dropDownList('quality_id['.++$j.']', $quality->id, $qualitysListData);
     }
     for(++$j;$j<4;++$j)
-      echo CHtml::dropDownList('quality_id['.$j.']', -1, CHtml::listData($qualitys, 'id', 'title'));
+      echo CHtml::dropDownList('quality_id['.$j.']', -1, $qualitysListData);
   ?>
  </div>
  <div class="buttonContainer">
