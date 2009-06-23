@@ -86,8 +86,11 @@ class updateTVDBCommand extends CConsoleCommand {
       $tvShow->description = $data->overview;
       $tvShow->tvdbId = $data->id;
 
-      // Throw exception instead?  or Log it?
-      if(!$tvShow->save()) {
+      if(empty($tvShow->title)) {
+        Yii::log('Trying to save a tvShow with no title from tvdb update'."\n".print_r(debug_backtrace()), CLogger::LEVEL_ERROR);
+      }
+      elseif(!$tvShow->save()) {
+        Yii::log('Error saving tvShow from tvdb update', CLogger::LEVEL_ERROR);
         continue;
       }
 
