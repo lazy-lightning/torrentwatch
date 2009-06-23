@@ -53,7 +53,7 @@ class feed extends CActiveRecord
 		return array(
 			array('title','length','max'=>128),
 			array('url','length','max'=>256),
-			array('url', 'required'),
+			array('url, downloadType', 'required'),
       array('status', 'default', value=>'0'),
       array('status', 'in', 'range'=>array(0, 1, 2)),
 

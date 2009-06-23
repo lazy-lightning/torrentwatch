@@ -1,6 +1,6 @@
 <?php
 
-class favoriteTvShow extends ARwithQuality
+class favoriteTvShow extends BaseFavorite
 {
 	/**
 	 * Returns the static model of the specified AR class.
@@ -24,8 +24,7 @@ class favoriteTvShow extends ARwithQuality
 	 */
 	public function rules()
 	{
-		return array(
-		);
+		return parent::rules();
 	}
 
 	/**
@@ -49,27 +48,6 @@ class favoriteTvShow extends ARwithQuality
 		);
 	}
 
-  public function afterSave()
-  {
-    parent::afterSave();
-    Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NOMATCH);
-  }
-
-  public function beforeSave()
-  {
-    // reset any currently matching feed Items that arn't downloaded to nomatch
-    if($this->isNewRecord === False) {
-      $this->dbConnection->createCommand(
-          'UPDATE feedItem SET status='.feedItem::STATUS_NOMATCH.
-          ' WHERE feedItem.id IN ( SELECT feedItem_id as id FROM matchingFavoriteTvShows m'.
-                                  ' WHERE m.favoriteTvShows_id = '.$this->id.
-                                  '   AND m.feedItem_status NOT IN ("'.
-                                    feedItem::STATUS_AUTO_DL.'", "'.feedItem::STATUS_MANUAL_DL.'"));'
-      )->execute();
-    }
-    return parent::beforeSave();
-  }
-
   public function beforeValidate($type)
   {
     if($this->isNewRecord && !is_numeric($this->tvShow_id)) {
@@ -81,23 +59,8 @@ class favoriteTvShow extends ARwithQuality
         Yii::log('Failed adding tvShow for new favorite validation: '.$e->error, CLogger::LEVEL_ERROR);
       }
     }
-    if(!empty($this->saveIn)) {
-      if(!is_dir($this->saveIn))
-      {
-        $this->addError('saveIn', "Save In must be a valid directory");
-      }
-    }
-    return parent::beforeValidate($type);
-  }
 
-  public function deleteByPk($pk,$condition='',$params=array())
-  {
-    if(parent::deleteByPk($pk, $condition, $params))
-    {
-      favoriteTvShows_quality::model()->deleteAll('favoriteTvShows_id = :id', array(':id'=>$pk));
-      return True;
-    }
-    return False;
+    return parent::beforeValidate($type);
   }
 
   public function getName()

@@ -1,6 +1,6 @@
 <?php
 
-class favoriteString extends ARwithQuality
+class favoriteString extends BaseFavorite
 {
 	/**
 	 * Returns the static model of the specified AR class.
@@ -24,9 +24,9 @@ class favoriteString extends ARwithQuality
 	 */
 	public function rules()
 	{
-		return array(
-			array('feed_id', 'numerical', 'integerOnly'=>true),
-		);
+		return array_merge(parent::rules(), array(
+          array('name, filter', 'required'),
+    ));
 	}
 
 	/**
@@ -50,9 +50,7 @@ class favoriteString extends ARwithQuality
 			'filter'=>'Filter',
 			'notFilter'=>'Not Filter',
 			'saveIn'=>'Save In',
-			'seedRatio'=>'Seed Ratio',
 			'feed_id'=>'Feed ',
-			'foo'=>'Foo',
 		);
 	}
 
@@ -60,5 +58,11 @@ class favoriteString extends ARwithQuality
   {
     parent::afterSave();
     Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NOMATCH);
+  }
+
+  public function beforeValidate() {
+    // Convert from GLOB to sql LIKE syntax
+    $this->filter = strtr($this->filter, '*', '%');
+    $this->notFilter = strtr($this->notFilter, '*', '%');
   }
 }
