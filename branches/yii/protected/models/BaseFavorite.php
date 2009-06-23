@@ -48,7 +48,7 @@ abstract class BaseFavorite extends ARwithQuality
       $table = $this->tableName();
       $class = $table.'_quality';
       $model = new $class;
-      $class->deleteAll($table.'_id = :id', array(':id'=>$pk));
+      $model->deleteAll($table.'_id = :id', array(':id'=>$pk));
       return True;
     }
     return False;
@@ -67,7 +67,7 @@ abstract class BaseFavorite extends ARwithQuality
   public function writableDirectory($attribute, $params) {
     if(!empty($this->$attribute) &&
        False == (is_dir($this->$attribute) && is_writable($this->$attribute)))
-      $this->addError($attribute, "Must be a writable directory");
+      $this->addError($attribute, $this->$attribute." is not a writable directory");
   }
 }
 

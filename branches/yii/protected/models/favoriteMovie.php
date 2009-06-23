@@ -25,7 +25,7 @@ class favoriteMovie extends BaseFavorite
 	public function rules()
 	{
 		return array_merge(parent::rules(), array(
-      array('name' 'required'),
+      array('name', 'required'),
       array('minYear', 'default', 'value'=>1900),
       array('maxYear', 'default', 'value'=>2012),
       array('rating', 'default', 'value'=>100),

@@ -126,7 +126,7 @@ class AjaxController extends CController
 
       if(isset($_GET['id'], $_POST['button']) && is_numeric($_GET['id']) && $_POST['button'] === 'Delete') 
       {
-        $this->deleteFavorite($model, $class);
+        $responce = $this->deleteFavorite($model, $class);
       } 
       else 
       {
@@ -275,7 +275,7 @@ class AjaxController extends CController
     $time['favoriteStrings'] = microtime(true);
     $feeds = feed::model()->findAll(); // todo: not id 0, which is 'All'
     $time['feeds'] = microtime(true);
-    $history = history::model()->findAll();
+    $history = array_reverse(history::model()->findAll());
     $time['history'] = microtime(true);
     $availClients = $app->dlManager->availClients;
     $time['availClients'] = microtime(true);
@@ -453,15 +453,20 @@ class AjaxController extends CController
 
   // this logic might be better served in a different class
   public function deleteFavorite($model, $class) {
+    $responce = array('dialog'=>array('header'=>'Delete Favorite'));
+
     $id = (integer)$_GET['id'];
     Yii::log("deleting $class $id", CLogger::LEVEL_ERROR);
+
     // Have to get the matching information before deleting the row
     // Is casting id to integer enough to make it safe without bindValue?
     $sql = "SELECT feedItem_id FROM matching${class}s WHERE ${class}s_id = $id AND feedItem_status NOT IN".
                 "('".feedItem::STATUS_AUTO_DL."', '".feedItem::STATUS_MANUAL_DL."');";
+
     $reader = Yii::app()->db->CreateCommand($sql)->query();
     $ids = array();
-    foreach($reader as $row) {
+    foreach($reader as $row) 
+    {
       $ids[] = $row['feedItem_id'];
     }
  
@@ -470,7 +475,15 @@ class AjaxController extends CController
       // Reset feedItem status on anything this was matching, then rerun matching routine incase something else matches the reset items
       feedItem::model()->updateByPk($ids, array('status'=>feedItem::STATUS_NEW));
       Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NEW);
+      $responce['dialog']['content'] = 'Your favorite has been successfully deleted';
+    } 
+    else 
+    {
+      $responce['dialog']['content'] = 'That favorite does not exist ?';
+      $responce['dialog']['error'] = True;
     }
+
+    return $responce;
   }
 
 }
