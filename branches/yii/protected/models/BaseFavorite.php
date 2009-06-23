@@ -8,6 +8,7 @@ abstract class BaseFavorite extends ARwithQuality
     return array(
         array('saveIn', 'writableDirectory'),
         array('feed_id', 'validFeed'),
+        array('queue', 'in', 'range'=>array(0,1)),
     );
   }
 

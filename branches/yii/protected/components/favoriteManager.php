@@ -33,6 +33,7 @@ abstract class favoriteManager extends CComponent {
     Yii::log('Looking for movie favorites', CLogger::LEVEL_ERROR);
     $db = Yii::app()->db;
     $toStart = array();
+    $toQueue = array();
     $duplicates = array();
 
     // Mark any previously downloaded movies that are now matching
@@ -54,9 +55,12 @@ abstract class favoriteManager extends CComponent {
     )->query();
 
     foreach($reader as $row) {
-      $toStart[$row['movie_id']][] = $row;
+      if($row['favorite_queue'])
+        $toQueue[] = $row['feedItem_id'];
+      else
+        $toStart[$row['movie_id']][] = $row;
     }
-    
+ 
     foreach($toStart as $items) {
       // For now just take the first feedItem for each movie, but this
       // structure allows there to be a decision making process inserted
@@ -72,6 +76,8 @@ abstract class favoriteManager extends CComponent {
     }
 
     // After matching has occured, updated item statuses
+    if(count($toQueue) !== 0)
+      feedItem::model()->updateByPk($toQueue, array('status'=>feedItem::STATUS_QUEUED));
     if(count($duplicates) !== 0) // mark feedItems as duplicate if another feedItem of the same season and episode
       feedItem::model()->updateByPk($duplicates, array('status'=>feedItem::STATUS_DUPLICATE)); // has been downloaded
   }
@@ -85,15 +91,21 @@ abstract class favoriteManager extends CComponent {
     Yii::log('Looking for string favorites', CLogger::LEVEL_ERROR);
     $db = Yii::app()->db;
     $toStart = array();
+    $toQueue = array();
 
     $reader = $db->createCommand(
         'SELECT * FROM matchingFavoriteStrings'.
         '  WHERE feedItem_status='.$itemStatus)->query();
 
     foreach($reader as $row) {
-      $this->startDownload($item, feedItem::STATUS_AUTO_DL);
+      if($row['favorite_queue'] == 1)
+        $toQueue[] = $row['feedItem_id'];
+      else
+        $this->startDownload($item, feedItem::STATUS_AUTO_DL);
     }
     
+    if(count($toQueue) !== 0)
+      feedItem::model()->updateByPk($toQueue, array('status'=>feedItem::STATUS_QUEUED));
   }
 
   /**
@@ -102,7 +114,7 @@ abstract class favoriteManager extends CComponent {
    */
   public function checkTvShowFavorites($itemStatus = feedItem::STATUS_NEW) {
     Yii::log('Looking for TvShow favorites', CLogger::LEVEL_ERROR);
-    $duplicates = $old = $dldEpisodes = array();
+    $duplicates = $toQueue = array();
     $db = Yii::app()->db;
 
     // Mark any duplicate episodes
@@ -138,7 +150,10 @@ abstract class favoriteManager extends CComponent {
     // and group the duplicates by tvEpisode_id
     $toStart = array();
     foreach($reader as $row) {
-      $toStart[$row['tvEpisode_id']][] = $row;
+      if($row['favorite_queue'] == 1)
+        $toQueue[] = $row['feedItem_id'];
+      else
+        $toStart[$row['tvEpisode_id']][] = $row;
     }
     unset($row);
 
@@ -157,6 +172,8 @@ abstract class favoriteManager extends CComponent {
     }
 
     // After matching has occured, updated item statuses
+    if(count($toQueue) !== 0)
+      feedItem::model()->updateByPk($toQueue, array('status'=>feedItem::STATUS_QUEUED));
     if(count($duplicates) !== 0) // mark feedItems as duplicate if another feedItem of the same season and episode
       feedItem::model()->updateByPk($duplicates, array('status'=>feedItem::STATUS_DUPLICATE)); // has been downloaded
   }

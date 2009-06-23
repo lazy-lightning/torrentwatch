@@ -17,7 +17,7 @@ class factory {
   }
 
   public static function networkByTitle($title) {
-    $network = network::model()->find('title LIKE :title', array(':title'=>$name));
+    $network = network::model()->find('title LIKE :title', array(':title'=>$title));
     if($network === null) {
       $network = new network;
       $network->title = $title;

@@ -77,6 +77,7 @@ class AjaxController extends CController
         $fav = new favoriteString;
         $fav->filter = $fav->name = $feedItem->title;
       } 
+      $fav->queue = 1;
       $fav->feed_id = 0;
 
       $ids = array();
@@ -151,18 +152,13 @@ class AjaxController extends CController
         if(isset($_POST['quality_id']))
           $favorite->qualityIds = $_POST['quality_id'];
 
+        // Tell the view to bring up the changed favorite
         $favorite->attributes = $_POST[$class];
-        if($favorite->save()) 
-          $responce['dialog']['content'] = $favorite->name.' has been saved';
-        else
-        {
-          $htmlId = $class.'s-'.$favorite->id;
-          $responce['showTab'] = "#".$class."s";
-          $responce['showFavorite'] = "#".$htmlId;
-          // favorite view will pick this up and display validation errors
-          $htmlId = $class.'s-'.$favorite->id;
-          $responce[$htmlId] = $favorite;
-        }
+        $favorite->save();
+        $htmlId = $class.'s-'.$favorite->id;
+        $responce[$htmlId] = $favorite;
+        $responce['showFavorite'] = "#".$htmlId;
+        $responce['showTab'] = "#".$class."s";
       }
     }
     catch ( Exception $e )
@@ -304,6 +300,9 @@ class AjaxController extends CController
     $time['movies'] = microtime(true);
     $others = $this->prepareFeedItems('otherFeedItem');
     $time['others'] = microtime(true);
+    $queued = $this->prepareFeedItems('queuedFeedItem');
+//    $queued = $this->prepareFeedItems('queuedFeedItem');
+    $time['queued'] = microtime(true);
 
     foreach($time as $key => $value) {
       $time[$key] = $value-$startTime;
@@ -324,6 +323,7 @@ class AjaxController extends CController
           'movies'=>$movies,
           'others'=>$others,
           'qualitys'=>$qualitys,
+          'queued'=>$queued,
           'responce'=>$responce,
           'tvEpisodes'=>$tvEpisodes,
     ));
