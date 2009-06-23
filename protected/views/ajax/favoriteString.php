@@ -30,6 +30,10 @@
       echo CHtml::dropDownList('quality_id['.$j.']', -1, $qualitysListData);
   ?>
  </div>
+ <div class="favorite_queue">
+  <?php echo CHtml::activeCheckBox($favorite, 'queue').' '.
+             CHtml::activeLabelEx($favorite, 'queue'); ?>
+ </div>
  <div class="buttonContainer">
    <a class="submitForm button" id="Update" href="#">Update</a>
    <a class="submitForm button" id="Delete" href="#">Delete</a>

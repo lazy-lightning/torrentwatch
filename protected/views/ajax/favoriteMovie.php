@@ -20,10 +20,12 @@
    <?php echo CHtml::activeLabelEx($favorite, 'rating').': '.
               CHtml::activeTextField($favorite, 'rating'); ?>
  </div>
- <div class="favorite_Years">
+ <div class="favorite_minYear">
    <?php echo CHtml::activeLabelEx($favorite, 'minYear').': '.
-              CHtml::activeTextField($favorite, 'minYear').' '.
-              CHtml::activeLabelEx($favorite, 'maxYear').': '.
+              CHtml::activeTextField($favorite, 'minYear'); ?>
+ </div>
+ <div class="favorite_maxYear">
+   <?php echo CHtml::activeLabelEx($favorite, 'maxYear').': '.
               CHtml::activeTextField($favorite, 'maxYear'); ?>
  </div>
  <div class="favorite_genre">
@@ -40,14 +42,14 @@
       echo CHtml::dropDownList('quality_id['.$j.']', -1, $qualitysListData);
   ?>
  </div>
+ <div class="favorite_queue">
+  <?php echo CHtml::activeCheckBox($favorite, 'queue').' '.
+             CHtml::activeLabelEx($favorite, 'queue'); ?>
+ </div>
  <div class="buttonContainer">
    <a class="submitForm button" id="Update" href="#">Update</a>
    <a class="submitForm button" id="Delete" href="#">Delete</a>
    <a class="toggleDialog button" href="#">Close</a>
  </div>
 </form>
-
-
-
-
 

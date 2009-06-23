@@ -24,7 +24,9 @@ class favoriteTvShow extends BaseFavorite
 	 */
 	public function rules()
 	{
-		return parent::rules();
+		return array_merge(parent::rules(), array(
+          array('onlyNewer', 'in', 'range'=>array(0, 1)),
+    ));
 	}
 
 	/**

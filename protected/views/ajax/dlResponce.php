@@ -5,5 +5,5 @@
 //    echo '</pre>';
 //  }
 
-  include 'protected/views/ajax/history_dialog.tpl';
+  include 'protected/views/ajax/history_dialog.php';
 

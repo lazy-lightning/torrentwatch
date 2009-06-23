@@ -3,8 +3,10 @@
     <li><a href="#tvEpisodes_container"><span>Tv Episodes</span></a></li>
     <li><a href="#movies_container"><span>Movies</span></a></li>
     <li><a href="#others_container"><span>Others</span></a></li>
+    <li><a href="#queued_container"><span>Queue</span></a></li>
+    <li><a href="#search_container"><span>Search</span></a></li>
   </ul>
-  <?php foreach(array('tvEpisodes', 'movies', 'others') as $type): ?>
+  <?php foreach(array('tvEpisodes', 'movies', 'others', 'queued') as $type): ?>
   <div class="feedItems" id="<?php echo $type; ?>_container">
     <ul>
       <?php
@@ -40,6 +42,7 @@
       ?>
     </ul>
   </div>
-  <?php endforeach; ?>
+  <?php endforeach;
+        include(VIEWPATH.'search_container.php'); ?>
 </div>
 

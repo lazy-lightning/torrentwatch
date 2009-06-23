@@ -3,13 +3,14 @@
 class feedItem extends CActiveRecord
 {
 
+  // Higher numbers so they can be sorted as "better" matches
   const STATUS_NEW = 0;
   const STATUS_NOMATCH = 1;
   const STATUS_MATCH = 2;
   const STATUS_FAILED_DL = 5;
   const STATUS_DUPLICATE = 6;
   const STATUS_OLD = 7;
-  // Higher numbers so they can be sorted as "better" matches
+  const STATUS_QUEUED = 15;
   const STATUS_AUTO_DL = 20;
   const STATUS_MANUAL_DL = 21;
 
@@ -99,14 +100,15 @@ class feedItem extends CActiveRecord
 
   public static function getStatusOptions() {
     return array(
+        self::STATUS_AUTO_DL=>'Automatic Download',
+        self::STATUS_DUPLICATE=>'Duplicate Episode',
+        self::STATUS_FAILED_DL=>'Failed Download',
         self::STATUS_NEW=>'New',
         self::STATUS_NOMATCH=>'Unmatched',
-        self::STATUS_MATCH=>'Matched',
-        self::STATUS_AUTO_DL=>'Automatic Download',
         self::STATUS_MANUAL_DL=>'Manual Download',
-        self::STATUS_FAILED_DL=>'Failed Download',
-        self::STATUS_DUPLICATE=>'Duplicate Episode',
+        self::STATUS_MATCH=>'Matched',
         self::STATUS_OLD=>'Old Episode',
+        self::STATUS_QUEUED=>'Queued for User',
     );
   }
 

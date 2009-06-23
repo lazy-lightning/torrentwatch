@@ -176,6 +176,8 @@ class downloadManager extends favoriteManager {
 
     if($success) 
     {
+      $this->markDuplicateQueuedItems();
+
       $history = new history;
       $history->feedItem_id = $this->feedItemId;
       $history->feedItem_title = $this->title;
@@ -184,6 +186,7 @@ class downloadManager extends favoriteManager {
       $history->favorite_name = $this->favoriteName;
       $history->favorite_type = $this->favoriteType;
       $history->save();
+
 
       // Update status as neccessary
       if(is_numeric($tvEpisodeId = $this->tvEpisodeId)) 
@@ -226,6 +229,22 @@ class downloadManager extends favoriteManager {
     $this->opts = null;
 
     return $success;
+  }
+
+  protected function markDuplicateQueuedItems() {
+    Yii::app()->db->createCommand(
+        'UPDATE feedItem'.
+        '   SET status = '.feedItem::STATUS_DUPLICATE.
+        ' WHERE status = '.feedItem::STATUS_QUEUED.
+        '   AND EXISTS( SELECT two.id'.
+        '                 FROM feedItem two'.
+        '                WHERE two.id = '.$this->feedItemId.
+        '                  AND (    (feedItem.movie_id NOT NULL AND feedItem.movie_id = two.movie_id )'.
+        '                        OR (feedItem.other_id NOT NULL AND feedItem.other_id = two.other_id )'.
+        '                        OR (feedItem.tvEpisode_id NOT NULL AND feedItem.tvEpisode_id = two.tvEpisode_id )'.
+        '                      )'.
+        '              );'
+    )->execute();
   }
 }
 
