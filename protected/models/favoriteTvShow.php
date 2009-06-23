@@ -45,13 +45,21 @@ class favoriteTvShow extends BaseFavorite
 	public function attributeLabels()
 	{
 		return array(
+        'tvShow_id'=>'TV Show',
+        'feed_id'=>'Feed',
+        'onlyNewer'=>'Only download newer episodes',
 		);
 	}
 
   public function beforeValidate($type)
   {
     if($this->isNewRecord && !is_numeric($this->tvShow_id)) {
-      try {
+      if(empty($this->tvShow_id))
+      {
+        $this->addError('tvShow_id', 'Please specify a TV Show');
+      } 
+      else try 
+      {
         $this->tvShow_id = factory::tvShowByTitle($this->tvShow_id)->id;
         Yii::log('Set tvShow_id to '.$this->tvShow_id, CLogger::LEVEL_ERROR);
       } catch ( Exception $e) {

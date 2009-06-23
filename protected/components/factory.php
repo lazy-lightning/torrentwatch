@@ -49,6 +49,11 @@ class factory {
   }
 
   public static function tvShowByTitle($title) {
+    if(empty($title)) {
+      Yii::log('trying to init tvShow without title'."\n".print_r(debug_backtrace()), CLogger::LEVEL_ERROR);
+      throw new CException('Attempt to initialize tvShow with no title');
+    }
+
     $tvShow = tvShow::model()->find(array(
           'select'=>'id',
           'condition' => 'title LIKE :title',
