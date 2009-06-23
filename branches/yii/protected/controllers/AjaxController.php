@@ -86,9 +86,14 @@ class AjaxController extends CController
       }
       $fav->qualityIds = $ids;
 
+      $htmlId = $type.'-'.$fav->id;
+      $responce['showTab'] = "#".$type;
+      $responce['showFavorite'] = "#".$htmlId;
       if($fav->save()) 
       {
         $responce['dialog']['content'] = 'New favorite successfully saved';
+        $htmlId = $type.'-'.$fav->id;
+        $responce['showFavorite'] = "#".$htmlId;
       }
       else
       {
