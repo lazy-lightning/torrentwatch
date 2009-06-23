@@ -41,9 +41,7 @@ class feedItem extends CActiveRecord
 	public function rules()
 	{
 		return array(
-			array('url','length','max'=>256),
-			array('title','length','max'=>128),
-			array('status, pubDate, lastUpdated, hash', 'required'),
+			array('status, pubDate, lastUpdated, hash, downloadType, feed_id', 'required'),
 			array('status, pubDate, lastUpdated', 'numerical', 'integerOnly'=>true),
 		);
 	}
@@ -56,6 +54,7 @@ class feedItem extends CActiveRecord
 		return array(
         'feed'=>array(self::BELONGS_TO, 'feed', 'feed_id'),
         'quality'=>array(self::MANY_MANY, 'quality', 'feedItem_quality(feedItem_id, quality_id)'),
+        // Belongs to only one of the next 3
         'tvEpisode'=>array(self::BELONGS_TO, 'tvEpisode', 'tvEpisode_id'),
         'movie'=>array(self::BELONGS_TO, 'movie', 'movie_id'),
         'other'=>array(self::BELONGS_TO, 'other', 'other_id'),
@@ -158,19 +157,17 @@ class feedItem extends CActiveRecord
       
       if($options = $this->detectTitleParams()) {
         list($shortTitle, $quality, $season, $episode) = $options;
-      
+     
+        // Set the quality ids, creating them as necessary if they dont already exist
         $qualityIds = array();
-        if(is_array($quality) && count($quality) === 0) {
-          $quality = array('Unknown');
-        }
         foreach($quality as $item) {
           $record = factory::qualityByTitle($item);
           $qualityIds[] = $record->id;
         }
         $this->qualityIds = $qualityIds;
     
-        // Date based episode
         if(!is_numeric($season)) {
+          // Item is a date based episode
           $episode = strtotime(str_replace(' ', '/', $season));
           Yii::log("Converting $season into $episode", CLogger::LEVEL_ERROR);
           if($episode === False) {
@@ -192,6 +189,7 @@ class feedItem extends CActiveRecord
             $this->other_id = $other->id;
           }
         } else {
+          // Found a season and episode for this item
           $tvEpisode = factory::tvEpisodeByEpisode($shortTitle, $season, $episode);
           $this->tvEpisode_id = $tvEpisode->id;
         }
@@ -211,13 +209,14 @@ class feedItem extends CActiveRecord
           .'(?:.+)?'; // Episode title: optinal, length is determined by the episode match
     // Episode
     $episode_reg =
-           '('  // must be a word boundry before the episode
+           '\b('  // must be a word boundry before the episode to prevent turning season 13 into season 3
           .'S\d+[. _]?E\d+'.'|'  // S12E1 or S1.E22 or S4 E1
           .'\d+x\d+' .'|'  // 1x23
           .'\d+[. ]?of[. ]?\d+'.'|'  // 03of18
           .'[\d -.]{10}'   // 2008-03-23 or 07.23.2008 or .20082306. etc
           .')';
-    $episode_reg2 = '\b(\d\d\d)\b'; // three digits (four hits movie years) with a word boundry on each side, ex: some.show.402.hdtv
+    $episode_reg2 = '\b(\d\d\d)\b.+'; // three digits (four hits movie years) with a word boundry on each side, ex: some.show.402.hdtv
+                                      // with at least some data after it to not match a group name at the end
   
     // Possible Qualitys
     $qual_reg ='(DVB' .'|'
