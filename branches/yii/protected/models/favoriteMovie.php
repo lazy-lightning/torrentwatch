@@ -1,6 +1,6 @@
 <?php
 
-class favoriteMovie extends ARwithQuality
+class favoriteMovie extends BaseFavorite
 {
 	/**
 	 * Returns the static model of the specified AR class.
@@ -24,9 +24,15 @@ class favoriteMovie extends ARwithQuality
 	 */
 	public function rules()
 	{
-		return array(
-			array('name', 'required'),
-		);
+		return array_merge(parent::rules(), array(
+      array('name' 'required'),
+      array('minYear', 'default', 'value'=>1900),
+      array('maxYear', 'default', 'value'=>2012),
+      array('rating', 'default', 'value'=>100),
+      array('genre_id', 'validGenre'),
+			array('minYear, maxYear', 'numerical', 'integerOnly'=>true, 'min'=>1900, 'max'=>2100),
+      array('rating', 'numerical', 'integerOnly'=>true, 'min'=>0, 'max'=>100),
+    ));
 	}
 
 	/**
@@ -49,26 +55,14 @@ class favoriteMovie extends ARwithQuality
 		return array(
 			'id'=>'Id',
 			'name'=>'Name',
-			'genre_id'=>'Genre ',
-			'quality_id'=>'Quality ',
+			'genre_id'=>'Genre',
+			'quality_id'=>'Quality',
 			'rating'=>'Rating',
 		);
 	}
 
-  public function afterSave()
-  {
-    parent::afterSave();
-    Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NOMATCH);
-  }
-
-  public function beforeValidate($type)
-  {
-    if($this->rating < 0 OR $this->rating > 100)
-      $this->addError("rating", "Rating must be between 0 and 100");
-
-    if(!empty($this->saveIn) && !is_dir($this->saveIn))
-      $this->addError("saveIn", "Save In must be a valid directory");
-    
-    return parent::beforeValidate($type);
+  public function validGenre($attribute, $params) {
+    if(!genre::model()->exists('id = :id', array(':id'=>$this->$attribute)))
+      $this->addError($attribute, 'Not a valid Genre Id');
   }
 }
