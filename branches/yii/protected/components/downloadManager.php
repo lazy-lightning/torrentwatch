@@ -172,7 +172,8 @@ class downloadManager extends favoriteManager {
     // $opts is used in the various get functions to make the following code cleaner
     $this->opts = $opts;
 
-    $success = $this->client->addByUrl($this->url);
+    $client = $this->getClient();
+    $success = is_object($client) ? $client->addByUrl($this->url) : False;
 
     if($success) 
     {
@@ -218,7 +219,11 @@ class downloadManager extends favoriteManager {
     } 
     else 
     {
-      $error = $this->errors[] = $this->client->getError();
+      if(is_object($client))
+        $error = $this->errors[] = $client->getError();
+      else
+        $error = $this->errors[] = 'Unable to initialize client';
+
       $status = feedItem::STATUS_FAILED_DL;
       Yii::log("Failed starting download: ".$error, CLogger::LEVEL_ERROR);
     }
