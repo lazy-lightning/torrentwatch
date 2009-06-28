@@ -15,13 +15,14 @@ class updateTVDBCommand extends CConsoleCommand {
     $db = Yii::app()->db;
     $now=time();
     $scanned = array();
-    $reader = $db->createCommand('SELECT tvEpisode.id, tvEpisode.season, tvEpisode.episode, tvShow.tvdbId'.
-                                 '  FROM tvEpisode,tvShow'.
-                                 ' WHERE tvShow.id = tvEpisode.tvShow_id'.
-                                 '   AND tvShow.tvdbId NOT NULL'.
-                                 '   AND tvEpisode.id IN ( SELECT tvEpisode_id from feedItem)'.
-                                 '   AND tvEpisode.description IS NULL'.
-                                 '   AND tvEpisode.lastTvdbUpdate <'.($now-(3600*48)).';' // one update per 48hrs if it fails
+    $reader = $db->createCommand('SELECT e.id id, e.season season, e.episode episode, s.tvdbId tvdbId'.
+                                 '  FROM tvShow s,'.
+                                 '       ( SELECT * FROM tvEpisode e'.
+                                 '          WHERE e.description IS NULL'.
+                                 '            AND e.lastTvdbUpdate < '.($now-(3600*48)).
+                                 '       ) e'.
+                                 ' WHERE s.tvdbId NOT NULL'.
+                                 '   AND s.id = e.tvShow_id'
 
     )->query();
     foreach($reader as $row) {
@@ -79,7 +80,9 @@ class updateTVDBCommand extends CConsoleCommand {
 
       echo "Found data for ".$data->seriesName."\n";
       $tvShow = tvShow::model()->findByPk($row['id']);
-      $tvShow->title = $data->seriesName;
+      // Dont change the title will mess up factory::tvShowByTitle()
+      // perhaps create new column for tvdb Name ?
+      //$tvShow->title = $data->seriesName;
       if(!empty($data->network))
         $tvShow->network_id = factory::networkByTitle($data->network)->id;
       $tvShow->rating = $data->rating;
