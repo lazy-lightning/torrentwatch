@@ -16,7 +16,8 @@ CREATE TABLE favoriteMovies (
     rating NUMERIC NOT_NULL DEFAULT 100, 
     saveIn TEXT, 
     minYear INTEGER NOT NULL DEFAULT 1900, 
-    maxYear INTEGER NOT NULL DEFAULT 2012,
+    maxYear INTEGER NOT NULL DEFAULT 2012, 
+    queue INTEGER NOT NULL DEFAULT 0,
     FOREIGN KEY (feed_id) REFERENCES feed(id),
     FOREIGN KEY (genre_id) REFERENCES genre(id),
     FOREIGN KEY (quality_id) REFERENCES quality(id)
@@ -31,10 +32,9 @@ CREATE TABLE favoriteStrings (
     notFilter TEXT,
     saveIn TEXT,
     feed_id INTEGER,
-    foo TEX,
-    name TEXT
+    name TEXT, 
+    queue INTEGER NOT NULL DEFAULT 0
 );
-
 CREATE TABLE favoriteStrings_quality ( 
     favoriteStrings_id INTEGER NOT NULL, 
     quality_id INTEGER NOT NULL,
@@ -46,43 +46,42 @@ CREATE TABLE favoriteTvShows (
     tvShow_id INTEGER NOT NULL ,
     feed_id INTEGER NOT NULL DEFAULT 0,
     saveIn TEXT,
-    onlyNewer integer NOT NULL  DEFAULT 0
+    onlyNewer integer NOT NULL DEFAULT 0, 
+    queue INTEGER NOT NULL DEFAULT 0
 );
 CREATE TABLE favoriteTvShows_quality (
-    favoriteTvShows_id INTEGER NOT NULL,
-    quality_id INTEGER NOT NULL,
-    FOREIGN KEY (favoriteTvShows_id) REFERENCES favoriteTvShows(id),
-    FOREIGN KEY (quality_id) REFERENCES quality(id)
+  favoriteTvShows_id INTEGER NOT NULL,
+  quality_id INTEGER NOT NULL,
+  FOREIGN KEY (favoriteTvShows_id) REFERENCES favoriteTvShows(id),
+  FOREIGN KEY (quality_id) REFERENCES quality(id)
 );
 CREATE TABLE feed (
-  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-  title TEXT,
-  description TEXT,
-  url TEXT NOT NULL,
-  status INTEGER NOT NULL DEFAULT 0, 
-  lastUpdated INTEGER NOT NULL DEFAULT 0, 
-  downloadType INTEGER NOT NULL, 
-  userTitle TEXT
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    title TEXT,
+    description TEXT,
+    url TEXT NOT NULL, 
+    status INTEGER NOT NULL DEFAULT 0, 
+    lastUpdated INTEGER NOT NULL DEFAULT 0, 
+    downloadType INTEGER NOT NULL, 
+    userTitle TEXT
 );
 CREATE TABLE feedItem (
   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   feed_id INTEGER NOT NULL,
   tvEpisode_id INTEGER,
-  other_id INTEGER, 
-  movie_id INTEGER, 
-  url VARCHAR(256),
-  title VARCHAR(128),
+  url TEXT,
+  title TEXT,
   description TEXT,
   status INTEGER NOT NULL,
   pubDate INTEGER NOT NULL,
   lastUpdated INTEGER NOT NULL, 
-  hash VARCHAR(32), 
+  hash TEXT, 
   imdbId INTEGER NOT NULL DEFAULT 0, 
-  downloadType INTEGER NOT NULL,
+  other_id INTEGER, 
+  movie_id INTEGER, 
+  downloadType INTEGER,
   FOREIGN KEY (feed_id) REFERENCES feed(id),
-  FOREIGN KEY (tvEpisode_id) REFERENCES tvEpisode(id),
-  FOREIGN KEY (movie_id) REFERENCES movie(id),
-  FOREIGN KEY (other_id) REFERENCES other(id)
+  FOREIGN KEY (tvEpisode_id) REFERENCES tvEpisode(id)
 );
 CREATE TABLE feedItem_quality (
   feedItem_id INTEGER NOT NULL,
@@ -92,7 +91,7 @@ CREATE TABLE feedItem_quality (
 );
 CREATE TABLE genre (
   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-  title VARCHAR(128) NOT NULL
+  title TEXT NOT NULL
 );
 CREATE TABLE history (
   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -105,7 +104,6 @@ CREATE TABLE history (
   date INTEGER NOT NULL,
   favorite_type TEXT
 );
-
 CREATE TABLE movie (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     title TEXT,
@@ -118,16 +116,15 @@ CREATE TABLE movie (
     plot TEXT, 
     lastImdbUpdate INTEGER DEFAULT 0
 );
-
 CREATE TABLE movie_genre (
-  movie_id INTEGER NOT NULL,
-  genre_id INTEGER NOT NULL,
-  FOREIGN KEY (movie_id) REFERENCES movie(id),
-  FOREIGN KEY (genre_id) REFERENCES genre(id)
+    movie_id INTEGER NOT NULL,
+    genre_id INTEGER NOT NULL,
+    FOREIGN KEY (movie_id) REFERENCES movie(id),
+    FOREIGN KEY (genre_id) REFERENCES genre(id)
 );
 CREATE TABLE network (
-  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-  title VARCHAR(128) NOT NULL
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL
 );
 CREATE TABLE other (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -137,7 +134,7 @@ CREATE TABLE other (
 );
 CREATE TABLE quality (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    title VARCHAR(128) NOT NULL
+    title TEXT NOT NULL
 );
 CREATE TABLE tvEpisode (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -153,27 +150,26 @@ CREATE TABLE tvEpisode (
     FOREIGN KEY (tvShow_id) REFERENCES tvShow(id)
 );
 CREATE TABLE tvShow (
-  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-  network_id INTEGER,
-  title TEXT,
-  description TEXT, 
-  rating INTEGER, 
-  tvdbId INTEGER, 
-  lastTvdbUpdate INTEGER NOT NULL DEFAULT 0,
-  FOREIGN KEY (network_id) REFERENCES network(id)
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    network_id INTEGER,
+    title TEXT,
+    description TEXT, 
+    rating INTEGER, 
+    tvdbId INTEGER, 
+    lastTvdbUpdate INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY (network_id) REFERENCES network(id)
 );
 CREATE TABLE tvShow_genre (
-  tvShow_id INTEGER NOT NULL,
-  genre_id INTEGER NOT NULL,
-  FOREIGN KEY (tvShow_id) REFERENCES tvShow(id),
-  FOREIGN KEY (genre_id) REFERENCES genre(id)
+    tvShow_id INTEGER NOT NULL,
+    genre_id INTEGER NOT NULL,
+    FOREIGN KEY (tvShow_id) REFERENCES tvShow(id),
+    FOREIGN KEY (genre_id) REFERENCES genre(id)
 );
 CREATE TABLE users (
-  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-  username TEXT NOT NULL,
-  password TEXT NOT NULL
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL,
+    password TEXT NOT NULL
 );
-
 CREATE VIEW tvFeedItem AS
 SELECT feedItem.id feedItem_id,
        feedItem.title feedItem_title,
@@ -196,7 +192,6 @@ SELECT feedItem.id feedItem_id,
    AND tvEpisode.tvShow_id = tvShow.id
    AND feed.id = feedItem.feed_id
  ORDER BY feedItem.pubDate DESC;
-
 CREATE VIEW matchingFavoriteMovies AS
 SELECT i.id feedItem_id,
        i.title feedItem_title,
@@ -210,31 +205,19 @@ SELECT i.id feedItem_id,
        m.status movie_status,
        f.name favorite_name,
        f.id favoriteMovies_id,
-       f.saveIn favorite_saveIn
-  FROM favoriteMovies f, movie m, feedItem i
+       f.saveIn favorite_saveIn,
+       f.queue favorite_queue
+  FROM favoriteMovies f, movie m, feedItem i, movie_genre mg
   LEFT OUTER JOIN feed
     ON feed.id = i.feed_id
- WHERE ( f.feed_id = 0
+ WHERE i.movie_id = m.id
+   AND mg.movie_id = m.id
+   AND f.genre_id = mg.genre_id
+   AND m.rating >= f.rating
+   AND m.year BETWEEN f.minYear AND f.maxYear
+   AND ( f.feed_id = 0
          OR
          f.feed_id = i.feed_id
-       )
-   AND i.movie_id = m.id
-   AND m.rating >= f.rating
-   AND f.genre_id IN ( SELECT movie_genre.genre_id
-                         FROM movie_genre
-                        WHERE m.id = movie_genre.movie_id
-                     )
-   AND m.year BETWEEN f.minYear AND f.maxYear
-   AND ( SELECT COUNT(fq.quality_id)
-           FROM feedItem_quality iq, favoriteMovies_quality fq
-          WHERE iq.feedItem_id = i.id
-            AND iq.quality_id = fq.quality_id
-            AND fq.favoriteMovies_id = f.id
-       ) =
-       ( SELECT COUNT(f.id)
-           FROM favoriteMovies, favoriteMovies_quality fq
-          WHERE favoriteMovies.id = f.id
-            AND favoriteMovies.id = fq.favoriteMovies_id
        );
 CREATE VIEW matchingFavoriteStrings AS
 SELECT i.id feedItem_id,
@@ -247,28 +230,27 @@ SELECT i.id feedItem_id,
        feed.title feed_title,
        f.name favorite_name,
        f.id favoriteStrings_id,
-       f.saveIn favorite_saveIn
-  FROM favoriteStrings f, feedItem i
-  LEFT OUTER JOIN feed
-    ON feed.id = i.feed_id
- WHERE ( f.feed_id = 0
+       f.saveIn favorite_saveIn,
+       f.queue favorite_queue
+  FROM favoriteStrings f, feedItem i, feed,
+       (SELECT favoriteStrings_id, count(quality_id) AS count FROM favoriteStrings_quality GROUP BY favoriteStrings_id) fq
+ WHERE feed.id = i.feed_id
+   AND ( f.feed_id = 0
          OR
          f.feed_id = i.feed_id
        )
+   AND f.id = fq.favoriteStrings_id
    AND ( SELECT COUNT(fq.quality_id)
            FROM feedItem_quality iq, favoriteStrings_quality fq
           WHERE iq.feedItem_id = i.id
             AND iq.quality_id = fq.quality_id
             AND fq.favoriteStrings_id = f.id
-       ) =
-       ( SELECT COUNT(f.id)
-           FROM favoriteStrings, favoriteStrings_quality fq
-          WHERE favoriteStrings.id = f.id
-            AND favoriteStrings.id = fq.favoriteStrings_id
-       )
+       ) = fq.count
    AND i.title LIKE f.filter
-   AND i.title NOT LIKE f.notFilter;
-
+   AND ( f.notFilter IS NULL
+         OR
+         i.title NOT LIKE f.notFilter
+       );
 CREATE VIEW matchingFavoriteTvShows AS
 SELECT i.feedItem_id feedItem_id,
        i.feedItem_title feedItem_title,
@@ -286,22 +268,19 @@ SELECT i.feedItem_id feedItem_id,
        i.tvShow_title favorite_name,
        f.id favoriteTvShows_id,
        f.saveIn favorite_saveIn,
-       f.onlyNewer favorite_onlyNewer
-  FROM tvFeedItem i, favoriteTvShows f
+       f.onlyNewer favorite_onlyNewer,
+       f.queue favorite_queue
+  FROM tvFeedItem i, favoriteTvShows f,
+       (SELECT favoriteTvShows_id, count(quality_id) as count FROM favoriteTvShows_quality GROUP BY favoriteTvShows_id) fq
  WHERE i.tvShow_id = f.tvShow_id
+   AND f.id = fq.favoriteTvShows_id
    AND (f.feed_id = i.feed_id OR f.feed_id = 0)
-   AND ( SELECT COUNT(feedItem_quality.quality_id)
+   AND ( SELECT COUNT(*)
            FROM feedItem_quality, favoriteTvShows_quality
           WHERE feedItem_quality.feedItem_id = i.feedItem_id
             AND feedItem_quality.quality_id = favoriteTvShows_quality.quality_id
             AND favoriteTvShows_quality.favoriteTvShows_id = f.id
-       ) =
-       ( SELECT COUNT(favoriteTvShows.id)
-           FROM favoriteTvShows, favoriteTvShows_quality
-          WHERE favoriteTvShows.id = favoriteTvShows_quality.favoriteTvShows_id
-            AND favoriteTvShows.id = f.id
-       );
-
+       ) = fq.count;
 CREATE VIEW movieFeedItem AS
 SELECT feedItem.id feedItem_id,
        feedItem.title feedItem_title,
@@ -319,15 +298,18 @@ SELECT feedItem.id feedItem_id,
  WHERE feedItem.movie_id = movie.id
    AND feedItem.feed_id = feed.id
  ORDER BY feedItem.pubDate DESC;
-
 CREATE VIEW newestTvEpisode AS 
-SELECT * 
-  FROM tvEpisode new 
+SELECT * FROM tvEpisode new 
  WHERE NOT EXISTS( SELECT * FROM tvEpisode old 
-                    WHERE new.tvShow_id = old.tvShow_id 
-                      AND ( new.season < old.season 
-                            OR 
-                            (new.season = old.season AND new.episode < old.episode)
+                    WHERE ( new.tvShow_id = old.tvShow_id 
+                            AND 
+                            ( new.season < old.season 
+                              OR 
+                              ( new.season = old.season 
+                                AND 
+                                new.episode < old.episode
+                              )
+                            )
                           )
                  );
 CREATE VIEW onlyNewerFeedItemFilter AS
@@ -339,7 +321,10 @@ SELECT feedItem_id, feedItem_status, tvEpisode_status
                 WHERE n.tvShow_id = m.tvShow_id
                   AND ( n.season > m.tvEpisode_season
                         OR
-                        ( n.season = m.tvEpisode_season AND n.episode > m.tvEpisode_episode )
+                        ( n.season = m.tvEpisode_season 
+                          AND 
+                          n.episode > m.tvEpisode_episode 
+                        )
                       )
              );
 CREATE VIEW otherFeedItem AS
@@ -358,22 +343,32 @@ SELECT feedItem.id feedItem_id,
  WHERE feedItem.other_id = other.id
    AND feedItem.feed_id = feed.id
  ORDER BY feedItem.pubDate DESC;
-
+CREATE VIEW queuedFeedItem AS
+SELECT f.title feed_title,
+       i.status feedItem_status,
+       i.description feedItem_description,
+       i.id feedItem_id,
+       i.title feedItem_title,
+       i.pubDate feedItem_pubDate
+  FROM feedItem i
+  LEFT OUTER JOIN feed f
+    ON i.feed_id = f.id
+ WHERE i.status = 15;
 CREATE VIEW recentTvShows AS 
 SELECT DISTINCT tvShow.* 
-  FROM ( SELECT tvEpisode.tvShow_id tvShow_id,
-                feedItem.pubDate pubDate 
+  FROM ( SELECT tvEpisode.tvShow_id as tvShow_id,
+                feedItem.pubDate as pubDate 
            FROM tvEpisode, feedItem 
-          WHERE feedItem.tvEpisode_id = tvEpisode.id 
+          WHERE feedItem.tvEpisode_id=tvEpisode.id 
           ORDER BY feedItem.pubDate DESC
        ), tvShow 
  WHERE tvShow.id = tvShow_id 
  ORDER BY pubDate DESC;
-
-CREATE INDEX "favoriteMovies_quality_index" ON "favoriteMovies_quality" ("favoriteMovies_id" DESC, "quality_id" ASC);
-CREATE INDEX "favoriteStrings_quality_index" ON "favoriteStrings_quality" ("favoriteStrings_id" ASC, "quality_id" ASC);
-CREATE INDEX "favoriteTvShows_quality_index" ON "favoriteTvShows_quality" ("favoriteTvShows_id" ASC, "quality_id" ASC);
+CREATE INDEX favoriteMovies_quality_index ON favoriteMovies_quality (favoriteMovies_id DESC, quality_id ASC);
+CREATE INDEX favoriteStrings_quality_index ON favoriteStrings_quality (favoriteStrings_id ASC, quality_id ASC);
+CREATE INDEX favoriteTvShows_quality_index ON favoriteTvShows_quality (favoriteTvShows_id ASC, quality_id ASC);
 CREATE INDEX feedItem_pubDate ON feedItem (pubDate DESC);
-CREATE INDEX "feedItem_quality_index" ON "feedItem_quality" ("feedItem_id" DESC, "quality_id" ASC);
-CREATE INDEX "movie_genre_index" ON "movie_genre" ("movie_id" DESC, "genre_id" ASC);
-CREATE INDEX "tvShow_genre_index" ON "tvShow_genre" ("tvShow_id" DESC, "genre_id" ASC);
+CREATE INDEX feedItem_quality_index ON feedItem_quality (feedItem_id DESC, quality_id ASC);
+CREATE INDEX feedItem_status ON feedItem (status DESC);
+CREATE INDEX movie_genre_index ON movie_genre (movie_id DESC, genre_id ASC);
+CREATE INDEX tvShow_genre_index ON tvShow_genre (tvShow_id DESC, genre_id ASC);
