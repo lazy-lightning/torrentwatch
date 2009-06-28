@@ -61,6 +61,9 @@ class favoriteMovie extends BaseFavorite
 		);
 	}
 
+  /**
+   * @return boolean $this->$attribute contains a valid genre id
+   */
   public function validGenre($attribute, $params) {
     if(!genre::model()->exists('id = :id', array(':id'=>$this->$attribute)))
       $this->addError($attribute, 'Not a valid Genre Id');

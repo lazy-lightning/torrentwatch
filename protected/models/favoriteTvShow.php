@@ -53,6 +53,10 @@ class favoriteTvShow extends BaseFavorite
 		);
 	}
 
+  /**
+   * pre-validation routine
+   * @return boolean continue validation process
+   */
   public function beforeValidate($type)
   {
     if($this->isNewRecord && !is_numeric($this->tvShow_id)) {
@@ -73,6 +77,9 @@ class favoriteTvShow extends BaseFavorite
     return parent::beforeValidate($type);
   }
 
+  /**
+   * @return string title of the tvShow favorited
+   */
   public function getName()
   {
     return $this->tvShow->title;

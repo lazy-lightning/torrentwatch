@@ -14,9 +14,11 @@ class feedItem extends CActiveRecord
   const STATUS_AUTO_DL = 20;
   const STATUS_MANUAL_DL = 21;
 
+  // Download Types
   const TYPE_TORRENT = 0;
   const TYPE_NZB = 1;
 
+  // used to set the feedItem_quality table
   private $_qualityIds;
 
 	/**
@@ -71,6 +73,9 @@ class feedItem extends CActiveRecord
 		);
 	}
 
+  /**
+   * @return array row id of every related quality
+   */
   public function getQualityIds() {
     if($this->_qualityIds === null) {
       $relations = feedItem_quality::model()->findAllByAttributes(array('quality_id' => $this->id));
@@ -85,6 +90,10 @@ class feedItem extends CActiveRecord
     return $this->_qualityIds;
   }
 
+  /**
+   * all valid download types and their string mappings
+   * @return array number=>string pairs 
+   */
   public function getDownloadTypeOptions() {
     return array(
         self::TYPE_TORRENT=>'Torrent',
@@ -92,12 +101,19 @@ class feedItem extends CActiveRecord
     );
   }
 
+  /**
+   * @return string String representation of download type
+   */
   public function getDownloadTypeText() {
     $options=$this->getDownloadTypeOptions();
     return isset($options[$this->downloadType]) ? $options[$this->downloadType]
         : "unknown ({$this->downloadType})";
   }
 
+  /**
+   * all valid statuses and their string mappings
+   * @return array number=>string pairs
+   */
   public static function getStatusOptions() {
     return array(
         self::STATUS_AUTO_DL=>'Automatic Download',
@@ -112,7 +128,7 @@ class feedItem extends CActiveRecord
     );
   }
 
-  // static to allow translation directly from ql row in a view
+  // static to allow translation directly from query row in a view without AR model
   public static function getStatusText($status = null) {
     if($status === null)
       $status = $this->status;

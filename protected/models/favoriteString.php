@@ -50,7 +50,8 @@ class favoriteString extends BaseFavorite
 			'filter'=>'Filter',
 			'notFilter'=>'Not Filter',
 			'saveIn'=>'Save In',
-			'feed_id'=>'Feed ',
+			'feed_id'=>'Feed',
+      'queue'=>'Queue matches',
 		);
 	}
 
@@ -63,6 +64,8 @@ class favoriteString extends BaseFavorite
   public function beforeValidate() {
     // Convert from GLOB to sql LIKE syntax
     $this->filter = strtr($this->filter, '*', '%');
-    $this->notFilter = strtr($this->notFilter, '*', '%');
+    $this->notFilter = empty($this->notFilter) ? NULL : strtr($this->notFilter, '*', '%');
+
+    return true;
   }
 }
