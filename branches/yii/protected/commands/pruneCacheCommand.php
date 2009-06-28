@@ -12,7 +12,8 @@ class pruneCacheCommand extends CConsoleCommand
     }
     else while(False !== ($file = readdir($dh)))
     {
-      if(False !== ($mtime = filemtime('cache/'.$file)))
+      if(!is_dir('cache/'.$file) &&
+         False !== ($mtime = filemtime('cache/'.$file)))
       {
         if($mtime < $expireTime)
           unlink('cache/'.$file);
