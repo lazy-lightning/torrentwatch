@@ -106,14 +106,15 @@ class BrowserEmulator {
     /* default is "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)",         */
     /* which means Internet Explorer 6.0 on WinXP                       */
    
-    $this->headerLines["User-Agent"] = "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)";
+    $this->headerLines["User-Agent"] = "UniversalFeedParser/4.01 +http://feedparser.org";
 
     /*******************************************************************************/
     /**
     * Set default to accept gzip encoded files
     */
+    $this->headerLines["Accept-Encoding"] = "*/*";
     if(platform_getGunzip())
-      $this->headerLines["Accept-Encoding"] = "gzip";
+      $this->headerLines["Accept-Encoding"] .= ",gzip,deflate";
   }
  
   /**
@@ -172,20 +173,32 @@ class BrowserEmulator {
     $url = $this->preparseURL($url);
     $this->lastResponse = Array();
    
-    preg_match("~([a-z]*://)?([^:^/]*)(:([0-9]{1,5}))?(/.*)?~i", $url, $matches);
+/*    preg_match("~([a-z]*://)?([^:^/]*)(:([0-9]{1,5}))?(/.*)?~i", $url, $matches);
    
     $protocol = $matches[1];
     $server = $matches[2];
     $port = $matches[4];
-    $path = $matches[5];
-    if ($port!="") {
+    $path = $matches[5]; */
+    $parts = parse_url($url);
+    $protocol = $parts['scheme'];
+    $server = $parts['host'];
+    $port = $parts['port'];
+    $path = $parts['path'];
+    if(isset($parts['query'])) {
+      $path .= '?'.$parts['query'];
+    }
+
+    if($protocol == 'https') {
+      $server = 'ssl://'.$server;
+      $this->setPort(443);
+    } elseif ($port!="") {
         $this->setPort($port);
     }
     if ($path=="") $path = "/";
     $socket = false;
     $socket = fsockopen($server, $this->port);
     if ($socket) {
-        $this->headerLines["Host"] = $server;
+        $this->headerLines["Host"] = $parts['host'];
        
         if ($this->authUser!="" && $this->authPass!="") {
           $this->headerLines["Authorization"] = "Basic ".base64_encode($this->authUser.":".$this->authPass);
@@ -265,6 +278,7 @@ class BrowserEmulator {
         $file = my_gzinflate($file);
     }
 
+//    file_put_contents('/tmp/fsockopen.'.rand(), $file);
     return $file;
   }
 
