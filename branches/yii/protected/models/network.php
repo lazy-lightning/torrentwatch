@@ -25,7 +25,6 @@ class network extends CActiveRecord
 	public function rules()
 	{
 		return array(
-			array('title','length','max'=>128),
 			array('title', 'required'),
 		);
 	}

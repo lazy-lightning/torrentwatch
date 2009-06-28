@@ -28,6 +28,7 @@ class history extends CActiveRecord
 		return array(
 			array('feedItem_id, date', 'required'),
 			array('feedItem_id, feed_id, status, date', 'numerical', 'integerOnly'=>true),
+      array('date', 'default', 'value'=>time()),
 		);
 	}
 
@@ -58,9 +59,4 @@ class history extends CActiveRecord
 		);
 	}
 
-  public function beforeValidate($type) {
-    if($this->isNewRecord)
-      $this->date = time();
-    return parent::beforeValidate($type);
-  }
 }

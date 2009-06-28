@@ -6,28 +6,6 @@ class feed extends CActiveRecord
   const STATUS_OK=1;
   const STATUS_ERROR=2;
 
-  /**
-   * Returns the mapping of feed status integer to string
-   * @return array of int=>string pairs
-   */
-  public function getStatusOptions()
-  {
-    return array(
-        self::STATUS_NEW=>'Never Updated',
-        self::STATUS_OK=>'Update Successful',
-        self::STATUS_ERROR=>'Error connecting to feed',
-    );
-  }
-
-  /**
-   * @return
-   */
-  public function getStatusText()
-  {
-    $options=$this->statusOptions;
-    return isset($options[$this->status]) ? $options[$this->status] : "unknown ({$this->status})";
-  }
-
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @return CActiveRecord the static model class
@@ -79,14 +57,67 @@ class feed extends CActiveRecord
 		);
 	}
 
+  /**
+   * pre-validation routine to keep update time properly set
+   * @return boolean continue validation
+   */
   public function beforeValidate($type) {
     $this->lastUpdated = time();
-    if($this->isNewRecord)
-      $this->status = self::STATUS_NEW;
 
     return parent::beforeValidate($type);
   }
 
+  /**
+   * delete related feed items and repoint any favorites to the generic all feeds id
+   * @return boolean successfull delete
+   */
+  function deleteByPk($pk, $condition='',$params=array())
+  {
+    if(parent::deleteByPk($pk, $condition, $params))
+    {
+      if(!is_array($pk))
+        $pk = array($pk);
+
+      // how can this be done using a 'WHERE feed_id IN :feed_id' clause safely?
+      // $where = "feed_id IN ('".implode("', '", $a)."')";
+      // but not safe at all, must be a better way
+      foreach($pk as $item)
+      {
+        feedItem::model()->deleteAll('feed_id = :feed_id', array(':feed_id'=>$item));
+        favoriteTvShow::model()->updateAll(array('feed_id'=>0), 'feed_id = :feed_id', array('feed_id'=>$item));
+        favoriteMovie::model()->updateAll(array('feed_id'=>0), 'feed_id = :feed_id', array('feed_id'=>$item));
+        favoriteString::model()->updateAll(array('feed_id'=>0), 'feed_id = :feed_id', array('feed_id'=>$item));
+      }
+      return True;
+    }
+    return False;
+  }
+
+  /**
+   * Returns the mapping of feed status integer to string
+   * @return array of int=>string pairs
+   */
+  public function getStatusOptions()
+  {
+    return array(
+        self::STATUS_NEW=>'Never Updated',
+        self::STATUS_OK=>'Update Successful',
+        self::STATUS_ERROR=>'Error connecting to feed',
+    );
+  }
+
+  /**
+   * @return
+   */
+  public function getStatusText()
+  {
+    $options=$this->statusOptions;
+    return isset($options[$this->status]) ? $options[$this->status] : "unknown ({$this->status})";
+  }
+
+  /**
+   * @return string the title of this feed, prefering a user provided title
+   */
   public function getTitle() {
     return empty($this->userTitle) ? $this->title : $this->userTitle;
   }
@@ -94,6 +125,7 @@ class feed extends CActiveRecord
   /**
    * updates the database with latest items from this feed
    * some inspiration from http://simplepie.org/wiki/tutorial/how_to_display_previous_feed_items_like_google_reader
+   * @return none
    */
   public function updateFeedItems($checkFavorites = True) {
     // id 0 is generic 'All Feeds' placeholder
@@ -122,25 +154,4 @@ class feed extends CActiveRecord
     $this->save();
   }
 
-  function deleteByPk($pk, $condition='',$params=array())
-  {
-    if(parent::deleteByPk($pk, $condition, $params))
-    {
-      if(!is_array($pk))
-        $pk = array($pk);
-
-      // how can this be done using a 'WHERE feed_id IN :feed_id' clause safely?
-      // $where = "feed_id IN ('".implode("', '", $a)."')";
-      // but not safe at all, must be a better way
-      foreach($pk as $item)
-      {
-        feedItem::model()->deleteAll('feed_id = :feed_id', array(':feed_id'=>$item));
-        favoriteTvShow::model()->updateAll(array('feed_id'=>0), 'feed_id = :feed_id', array('feed_id'=>$item));
-        favoriteMovie::model()->updateAll(array('feed_id'=>0), 'feed_id = :feed_id', array('feed_id'=>$item));
-        favoriteString::model()->updateAll(array('feed_id'=>0), 'feed_id = :feed_id', array('feed_id'=>$item));
-      }
-      return True;
-    }
-    return False;
-  }
 }
