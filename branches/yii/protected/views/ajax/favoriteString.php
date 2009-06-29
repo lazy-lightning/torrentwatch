@@ -1,4 +1,9 @@
-<?php echo CHtml::beginForm(array('updateFavorite', 'id'=>$favorite->id), 'post', array('class'=>'favinfo', 'id'=>'favoriteStrings-'.$favorite->id)); ?>
+<?php echo CHtml::beginForm(array('updateFavorite', 'id'=>$favorite->id), 'post', array('class'=>'favinfo', 'id'=>'favoriteStrings-'.$favorite->id));
+      if(isset($responce['favoriteStrings-'.$favorite->id])) {
+        $favorite = $responce['favoriteStrings-'.$favorite->id];
+        echo CHtml::errorSummary($favorite);
+      } ?>
+
  <div class="favorite_name">
   <?php 
     echo CHtml::activeLabelEx($favorite, 'name').': '.

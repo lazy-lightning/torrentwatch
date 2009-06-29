@@ -39,6 +39,7 @@ class movie extends CActiveRecord
 	public function relations()
 	{
 		return array(
+      'genres'=>array(self::MANY_MANY, 'genre', 'movie_genre(movie_id, genre_id)'),
 		);
 	}
 
@@ -53,4 +54,24 @@ class movie extends CActiveRecord
 			'imdbId'=>'Imdb ',
 		);
 	}
+
+  /**
+   * @return string url to imdb page
+   */
+  public function getImdbLink()
+  {
+    return 'http://www.imdb.com/title/tt'.$this->imdbId;
+  }
+
+  /**
+   * @return string genres in 'A / B / C' format
+   */
+  public function getGenreString()
+  {
+    $string = array();
+    foreach($this->genres as $genre) { 
+      $string[] = $genre->title;
+    }
+    return implode(' / ', $string);
+  }
 }
