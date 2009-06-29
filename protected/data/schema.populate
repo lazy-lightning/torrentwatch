@@ -1,6 +1,6 @@
 -- Default username/pass
-INSERT INTO users (id, username, password) VALUES(1,'admin','admin');
-INSERT INTO users (id, username, password) VALUES(2,'demo','demo');
+INSERT INTO users (id, username, password) VALUES(1,'admin','f6fdffe48c908deb0f4c3bd36c032e72');
+INSERT INTO users (id, username, password) VALUES(2,'demo','c514c91e4ed341f263e458d44b3bb0a7');
 
 -- Generic all_something identifiers
 INSERT INTO feed (id, title, description, url, status, lastUpdated, downloadType) VALUES (0, 'All Feeds', '', '', 0, 0, 0);
