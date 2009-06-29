@@ -26,6 +26,7 @@ class usenetItem extends feedAdapter_Item {
         '/\(([^):]+)\) \[\d+\/\d+\] - &quot;.*&quot;/i' => 1,
         '/^([\w\d.]+(?:-\w+)?) ?&quot;.*&quot;/i' => 1,
         '/^([A-Za-z0-9. ]+)&quot;.*&quot;/i' => 1,
+        '/\[([^\]]+)\.(?:par2|part\d+\.rar|rar|r\d+|nzb|avi|mkv)\]/i' => 1,
         '/&quot;(.*)&quot;/i' => 1,
       );
       $postClean = array(
