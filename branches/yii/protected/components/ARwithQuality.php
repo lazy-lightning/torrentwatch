@@ -27,12 +27,10 @@ abstract class ARwithQuality extends CActiveRecord {
 
   public function setQualityIds($in) {
     $out = array();
-    Yii::log("quality ids in: ".print_r($in, true), CLogger::LEVEL_ERROR);
     foreach($in as $val) {
       if($val >= 0)
         $out[] = $val;
     }
-    Yii::log("quality ids out: ".print_r($out, true), CLogger::LEVEL_ERROR);
     $this->_qualityIds = $out;
   }
 
