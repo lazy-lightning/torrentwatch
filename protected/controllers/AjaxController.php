@@ -68,8 +68,9 @@ class AjaxController extends CController
       {
         $type = 'favoriteMovies';
         $fav=new favoriteMovie;
-        $fav->genre = $feedItem->movie->genre;
-        $fav->name = $feedItem->title;
+        $fav->rating = empty($feedItem->movie->rating) ? 100 : $feedItem->movie->rating;
+        $fav->genre_id = $feedItem->movie->genres[0]->id;
+        $fav->name = $feedItem->movie->genres[0]->title.' - '.$feedItem->qualityString;
       } 
       else
       {
