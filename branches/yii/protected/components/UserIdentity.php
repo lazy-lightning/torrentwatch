@@ -20,7 +20,9 @@ class UserIdentity extends CUserIdentity
     $db = Yii::app()->db;
     $exists = $db->createCommand('SELECT NOT EXISTS(SELECT username FROM users WHERE username=:username)');
     $exists->bindValue(':username', $this->username);
-    $pwcheck = $db->createCommand('SELECT NOT EXISTS(SELECT username FROM users WHERE password=:password)');
+
+    $pwcheck = $db->createCommand('SELECT NOT EXISTS(SELECT username FROM users WHERE username=:username AND password=:password)');
+    $pwcheck->bindValue(':username', $this->username);
     $pwcheck->bindValue(':password', $this->password);
 
 		if($exists->queryScalar())
