@@ -1,13 +1,19 @@
 
 <div>
-  <h2><?php echo CHtml::link($movie->title, $movie->imdbLink); ?></h2>
+  <h2><?php echo CHtml::link($movie->fullTitle, $movie->imdbLink); ?></h2>
 </div>
-<?php if(!empty($movie->year)): ?>
+<?php if(!empty($item->qualityString)): ?>
+  <div>
+    <span>Quality:</span>
+    <span class='content'><?php echo CHtml::encode($item->qualityString); ?></span>
+  </div>
+<?php endif;
+      if(!empty($movie->year)): ?>
   <div>
     <span>Year:</span>
     <span class='content'><?php echo CHtml::encode($movie->year); ?></span>
   </div>
-<?php endif;   
+<?php endif;
       if(!empty($movie->genreString)): ?>
   <div>
     <span>Genre:</span>

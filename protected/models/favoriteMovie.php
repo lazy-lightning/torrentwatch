@@ -57,7 +57,7 @@ class favoriteMovie extends BaseFavorite
       'name'=>'Name',
       'genre_id'=>'Genre',
       'quality_id'=>'Quality',
-      'rating'=>'Rating',
+      'rating'=>'Rating >=',
     );
   }
 
