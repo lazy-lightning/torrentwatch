@@ -45,8 +45,8 @@ class favoriteMovies_quality extends CActiveRecord
   public function attributeLabels()
   {
     return array(
-      'favoriteMovies_id'=>'Favorite Movies ',
-      'quality_id'=>'Quality ',
+      'favoriteMovies_id'=>'Favorite Movies',
+      'quality_id'=>'Quality',
     );
   }
 }

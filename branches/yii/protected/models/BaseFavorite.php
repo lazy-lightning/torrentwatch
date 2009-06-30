@@ -6,9 +6,11 @@ abstract class BaseFavorite extends ARwithQuality
   public function rules()
   {
     return array(
+        array('queue', 'default', 'value'=>1),
+        array('feed_id', 'default', 'value'=>0),
         array('saveIn', 'writableDirectory'),
-        array('feed_id', 'validFeed'),
-        array('queue', 'in', 'range'=>array(0,1)),
+        array('feed_id', 'exist', 'allowEmpty'=>False, 'attributeName'=>'id', 'className'=>'feed'),
+        array('queue', 'in', 'allowEmpty'=>False, 'range'=>array(0,1)),
     );
   }
 
@@ -27,14 +29,7 @@ abstract class BaseFavorite extends ARwithQuality
   public function beforeSave()
   {
     if($this->isNewRecord === False) {
-      $table = $this->tableName();
-      $this->dbConnection->createCommand(
-          'UPDATE feedItem SET status='.feedItem::STATUS_NOMATCH.
-          ' WHERE feedItem.id IN ( SELECT feedItem_id as id FROM matching'.$table.' m'.
-                                  ' WHERE m.'.$table.'_id = '.$this->id.
-                                  '   AND m.feedItem_status NOT IN ("'.
-                                    feedItem::STATUS_AUTO_DL.'", "'.feedItem::STATUS_MANUAL_DL.'"));'
-      )->execute();
+      Yii::app()->dlManager->resetMatching($this);
     }
     return parent::beforeSave();
   }
@@ -55,13 +50,6 @@ abstract class BaseFavorite extends ARwithQuality
     return False;
   }
 
-  /**
-   * Validation function
-   */
-  public function validFeed($attribute, $params) {
-    if(False === feed::model()->exists('id = :id', array(':id'=>$this->$attribute)))
-      $this->addError($attribute, 'Must be a valid Feed Id');
-  }
   /**
    * Validation function
    */

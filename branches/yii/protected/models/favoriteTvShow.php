@@ -25,7 +25,9 @@ class favoriteTvShow extends BaseFavorite
   public function rules()
   {
     return array_merge(parent::rules(), array(
-          array('onlyNewer', 'in', 'range'=>array(0, 1)),
+          array('onlyNewer', 'default', 'value'=>0),
+          array('onlyNewer', 'in', 'allowEmpty'=>False, 'range'=>array(0, 1)),
+          array('tvShow_id', 'exist', 'allowEmpty'=>False, 'attributeName'=>'id', 'className'=>'tvShow'),
     ));
   }
 
@@ -54,8 +56,10 @@ class favoriteTvShow extends BaseFavorite
   }
 
   /**
-   * pre-validation routine
+   * validation routine converts tvShow_id from string into an id on
+   * a new record if neccessary
    * @return boolean continue validation process
+   * TODO: convert into generic validation function or class
    */
   public function beforeValidate($type)
   {
@@ -67,7 +71,6 @@ class favoriteTvShow extends BaseFavorite
       else try 
       {
         $this->tvShow_id = factory::tvShowByTitle($this->tvShow_id)->id;
-        Yii::log('Set tvShow_id to '.$this->tvShow_id, CLogger::LEVEL_ERROR);
       } catch ( Exception $e) {
         $this->addError("tvShow_id", "There was a problem initilizing a tvshow of that title");
         Yii::log('Failed adding tvShow for new favorite validation: '.$e->error, CLogger::LEVEL_ERROR);

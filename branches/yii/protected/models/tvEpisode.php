@@ -42,8 +42,12 @@ class tvEpisode extends CActiveRecord
   public function rules()
   {
     return array(
-      array('title','length','max'=>128),
-      array('season, episode, lastUpdated, status', 'numerical', 'integerOnly'=>true),
+      array('lastUpdated', 'default', 'setOnEmpty'=>false, 'value'=>time()),
+      array('tvShow_id', 'exist', 'allowEmpty'=>false, 'attributeName'=>'id', 'className'=>'tvShow'),
+      array('lastTvdbUpdate', 'default', 'value'=>0),
+      array('lastTvdbUpdate, season, episode', 'numerical', 'allowEmpty'=>false, 'integerOnly'=>true, 'min'=>0),
+      array('status', 'default', 'value'=>self::STATUS_NEW),
+      array('status', 'in', 'allowEmpty'=>false, 'range'=>array_keys($this->getStatusOptions())),
     );
   }
 
@@ -76,6 +80,15 @@ class tvEpisode extends CActiveRecord
     return parent::beforeValidate($type);
   }
 
+  /**
+   * @return favoriteMovie a favoriteMovie object to match this movie
+   */
+  public function generateFavorite() {
+    $fav = new favoriteTvShow;
+    $fav->tvShow_id = $this->tvShow_id;
+    return $fav;
+  }
+
   public function getEpisodeString($empty = TRUE) {
     if($this->season == 0 && $this->episode == 0)
       return $empty ? '' : 'Single Episode';
@@ -84,4 +97,5 @@ class tvEpisode extends CActiveRecord
     else 
       return sprintf('S%02dE%02d', $this->season, $this->episode);
   }
+
 }
