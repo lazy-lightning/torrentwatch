@@ -5,6 +5,16 @@
 // new feedItems and their related models
 
 class factory {
+  public static function feedItemByAttributes($attributes)
+  {
+    $item = new feedItem;
+    $item->attributes = $attributes;
+    if(!$item->save())
+      throw new CException("New feed item failed to save");
+
+    return $item;
+  }
+
   public static function genreByTitle($title) {
     $genre = genre::model()->find('title LIKE :title', array(':title'=>$title));
     if($genre === null) {
@@ -17,6 +27,10 @@ class factory {
   }
 
   public static function networkByTitle($title) {
+    // Remove the preface
+    if(strtolower(substr($title, 0, 4)) === 'the ')
+      $title = substr($title, 4);
+
     $network = network::model()->find('title LIKE :title', array(':title'=>$title));
     if($network === null) {
       $network = new network;
@@ -83,6 +97,15 @@ class factory {
       }
     }
     return $record;
+  }
+
+  public static function qualityIdsByTitleArray($titles) {
+    $ids = array();
+    foreach($titles as $title)
+    {
+      $ids[] = self::qualityByTitle($title)->id;
+    }
+    return $ids;
   }
 
   public static function movieByImdbId($imdbId, $title) {

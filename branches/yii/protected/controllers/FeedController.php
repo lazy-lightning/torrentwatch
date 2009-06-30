@@ -71,6 +71,7 @@ class FeedController extends BaseController
 			if($feed->save())
 				$this->redirect(array('show','id'=>$feed->id));
 		}
+
 		$this->render('create',array('feed'=>$feed));
 	}
 

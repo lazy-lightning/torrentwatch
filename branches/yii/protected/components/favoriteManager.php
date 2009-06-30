@@ -178,5 +178,20 @@ abstract class favoriteManager extends CComponent {
       feedItem::model()->updateByPk($duplicates, array('status'=>feedItem::STATUS_DUPLICATE)); // has been downloaded
   }
 
+  /**
+   * Reset any currently matching items to nomatch
+   */
+  public function resetMatching($favorite)
+  {
+    $table = $favorite->tableName();
+    $favorite->dbConnection->createCommand(
+        'UPDATE feedItem SET status='.feedItem::STATUS_NOMATCH.
+        ' WHERE feedItem.id IN ( SELECT feedItem_id as id FROM matching'.$table.' m'.
+                                ' WHERE m.'.$table.'_id = '.$favorite->id.
+                                '   AND m.feedItem_status NOT IN ("'.
+                                  feedItem::STATUS_AUTO_DL.'", "'.feedItem::STATUS_MANUAL_DL.'"));'
+    )->execute();
+  }
+
 }
 
