@@ -1,6 +1,6 @@
 <?php
 
-class feedItem extends CActiveRecord
+class feedItem extends ARwithQuality
 {
 
   // Higher numbers so they can be sorted as "better" matches
@@ -18,76 +18,57 @@ class feedItem extends CActiveRecord
   const TYPE_TORRENT = 0;
   const TYPE_NZB = 1;
 
-  // used to set the feedItem_quality table
-  private $_qualityIds;
+  /**
+   * Returns the static model of the specified AR class.
+   * @return CActiveRecord the static model class
+   */
+  public static function model($className=__CLASS__)
+  {
+    return parent::model($className);
+  }
 
-	/**
-	 * Returns the static model of the specified AR class.
-	 * @return CActiveRecord the static model class
-	 */
-	public static function model($className=__CLASS__)
-	{
-		return parent::model($className);
-	}
+  /**
+   * @return string the associated database table name
+   */
+  public function tableName()
+  {
+    return 'feedItem';
+  }
 
-	/**
-	 * @return string the associated database table name
-	 */
-	public function tableName()
-	{
-		return 'feedItem';
-	}
+  /**
+   * @return array validation rules for model attributes.
+   */
+  public function rules()
+  {
+    return array(
+      array('status, pubDate, lastUpdated, hash, downloadType, feed_id', 'required'),
+      array('pubDate, lastUpdated, feed_id, movie_id, other_id, tvEpisode_id', 'numerical', 'integerOnly'=>true, 'min'=>0),
+      array('status', 'numerical', 'integerOnly'=>true, 'min'=>self::STATUS_NEW, 'max'=>self::STATUS_MANUAL_DL),
+    );
+  }
 
-	/**
-	 * @return array validation rules for model attributes.
-	 */
-	public function rules()
-	{
-		return array(
-			array('status, pubDate, lastUpdated, hash, downloadType, feed_id', 'required'),
-			array('status, pubDate, lastUpdated', 'numerical', 'integerOnly'=>true),
-		);
-	}
-
-	/**
-	 * @return array relational rules.
-	 */
-	public function relations()
-	{
-		return array(
+  /**
+   * @return array relational rules.
+   */
+  public function relations()
+  {
+    return array(
         'feed'=>array(self::BELONGS_TO, 'feed', 'feed_id'),
         'quality'=>array(self::MANY_MANY, 'quality', 'feedItem_quality(feedItem_id, quality_id)'),
         // Belongs to only one of the next 3
         'tvEpisode'=>array(self::BELONGS_TO, 'tvEpisode', 'tvEpisode_id'),
         'movie'=>array(self::BELONGS_TO, 'movie', 'movie_id'),
         'other'=>array(self::BELONGS_TO, 'other', 'other_id'),
-		);
-	}
-
-	/**
-	 * @return array customized attribute labels (name=>label)
-	 */
-	public function attributeLabels()
-	{
-		return array(
-		);
-	}
+    );
+  }
 
   /**
-   * @return array row id of every related quality
+   * @return array customized attribute labels (name=>label)
    */
-  public function getQualityIds() {
-    if($this->_qualityIds === null) {
-      $relations = feedItem_quality::model()->findAllByAttributes(array('quality_id' => $this->id));
-
-      $ids = array();
-      foreach($relations as $record) {
-        $ids[] = $record->quality_id;
-      }
-      
-      $this->_qualityIds = $ids;
-    }
-    return $this->_qualityIds;
+  public function attributeLabels()
+  {
+    return array(
+    );
   }
 
   /**
@@ -137,36 +118,6 @@ class feedItem extends CActiveRecord
         : "unknown ({$status})";
   }
       
-  public function getQualityString() {
-    $string = array();
-    foreach($this->quality as $quality) { 
-      $string[] = $quality->title;
-    }
-    return implode(' / ', $string);
-  }
-
-  public function setQualityIds($ids = array()) {
-    $this->_qualityIds = $ids;
-  }
-
-  public function afterSave() {
-    // update scenario
-    // Clean out any quality relations if this isn't new
-    if(!$this->isNewRecord) {
-      feedItem_quality::model()->deleteAll('feedItem_id=:feedItem_id', array(':feedItem_id'=>$this->id));
-    }
-
-    // set quality relations
-    foreach($this->qualityIds as $qualityId) {
-      $relation = new feedItem_quality;
-      $relation->feedItem_id = $this->id;
-      $relation->quality_id = $qualityId;
-      $relation->save();
-    }
-
-    parent::afterSave();
-  }
-
   public function beforeValidate($type) {
     $this->lastUpdated = time();
 

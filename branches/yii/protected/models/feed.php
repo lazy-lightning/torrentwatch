@@ -6,56 +6,54 @@ class feed extends CActiveRecord
   const STATUS_OK=1;
   const STATUS_ERROR=2;
 
-	/**
-	 * Returns the static model of the specified AR class.
-	 * @return CActiveRecord the static model class
-	 */
-	public static function model($className=__CLASS__)
-	{
-		return parent::model($className);
-	}
+  /**
+   * Returns the static model of the specified AR class.
+   * @return CActiveRecord the static model class
+   */
+  public static function model($className=__CLASS__)
+  {
+    return parent::model($className);
+  }
 
-	/**
-	 * @return string the associated database table name
-	 */
-	public function tableName()
-	{
-		return 'feed';
-	}
+  /**
+   * @return string the associated database table name
+   */
+  public function tableName()
+  {
+    return 'feed';
+  }
 
-	/**
-	 * @return array validation rules for model attributes.
-	 */
-	public function rules()
-	{
-		return array(
-			array('title','length','max'=>128),
-			array('url','length','max'=>256),
-			array('url, downloadType', 'required'),
+  /**
+   * @return array validation rules for model attributes.
+   */
+  public function rules()
+  {
+    return array(
+      array('url, downloadType', 'required'),
       array('status', 'default', value=>'0'),
       array('status', 'in', 'range'=>array(0, 1, 2)),
 
-		);
-	}
+    );
+  }
 
-	/**
-	 * @return array relational rules.
-	 */
-	public function relations()
-	{
-		return array(
+  /**
+   * @return array relational rules.
+   */
+  public function relations()
+  {
+    return array(
         'feedItems'=>array(self::HAS_MANY, 'feedItem', 'feedItem_id'),
-		);
-	}
+    );
+  }
 
-	/**
-	 * @return array customized attribute labels (name=>label)
-	 */
-	public function attributeLabels()
-	{
-		return array(
-		);
-	}
+  /**
+   * @return array customized attribute labels (name=>label)
+   */
+  public function attributeLabels()
+  {
+    return array(
+    );
+  }
 
   /**
    * pre-validation routine to keep update time properly set
