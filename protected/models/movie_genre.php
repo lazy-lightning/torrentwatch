@@ -2,51 +2,51 @@
 
 class movie_genre extends CActiveRecord
 {
-	/**
-	 * Returns the static model of the specified AR class.
-	 * @return CActiveRecord the static model class
-	 */
-	public static function model($className=__CLASS__)
-	{
-		return parent::model($className);
-	}
+  /**
+   * Returns the static model of the specified AR class.
+   * @return CActiveRecord the static model class
+   */
+  public static function model($className=__CLASS__)
+  {
+    return parent::model($className);
+  }
 
-	/**
-	 * @return string the associated database table name
-	 */
-	public function tableName()
-	{
-		return 'movie_genre';
-	}
+  /**
+   * @return string the associated database table name
+   */
+  public function tableName()
+  {
+    return 'movie_genre';
+  }
 
-	/**
-	 * @return array validation rules for model attributes.
-	 */
-	public function rules()
-	{
-		return array(
-			array('movie_id, genre_id', 'required'),
-			array('movie_id, genre_id', 'numerical', 'integerOnly'=>true),
-		);
-	}
+  /**
+   * @return array validation rules for model attributes.
+   */
+  public function rules()
+  {
+    return array(
+      array('movie_id, genre_id', 'required'),
+      array('movie_id, genre_id', 'numerical', 'integerOnly'=>true),
+    );
+  }
 
-	/**
-	 * @return array relational rules.
-	 */
-	public function relations()
-	{
-		return array(
-		);
-	}
+  /**
+   * @return array relational rules.
+   */
+  public function relations()
+  {
+    return array(
+    );
+  }
 
-	/**
-	 * @return array customized attribute labels (name=>label)
-	 */
-	public function attributeLabels()
-	{
-		return array(
-			'movie_id'=>'Movie ',
-			'genre_id'=>'Genre ',
-		);
-	}
+  /**
+   * @return array customized attribute labels (name=>label)
+   */
+  public function attributeLabels()
+  {
+    return array(
+      'movie_id'=>'Movie ',
+      'genre_id'=>'Genre ',
+    );
+  }
 }
