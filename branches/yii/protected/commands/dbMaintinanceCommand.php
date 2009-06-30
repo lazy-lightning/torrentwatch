@@ -31,6 +31,13 @@ class dbMaintinanceCommand extends CConsoleCommand {
         '         id NOT IN (SELECT tvEpisode_id FROM feedItem)'.
         '       )'.
         '   AND status = '.tvEpisode::STATUS_NEW.';',
+        // Empty out unrelated networks
+        'DELETE FROM network'.
+        ' WHERE id NOT IN (SELECT network_id FROM tvShow);',
+        // Empty out unrelated genres
+        'DELETE FROM genre'.
+        ' WHERE id NOT IN (SELECT genre_id from favoriteMovies)'.
+        '   AND id NOT IN (SELECT genre_id from movie_genre);',
         //
     );
     // SQLite doesn't do anything with foreign keys, so clean out MANY_MANY relationships that point to
