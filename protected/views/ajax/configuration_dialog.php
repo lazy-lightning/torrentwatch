@@ -90,21 +90,24 @@
       </div>
      <?php endforeach; ?>
     <?php endif; ?>
+    <?php $feed = isset($responce['activeFeed-']) ? $responce['activeFeed-'] : new feed; ?>
     <div class="activeFeed">
       <?php echo CHtml::beginForm(array('addFeed'), 'post', array('class'=>'feedform')); ?>
         <a class="submitForm button" id="Add" href="#">Add</a>
+        <?php echo CHtml::errorSummary($feed); ?>
         <div>
           <label class="item">New Feed</label>
-          <?php echo CHtml::dropDownList('feed[downloadType]', 0, array(feedItem::TYPE_NZB=>'NZB', feedItem::TYPE_TORRENT=>'Torrent')); ?>
+          <?php echo CHtml::dropDownList('feed[downloadType]', $feed->downloadType, array(feedItem::TYPE_NZB=>'NZB', feedItem::TYPE_TORRENT=>'Torrent')); ?>
         </div>
         <div>
-          <input type="text" name="feed[url]" id="feed_url">
+          <?php echo CHtml::activeTextField($feed, 'url'); ?>
         </div>
         <div class="buttonContainer">
           <a class='toggleDialog button' href='#'>Close</a>
         </div>
       </form>
     </div>
+    <div class='clear'></div>
   </div>
 </div>
   

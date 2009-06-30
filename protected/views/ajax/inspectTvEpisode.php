@@ -17,7 +17,7 @@
 <?php if(!empty($tvShow->rating)): ?>
   <div>
     <span>Rating: </span>
-    <span class='content'><?php echo CHtml::encode($tvShow->rating); ?></span>
+    <span class='content'><?php echo CHtml::encode($tvShow->rating); ?> / 10</span>
   </div>
 <?php endif; ?>
 <?php if(!empty($tvShow->description)): ?>

@@ -17,6 +17,14 @@ abstract class BaseDvrConfig extends CAttributeCollection {
     $this->_changed[$key] = true;
   }
 
+  public function setAttributes($attributes) {
+    foreach($attributes as $key => $value)
+    {
+      if($this->contains($key))
+        $this->$key = $value;
+    }
+  }
+
   public function setChanged($key) {
     $this->_changed[$key] = true;
   }

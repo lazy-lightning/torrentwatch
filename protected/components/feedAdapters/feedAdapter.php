@@ -38,7 +38,7 @@ class feedAdapter extends SimplePie {
     foreach($items as $item) {
       $hash = md5($item->get_id());
       if(false === feedItem::model()->exists('hash=:hash', array(':hash'=>$hash))) {
-        feedItem::factory(array(
+        factory::feedItemByAttributes(array(
               'hash'        => $hash,
               'feed_id'     => $this->_feedAR->id,
               'downloadType'=> $this->_feedAR->downloadType,
