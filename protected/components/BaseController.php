@@ -4,6 +4,9 @@ abstract class BaseController extends CController {
   private $_resolution;
   public $imageRoot;
 
+  /**
+   * @return array list of items to be used as the side bar menu
+   */
   public function getMainMenuItems() {
     return array(
         array('name'=>'index', 'label'=>'NMTDVR Home', 'url'=>array('site/index')),
@@ -12,12 +15,21 @@ abstract class BaseController extends CController {
     );
   }
 
+  /**
+   * @return string the resolution(hd/sd) of the nmt requestin the page
+   */
   public function getResolution() {
     return $this->_resolution;
   }
 
+  /**
+   * Point the imageRoot and layout to the appropriate pages for this request
+   * @return none
+   */
   public function init() {
+    // sd if reported in user agent, otherwise default to hd
     $this->_resolution = stristr($_SERVER['HTTP_USER_AGENT'], 'Res720x576') === False?'hd':'sd';
+    // if the user agent is an NMT give it local filepath, otherwise based off script
     if(stristr($_SERVER['HTTP_USER_AGENT'], 'Syabas') === False) 
       $this->imageRoot = dirname($_SERVER['SCRIPT_NAME']).'/assets/images/';
     else
@@ -25,12 +37,16 @@ abstract class BaseController extends CController {
 
     $this->imageRoot .= $this->_resolution.'/';
 
+    // Switch to ajax view when required
     if(Yii::app()->request->isAjaxRequest)
       $this->layout = 'ajax';
     else
       $this->layout = 'main_'.$this->_resolution;
   }
 
+  /**
+   * Prepares a set of links to be used by the NMT view
+   */
   public function prepareListItems($in, $index = 1) {
     $out = array();
     $mWidth = $this->_resolution==='hd'?560:290;
