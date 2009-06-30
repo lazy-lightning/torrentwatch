@@ -29,6 +29,7 @@ class movie extends CActiveRecord
   public function rules()
   {
     return array(
+      array('status', 'default', 'value'=>self::STATUS_NEW),
       array('imdbId', 'numerical', 'integerOnly'=>true),
     );
   }
@@ -53,6 +54,23 @@ class movie extends CActiveRecord
       'title'=>'Title',
       'imdbId'=>'Imdb ',
     );
+  }
+
+  /**
+   * @return favoriteMovie a favoriteMovie object to match this movie
+   */
+  public function generateFavorite()
+  {
+    $fav=new favoriteMovie;
+    $fav->rating = empty($feedItem->movie->rating) ? 100 : $feedItem->movie->rating;
+    $fav->genre_id = $feedItem->movie->genres[0]->id;
+    $fav->name = $feedItem->movie->genres[0]->title.' - '.$feedItem->qualityString;
+    if(!empty($feedItem->movie->year))
+    {
+      $fav->minYear = $feedItem->movie->year - 5;
+      $fav->maxYear = $feedItem->movie->year + 5;
+    }
+    return $fav;
   }
 
   /**

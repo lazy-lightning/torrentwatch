@@ -29,9 +29,9 @@ class favoriteMovie extends BaseFavorite
       array('minYear', 'default', 'value'=>1900),
       array('maxYear', 'default', 'value'=>2012),
       array('rating', 'default', 'value'=>100),
-      array('genre_id', 'validGenre'),
-      array('minYear, maxYear', 'numerical', 'integerOnly'=>true, 'min'=>1900, 'max'=>2100),
-      array('rating', 'numerical', 'integerOnly'=>true, 'min'=>0, 'max'=>100),
+      array('genre_id', 'exist', 'allowEmpty'=>false, 'attributeName'=>'id', 'className'=>'genre'),
+      array('minYear, maxYear', 'numerical', 'allowEmpty'=>false, 'integerOnly'=>true, 'min'=>1900, 'max'=>2100),
+      array('rating', 'numerical', 'allowEmpty'=>false, 'integerOnly'=>true, 'min'=>0, 'max'=>100),
     ));
   }
 
@@ -59,13 +59,5 @@ class favoriteMovie extends BaseFavorite
       'quality_id'=>'Quality',
       'rating'=>'Rating >=',
     );
-  }
-
-  /**
-   * @return boolean $this->$attribute contains a valid genre id
-   */
-  public function validGenre($attribute, $params) {
-    if(!genre::model()->exists('id = :id', array(':id'=>$this->$attribute)))
-      $this->addError($attribute, 'Not a valid Genre Id');
   }
 }

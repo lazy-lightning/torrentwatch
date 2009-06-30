@@ -29,10 +29,11 @@ class feed extends CActiveRecord
   public function rules()
   {
     return array(
-      array('url, downloadType', 'required'),
-      array('status', 'default', value=>'0'),
-      array('status', 'in', 'range'=>array(0, 1, 2)),
-
+      array('lastUpdated', 'default', 'setOnEmpty'=>false, 'value'=>time()),
+      array('downloadType', 'in', 'allowEmpty'=>false, 'range'=>array_keys(feedItem::getDownloadTypeOptions())),
+      array('url', 'url', 'allowEmpty'=>false),
+      array('status', 'default', value=>self::STATUS_NEW),
+      array('status', 'in', 'allowEmpty'=>false, 'range'=>array_keys($this->getStatusOptions())),
     );
   }
 
@@ -55,21 +56,22 @@ class feed extends CActiveRecord
     );
   }
 
-  /**
-   * pre-validation routine to keep update time properly set
-   * @return boolean continue validation
-   */
-  public function beforeValidate($type) {
-    $this->lastUpdated = time();
-
-    return parent::beforeValidate($type);
+  public function afterSave() {
+    parent::afterSave();
+    if($this->isNewRecord)
+    {
+      // force to false so the save from in updateFeedItems doesn't fail
+      $this->isNewRecord = False;
+      $this->updateFeedItems();
+      $this->refresh();
+    }
   }
 
   /**
    * delete related feed items and repoint any favorites to the generic all feeds id
    * @return boolean successfull delete
    */
-  function deleteByPk($pk, $condition='',$params=array())
+  public function deleteByPk($pk, $condition='',$params=array())
   {
     if(parent::deleteByPk($pk, $condition, $params))
     {
@@ -95,7 +97,7 @@ class feed extends CActiveRecord
    * Returns the mapping of feed status integer to string
    * @return array of int=>string pairs
    */
-  public function getStatusOptions()
+  public static function getStatusOptions()
   {
     return array(
         self::STATUS_NEW=>'Never Updated',
@@ -131,7 +133,6 @@ class feed extends CActiveRecord
       Yii::log("Skip all feeds placeholder");
       return;
     }
-    // initialize the adapter
 
     // Chooses and returns the proper feedAapter for this feed
     $adapter = feedAdapterRouter::getAdapter($this);

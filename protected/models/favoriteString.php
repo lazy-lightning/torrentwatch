@@ -26,6 +26,7 @@ class favoriteString extends BaseFavorite
   {
     return array_merge(parent::rules(), array(
           array('name, filter', 'required'),
+          array('filter, notFilter', 'convertGlobtoSQL')
     ));
   }
 
@@ -61,11 +62,10 @@ class favoriteString extends BaseFavorite
     Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NOMATCH);
   }
 
-  public function beforeValidate() {
-    // Convert from GLOB to sql LIKE syntax
-    $this->filter = strtr($this->filter, '*', '%');
-    $this->notFilter = empty($this->notFilter) ? NULL : strtr($this->notFilter, '*', '%');
-
+  public function convertGlobToSQL($attribute, $params)
+  {
+    $value = $this->$attribute;
+    $this->$attribute = empty($value) ? NULL : strtr($value, '*', '%');
     return true;
   }
 }

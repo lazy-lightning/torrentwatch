@@ -29,6 +29,7 @@ class other extends CActiveRecord
   public function rules()
   {
     return array(
+        array('status', 'default', 'value'=>self::STATUS_NEW),
     );
   }
 
