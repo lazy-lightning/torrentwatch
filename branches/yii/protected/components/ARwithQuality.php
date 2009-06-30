@@ -25,6 +25,14 @@ abstract class ARwithQuality extends CActiveRecord {
     return $this->_qualityIds;
   }
 
+  public function getQualityString() {
+    $string = array();
+    foreach($this->quality as $quality) {
+      $string[] = $quality->title;
+    }
+    return implode(' / ', $string);
+  }
+
   public function setQualityIds($in) {
     $out = array();
     foreach($in as $val) {

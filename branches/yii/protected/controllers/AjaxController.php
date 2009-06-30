@@ -71,6 +71,11 @@ class AjaxController extends CController
         $fav->rating = empty($feedItem->movie->rating) ? 100 : $feedItem->movie->rating;
         $fav->genre_id = $feedItem->movie->genres[0]->id;
         $fav->name = $feedItem->movie->genres[0]->title.' - '.$feedItem->qualityString;
+        if(!empty($feedItem->movie->year))
+        {
+          $fav->minYear = $feedItem->movie->year - 5;
+          $fav->maxYear = $feedItem->movie->year + 5;
+        }
       } 
       else
       {
@@ -302,7 +307,6 @@ class AjaxController extends CController
     $others = $this->prepareFeedItems('otherFeedItem');
     $time['others'] = microtime(true);
     $queued = $this->prepareFeedItems('queuedFeedItem');
-//    $queued = $this->prepareFeedItems('queuedFeedItem');
     $time['queued'] = microtime(true);
 
     foreach($time as $key => $value) {
@@ -335,24 +339,25 @@ class AjaxController extends CController
   {
     $view = 'inspectError';
     $item = null;
+    $opts = array();
     if(isset($_GET['feedItem_id']) && is_numeric($_GET['feedItem_id']))
     {
-      $item = feedItem::model()->findByPk($_GET['feedItem_id']);
+      $item = $opts['item'] = feedItem::model()->findByPk($_GET['feedItem_id']);
       if($item !== null) {
         if(!empty($item->tvEpisode_id)) 
         {
           $view = 'inspectTvEpisode';
-          $opts=array('tvEpisode' => $item->tvEpisode);
+          $opts['tvEpisode'] = $item->tvEpisode;
         }
         elseif(!empty($item->movie_id))
         {
           $view = 'inspectMovie';
-          $opts = array('movie' => $item->movie);
+          $opts['movie'] = $item->movie;
         }
         elseif(!empty($item->other_id)) 
         {
           $view = 'inspectOther';
-          $opts = array('other' => $item->other);
+          $opts['other'] = $item->other;
         }
       }
     }

@@ -74,4 +74,12 @@ class movie extends CActiveRecord
     }
     return implode(' / ', $string);
   }
+
+  /**
+   * @return string prefered title of the movie
+   */
+  public function getFullTitle()
+  {
+    return empty($this->name) ? $this->title : $this->name;
+  }
 }
