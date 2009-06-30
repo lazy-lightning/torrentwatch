@@ -1,24 +1,34 @@
 
 <div>
-  <span>Title:</span>
-  <span><?php echo CHtml::link($movie->title, $movie->imdbLink); ?></span>
+  <h2><?php echo CHtml::link($movie->title, $movie->imdbLink); ?></h2>
 </div>
-<div>
-  <span>Year:</span>
-  <span><?php echo CHtml::encode($movie->year); ?></span>
-</div>
-<div>
-  <span>Genre:</span>
-  <span><?php echo CHtml::encode($movie->genreString); ?></span>
+<?php if(!empty($movie->year)): ?>
+  <div>
+    <span>Year:</span>
+    <span class='content'><?php echo CHtml::encode($movie->year); ?></span>
+  </div>
+<?php endif;   
+      if(!empty($movie->genreString)): ?>
+  <div>
+    <span>Genre:</span>
+    <span class='content'><?php echo CHtml::encode($movie->genreString); ?></span>
+  </div>
+<?php endif;   
+      if(!empty($movie->rating)): ?>
 <div>
   <span>Rating:</span>
-  <span><?php echo CHtml::encode($movie->rating); ?> / 100</span>
+  <span class='content'><?php echo CHtml::encode($movie->rating); ?> / 100</span>
 </div>
-<div>
-  <span>Plot:</span>
-  <span><?php echo CHtml::encode($movie->plot); ?></span>
-</div>
-<div>
-  <span>Runtime:</span>
-  <span><?php echo CHtml::encode($movie->runtime); ?></span>
-</div>
+<?php endif;
+      if(!empty($movie->plot)): ?>
+  <div>
+    <span>Plot:</span>
+    <span class='content'><?php echo CHtml::encode($movie->plot); ?></span>
+  </div>
+<?php endif; 
+      if(!empty($movie->runtime)): ?>
+  <div>
+    <span>Runtime:</span>
+    <span class='content'><?php echo CHtml::encode($movie->runtime); ?></span>
+  </div>
+<?php endif; ?>
