@@ -3,9 +3,10 @@
 abstract class BaseDvrConfig extends CModel {
   private $_updateCommand; // CDbCommand that can update a value from this category
   private $_changed=array(); // changed items since load
-  protected $_id = null; // id from the dvrConfigCategory table
   private $_ar = array(); // loaded values
   private $allowNewEntries = True; // If new items can be added to the array
+
+  protected $_id = null; // id from the dvrConfigCategory table
 
   /**
    * override __get to retreive variables from our internal config array
@@ -62,12 +63,8 @@ abstract class BaseDvrConfig extends CModel {
   }
 
   /**
-   * unused with override of the setAttributes function
+   * @return boolean if the save should proceede
    */
-  public function safeAttributes()
-  {
-  }
-
   public function beforeSave()
   {
     return True;
@@ -86,7 +83,7 @@ abstract class BaseDvrConfig extends CModel {
    * Returns a CDbCommand capable of updating a row for this category
    * @return CDbCommand command requiring :key and :value to be bound
    */
-  public function getUpdateCommand()
+  private function getUpdateCommand()
   {
     if(!$this->_updateCommand)
     {
@@ -111,6 +108,13 @@ abstract class BaseDvrConfig extends CModel {
   }
 
   /**
+   * unused with override of the setAttributes function
+   */
+  public function safeAttributes()
+  {
+  }
+
+  /**
    * save any changed values to the database
    * @param boolean weather to perform validation before saving the record
    * If the validation fails, the record will not be saved to the database
@@ -125,8 +129,8 @@ abstract class BaseDvrConfig extends CModel {
   }
 
   /**
-   * Override setAttributes from CModel to set any
-   * item already contained in the category
+   * Override setAttributes from CModel to allow mass assignment
+   * for all attributes contained in the category
    */
   public function setAttributes($values, $scenario='') {
     Yii::log(__FUNCTION__.': '.print_r($values, true), CLogger::LEVEL_ERROR);
@@ -137,7 +141,7 @@ abstract class BaseDvrConfig extends CModel {
   }
 
   /**
-   * tag a variable as changed since load
+   * Tag an attribute as changed since load
    * @param string the key to tag
    */
   public function setChanged($key) {
@@ -180,7 +184,7 @@ abstract class BaseDvrConfig extends CModel {
    * @param string $key the key to be updated
    * @param mixed $value the value to be associated with the key
    */
-  public function updateByKey($key, $value)
+  private function updateByKey($key, $value)
   {
     $cmd = $this->getUpdateCommand();
     $cmd->bindValue(':key', $key);
@@ -195,10 +199,10 @@ class dvrConfigCategory extends BaseDvrConfig {
   private $_title;
 
   /**
-   *
-   * @param dvrConfig the parent dvrClass instantiating this class
+   * Constructor.
+   * @param dvrConfig $parent the object instantiating this class
    * @param string the title of this category
-   * @param array an array of key=>value pairs to fill the array
+   * @param array an array of key=>value pairs to assign to the category
    */
   public function __construct($parent, $id, $title, $values) {
     $this->_parent = $parent;
@@ -211,7 +215,7 @@ class dvrConfigCategory extends BaseDvrConfig {
 
   /**
    * Notifies parent of any add events to propogate save
-   * @param mixed the key to be added
+   * @param string the key to be added
    * @param mixed the value to be associated with said key
    */
   public function add($key, $value) {
@@ -219,11 +223,18 @@ class dvrConfigCategory extends BaseDvrConfig {
     $this->_parent->setChanged($this->_title);
   }
 
+  /**
+   * Initalize this subcategory
+   */
   public function init() {
     $this->_parent->add($this->_title, $this);
     parent::init();
   }
 
+  /**
+   * Returns the title of this sub-category
+   * @return string
+   */
   public function getTitle() {
     return $this->_title;
   }
@@ -232,6 +243,9 @@ class dvrConfigCategory extends BaseDvrConfig {
 
 class dvrConfig extends BaseDvrConfig {
 
+  /**
+   *
+   */
   public function init() {
     $db = Yii::app()->db;
     // Get our configuration information out of the database
