@@ -20,18 +20,7 @@ abstract class favoriteManager extends CComponent {
     $this->checkStringFavorites($itemStatus);
 
     $this->startDownloads();
-    $this->updateItemStatus();
-
-    // if we were checking new items, change all still new to nomatch
-    if($itemStatus === feedItem::STATUS_NEW) 
-    {
-      feedItem::model()->updateAll(
-          array('status'=>feedItem::STATUS_NOMATCH),
-          'status = :status',
-          array(':status'=>feedItem::STATUS_NEW)
-      );
-    }
-    
+    $this->updateItemStatus($itemStatus);
   }
  
   /**
@@ -168,7 +157,7 @@ abstract class favoriteManager extends CComponent {
   /**
    * update the status of all feedItems tagged in the internal arrays
    */
-  private function updateItemStatus()
+  private function updateItemStatus($updateType)
   {
     // After matching has occured, updated item statuses
     if(count($this->toQueue) !== 0)
@@ -176,6 +165,16 @@ abstract class favoriteManager extends CComponent {
     if(count($this->duplicates) !== 0)
       feedItem::model()->updateByPk($this->duplicates, array('status'=>feedItem::STATUS_DUPLICATE));
 
+    // if we were checking new items, change all still new to nomatch
+    if($updateType === feedItem::STATUS_NEW) 
+    {
+      feedItem::model()->updateAll(
+          array('status'=>feedItem::STATUS_NOMATCH),
+          'status = :status',
+          array(':status'=>feedItem::STATUS_NEW)
+      );
+    }
+    
     $this->duplicates = $this->toQueue = array();
   }
 
