@@ -4,18 +4,27 @@
 abstract class favoriteManager extends CComponent {
   abstract function startDownload($opts, $status);
 
+  private $toStart = array();
+  private $toQueue = array();
+  private $duplicates = array();
+
   // there must be a better way than the following for multiple favorites . . .
   /**
    * looks for feedItems that matching a favorite in the database
    * @param integer a feeditem status to limit the search to
    */
-  public function checkFavorites($itemStatus = feedItem::STATUS_NEW) {
+  public function checkFavorites($itemStatus = feedItem::STATUS_NEW) 
+  {
     $this->checkTvShowFavorites($itemStatus);
     $this->checkMovieFavorites($itemStatus);
     $this->checkStringFavorites($itemStatus);
 
+    $this->startDownloads();
+    $this->updateItemStatus();
+
     // if we were checking new items, change all still new to nomatch
-    if($itemStatus === feedItem::STATUS_NEW) {
+    if($itemStatus === feedItem::STATUS_NEW) 
+    {
       feedItem::model()->updateAll(
           array('status'=>feedItem::STATUS_NOMATCH),
           'status = :status',
@@ -29,12 +38,10 @@ abstract class favoriteManager extends CComponent {
    * looks for feedItems that matching a favoriteMovie in the database
    * @param integer a feeditem status to limit the search to
    */
-  public function checkMovieFavorites($itemStatus = feedItem::STATUS_NEW) {
+  private function checkMovieFavorites($itemStatus = feedItem::STATUS_NEW) 
+  {
     Yii::log('Looking for movie favorites', CLogger::LEVEL_ERROR);
     $db = Yii::app()->db;
-    $toStart = array();
-    $toQueue = array();
-    $duplicates = array();
 
     // Mark any previously downloaded movies that are now matching
     $db->createCommand(
@@ -54,32 +61,13 @@ abstract class favoriteManager extends CComponent {
         '   AND movie_status='.movie::STATUS_NEW
     )->query();
 
-    foreach($reader as $row) {
+    foreach($reader as $row) 
+    {
       if($row['favorite_queue'])
-        $toQueue[] = $row['feedItem_id'];
+        $this->toQueue[] = $row['feedItem_id'];
       else
-        $toStart[$row['movie_id']][] = $row;
+        $this->toStart['movie.'.$row['movie_id']][] = $row;
     }
- 
-    foreach($toStart as $items) {
-      // For now just take the first feedItem for each movie, but this
-      // structure allows there to be a decision making process inserted
-      // here to decide which item based on feed priority or something.
-      $success = false;
-      foreach($items as $item) {
-        if($success) {
-          $duplicates[] = $item['feedItem_id'];
-        } else {
-          $success = $this->startDownload($item, feedItem::STATUS_AUTO_DL);
-        }
-      }
-    }
-
-    // After matching has occured, updated item statuses
-    if(count($toQueue) !== 0)
-      feedItem::model()->updateByPk($toQueue, array('status'=>feedItem::STATUS_QUEUED));
-    if(count($duplicates) !== 0) // mark feedItems as duplicate if another feedItem of the same season and episode
-      feedItem::model()->updateByPk($duplicates, array('status'=>feedItem::STATUS_DUPLICATE)); // has been downloaded
   }
 
   /**
@@ -87,34 +75,32 @@ abstract class favoriteManager extends CComponent {
    * and starts them.   Needs some work to prevent duplicate downloads
    * @param integer a feeditem status to limit the search to
    */
-  public function checkStringFavorites($itemStatus = feedItem::STATUS_NEW) {
+  private function checkStringFavorites($itemStatus = feedItem::STATUS_NEW) 
+  {
     Yii::log('Looking for string favorites', CLogger::LEVEL_ERROR);
     $db = Yii::app()->db;
-    $toStart = array();
-    $toQueue = array();
 
     $reader = $db->createCommand(
         'SELECT * FROM matchingFavoriteStrings'.
-        '  WHERE feedItem_status='.$itemStatus)->query();
+        '  WHERE feedItem_status='.$itemStatus
+    )->query();
 
-    foreach($reader as $row) {
+    foreach($reader as $row) 
+    {
       if($row['favorite_queue'] == 1)
-        $toQueue[] = $row['feedItem_id'];
+        $this->toQueue[] = $row['feedItem_id'];
       else
-        $this->startDownload($item, feedItem::STATUS_AUTO_DL);
+        $this->toStart[][] = $row;
     }
-    
-    if(count($toQueue) !== 0)
-      feedItem::model()->updateByPk($toQueue, array('status'=>feedItem::STATUS_QUEUED));
   }
 
   /**
    * looks for feedItems that matching a favoriteTvShow in the database
    * @param integer a feeditem status to limit the search to
    */
-  public function checkTvShowFavorites($itemStatus = feedItem::STATUS_NEW) {
+  private function checkTvShowFavorites($itemStatus = feedItem::STATUS_NEW) 
+  {
     Yii::log('Looking for TvShow favorites', CLogger::LEVEL_ERROR);
-    $duplicates = $toQueue = array();
     $db = Yii::app()->db;
 
     // Mark any duplicate episodes
@@ -147,50 +133,69 @@ abstract class favoriteManager extends CComponent {
     )->query();
 
     // loop through the matching items
-    // and group the duplicates by tvEpisode_id
-    $toStart = array();
-    foreach($reader as $row) {
+    foreach($reader as $row) 
+    {
       if($row['favorite_queue'] == 1)
-        $toQueue[] = $row['feedItem_id'];
-      else
-        $toStart[$row['tvEpisode_id']][] = $row;
+        $this->toQueue[] = $row['feedItem_id'];
+      else // group the duplicates by tvEpisode_id
+        $this->toStart['tvEpisode.'.$row['tvEpisode_id']][] = $row;
     }
-    unset($row);
+  }
 
-    foreach($toStart as $items) {
-      // For now just take the first item of each tvepisode, but this
-      // structure allows there to be a decision making process inserted
-      // here to decide which item based on feed priority or something.
+  /**
+   * start downloading any items tagged in the toStart array
+   * append un-started duplicates to the duplicates array
+   */
+  private function startDownloads() 
+  {
+    foreach($this->toStart as $items) 
+    {
+      // For now just take the first item of each but this
+      // structure allows there to be a decision making process
+      // to decide which item based on feed priority or something.
       $success = false;
-      foreach($items as $item) {
-        if($success) {
-          $duplicates[] = $item['feedItem_id'];
-        } else {
+      foreach($items as $item) 
+      {
+        if($success) 
+          $this->duplicates[] = $item['feedItem_id'];
+        else
           $success = $this->startDownload($item, feedItem::STATUS_AUTO_DL);
-        }
       }
     }
+    $this->toStart = array();
+  }
 
+  /**
+   * update the status of all feedItems tagged in the internal arrays
+   */
+  private function updateItemStatus()
+  {
     // After matching has occured, updated item statuses
-    if(count($toQueue) !== 0)
-      feedItem::model()->updateByPk($toQueue, array('status'=>feedItem::STATUS_QUEUED));
-    if(count($duplicates) !== 0) // mark feedItems as duplicate if another feedItem of the same season and episode
-      feedItem::model()->updateByPk($duplicates, array('status'=>feedItem::STATUS_DUPLICATE)); // has been downloaded
+    if(count($this->toQueue) !== 0)
+      feedItem::model()->updateByPk($this->toQueue, array('status'=>feedItem::STATUS_QUEUED));
+    if(count($this->duplicates) !== 0)
+      feedItem::model()->updateByPk($this->duplicates, array('status'=>feedItem::STATUS_DUPLICATE));
+
+    $this->duplicates = $this->toQueue = array();
   }
 
   /**
    * Reset any currently matching items to nomatch
+   * @param BaseFavorite favorite to reset the matches of
    */
   public function resetMatching($favorite)
   {
-    $table = $favorite->tableName();
-    $favorite->dbConnection->createCommand(
-        'UPDATE feedItem SET status='.feedItem::STATUS_NOMATCH.
-        ' WHERE feedItem.id IN ( SELECT feedItem_id as id FROM matching'.$table.' m'.
-                                ' WHERE m.'.$table.'_id = '.$favorite->id.
-                                '   AND m.feedItem_status NOT IN ("'.
-                                  feedItem::STATUS_AUTO_DL.'", "'.feedItem::STATUS_MANUAL_DL.'"));'
-    )->execute();
+    if(is_subclass_of($favorite, 'BaseFavorite'))
+    {
+      $table = $favorite->tableName();
+      $favorite->dbConnection->createCommand(
+          'UPDATE feedItem SET status='.feedItem::STATUS_NOMATCH.
+          ' WHERE feedItem.id IN ( SELECT feedItem_id as id FROM matching'.$table.' m'.
+                                  ' WHERE m.'.$table.'_id = '.$favorite->id.
+                                  '   AND m.feedItem_status NOT IN ("'.
+                                    feedItem::STATUS_AUTO_DL.'", "'.feedItem::STATUS_MANUAL_DL.'"));'
+      )->execute();
+    }
   }
 
 }
