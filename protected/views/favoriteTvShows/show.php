@@ -11,13 +11,13 @@
 
 <table class="dataGrid">
 <tr>
-	<th class="label"><?php echo CHtml::encode($favorite->getAttributeLabel('tvShow_id')); ?>
+  <th class="label"><?php echo CHtml::encode($favorite->getAttributeLabel('tvShow_id')); ?>
 </th>
     <td><?php echo CHtml::link($favorite->tvShow->title, array('tvShow/show', 'id'=>$favorite->tvShow->id)); ?>
 </td>
 </tr>
 <tr>
-	<th class="label"><?php echo CHtml::encode($favorite->getAttributeLabel('quality_id')); ?>
+  <th class="label"><?php echo CHtml::encode($favorite->getAttributeLabel('quality_id')); ?>
 </th>
     <td><?php echo CHtml::encode($favorite->quality->title); ?>
 </td>

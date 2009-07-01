@@ -17,37 +17,37 @@
 </td>
 </tr>
 <tr>
-	<th class="label">Episode
+  <th class="label">Episode
 </th>
     <td><?php echo CHtml::encode($tvepisode->episodeString); ?>
 </td>
 </tr>
 <tr>
-	<th class="label"><?php echo CHtml::encode($tvepisode->getAttributeLabel('title')); ?>
+  <th class="label"><?php echo CHtml::encode($tvepisode->getAttributeLabel('title')); ?>
 </th>
     <td><?php echo CHtml::encode($tvepisode->title); ?>
 </td>
 </tr>
 <tr>
-	<th class="label"><?php echo CHtml::encode($tvepisode->getAttributeLabel('description')); ?>
+  <th class="label"><?php echo CHtml::encode($tvepisode->getAttributeLabel('description')); ?>
 </th>
     <td><?php echo CHtml::encode($tvepisode->description); ?>
 </td>
 </tr>
 <tr>
-	<th class="label"><?php echo CHtml::encode($tvepisode->getAttributeLabel('lastUpdated')); ?>
+  <th class="label"><?php echo CHtml::encode($tvepisode->getAttributeLabel('lastUpdated')); ?>
 </th>
     <td><?php echo Yii::app()->dateFormatter->formatDateTime($tvepisode->lastUpdated); ?>
 </td>
 </tr>
 <tr>
-	<th class="label"><?php echo CHtml::encode($tvepisode->getAttributeLabel('status')); ?>
+  <th class="label"><?php echo CHtml::encode($tvepisode->getAttributeLabel('status')); ?>
 </th>
     <td><?php echo CHtml::encode($tvepisode->statusText); ?>
 </td>
 </tr>
 <tr>
-	<th class="label">Available Quailtys</th>
+  <th class="label">Available Quailtys</th>
 <?php $x=False;foreach($tvepisode->feedItems as $item): ?>
   <?php if($x):?>
   <tr>

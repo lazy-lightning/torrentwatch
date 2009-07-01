@@ -9,61 +9,61 @@
 
 <table class="dataGrid">
 <tr>
-	<th class="label">Feed
+  <th class="label">Feed
 </th>
     <td><?php echo CHtml::link($feeditem->feed->title, array('feed/show', 'id'=>$feeditem->feed->id)); ?>
 </td>
 </tr>
 <tr>
-	<th class="label">TV Show
+  <th class="label">TV Show
 </th>
     <td><?php echo CHtml::link($feeditem->tvEpisode->tvShow->title, array('tvShow/show', 'id'=>$feeditem->tvEpisode->tvShow->id)); ?>
 </td>
 </tr>
 <tr>
-	<th class="label">Episode
+  <th class="label">Episode
 </th>
     <td><?php echo CHtml::link($feeditem->tvEpisode->episodeString, array('tvEpisode/show', 'id'=>$feeditem->tvEpisode->id)); ?>
 </td>
 </tr>
 <tr>
-	<th class="label">Quality
+  <th class="label">Quality
 </th>
     <td><?php echo CHtml::encode($feeditem->qualityString); ?>
 </td>
 </tr>
 <tr>
-	<th class="label"><?php echo CHtml::encode($feeditem->getAttributeLabel('url')); ?>
+  <th class="label"><?php echo CHtml::encode($feeditem->getAttributeLabel('url')); ?>
 </th>
     <td><?php echo CHtml::encode($feeditem->url); ?>
 </td>
 </tr>
 <tr>
-	<th class="label"><?php echo CHtml::encode($feeditem->getAttributeLabel('title')); ?>
+  <th class="label"><?php echo CHtml::encode($feeditem->getAttributeLabel('title')); ?>
 </th>
     <td><?php echo CHtml::encode($feeditem->title); ?>
 </td>
 </tr>
 <tr>
-	<th class="label"><?php echo CHtml::encode($feeditem->getAttributeLabel('description')); ?>
+  <th class="label"><?php echo CHtml::encode($feeditem->getAttributeLabel('description')); ?>
 </th>
     <td><?php echo CHtml::encode($feeditem->description); ?>
 </td>
 </tr>
 <tr>
-	<th class="label"><?php echo CHtml::encode($feeditem->getAttributeLabel('status')); ?>
+  <th class="label"><?php echo CHtml::encode($feeditem->getAttributeLabel('status')); ?>
 </th>
     <td><?php echo CHtml::encode($feeditem->statusText); ?>
 </td>
 </tr>
 <tr>
-	<th class="label">Published
+  <th class="label">Published
 </th>
     <td><?php echo Yii::app()->dateFormatter->formatDateTime($feeditem->pubDate); ?>
 </td>
 </tr>
 <tr>
-	<th class="label"><?php echo CHtml::encode($feeditem->getAttributeLabel('lastUpdated')); ?>
+  <th class="label"><?php echo CHtml::encode($feeditem->getAttributeLabel('lastUpdated')); ?>
 </th>
     <td><?php echo Yii::app()->dateFormatter->formatDateTime($feeditem->lastUpdated); ?>
 </td>

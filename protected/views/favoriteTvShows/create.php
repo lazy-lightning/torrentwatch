@@ -6,6 +6,6 @@
 </div>
 
 <?php echo $this->renderPartial('_form', array(
-	'favorite'=>$favorite,
-	'update'=>false,
+  'favorite'=>$favorite,
+  'update'=>false,
 )); ?>

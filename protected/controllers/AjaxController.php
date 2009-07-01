@@ -5,10 +5,10 @@ class AjaxController extends CController
 
   const ERROR_INVALID_ID = "Invalid ID paramater";
 
-	/**
-	 * @var string specifies the default action to be 'list'.
-	 */
-	public $defaultAction='fullResponce';
+  /**
+   * @var string specifies the default action to be 'list'.
+   */
+  public $defaultAction='fullResponce';
 
   protected $responce = array();
 
@@ -20,41 +20,41 @@ class AjaxController extends CController
     $this->layout = 'ajax';
   }
 
-	/**
-	 * @return array action filters
-	 */
-	public function filters()
-	{
-		return array(
-			'accessControl', // perform access control for CRUD operations
-		);
-	}
+  /**
+   * @return array action filters
+   */
+  public function filters()
+  {
+    return array(
+      'accessControl', // perform access control for CRUD operations
+    );
+  }
 
-	/**
-	 * Specifies the access control rules.
-	 * This method is used by the 'accessControl' filter.
-	 * @return array access control rules
-	 */
-	public function accessRules()
-	{
-		return array(
-/*			array('allow',  // allow all users
-				'actions'=>array(),
-				'users'=>array('*'),
-			), */
-			array('allow', // allow authenticated user
-				'actions'=>array('fullResponce', 'dlFeedItem', 'saveConfig', 'addFeed', 'addFavorite', 'updateFavorite', 'inspect', 'clearHistory'),
-				'users'=>array('@'),
-			),
-			array('allow', // allow admin user 
-				'actions'=>array(),
-				'users'=>array('admin'),
-			),
-			array('deny',  // deny all users
-				'users'=>array('*'),
-			),
-		);
-	}
+  /**
+   * Specifies the access control rules.
+   * This method is used by the 'accessControl' filter.
+   * @return array access control rules
+   */
+  public function accessRules()
+  {
+    return array(
+/*      array('allow',  // allow all users
+        'actions'=>array(),
+        'users'=>array('*'),
+      ), */
+      array('allow', // allow authenticated user
+        'actions'=>array('fullResponce', 'dlFeedItem', 'saveConfig', 'addFeed', 'addFavorite', 'updateFavorite', 'inspect', 'clearHistory'),
+        'users'=>array('@'),
+      ),
+      array('allow', // allow admin user 
+        'actions'=>array(),
+        'users'=>array('admin'),
+      ),
+      array('deny',  // deny all users
+        'users'=>array('*'),
+      ),
+    );
+  }
 
   public function loadFeedItem($id = null)
   {

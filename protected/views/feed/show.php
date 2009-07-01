@@ -17,19 +17,19 @@
 </td>
 </tr>
 <tr>
-	<th class="label"><?php echo CHtml::encode($feed->getAttributeLabel('title')); ?>
+  <th class="label"><?php echo CHtml::encode($feed->getAttributeLabel('title')); ?>
 </th>
     <td><?php echo CHtml::encode($feed->title); ?>
 </td>
 </tr>
 <tr>
-	<th class="label"><?php echo CHtml::encode($feed->getAttributeLabel('description')); ?>
+  <th class="label"><?php echo CHtml::encode($feed->getAttributeLabel('description')); ?>
 </th>
     <td><?php echo CHtml::encode($feed->description); ?>
 </td>
 </tr>
 <tr>
-	<th class="label"><?php echo CHtml::encode($feed->getAttributeLabel('url')); ?>
+  <th class="label"><?php echo CHtml::encode($feed->getAttributeLabel('url')); ?>
 </th>
     <td><?php echo CHtml::encode($feed->url); ?>
 </td>

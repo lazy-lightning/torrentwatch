@@ -6,6 +6,6 @@
 </div>
 
 <?php echo $this->renderPartial('_form', array(
-	'feed'=>$feed,
-	'update'=>false,
+  'feed'=>$feed,
+  'update'=>false,
 )); ?>
