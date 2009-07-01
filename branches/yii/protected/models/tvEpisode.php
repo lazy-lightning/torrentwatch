@@ -83,9 +83,10 @@ class tvEpisode extends CActiveRecord
   /**
    * @return favoriteMovie a favoriteMovie object to match this movie
    */
-  public function generateFavorite() {
+  public function generateFavorite($feedItem) {
     $fav = new favoriteTvShow;
     $fav->tvShow_id = $this->tvShow_id;
+    $fav->onlyNewer = 1;
     return $fav;
   }
 
