@@ -5,7 +5,7 @@ class downloadManager extends favoriteManager {
   private $_nzbClient, $_torClient;
 
   private $opts; // the current item being started in the form of either
-                 // a feedItem or a row from a matchingFavorite* table
+                 // a feedItem or a row from a matchingFavorite* view
 
   /**
    * returns the options of the current item being started
@@ -103,7 +103,7 @@ class downloadManager extends favoriteManager {
            isset($this->opts['favoriteStrings_id']) ? 'String' : null;
   }
 
-  public function getItemType() {
+  public function getItemTypeRecord() {
     if(is_array($this->opts))
     {
       $class = 'favorite'.ucwords($this->getFavoriteType());
@@ -114,7 +114,7 @@ class downloadManager extends favoriteManager {
     }
     else
     {
-      return $this->opts->itemType;
+      return $this->opts->itemTypeRecord;
     }
   }
 
@@ -157,18 +157,28 @@ class downloadManager extends favoriteManager {
       }
       return $this->$_attr;
     }
+    $this->addError("downloadType", "Download type of the feedItem is invalid.");
     Yii::log("Unknown download type\n".print_r($this->opts, true), CLogger::LEVEL_ERROR);
-  }
-
-  public function getErrors() 
-  {
-    return $this->errors;
   }
 
   public function afterDownload()
   {
-    $this->markDuplicateQueuedItems();
+    // mark queued items to duplicate if they match the started item
+    Yii::app()->db->createCommand(
+        'UPDATE feedItem'.
+        '   SET status = '.feedItem::STATUS_DUPLICATE.
+        ' WHERE status = '.feedItem::STATUS_QUEUED.
+        '   AND EXISTS( SELECT two.id'.
+        '                 FROM feedItem two'.
+        '                WHERE two.id = '.$this->feedItemId.
+        '                  AND (    (feedItem.movie_id NOT NULL AND feedItem.movie_id = two.movie_id )'.
+        '                        OR (feedItem.other_id NOT NULL AND feedItem.other_id = two.other_id )'.
+        '                        OR (feedItem.tvEpisode_id NOT NULL AND feedItem.tvEpisode_id = two.tvEpisode_id )'.
+        '                      )'.
+        '              );'
+    )->execute();
 
+    // create a new history record for this download
     $history = new history;
     $history->feedItem_id = $this->feedItemId;
     $history->feedItem_title = $this->title;
@@ -178,11 +188,13 @@ class downloadManager extends favoriteManager {
     $history->favorite_type = $this->favoriteType;
     $history->save();
 
-    $itemType = $this->itemType;
-    if($itemType) 
+    // mark the tvEpisode/movie/other as STATUS_DOWNLOADED
+    $record = $this->itemTypeRecord;
+    if($record) 
     {
-      $itemType->status = $itemType->STATUS_DOWNLOADED;
-      $itemType->save();
+      $class = get_class($record);
+      $record->status = constant("$class::STATUS_DOWNLOADED");
+      $record->save();
     }
   }
 
@@ -218,11 +230,12 @@ class downloadManager extends favoriteManager {
         $this->afterDownload($success);
       else
       {
-        $error = $this->errors[] = (is_object($client) ? $client->getError() : 'Unable to initialize client');
+        $error = true;
+        $this->addError("client", (is_object($client) ? $client->getError() : 'Unable to initialize client'));
         $status = feedItem::STATUS_FAILED_DL;
-        Yii::log("Failed starting download: ".$error, CLogger::LEVEL_ERROR);
       }
       // not in afterDownload to allow failure to set STATUS_FAILED_DL
+      Yii::log("Setting feedItem {$this->feedItemId} to $status", CLogger::LEVEL_ERROR);
       feedItem::model()->updateByPk($this->feedItemId, array('status'=>$status));
     }
 
@@ -233,19 +246,6 @@ class downloadManager extends favoriteManager {
   }
 
   protected function markDuplicateQueuedItems() {
-    Yii::app()->db->createCommand(
-        'UPDATE feedItem'.
-        '   SET status = '.feedItem::STATUS_DUPLICATE.
-        ' WHERE status = '.feedItem::STATUS_QUEUED.
-        '   AND EXISTS( SELECT two.id'.
-        '                 FROM feedItem two'.
-        '                WHERE two.id = '.$this->feedItemId.
-        '                  AND (    (feedItem.movie_id NOT NULL AND feedItem.movie_id = two.movie_id )'.
-        '                        OR (feedItem.other_id NOT NULL AND feedItem.other_id = two.other_id )'.
-        '                        OR (feedItem.tvEpisode_id NOT NULL AND feedItem.tvEpisode_id = two.tvEpisode_id )'.
-        '                      )'.
-        '              );'
-    )->execute();
   }
 }
 
