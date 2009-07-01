@@ -139,21 +139,18 @@ class feedItem extends ARwithQuality
 
       $this->qualityIds = factory::qualityIdsByTitleArray($quality);
      
-      if($season > 0 && $episode > 0) {
+      if($season >= 0 && $episode > 0) {
         // Found a season and episode for this item
-        $tvEpisode = factory::tvEpisodeByEpisode($shortTitle, $season, $episode);
-        $this->tvEpisode_id = $tvEpisode->id;
+        $this->tvEpisode_id = factory::tvEpisodeByEpisode($shortTitle, $season, $episode)->id;
       }
       elseif($this->imdbId > 1000) 
       {
         // IMdB id is not best differentiator, but will work for now
-        $movie = factory::movieByImdbId($this->imdbId, $shortTitle);
-        $this->movie_id = $movie->id;
+        $this->movie_id = factory::movieByImdbId($this->imdbId, $shortTitle)->id;
       }
       else 
       {
-        $other = factory::otherByTitle($shortTitle);
-        $this->other_id = $other->id;
+        $this->other_id = factory::otherByTitle($shortTitle)->id;
       }
     }
     return parent::beforeValidate($type);
@@ -161,8 +158,8 @@ class feedItem extends ARwithQuality
 
   protected function detectTitleParams() {
     // strtr values
-    $from = "._";
-    $to = "  ";
+    $from = "._-";
+    $to = "   ";
     // Series Title
     $title_reg =
            '^([^-\(]+)' // Series title: string not including - or (
@@ -172,13 +169,17 @@ class feedItem extends ARwithQuality
            '\b('  // must be a word boundry before the episode to prevent turning season 13 into season 3
           .'S\d+[. _]?E\d+'.'|'  // S12E1 or S1.E22 or S4 E1
           .'\d+x\d+' .'|'  // 1x23
-          .'\d+[. ]?of[. ]?\d+'.'|'  // 03of18
-          .'[\d -.]{10}'   // 2008-03-23 or 07.23.2008 or .20082306. etc
+          .'\d+[. ]?of[. ]?\d+'  // 03of18
           .')';
     $episode_reg2 = '\b([SE])(\d+)\b';
     $episode_reg3 = '\b(\d\d\d)\b.+'; // three digits (four hits movie years) with a word boundry on each side, ex: some.show.402.hdtv
                                       // with at least some data after it to not match a group name at the end
-  
+    $episode_reg4 =
+           '\b('
+          .'\d\d\d\d[- ._]\d\d[- _.]\d\d'.'|' // 2008-03-23
+          .'\d\d[- _.]\d\d[- _.]\d\d\d\d'  // 03.23.2008
+          .')';
+
     // Possible Qualitys
     $qual_reg ='(DVB' .'|'
              .'720p'   .'|'
@@ -217,16 +218,32 @@ class feedItem extends ARwithQuality
       $quality = $qregs[1];
     }
 
+    Yii::log($this->title, CLogger::LEVEL_ERROR);
     if(preg_match("/$title_reg$episode_reg/i", $this->title, $regs)) 
     {
-      $episode_guess = trim($regs[2]);
+      Yii::log('episode match'.print_r($regs, TRUE), CLogger::LEVEL_ERROR);
       $shortTitle = trim($regs[1]);
-      $episode_guess = trim(strtr($episode_guess, $from, $to));
+      $episode_guess = trim(strtr($regs[2], $from, $to));
       // if match was a date season will receive it, guaranteed no x in the date from previous regexp so episode will be empty
       list($season,$episode) = explode('x', preg_replace('/(S(\d+) ?E(\d+)|(\d+)x(\d+)|(\d+) ?of ?(\d+))/i', '\2\4\6x\3\5\7', $episode_guess));
     }
+    elseif(preg_match("/$title_reg$episode_reg4/i", $this->title, $regs))
+    {
+      Yii::log('date based episode '.print_r($regs, TRUE), CLogger::LEVEL_ERROR);
+      // Item is a date based episode
+      $shortTitle = trim($regs[1]);
+      $date = strtotime(str_replace(' ', '/', trim(strtr($regs[2], $from, $to))));
+      $season = 0;
+      $episode = (integer) $date; // cast false to 0
+
+      // strtotime failed, append given date to title
+      if($date === False)
+        $shortTitle .= ' '.$season;
+      Yii::log("season: $season episode: $episode shortTitle: $shortTitle", CLogger::LEVEL_ERROR);
+    }
     elseif(preg_match("/$title_reg$episode_reg2/i", $this->title, $regs))
     {
+      Yii::log('episode or season, not both'.print_r($regs, TRUE), CLogger::LEVEL_ERROR);
       // only episode or season, not both
       $shortTitle = trim($regs[1]);
       $season  = $regs[2] == 'S' ? trim($regs[3]) : 1;
@@ -234,6 +251,7 @@ class feedItem extends ARwithQuality
     }
     elseif(preg_match("/$title_reg$episode_reg3/i", $this->title, $regs)) 
     {
+      Yii::log('3 digit season/episode identifier'.print_r($regs, TRUE), CLogger::LEVEL_ERROR);
       // 3 digit season/episode identifier
       $shortTitle = trim($regs[1]);
       $episode_guess = $regs[2];
@@ -242,6 +260,7 @@ class feedItem extends ARwithQuality
     } 
     else 
     {
+      Yii::log('no match, strip quality', CLogger::LEVEL_ERROR);
       // No match, just strip everything after the quality
       $shortTitle = preg_replace("/$qual_reg.*/i", "", $this->title);
       $season = $episode = 0;
@@ -254,17 +273,6 @@ class feedItem extends ARwithQuality
     {
       $network = $regs[1];
       $shortTitle = $regs[2];
-    }
-
-    if(!is_numeric($season)) {
-      // Item is a date based episode
-      $date = strtotime(str_replace(' ', '/', $season));
-      $season = 0;
-      $episode = (integer) $date; // cast false to 0
-
-      // strtotime failed, append given date to title
-      if($date === False)
-        $shortTitle .= ' '.$season;
     }
 
     return array($shortTitle, $quality, $season, $episode, $network);
