@@ -11,7 +11,7 @@
 
 <table class="dataGrid">
 <tr>
-	<th class="label"><?php echo CHtml::encode($network->getAttributeLabel('title')); ?>
+  <th class="label"><?php echo CHtml::encode($network->getAttributeLabel('title')); ?>
 </th>
     <td><?php echo CHtml::encode($network->title); ?>
 </td>

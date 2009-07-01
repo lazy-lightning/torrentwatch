@@ -7,12 +7,12 @@
  */
 class UserIdentity extends CUserIdentity
 {
-	/**
-	 * Authenticates a user.
-	 * @return boolean whether authentication succeeds.
-	 */
-	public function authenticate()
-	{
+  /**
+   * Authenticates a user.
+   * @return boolean whether authentication succeeds.
+   */
+  public function authenticate()
+  {
     $db = Yii::app()->db;
     $exists = $db->createCommand('SELECT NOT EXISTS(SELECT username FROM users WHERE username=:username)');
     $exists->bindValue(':username', $this->username);
@@ -21,12 +21,12 @@ class UserIdentity extends CUserIdentity
     $pwcheck->bindValue(':username', $this->username);
     $pwcheck->bindValue(':password', md5($this->username.$this->password)); // salt with username
 
-		if($exists->queryScalar())
-			$this->errorCode=self::ERROR_USERNAME_INVALID;
-		else if($pwcheck->queryScalar())
-			$this->errorCode=self::ERROR_PASSWORD_INVALID;
-		else
-			$this->errorCode=self::ERROR_NONE;
-		return !$this->errorCode;
-	}
+    if($exists->queryScalar())
+      $this->errorCode=self::ERROR_USERNAME_INVALID;
+    else if($pwcheck->queryScalar())
+      $this->errorCode=self::ERROR_PASSWORD_INVALID;
+    else
+      $this->errorCode=self::ERROR_NONE;
+    return !$this->errorCode;
+  }
 }

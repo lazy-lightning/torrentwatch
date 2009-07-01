@@ -6,6 +6,6 @@
 </div>
 
 <?php echo $this->renderPartial('_form', array(
-	'network'=>$network,
-	'update'=>false,
+  'network'=>$network,
+  'update'=>false,
 )); ?>

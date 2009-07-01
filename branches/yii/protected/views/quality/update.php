@@ -7,6 +7,6 @@
 </div>
 
 <?php echo $this->renderPartial('_form', array(
-	'quality'=>$quality,
-	'update'=>true,
+  'quality'=>$quality,
+  'update'=>true,
 )); ?>

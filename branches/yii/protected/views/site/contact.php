@@ -37,13 +37,13 @@ If you have business inquries or other questions, please fill out the following 
 
 <?php if(extension_loaded('gd')): ?>
 <div class="simple">
-	<?php echo CHtml::activeLabel($contact,'verifyCode'); ?>
-	<div>
-	<?php $this->widget('CCaptcha'); ?>
-	<?php echo CHtml::activeTextField($contact,'verifyCode'); ?>
-	</div>
-	<p class="hint">Please enter the letters as they are shown in the image above.
-	<br/>Letters are not case-sensitive.</p>
+  <?php echo CHtml::activeLabel($contact,'verifyCode'); ?>
+  <div>
+  <?php $this->widget('CCaptcha'); ?>
+  <?php echo CHtml::activeTextField($contact,'verifyCode'); ?>
+  </div>
+  <p class="hint">Please enter the letters as they are shown in the image above.
+  <br/>Letters are not case-sensitive.</p>
 </div>
 <?php endif; ?>
 

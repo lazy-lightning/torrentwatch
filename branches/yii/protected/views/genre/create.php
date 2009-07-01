@@ -6,6 +6,6 @@
 </div>
 
 <?php echo $this->renderPartial('_form', array(
-	'genre'=>$genre,
-	'update'=>false,
+  'genre'=>$genre,
+  'update'=>false,
 )); ?>

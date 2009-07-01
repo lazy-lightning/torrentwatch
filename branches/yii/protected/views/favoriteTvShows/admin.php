@@ -10,7 +10,7 @@
     <th><?php echo $sort->link('id'); ?></th>
     <th><?php echo $sort->link('tvShow_id'); ?></th>
     <th><?php echo $sort->link('quality_id'); ?></th>
-	<th>Actions</th>
+  <th>Actions</th>
   </tr>
 <?php foreach($favoriteList as $n=>$model): ?>
   <tr class="<?php echo $n%2?'even':'odd';?>">
@@ -20,10 +20,10 @@
     <td>
       <?php echo CHtml::link('Update',array('update','id'=>$model->id)); ?>
       <?php echo CHtml::linkButton('Delete',array(
-      	  'submit'=>'',
-      	  'params'=>array('command'=>'delete','id'=>$model->id),
-      	  'confirm'=>"Are you sure to delete #{$model->id}?")); ?>
-	</td>
+          'submit'=>'',
+          'params'=>array('command'=>'delete','id'=>$model->id),
+          'confirm'=>"Are you sure to delete #{$model->id}?")); ?>
+  </td>
   </tr>
 <?php endforeach; ?>
 </table>

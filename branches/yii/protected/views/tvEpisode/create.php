@@ -6,6 +6,6 @@
 </div>
 
 <?php echo $this->renderPartial('_form', array(
-	'tvepisode'=>$tvepisode,
-	'update'=>false,
+  'tvepisode'=>$tvepisode,
+  'update'=>false,
 )); ?>

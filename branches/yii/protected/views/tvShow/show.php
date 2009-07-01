@@ -11,19 +11,19 @@
 
 <table class="dataGrid">
 <tr>
-	<th class="label"><?php echo CHtml::encode($tvshow->getAttributeLabel('network_id')); ?>
+  <th class="label"><?php echo CHtml::encode($tvshow->getAttributeLabel('network_id')); ?>
 </th>
     <td><?php echo CHtml::encode($tvshow->network_id); ?>
 </td>
 </tr>
 <tr>
-	<th class="label"><?php echo CHtml::encode($tvshow->getAttributeLabel('title')); ?>
+  <th class="label"><?php echo CHtml::encode($tvshow->getAttributeLabel('title')); ?>
 </th>
     <td><?php echo CHtml::encode($tvshow->title); ?>
 </td>
 </tr>
 <tr>
-	<th class="label"><?php echo CHtml::encode($tvshow->getAttributeLabel('description')); ?>
+  <th class="label"><?php echo CHtml::encode($tvshow->getAttributeLabel('description')); ?>
 </th>
     <td><?php echo CHtml::encode($tvshow->description); ?>
 </td>
