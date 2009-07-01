@@ -323,8 +323,9 @@ class AjaxController extends CController
         $config->$_POST['category']->attributes = $_POST['dvrConfigCategory'];
 
       // if this is a client category, also set the main config to use this client
-      if(substr($_POST['category'], 0, 6) === 'client')
-        $c->$_POST['type'] = $_POST['category'];
+      if(in_array($_POST['type'], array('nzbClient', 'torClient')) &&
+         substr($_POST['category'], 0, 6) === 'client')
+        $config->$_POST['type'] = $_POST['category'];
     }
     elseif(isset($_POST['dvrConfig']))
     {
