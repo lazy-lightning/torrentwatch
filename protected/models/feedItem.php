@@ -293,15 +293,13 @@ class feedItem extends ARwithQuality
     }
     else
     {
-      $fav = $itemType->generateFavorite();
+      $fav = $itemType->generateFavorite($this);
     }
 
     if($fav) {
       $ids = array();
       foreach($this->quality as $quality)
-      {
         $ids[] = $quality->id;
-      }
       $fav->qualityIds = $ids;
     }
 
