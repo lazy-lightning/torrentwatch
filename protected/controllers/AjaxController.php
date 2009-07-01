@@ -209,11 +209,11 @@ class AjaxController extends CController
     if($feedItem)
     {
       if(Yii::app()->dlManager->startDownload($feedItem, feedItem::STATUS_MANUAL_DL))
-        $this->responce['dialog']['content'] = $feedItem->fullTitle.' has been Started';
+        $this->responce['dialog']['content'] = $feedItem->title.' has been Started';
       else
       {
         $this->responce['dialog']['error'] = true;
-        $this->responce['dialog']['content'] = 'Failed: '.print_r(Yii::app()->dlManager->getErrors(), true);
+        $this->responce['dialog']['content'] = CHtml::errorSummary(Yii::app()->dlManager);
       }
     } 
 
