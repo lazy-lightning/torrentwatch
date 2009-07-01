@@ -139,7 +139,8 @@ class feedItem extends ARwithQuality
 
       $this->qualityIds = factory::qualityIdsByTitleArray($quality);
      
-      if($season >= 0 && $episode > 0) {
+      if(($season >= 0 && $episode > 0) ||
+         ($season > 0 && $episode == 0)) {
         // Found a season and episode for this item
         $this->tvEpisode_id = factory::tvEpisodeByEpisode($shortTitle, $season, $episode)->id;
       }
