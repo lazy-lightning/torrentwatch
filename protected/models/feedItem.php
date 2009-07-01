@@ -42,7 +42,7 @@ class feedItem extends ARwithQuality
   {
     return array(
       array('lastUpdated', 'default', 'setOnEmpty'=>false, 'value'=>time()),
-      array('hash', 'string', 'allowEmpty'=>false, 'is'=>32),
+      array('hash', 'length', 'allowEmpty'=>false, 'is'=>32),
       array('feed_id', 'default', 'value'=>0),
       array('feed_id', 'exist', 'allowEmpty'=>false, 'attributeName'=>'id', 'className'=>'feed'),
       array('movie_id', 'exist', 'attributeName'=>'id', 'className'=>'movie'),
