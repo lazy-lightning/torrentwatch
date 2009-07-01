@@ -71,15 +71,6 @@ class tvEpisode extends CActiveRecord
     );
   }
 
-  public function beforeValidate($type) {
-    $this->lastUpdated = time();
-    if($this->isNewRecord) {
-      $this->status = self::STATUS_NEW;
-    }
-
-    return parent::beforeValidate($type);
-  }
-
   /**
    * @return favoriteMovie a favoriteMovie object to match this movie
    */
@@ -90,11 +81,14 @@ class tvEpisode extends CActiveRecord
     return $fav;
   }
 
+  /**
+   * @return string a string representation of this records episode
+   */
   public function getEpisodeString($empty = TRUE) {
-    if($this->season == 0 && $this->episode == 0)
-      return $empty ? '' : 'Single Episode';
-    elseif($this->episode > 10000)
+    if($this->episode > 10000)
       return date('Y-m-d', $this->episode);
+    elseif($this->season > 0 && $this->episode == 0)
+      return sprintf('S%02dE??', $this->season);
     else 
       return sprintf('S%02dE%02d', $this->season, $this->episode);
   }
