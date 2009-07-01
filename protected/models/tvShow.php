@@ -30,6 +30,7 @@ class tvShow extends CActiveRecord
       array('rating', 'numerical', 'integerOnly'=>true, 'min'=>0, 'max'=>10),
       array('tvdbId', 'numerical', 'integerOnly'=>true, 'min'=>0),
       array('lastTvdbUpdate', 'default', 'value'=>0),
+      array('lastTvdbUpdate', 'numerical', 'allowEmpty'=>false, 'integerOnly'=>true, 'min'=>0),
     );
   }
 
