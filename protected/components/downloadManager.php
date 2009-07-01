@@ -4,7 +4,8 @@ class downloadManager extends favoriteManager {
   private $errors = array();
   private $_nzbClient, $_torClient;
 
-  private $opts;
+  private $opts; // the current item being started in the form of either
+                 // a feedItem or a row from a matchingFavorite* table
 
   /**
    * returns the options of the current item being started
@@ -97,9 +98,24 @@ class downloadManager extends favoriteManager {
     if(!is_array($this->opts))
       return null;
 
-    return isset($this->opts['favoriteTvShows_id']) ? 'tvEpisode' :
+    return isset($this->opts['favoriteTvShows_id']) ? 'tvShow' :
            isset($this->opts['favoriteMovies_id']) ? 'Movie' :
            isset($this->opts['favoriteStrings_id']) ? 'String' : null;
+  }
+
+  public function getItemType() {
+    if(is_array($this->opts))
+    {
+      $class = 'favorite'.ucwords($this->getFavoriteType());
+      if($class !== 'favorite')
+        return CActiveRecord::model($class)->findByPk($this->opts[$class.'s_id']);
+      else
+        return null;
+    }
+    else
+    {
+      return $this->opts->itemType;
+    }
   }
 
   /**
@@ -124,26 +140,22 @@ class downloadManager extends favoriteManager {
   public function getClient() 
   {
     $type = $this->downloadType;
-    switch($type) 
+    $clientMap = array(
+        feedItem::TYPE_TORRENT=>'torClient',
+        feedItem::TYPE_NZB=>'nzbClient',
+    );
+
+    if(isset($clientMap[$type]))
     {
-      case feedItem::TYPE_TORRENT:
-        if($this->_torClient === null) 
-        {
-          $class = Yii::app()->dvrConfig->torClient;
-          if(in_array($class, array_keys($this->availClients[$type])))
-            $this->_torClient = new $class($this);
-        }
-        return $this->_torClient;
-        break;
-      case feedItem::TYPE_NZB:
-        if($this->_nzbClient === null) 
-        {
-          $class = Yii::app()->dvrConfig->nzbClient;
-          if(in_array($class, array_keys($this->availClients[$type]))) 
-            $this->_nzbClient = new $class($this);
-        }
-        return $this->_nzbClient;
-        break;
+      $attr = $clientMap[$type];
+      $_attr = '_'.$attr;
+      if($this->$_attr === null)
+      {
+        $class = Yii::app()->dvrConfig->$attr;
+        if(in_array($class, array_keys($this->availClients[$type]))) 
+          $this->$_attr = new $class($this);
+      }
+      return $this->$_attr;
     }
     Yii::log("Unknown download type\n".print_r($this->opts, true), CLogger::LEVEL_ERROR);
   }
@@ -151,6 +163,32 @@ class downloadManager extends favoriteManager {
   public function getErrors() 
   {
     return $this->errors;
+  }
+
+  public function afterDownload()
+  {
+    $this->markDuplicateQueuedItems();
+
+    $history = new history;
+    $history->feedItem_id = $this->feedItemId;
+    $history->feedItem_title = $this->title;
+    $history->feed_id = $this->feedId;
+    $history->feed_title = $this->feedTitle;
+    $history->favorite_name = $this->favoriteName;
+    $history->favorite_type = $this->favoriteType;
+    $history->save();
+
+    $itemType = $this->itemType;
+    if($itemType) 
+    {
+      $itemType->status = $itemType->STATUS_DOWNLOADED;
+      $itemType->save();
+    }
+  }
+
+  public function beforeDownload()
+  {
+    return True;
   }
 
   /**
@@ -169,71 +207,29 @@ class downloadManager extends favoriteManager {
   {
     Yii::log('Starting download', CLogger::LEVEL_ERROR);
     $error = False;
+
     // $opts is used in the various get functions to make the following code cleaner
     $this->opts = $opts;
 
     $client = $this->getClient();
-    $success = is_object($client) ? $client->addByUrl($this->url) : False;
-
-    if($success) 
+    if($this->beforeDownload())
     {
-      $this->markDuplicateQueuedItems();
-
-      $history = new history;
-      $history->feedItem_id = $this->feedItemId;
-      $history->feedItem_title = $this->title;
-      $history->feed_id = $this->feedId;
-      $history->feed_title = $this->feedTitle;
-      $history->favorite_name = $this->favoriteName;
-      $history->favorite_type = $this->favoriteType;
-      $history->save();
-
-
-      // Update status as neccessary
-      if(is_numeric($tvEpisodeId = $this->tvEpisodeId)) 
-      {
-        Yii::log("Setting tvEpisode $tvEpisodeId to STATUS_DOWNLOADED", CLogger::LEVEL_ERROR);
-        tvEpisode::model()->updateByPk(
-            $tvEpisodeId, array('status'=>tvEpisode::STATUS_DOWNLOADED)
-        );
-        
-      } 
-      elseif(is_numeric($movieId = $this->movieId)) 
-      {
-        Yii::log("Setting movie $movieId to STATUS_DOWNLOADED", CLogger::LEVEL_ERROR);
-        movie::model()->updateByPk(
-            $movieId, array('status' => movie::STATUS_DOWNLOADED)
-        );
-      } 
-      elseif(is_numeric($otherId = $this->otherId)) 
-      {
-        Yii::log("Setting other $otherId to STATUS_DOWNLOADED", CLogger::LEVEL_ERROR);
-        other::model()->updateByPk(
-            $otherId, array('status' => other::STATUS_DOWNLOADED)
-        );
-      } 
-      else 
-      {
-        Yii::log("Success starting, but Unknown feeditem type in startDownload\n".print_r($this->opts, true), CLogger::LEVEL_ERROR);
-      }
-    } 
-    else 
-    {
-      if(is_object($client))
-        $error = $this->errors[] = $client->getError();
+      if(is_object($client) ? $client->addByUrl($this->url) : False)
+        $this->afterDownload($success);
       else
-        $error = $this->errors[] = 'Unable to initialize client';
-
-      $status = feedItem::STATUS_FAILED_DL;
-      Yii::log("Failed starting download: ".$error, CLogger::LEVEL_ERROR);
+      {
+        $error = $this->errors[] = (is_object($client) ? $client->getError() : 'Unable to initialize client');
+        $status = feedItem::STATUS_FAILED_DL;
+        Yii::log("Failed starting download: ".$error, CLogger::LEVEL_ERROR);
+      }
+      // not in afterDownload to allow failure to set STATUS_FAILED_DL
+      feedItem::model()->updateByPk($this->feedItemId, array('status'=>$status));
     }
-
-    feedItem::model()->updateByPk($this->feedItemId, array('status'=>$status));
 
     // reset the options to null incase anything trys to access the stale information
     $this->opts = null;
 
-    return $success;
+    return !$error;
   }
 
   protected function markDuplicateQueuedItems() {
