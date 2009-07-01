@@ -1,85 +1,193 @@
 <?php
 
-abstract class BaseDvrConfig extends CAttributeCollection {
-  protected $_changed;
-  protected $_id = null;
+abstract class BaseDvrConfig extends CModel {
+  private $_updateCommand; // CDbCommand that can update a value from this category
+  private $_changed=array(); // changed items since load
+  protected $_id = null; // id from the dvrConfigCategory table
+  private $_ar = array(); // loaded values
+  private $allowNewEntries = True; // If new items can be added to the array
 
-  public function __construct() {
-    $this->caseSensitive = true;
+  /**
+   * override __get to retreive variables from our internal config array
+   * @param string the requested variables name
+   * @return mixed the requested variables value
+   */
+  public function __get($name) {
+    if($this->contains($name))
+      return $this->_ar[$name];
+
+    return parent::__get($name);
   }
 
-  public function init() {
-    $this->_changed = array();
+  /**
+   * override __set to set variables from our internal config array
+   * @param string $name the attribute name to set
+   * @param mixed $value the value to be associated with the name
+   */
+  public function __set($name, $value) {
+    if($this->contains($name))
+      $this->add($name, $value);
+    else
+      parent::__set($name, $value);
   }
 
+  /**
+   * add an attribute to the internal config array
+   * @param string $key the key to add to the config array
+   * @param string $value the value assign to the key
+   */
   public function add($key, $value) {
-    parent::add($key, $value);
-    $this->_changed[$key] = true;
-  }
-
-  public function setAttributes($attributes) {
-    foreach($attributes as $key => $value)
+    if($this->allowNewEntries || $this->contains($key))
     {
-      if($this->contains($key))
-        $this->$key = $value;
+      $this->_ar[$key] = $value;
+      $this->_changed[$key] = true;
     }
   }
 
+  /**
+   * reset the array of changed attributes after saving
+   */
+  public function afterSave()
+  {
+    $this->_changed = array();
+  }
+
+  /**
+   * Returns the list of all attributeNames of the category.
+   * @return array list of attribute names
+   */
+  public function attributeNames() 
+  {
+    return array_keys($this->_ar);
+  }
+
+  /**
+   * unused with override of the setAttributes function
+   */
+  public function safeAttributes()
+  {
+  }
+
+  public function beforeSave()
+  {
+    return True;
+  }
+
+  /**
+   * @param string $key a key to check for
+   * @return boolean if the given key exists
+   */
+  public function contains($key)
+  {
+    return isset($this->_ar[$key]);
+  }
+
+  /**
+   * Returns a CDbCommand capable of updating a row for this category
+   * @return CDbCommand command requiring :key and :value to be bound
+   */
+  public function getUpdateCommand()
+  {
+    if(!$this->_updateCommand)
+    {
+      $this->_updateCommand = Yii::app()->db->createCommand(
+          'UPDATE dvrConfig SET value = :value WHERE key = :key AND dvrConfigCategory_id '
+          .($this->_id === null ? 'IS NULL' : '= :catId')
+      );
+      if($this->_id !== null)
+        $this->_updateCommand->bindValue(':catId', $this->_id);
+    }
+    return $this->_updateCommand;
+  }
+
+  /**
+   * dissalow new entries to the category after initialization
+   * and reset the changed attributes array
+   */
+  public function init()
+  {
+    $this->allowNewEntries = false;
+    $this->_changed = array();
+  }
+
+  /**
+   * save any changed values to the database
+   * @param boolean weather to perform validation before saving the record
+   * If the validation fails, the record will not be saved to the database
+   * the validation will be performed under the 'update' scenario
+   * @return boolean weather saving succeeds
+   */
+  public function save($runValidation=true) {
+    if(!$runValidation || $this->validate('update'))
+      return $this->update(array_keys($this->_changed));
+    else
+      return false;
+  }
+
+  /**
+   * Override setAttributes from CModel to set any
+   * item already contained in the category
+   */
+  public function setAttributes($values, $scenario='') {
+    Yii::log(__FUNCTION__.': '.print_r($values, true), CLogger::LEVEL_ERROR);
+    foreach($values as $name=>$value)
+    {
+      $this->add($name, $value);
+    }
+  }
+
+  /**
+   * tag a variable as changed since load
+   * @param string the key to tag
+   */
   public function setChanged($key) {
     $this->_changed[$key] = true;
   }
 
-  public function save() {
-    $key = $value = 0;
-    $sql = 'UPDATE dvrConfig SET value = :value WHERE key = :key AND dvrConfigCategory_id';
-    if($this->_id === null)
-      $sql .= ' IS NULL';
-    else
-      $sql .= ' = :catId';
+  /**
+   * Updates the rows represented by this category
+   * Note, validation is not performed in this method. You may call {@link validate} to perform the validation.
+   * @param array list of attributes to be saved.  Defaults to null,
+   * meaning all attributes that were loaded from DB will be saved.
+   * @return boolean whether the update is successful
+   */
+  public function update($attributes=null)
+  {
+    if($this->beforeSave())
+    {
+      Yii::log('saving '.print_r($this, TRUE), CLogger::LEVEL_ERROR);
 
-    $cmd = Yii::app()->db->createCommand($sql);
-    $cmd->bindParam(':key', $key);
-    $cmd->bindParam(':value', $value);
-    if($this->_id !== null)
-      $cmd->bindValue(':catId', $this->_id);
-
-    foreach($this->_changed as $key => $foo) {
-      $value = $this->$key;
-      if(is_object($value))
-        $value->save();
-      else {
-        Yii::log("update dvrConfig set value = $value where key = $key and dvrConfigCategory_id = ".($this->_id === null ? 'null' : $this->_id), CLogger::LEVEL_ERROR);
-        $cmd->execute();
+      if($attributes===null)
+        $attributes = $this->attributeNames();
+      foreach($attributes as $key) 
+      {
+        $value = $this->$key;
+        if(is_object($value))
+          $value->save();
+        else 
+          $this->updateByKey($key, $value);
       }
+
+      $this->afterSave();
+      return true;
     }
-    $this->_changed = array();
 
-    return True;
+    return false;
   }
 
-  // attribute label functions copied from CModel since no multi-inheritance
-  // allows this to be used like an AR class from the view
-  public function hasErrors() {
-    return False;
-  }
-
-  public function attributeLabels() {
-    return array();
-  }
-
-  public function getAttributeLabel($attribute)
+  /**
+   * Updates a single row represented by the key and this objects category
+   * @param string $key the key to be updated
+   * @param mixed $value the value to be associated with the key
+   */
+  public function updateByKey($key, $value)
   {
-    $labels=$this->attributeLabels();
-    if(isset($labels[$attribute]))
-      return $labels[$attribute];
-    else
-      return $this->generateAttributeLabel($attribute);
+    $cmd = $this->getUpdateCommand();
+    $cmd->bindValue(':key', $key);
+    $cmd->bindValue(':value', $value);
+    $cmd->execute();
   }
 
-  public function generateAttributeLabel($name)
-  {
-    return ucwords(trim(strtolower(str_replace(array('-','_'),' ',preg_replace('/(?<![A-Z])[A-Z]/', ' \0', $name)))));
-  }
 }
 
 class dvrConfigCategory extends BaseDvrConfig {
@@ -93,7 +201,6 @@ class dvrConfigCategory extends BaseDvrConfig {
    * @param array an array of key=>value pairs to fill the array
    */
   public function __construct($parent, $id, $title, $values) {
-    parent::__construct();
     $this->_parent = $parent;
     $this->_title = $title;
     $this->_id = $id;
@@ -113,8 +220,8 @@ class dvrConfigCategory extends BaseDvrConfig {
   }
 
   public function init() {
-    parent::init();
     $this->_parent->add($this->_title, $this);
+    parent::init();
   }
 
   public function getTitle() {
@@ -147,8 +254,7 @@ class dvrConfig extends BaseDvrConfig {
     // loop through and create categories
     foreach($reader as $row) {
       $id = $row['id'];
-      $title = $row['title'];
-      $c = new dvrConfigCategory($this, $id, $title, empty($data[$id]) ? array() : $data[$id]);
+      $c = new dvrConfigCategory($this, $id, $row['title'], empty($data[$id]) ? array() : $data[$id]);
       // dvrConfigCategory will add to parent on successfull init
       $c->init();
     }
