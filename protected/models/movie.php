@@ -59,16 +59,16 @@ class movie extends CActiveRecord
   /**
    * @return favoriteMovie a favoriteMovie object to match this movie
    */
-  public function generateFavorite()
+  public function generateFavorite($feedItem)
   {
     $fav=new favoriteMovie;
-    $fav->rating = empty($feedItem->movie->rating) ? 100 : $feedItem->movie->rating;
-    $fav->genre_id = $feedItem->movie->genres[0]->id;
-    $fav->name = $feedItem->movie->genres[0]->title.' - '.$feedItem->qualityString;
-    if(!empty($feedItem->movie->year))
+    $fav->rating = empty($this->rating) ? 100 : $this->rating;
+    $fav->genre_id = $this->genres[0]->id;
+    $fav->name = $this->genres[0]->title.' - '.$feedItem->qualityString;
+    if(!empty($this->year))
     {
-      $fav->minYear = $feedItem->movie->year - 5;
-      $fav->maxYear = $feedItem->movie->year + 5;
+      $fav->minYear = $this->year - 5;
+      $fav->maxYear = $this->year + 5;
     }
     return $fav;
   }
