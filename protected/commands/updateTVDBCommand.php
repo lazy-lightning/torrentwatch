@@ -59,6 +59,7 @@ class updateTVDBCommand extends CConsoleCommand {
 
     $transaction = Yii::app()->db->beginTransaction();
     try {
+      echo count($toSave)." tv Episodes to save\n";
       foreach($toSave as $record)
         $record->save();
       tvEpisode::model()->updateByPk($scanned, array('lastTvdbUpdate'=>$now));
@@ -91,7 +92,8 @@ class updateTVDBCommand extends CConsoleCommand {
 
       $toSave[$row['id']] = $data;
     }
-    
+
+    echo count($toSave)." tv Shows to save\n";
     $transaction = Yii::app()->db->beginTransaction();
     try {
       foreach($toSave as $id => $data)
@@ -103,12 +105,13 @@ class updateTVDBCommand extends CConsoleCommand {
 
         if(!empty($data->network))
           $tvShow->network_id = factory::networkByTitle($data->network)->id;
-        $tvShow->rating = $data->rating;
+        $tvShow->rating = (integer) $data->rating;
         $tvShow->description = $data->overview;
         $tvShow->tvdbId = $data->id;
   
         if($tvShow->save()) 
         {
+          echo "Saved {$tvShow->title}\n";
           if(!empty($data->genres)) 
           {
             // Initialize our SQL INSERT command
@@ -125,20 +128,16 @@ class updateTVDBCommand extends CConsoleCommand {
             // Loopthrough the genres linking them all to the tvShow
             foreach($data->genres as $genre) 
             {
-              $g = factory::genreByTitle($genre);
-              $genre_id = $g->id;
-              if(is_numeric($genre_id)) {
-                $addGenre->execute();
-              } 
-              else 
-              {
-                echo "Failure with loadGenre\n";
-                var_dump($g);
-              }
+              $genre_id = factory::genreByTitle($genre)->id;
+              $addGenre->execute();
             }
-          } 
-          else
-            Yii::log('Error saving tvShow after tvdb update', CLogger::LEVEL_ERROR);
+          }
+        } 
+        else 
+        {
+          echo "Failed save {$tvShow->title}\n";
+          Yii::log('Error saving tvShow after tvdb update', CLogger::LEVEL_ERROR);
+          Yii::log(print_r($tvShow->errors, TRUE));
         }
       }
       tvShow::model()->updateByPk($scanned, array('lastTvdbUpdate'=>$now));
