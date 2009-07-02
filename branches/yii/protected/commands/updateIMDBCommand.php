@@ -82,7 +82,7 @@ class updateIMDbCommand extends CConsoleCommand {
       }
 
       echo "Found! Updating ".$scraper->title."\n";
-      $toSave[$id] = $scraper;
+      $toSave[$row['id']] = $scraper;
     }
 
     $transaction = Yii::app()->db->beginTransaction();
@@ -100,7 +100,7 @@ class updateIMDbCommand extends CConsoleCommand {
 
   protected function updateMovieFromScraper($movie, $scraper)
   {
-    if(!is_object($movie))
+    if(!is_a($movie, 'movie'))
       $movie = movie::model()->findByPk($movie);
 
     $movie->year = $scraper->year;
