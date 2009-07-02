@@ -173,12 +173,14 @@ class feedItem extends ARwithQuality
           .'\d+[. ]?of[. ]?\d+'  // 03of18
           .')';
     $episode_reg2 = '\b([SE])(\d+)\b';
-    $episode_reg3 = '\b(\d\d\d)\b.+'; // three digits (four hits movie years) with a word boundry on each side, ex: some.show.402.hdtv
-                                      // with at least some data after it to not match a group name at the end
+    $episode_reg3 = '\b(0?\d\d\d)\b..'; // three digits (four hits movie years, optional 0 to catch single digit season) with a 
+                                        // word boundry on each side, ex: some.show.402.hdtv
+                                        // with at least some data after it to not match a group name at the end
     $episode_reg4 =
            '\b('
           .'\d\d\d\d[- ._]\d\d[- _.]\d\d'.'|' // 2008-03-23
-          .'\d\d[- _.]\d\d[- _.]\d\d\d\d'  // 03.23.2008
+          .'\d\d[- _.]\d\d[- _.]\d\d\d\d'.'|' // 03.23.2008
+          .'\d\d[- _.]\d\d[- _.]\d\d'         // 03 23 08 
           .')';
 
     // Possible Qualitys
