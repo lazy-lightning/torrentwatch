@@ -183,9 +183,9 @@ class FeedController extends BaseController
     if (isset($_GET['command']) && $_GET['command']==='updateFeedItems')
     {
       if(isset($_GET['id'])) {
-        Yii::log('performing single update', CLogger::LEVEL_ERROR);
+        Yii::log('performing single update');
         $this->loadfeed()->updateFeedItems();
-        Yii::log('update complete', CLogger::LEVEL_ERROR);
+        Yii::log('update complete');
       } else {
         foreach(feed::model()->findAll() as $feed)
           $feed->updateFeedItems();

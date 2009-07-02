@@ -133,7 +133,7 @@ abstract class BaseDvrConfig extends CModel {
    * for all attributes contained in the category
    */
   public function setAttributes($values, $scenario='') {
-    Yii::log(__FUNCTION__.': '.print_r($values, true), CLogger::LEVEL_ERROR);
+    Yii::log(__FUNCTION__.': '.print_r($values, true));
     foreach($values as $name=>$value)
     {
       $this->add($name, $value);
@@ -159,21 +159,30 @@ abstract class BaseDvrConfig extends CModel {
   {
     if($this->beforeSave())
     {
-      Yii::log('saving '.print_r($this, TRUE), CLogger::LEVEL_ERROR);
+      $transaction = Yii::app()->db->startTransaction();
+      try {
+        Yii::log('saving '.print_r($this, TRUE));
 
-      if($attributes===null)
-        $attributes = $this->attributeNames();
-      foreach($attributes as $key) 
+        if($attributes===null)
+          $attributes = $this->attributeNames();
+        foreach($attributes as $key) 
+        {
+          $value = $this->$key;
+          if(is_object($value))
+            $value->save();
+          else 
+            $this->updateByKey($key, $value);
+        }
+  
+        $this->afterSave();
+        $transaction->commit();
+        return true;
+      } 
+      catch ( Exception $e ) 
       {
-        $value = $this->$key;
-        if(is_object($value))
-          $value->save();
-        else 
-          $this->updateByKey($key, $value);
+        $transaction->rollback();
+        throw $e;
       }
-
-      $this->afterSave();
-      return true;
     }
 
     return false;

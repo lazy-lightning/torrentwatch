@@ -183,7 +183,6 @@ class CDbCommand extends CComponent
 	 */
 	public function execute()
 	{
-// DEBUG OPTION BY ERIK    Yii::log($this->getText(), CLogger::LEVEL_ERROR);
 		$params=$this->_connection->enableParamLogging && !empty($this->_params) ? '. Bind with parameter ' . implode(', ',$this->_params) : '';
 		Yii::trace('Executing SQL: '.$this->getText().$params,'system.db.CDbCommand');
 		try
@@ -276,7 +275,6 @@ class CDbCommand extends CComponent
 	 */
 	private function queryInternal($method,$mode)
 	{
-// DEBUG OPTION BY ERIK    Yii::log($this->getText(), CLogger::LEVEL_ERROR);
 		$params=$this->_connection->enableParamLogging && !empty($this->_params) ? '. Bind with parameter ' . implode(', ',$this->_params) : '';
 		Yii::trace('Querying SQL: '.$this->getText().$params,'system.db.CDbCommand');
 		try

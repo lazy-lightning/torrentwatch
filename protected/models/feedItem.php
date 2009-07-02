@@ -221,10 +221,10 @@ class feedItem extends ARwithQuality
       $quality = $qregs[1];
     }
 
-    Yii::log($this->title, CLogger::LEVEL_ERROR);
+    Yii::log($this->title);
     if(preg_match("/$title_reg$episode_reg/i", $this->title, $regs)) 
     {
-      Yii::log('episode match'.print_r($regs, TRUE), CLogger::LEVEL_ERROR);
+      Yii::log('episode match'.print_r($regs, TRUE));
       $shortTitle = trim($regs[1]);
       $episode_guess = trim(strtr($regs[2], $from, $to));
       // if match was a date season will receive it, guaranteed no x in the date from previous regexp so episode will be empty
@@ -232,7 +232,7 @@ class feedItem extends ARwithQuality
     }
     elseif(preg_match("/$title_reg$episode_reg4/i", $this->title, $regs))
     {
-      Yii::log('date based episode '.print_r($regs, TRUE), CLogger::LEVEL_ERROR);
+      Yii::log('date based episode '.print_r($regs, TRUE));
       // Item is a date based episode
       $shortTitle = trim($regs[1]);
       $date = strtotime(str_replace(' ', '/', trim(strtr($regs[2], $from, $to))));
@@ -242,11 +242,11 @@ class feedItem extends ARwithQuality
       // strtotime failed, append given date to title
       if($date === False)
         $shortTitle .= ' '.$season;
-      Yii::log("season: $season episode: $episode shortTitle: $shortTitle", CLogger::LEVEL_ERROR);
+      Yii::log("season: $season episode: $episode shortTitle: $shortTitle");
     }
     elseif(preg_match("/$title_reg$episode_reg2/i", $this->title, $regs))
     {
-      Yii::log('episode or season, not both'.print_r($regs, TRUE), CLogger::LEVEL_ERROR);
+      Yii::log('episode or season, not both'.print_r($regs, TRUE));
       // only episode or season, not both
       $shortTitle = trim($regs[1]);
       $season  = $regs[2] == 'S' ? trim($regs[3]) : 1;
@@ -254,7 +254,7 @@ class feedItem extends ARwithQuality
     }
     elseif(preg_match("/$title_reg$episode_reg3/i", $this->title, $regs)) 
     {
-      Yii::log('3 digit season/episode identifier'.print_r($regs, TRUE), CLogger::LEVEL_ERROR);
+      Yii::log('3 digit season/episode identifier'.print_r($regs, TRUE));
       // 3 digit season/episode identifier
       $shortTitle = trim($regs[1]);
       $episode_guess = $regs[2];
@@ -263,7 +263,7 @@ class feedItem extends ARwithQuality
     } 
     else 
     {
-      Yii::log('no match, strip quality', CLogger::LEVEL_ERROR);
+      Yii::log('no match, strip quality');
       // No match, just strip everything after the quality
       $shortTitle = preg_replace("/$qual_reg.*/i", "", $this->title);
       $season = $episode = 0;

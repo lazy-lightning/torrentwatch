@@ -136,7 +136,7 @@ class feed extends CActiveRecord
 
     // Chooses and returns the proper feedAapter for this feed
     $adapter = feedAdapterRouter::getAdapter($this);
-    Yii::log("Initialized ".get_class($adapter)." for: {$this->url}", CLogger::LEVEL_ERROR);
+    Yii::log("Initialized ".get_class($adapter)." for: {$this->url}");
 
     // Checks for and inserts new feed items, updates feed status, etc.
     $adapter->init();

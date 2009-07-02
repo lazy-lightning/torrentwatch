@@ -35,7 +35,7 @@ class usenetItem extends feedAdapter_Item {
       $newTitle = $this->clean($title, $cleaners);
       $newTitle = $this->clean($newTitle, $postClean);
       if($newTitle === $title)
-        Yii::log('Failed cleaning: '.$title, CLogger::LEVEL_ERROR);
+        Yii::log('Failed cleaning: '.$title, CLogger::LEVEL_WARNING);
       $this->cleanTitle = $newTitle;
     }
     return $this->cleanTitle;

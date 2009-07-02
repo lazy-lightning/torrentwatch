@@ -1,13 +1,13 @@
 <?php
   define('VIEWPATH','protected/views/ajax/');
   $logger = Yii::getLogger();
-  Yii::log('start configuration_dialog: '.$logger->getExecutionTime(), CLogger::LEVEL_ERROR);
+  Yii::log('start configuration_dialog: '.$logger->getExecutionTime(), CLogger::LEVEL_PROFILE);
   include VIEWPATH.'configuration_dialog.php';
-  Yii::log('start favorites_dialog: '.$logger->getExecutionTime(), CLogger::LEVEL_ERROR);
+  Yii::log('start favorites_dialog: '.$logger->getExecutionTime(), CLogger::LEVEL_PROFILE);
   include VIEWPATH.'favorites_dialog.php';
-  Yii::log('start feedItems_dialog: '.$logger->getExecutionTime(), CLogger::LEVEL_ERROR);
+  Yii::log('start feedItems_dialog: '.$logger->getExecutionTime(), CLogger::LEVEL_PROFILE);
   include VIEWPATH.'feedItems_container.php';
-  Yii::log('start history_dialog: '.$logger->getExecutionTime(), CLogger::LEVEL_ERROR);
+  Yii::log('start history_dialog: '.$logger->getExecutionTime(), CLogger::LEVEL_PROFILE);
   include VIEWPATH.'history_dialog.php';
 
   if(isset($responce['dialog']))

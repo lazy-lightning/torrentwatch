@@ -266,7 +266,7 @@ class IMDbScraper extends Scraper {
     {
       // There are no matches found... do nothing
       $this->accuracy = 0;
-      Yii::log("No Match found.", CLogger::LEVEL_ERROR);
+      Yii::log("No Match found.", CLogger::LEVEL_WARNING);
     }
     else if (strpos($html, "<title>IMDb Title Search</title>") > 0)
     {

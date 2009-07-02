@@ -32,8 +32,8 @@ class clientFolder extends BaseClient
         }
       }
   
-      Yii::log(print_r($this->manager->title, TRUE), CLogger::LEVEL_ERROR);
-      Yii::log("Writing $title to $filename", CLogger::LEVEL_ERROR);
+      Yii::log(print_r($this->manager->title, TRUE));
+      Yii::log("Writing $title to $filename");
       $return = file_put_contents($filename, $data);
     }
     else

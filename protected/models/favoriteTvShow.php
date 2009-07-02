@@ -73,7 +73,6 @@ class favoriteTvShow extends BaseFavorite
         $this->tvShow_id = factory::tvShowByTitle($this->tvShow_id)->id;
       } catch ( Exception $e) {
         $this->addError("tvShow_id", "There was a problem initilizing a tvshow of that title");
-        Yii::log('Failed adding tvShow for new favorite validation: '.$e->error, CLogger::LEVEL_ERROR);
       }
     }
 

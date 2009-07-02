@@ -14,7 +14,7 @@ class feedAdapterRouter {
     $url = $feed->url;
     foreach(self::$adapters as $class => $reg) {
       if(preg_match($reg, $url)) {
-        Yii::log("Initializing $class for $url", CLogger::LEVEL_ERROR);
+        Yii::log("Initializing $class for $url");
         return new $class($feed);
       }
     }

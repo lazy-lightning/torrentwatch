@@ -37,7 +37,7 @@ class feedAdapterNewzleech extends feedAdapter {
       } 
       else 
       {
-        Yii::log('Skipping item, too small: '.$regs[1].' '.$regs[2], CLogger::LEVEL_ERROR);
+        Yii::log('Skipping item, too small: '.$regs[1].' '.$regs[2]);
       }
     }
 
