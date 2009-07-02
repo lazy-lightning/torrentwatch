@@ -1,3 +1,5 @@
+BEGIN TRANSACTION;
+
 -- Default username/pass
 INSERT INTO users (id, username, password) VALUES(1,'admin','f6fdffe48c908deb0f4c3bd36c032e72');
 INSERT INTO users (id, username, password) VALUES(2,'demo','c514c91e4ed341f263e458d44b3bb0a7');
@@ -25,6 +27,7 @@ INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('feedItemLifetim
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('torClient','clientNZBGet',NULL);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('nzbClient','clientTrans122',NULL);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('webItemsPerLoad', 50, NULL);
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('maxItemsPerFeed', 500, NULL);
 -- BTPD
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('executable','/mnt/syb8634/bin/btcli',2);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('directory','/share/.btpd',2);
@@ -43,3 +46,4 @@ INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('password','',5)
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('category','',7);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('baseApi','http://127.0.0.1:8080/sabnzbd/',7);
 
+COMMIT;
