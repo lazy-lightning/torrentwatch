@@ -10,17 +10,15 @@ CREATE TABLE dvrConfigCategory (
 CREATE TABLE favoriteMovies (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
-    genre_id INTEGER NOT NULL DEFAULT 0,
-    quality_id INTEGER NOT NULL DEFAULT 0,
-    feed_id INTEGER NOT NULL DEFAULT 0, 
-    rating NUMERIC NOT_NULL DEFAULT 100, 
-    saveIn TEXT, 
-    minYear INTEGER NOT NULL DEFAULT 1900, 
-    maxYear INTEGER NOT NULL DEFAULT 2012, 
-    queue INTEGER NOT NULL DEFAULT 0,
+    genre_id INTEGER NOT NULL,
+    feed_id INTEGER NOT NULL,
+    rating NUMERIC NOT_NULL,
+    saveIn TEXT,
+    minYear INTEGER NOT NULL,
+    maxYear INTEGER NOT NULL,
+    queue INTEGER NOT NULL,
     FOREIGN KEY (feed_id) REFERENCES feed(id),
-    FOREIGN KEY (genre_id) REFERENCES genre(id),
-    FOREIGN KEY (quality_id) REFERENCES quality(id)
+    FOREIGN KEY (genre_id) REFERENCES genre(id)
 );
 CREATE TABLE favoriteMovies_quality ( 
     favoriteMovies_id INTEGER NOT NULL, 
@@ -28,12 +26,12 @@ CREATE TABLE favoriteMovies_quality (
 );
 CREATE TABLE favoriteStrings (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    filter TEXT,
+    filter TEXT NOT NULL,
     notFilter TEXT,
     saveIn TEXT,
-    feed_id INTEGER,
-    name TEXT, 
-    queue INTEGER NOT NULL DEFAULT 0
+    feed_id INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    queue INTEGER NOT NULL
 );
 CREATE TABLE favoriteStrings_quality ( 
     favoriteStrings_id INTEGER NOT NULL, 
@@ -42,12 +40,12 @@ CREATE TABLE favoriteStrings_quality (
     FOREIGN KEY (quality_id) REFERENCES quality(id)
 );
 CREATE TABLE favoriteTvShows (
-    id INTEGER PRIMARY KEY NOT NULL ,
-    tvShow_id INTEGER NOT NULL ,
-    feed_id INTEGER NOT NULL DEFAULT 0,
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    tvShow_id INTEGER NOT NULL,
+    feed_id INTEGER NOT NULL,
     saveIn TEXT,
-    onlyNewer integer NOT NULL DEFAULT 0, 
-    queue INTEGER NOT NULL DEFAULT 0
+    onlyNewer INTEGER NOT NULL,
+    queue INTEGER NOT NULL
 );
 CREATE TABLE favoriteTvShows_quality (
   favoriteTvShows_id INTEGER NOT NULL,
@@ -218,6 +216,12 @@ SELECT i.id feedItem_id,
    AND ( f.feed_id = 0
          OR
          f.feed_id = i.feed_id
+       )
+   AND ( SELECT COUNT(*)
+           FROM feedItem_quality iq, favoriteMovies_quality fq
+          WHERE i.id = iq.feedItem_id
+            AND iq.quality_id = fq.quality_id
+            AND fq.favoriteMovies_id = f.id
        );
 CREATE VIEW matchingFavoriteStrings AS
 SELECT i.id feedItem_id,
@@ -280,7 +284,8 @@ SELECT i.feedItem_id feedItem_id,
           WHERE feedItem_quality.feedItem_id = i.feedItem_id
             AND feedItem_quality.quality_id = favoriteTvShows_quality.quality_id
             AND favoriteTvShows_quality.favoriteTvShows_id = f.id
-       ) = fq.count;
+       ) = fq.count
+   AND NOT i.tvEpisode_episode = 0;
 CREATE VIEW movieFeedItem AS
 SELECT feedItem.id feedItem_id,
        feedItem.title feedItem_title,
