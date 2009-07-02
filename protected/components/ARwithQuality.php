@@ -43,7 +43,7 @@ abstract class ARwithQuality extends CActiveRecord {
   }
 
   public function afterSave() {
-    $transaction = $this->db->beginTransaction();
+    $transaction = $this->dbConnection->beginTransaction();
     try {
       // update scenario
       // Clean out any quality relations if this isn't new
