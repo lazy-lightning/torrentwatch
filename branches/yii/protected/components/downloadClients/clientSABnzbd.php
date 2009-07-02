@@ -11,7 +11,6 @@ class clientSABnzbd extends BaseClient {
     $result = $be->file_get_contents($this->config->baseApi.'addFile');
 
     $successString = 'This resource resides temporarily at';
-    Yii::log("title: ".$this->manager->title, CLogger::LEVEL_ERROR);
     return substr($result, 0, strlen($successString)) == $successString ? True : False;
   }
 

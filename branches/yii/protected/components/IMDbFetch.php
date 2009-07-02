@@ -148,14 +148,14 @@ function strip_title ($title)
     // If we are sure that we found a good result, then get the file details.
     if ($best_match["pc"] > 75)
     {
-      Yii::log('Possible matches are:'.implode(', ', $haystack), CLogger::LEVEL_ERROR);;
-      Yii::log('Best guess: ['.$best_match["id"].'] - '.$haystack[$best_match["id"]], CLogger::LEVEL_ERROR);
+      Yii::log('Possible matches are:'.implode(', ', $haystack));;
+      Yii::log('Best guess: ['.$best_match["id"].'] - '.$haystack[$best_match["id"]]);
       $accuracy = $best_match["pc"];
       return $best_match["id"];
     }
     else
     {
-      Yii::log("Multiple Matches found, No match > 75%\n".implode(', ', $haystack), CLogger::LEVEL_ERROR);
+      Yii::log("Multiple Matches found, No match > 75%\n".implode(', ', $haystack), CLogger::LEVEL_WARNING);
       return false;
     }
   }

@@ -43,24 +43,31 @@ abstract class ARwithQuality extends CActiveRecord {
   }
 
   public function afterSave() {
-    // update scenario
-    // Clean out any quality relations if this isn't new
-    // cant use class::model() syntax with dynamic class name
-    $table = $this->tableName();
-    $class = $table.'_quality';
-    $id = $table.'_id';
-    if(!$this->isNewRecord) {
-      $model = new $class;
-      $model->deleteAll($id.'=:id', array(':id'=>$this->id));
-    }
+    $transaction = $this->db->beginTransaction();
+    try {
+      // update scenario
+      // Clean out any quality relations if this isn't new
+      // cant use class::model() syntax with dynamic class name
+      $table = $this->tableName();
+      $class = $table.'_quality';
+      $id = $table.'_id';
+      if(!$this->isNewRecord) {
+        $model = new $class;
+        $model->deleteAll($id.'=:id', array(':id'=>$this->id));
+      }
 
-    // set quality relations
-    foreach($this->qualityIds as $qualityId) {
-      Yii::log("load $class and set $id = {$this->id} and quality_id = $qualityId", CLogger::LEVEL_ERROR);
-      $relation = new $class;
-      $relation->$id = $this->id;
-      $relation->quality_id = $qualityId;
-      $relation->save();
+      // set quality relations
+      foreach($this->qualityIds as $qualityId) {
+        Yii::log("load $class and set $id = {$this->id} and quality_id = $qualityId");
+        $relation = new $class;
+        $relation->$id = $this->id;
+        $relation->quality_id = $qualityId;
+        $relation->save();
+      }
+      $transaction->commit();
+    } catch ( Exception $e ) {
+      $transaction->rollback();
+      throw $e;
     }
 
     parent::afterSave();

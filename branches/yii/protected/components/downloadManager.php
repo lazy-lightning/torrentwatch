@@ -163,38 +163,45 @@ class downloadManager extends favoriteManager {
 
   public function afterDownload()
   {
-    // mark queued items to duplicate if they match the started item
-    Yii::app()->db->createCommand(
-        'UPDATE feedItem'.
-        '   SET status = '.feedItem::STATUS_DUPLICATE.
-        ' WHERE status = '.feedItem::STATUS_QUEUED.
-        '   AND EXISTS( SELECT two.id'.
-        '                 FROM feedItem two'.
-        '                WHERE two.id = '.$this->feedItemId.
-        '                  AND (    (feedItem.movie_id NOT NULL AND feedItem.movie_id = two.movie_id )'.
-        '                        OR (feedItem.other_id NOT NULL AND feedItem.other_id = two.other_id )'.
-        '                        OR (feedItem.tvEpisode_id NOT NULL AND feedItem.tvEpisode_id = two.tvEpisode_id )'.
-        '                      )'.
-        '              );'
-    )->execute();
-
-    // create a new history record for this download
-    $history = new history;
-    $history->feedItem_id = $this->feedItemId;
-    $history->feedItem_title = $this->title;
-    $history->feed_id = $this->feedId;
-    $history->feed_title = $this->feedTitle;
-    $history->favorite_name = $this->favoriteName;
-    $history->favorite_type = $this->favoriteType;
-    $history->save();
-
-    // mark the tvEpisode/movie/other as STATUS_DOWNLOADED
-    $record = $this->itemTypeRecord;
-    if($record) 
-    {
-      $class = get_class($record);
-      $record->status = constant("$class::STATUS_DOWNLOADED");
-      $record->save();
+    $transaction = Yii::app()->db->beginTransaction();
+    try {
+      // mark queued items to duplicate if they match the started item
+      Yii::app()->db->createCommand(
+          'UPDATE feedItem'.
+          '   SET status = '.feedItem::STATUS_DUPLICATE.
+          ' WHERE status = '.feedItem::STATUS_QUEUED.
+          '   AND EXISTS( SELECT two.id'.
+          '                 FROM feedItem two'.
+          '                WHERE two.id = '.$this->feedItemId.
+          '                  AND (    (feedItem.movie_id NOT NULL AND feedItem.movie_id = two.movie_id )'.
+          '                        OR (feedItem.other_id NOT NULL AND feedItem.other_id = two.other_id )'.
+          '                        OR (feedItem.tvEpisode_id NOT NULL AND feedItem.tvEpisode_id = two.tvEpisode_id )'.
+          '                      )'.
+          '              );'
+      )->execute();
+  
+      // create a new history record for this download
+      $history = new history;
+      $history->feedItem_id = $this->feedItemId;
+      $history->feedItem_title = $this->title;
+      $history->feed_id = $this->feedId;
+      $history->feed_title = $this->feedTitle;
+      $history->favorite_name = $this->favoriteName;
+      $history->favorite_type = $this->favoriteType;
+      $history->save();
+  
+      // mark the tvEpisode/movie/other as STATUS_DOWNLOADED
+      $record = $this->itemTypeRecord;
+      if($record) 
+      {
+        $class = get_class($record);
+        $record->status = constant("$class::STATUS_DOWNLOADED");
+        $record->save();
+      }
+      $transaction->commit();
+    } catch ( Exception $e ) {
+      $transaction->rollback();
+      throw $e;
     }
   }
 
@@ -217,7 +224,7 @@ class downloadManager extends favoriteManager {
    */
   public function startDownload($opts, $status) 
   {
-    Yii::log('Starting download', CLogger::LEVEL_ERROR);
+    Yii::log('Starting download');
     $error = False;
 
     // $opts is used in the various get functions to make the following code cleaner
@@ -235,7 +242,7 @@ class downloadManager extends favoriteManager {
         $status = feedItem::STATUS_FAILED_DL;
       }
       // not in afterDownload to allow failure to set STATUS_FAILED_DL
-      Yii::log("Setting feedItem {$this->feedItemId} to $status", CLogger::LEVEL_ERROR);
+      Yii::log("Setting feedItem {$this->feedItemId} to $status");
       feedItem::model()->updateByPk($this->feedItemId, array('status'=>$status));
     }
 
@@ -245,7 +252,5 @@ class downloadManager extends favoriteManager {
     return !$error;
   }
 
-  protected function markDuplicateQueuedItems() {
-  }
 }
 

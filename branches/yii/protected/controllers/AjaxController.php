@@ -129,14 +129,14 @@ class AjaxController extends CController
       {
         if(isset($_GET['id']) && is_numeric($_GET['id'])) 
         {
-          Yii::log('updating favorite', CLogger::LEVEL_ERROR);
+          Yii::log('updating favorite');
           $favorite = $model->findByPk($_GET['id']);
           if($favorite === null)
             throw new CException(self::ERROR_INVALID_ID);
         } 
         else 
         {
-          Yii::log('creating favorite', CLogger::LEVEL_ERROR);
+          Yii::log('creating favorite');
           $favorite = $model;
         }
 
@@ -268,8 +268,8 @@ class AjaxController extends CController
       $startTime = $value;
     }
 
-    Yii::log('Database timing '.print_r($time, true), CLogger::LEVEL_ERROR);
-    Yii::log("pre-render: ".$logger->getExecutionTime()."\n", CLogger::LEVEL_ERROR);
+    Yii::log('Database timing '.print_r($time, true), CLogger::LEVEL_PROFILE);
+    Yii::log("pre-render: ".$logger->getExecutionTime()."\n", CLogger::LEVEL_PROFILE);
     $this->render('fullResponce', array(
           'availClients'=>$availClients,
           'config'=>$config,
@@ -286,7 +286,7 @@ class AjaxController extends CController
           'responce'=>$this->responce,
           'tvEpisodes'=>$tvEpisodes,
     ));
-    Yii::log("end controller: ".$logger->getExecutionTime()."\n", CLogger::LEVEL_ERROR);
+    Yii::log("end controller: ".$logger->getExecutionTime()."\n", CLogger::LEVEL_PROFILE);
   }
 
   public function actionInspect()
@@ -313,7 +313,7 @@ class AjaxController extends CController
 
     $config = Yii::app()->dvrConfig;
 
-    Yii::log(print_r($_POST, TRUE), CLogger::LEVEL_ERROR);
+    Yii::log(print_r($_POST, TRUE));
 
     if(isset($_POST['category'], $_POST['type']) && 
        $config->contains($_POST['category']))
@@ -395,7 +395,7 @@ class AjaxController extends CController
     $this->responce = array('dialog'=>array('header'=>'Delete Favorite'));
 
     $id = (integer)$_GET['id'];
-    Yii::log("deleting $class $id", CLogger::LEVEL_ERROR);
+    Yii::log("deleting $class $id");
 
     // Have to get the matching information before deleting the row
     // Is casting id to integer enough to make it safe without bindValue?

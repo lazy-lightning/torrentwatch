@@ -15,12 +15,27 @@ abstract class favoriteManager extends CComponent {
    */
   public function checkFavorites($itemStatus = feedItem::STATUS_NEW) 
   {
-    $this->checkTvShowFavorites($itemStatus);
-    $this->checkMovieFavorites($itemStatus);
-    $this->checkStringFavorites($itemStatus);
+    $transaction = Yii::app()->db->beginTransaction();
+    try {
+      $this->checkTvShowFavorites($itemStatus);
+      $this->checkMovieFavorites($itemStatus);
+      $this->checkStringFavorites($itemStatus);
+      $transaction->commit();
+    } catch ( Exception $e ) {
+      $transaction->rollback();
+      throw $e;
+    }
 
     $this->startDownloads();
-    $this->updateItemStatus($itemStatus);
+
+    $transaction = Yii::app()->db->beginTransaction();
+    try {
+      $this->updateItemStatus($itemStatus);
+      $transaction->commit();
+    } catch ( Exception $e ) {
+      $transaction->rollback();
+      throw $e;
+    }
   }
  
   /**
@@ -29,7 +44,7 @@ abstract class favoriteManager extends CComponent {
    */
   private function checkMovieFavorites($itemStatus = feedItem::STATUS_NEW) 
   {
-    Yii::log('Looking for movie favorites', CLogger::LEVEL_ERROR);
+    Yii::log('Looking for movie favorites');
     $db = Yii::app()->db;
 
     // Mark any previously downloaded movies that are now matching
@@ -66,7 +81,7 @@ abstract class favoriteManager extends CComponent {
    */
   private function checkStringFavorites($itemStatus = feedItem::STATUS_NEW) 
   {
-    Yii::log('Looking for string favorites', CLogger::LEVEL_ERROR);
+    Yii::log('Looking for string favorites');
     $db = Yii::app()->db;
 
     $reader = $db->createCommand(
@@ -89,7 +104,7 @@ abstract class favoriteManager extends CComponent {
    */
   private function checkTvShowFavorites($itemStatus = feedItem::STATUS_NEW) 
   {
-    Yii::log('Looking for TvShow favorites', CLogger::LEVEL_ERROR);
+    Yii::log('Looking for TvShow favorites');
     $db = Yii::app()->db;
 
     // Mark any duplicate episodes
