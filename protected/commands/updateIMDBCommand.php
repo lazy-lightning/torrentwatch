@@ -10,13 +10,13 @@ class updateIMDbCommand extends CConsoleCommand {
 
   protected function updateOthers() {
     $db = Yii::app()->db;
-    $scanned = array();
+    $scanned = $toSave = array();
     $reader = $db->createCommand('SELECT id, title'.
                                  '  FROM other'.
                                  ' WHERE lastImdbUpdate = 0'
     )->query();
     foreach($reader as $row) {
-
+      $scanned[] = $row['id'];
       $title = $row['title'];
       if(substr($title, -4) === '1080')
         $title = substr($title, 0, -4);
@@ -32,24 +32,37 @@ class updateIMDbCommand extends CConsoleCommand {
 
       echo "Found! Updating to ".$scraper->title."\n";
 
-      $movie = factory::movieByImdbId($scraper->imdbId, $row['title']);
-
-      feedItem::model()->updateAll(
-          array('other_id'=>NULL,
-                'movie_id'=>$movie->id,
-          ),
-          'other_id = '.$row['id']
-      );
-      other::model()->deleteByPk($row['id']);
-      $this->updateMovieFromScraper($movie, $scraper);
+      $toSave[] = array($row['id'], $row['title'], $movie, $scraper);
     }
-    other::model()->updateByPk($scanned, array('lastImdbUpdate'=>time()));
+
+    $transaction = Yii::app()->db->beginTransaction();
+    try {
+      foreach($toSave as $arr) {
+        list($id, $title, $scraper) = $arr;
+
+        $movie = factory::movieByImdbId($scraper->imdbId, $title);
+
+        feedItem::model()->updateAll(
+            array('other_id'=>NULL,
+                  'movie_id'=>$movie->id,
+            ),
+            'other_id = '.$id
+        );
+        other::model()->deleteByPk($id);
+        $this->updateMovieFromScraper($movie, $scraper);
+      }
+      other::model()->updateByPk($scanned, array('lastImdbUpdate'=>time()));
+      $transaction->commit();
+    } catch ( Exception $e ) {
+      $transaction->rollback();
+      throw $e;
+    }
   }
 
   protected function updateMovies() {
     $db = Yii::app()->db;
     $now = time();
-    $scanned = array();
+    $scanned = $toSave = array();
     $reader = $db->createCommand('SELECT id, imdbId'.
                                  '  FROM movie'.
                                  ' WHERE lastImdbUpdate <'.($now-(3600*24)). // one update per 24hrs
@@ -57,7 +70,6 @@ class updateIMDbCommand extends CConsoleCommand {
 
     )->query();
     foreach($reader as $row) {
-      echo "FOO\n";
       $scanned[] = $row['id'];
 
       echo "Looking for Imdb Id: ".$row['imdbId']."\n";
@@ -70,10 +82,20 @@ class updateIMDbCommand extends CConsoleCommand {
       }
 
       echo "Found! Updating ".$scraper->title."\n";
-
-      $this->updateMovieFromScraper($row['id'], $scraper);
+      $toSave[$id] = $scraper;
     }
-    movie::model()->updateByPk($scanned, array('lastImdbUpdate'=>$now));
+
+    $transaction = Yii::app()->db->beginTransaction();
+    try {
+      foreach($toSave as $id => $scraper)
+        $this->updateMovieFromScraper($id, $scraper);
+
+      movie::model()->updateByPk($scanned, array('lastImdbUpdate'=>$now));
+      $transaction->commit();
+    } catch ( Exception $e) {
+      $transaction->rollback();
+      throw $e;
+    }
   }
 
   protected function updateMovieFromScraper($movie, $scraper)
@@ -96,7 +118,9 @@ class updateIMDbCommand extends CConsoleCommand {
         }
       }
       return True;
-    }
+    } else
+      Yii::log('Error saving movie after IMDB update.', CLogger::LEVEL_ERROR);
+
     return False;
   }
 }

@@ -14,7 +14,7 @@ class updateTVDBCommand extends CConsoleCommand {
   protected function updateTvEpisodes() {
     $db = Yii::app()->db;
     $now=time();
-    $scanned = array();
+    $scanned = $toSave = array();
     $reader = $db->createCommand('SELECT e.id id, e.season season, e.episode episode, s.tvdbId tvdbId'.
                                  '  FROM tvShow s,'.
                                  '       ( SELECT * FROM tvEpisode e'.
@@ -54,74 +54,99 @@ class updateTVDBCommand extends CConsoleCommand {
       $tvEpisode->firstAired = $ep->firstAired;
       $tvEpisode->description = $ep->overview;
       $tvEpisode->title = $ep->name;
-      $tvEpisode->save();
+      $toSave[] = $tvEpisode;
     }
-    tvEpisode::model()->updateByPk($scanned, array('lastTvdbUpdate'=>$now));
+
+    $transaction = Yii::app()->db->beginTransaction();
+    try {
+      foreach($toSave as $record)
+        $record->save();
+      tvEpisode::model()->updateByPk($scanned, array('lastTvdbUpdate'=>$now));
+      $transaction->commit();
+    } catch ( Exception $e ) {
+      $transaction->rollback();
+    }
   }
 
   protected function updateTvShows() {
     $db = Yii::app()->db;
-    $scanned = array();
+    $scanned = $toSave = array();
     $now = time();
 
     $reader = $db->createCommand('SELECT id,title FROM tvShow'.
                                  ' WHERE description IS NULL'.
                                  '   AND lastTvdbUpdate < '.($now-(3600*48))
     )->query();
-    foreach($reader as $row) {
+    foreach($reader as $row) 
+    {
       $scanned[]= $row['id'];
       echo "Searching for ".$row['title']."\n";
       $tvdbShows = TV_Shows::search($row['title']);
-      if(!$tvdbShows) {
+      if(!$tvdbShows)
         continue;
-      }
+
       $data = $tvdbShows[0];
+      echo "Found data for ".$data->seriesName."\n";
       $this->tvShows[$data->tvdbId] = $data;
 
-      echo "Found data for ".$data->seriesName."\n";
-      $tvShow = tvShow::model()->findByPk($row['id']);
-      // Dont change the title will mess up factory::tvShowByTitle()
-      // perhaps create new column for tvdb Name ?
-      //$tvShow->title = $data->seriesName;
-      if(!empty($data->network))
-        $tvShow->network_id = factory::networkByTitle($data->network)->id;
-      $tvShow->rating = $data->rating;
-      $tvShow->description = $data->overview;
-      $tvShow->tvdbId = $data->id;
-
-      if(empty($tvShow->title)) {
-        Yii::log('Trying to save a tvShow with no title from tvdb update'."\n".print_r(debug_backtrace()), CLogger::LEVEL_ERROR);
-      }
-      elseif(!$tvShow->save()) {
-        Yii::log('Error saving tvShow from tvdb update', CLogger::LEVEL_ERROR);
-        continue;
-      }
-
-      if(!empty($data->genres)) {
-        // Initialize our SQL INSERT command
-        $genre_id = '';
-        if(!isset($addGenre)) {
-          $addGenre = $db->createCommand(
-              "INSERT INTO tvShow_genre (tvShow_id, genre_id) VALUES (:tvShow, :genre);"
-          );
-          $addGenre->bindParam(':genre', $genre_id);
-        }
-        $addGenre->bindValue(':tvShow', $tvShow->id);
-
-        // Loopthrough the genres linking them all to the tvShow
-        foreach($data->genres as $genre) {
-          $g = factory::genreByTitle($genre);
-          $genre_id = $g->id;
-          if(is_numeric($genre_id)) {
-            $addGenre->execute();
-          } else {
-            echo "Failure with loadGenre\n";
-            var_dump($g);
-          }
-        }
-      }
+      $toSave[$row['id']] = $data;
     }
-    tvShow::model()->updateByPk($scanned, array('lastTvdbUpdate'=>$now));
+    
+    $transaction = Yii::app()->db->beginTransaction();
+    try {
+      foreach($toSave as $id => $data)
+      {
+        $tvShow = tvShow::model()->findByPk($id);
+        // Dont change the title will mess up factory::tvShowByTitle()
+        // perhaps create new column for tvdb Name ?
+        //$tvShow->title = $data->seriesName;
+
+        if(!empty($data->network))
+          $tvShow->network_id = factory::networkByTitle($data->network)->id;
+        $tvShow->rating = $data->rating;
+        $tvShow->description = $data->overview;
+        $tvShow->tvdbId = $data->id;
+  
+        if($tvShow->save()) 
+        {
+          if(!empty($data->genres)) 
+          {
+            // Initialize our SQL INSERT command
+            $genre_id = '';
+            if(!isset($addGenre)) 
+            {
+              $addGenre = $db->createCommand(
+                  "INSERT INTO tvShow_genre (tvShow_id, genre_id) VALUES (:tvShow, :genre);"
+              );
+              $addGenre->bindParam(':genre', $genre_id);
+            }
+            $addGenre->bindValue(':tvShow', $tvShow->id);
+    
+            // Loopthrough the genres linking them all to the tvShow
+            foreach($data->genres as $genre) 
+            {
+              $g = factory::genreByTitle($genre);
+              $genre_id = $g->id;
+              if(is_numeric($genre_id)) {
+                $addGenre->execute();
+              } 
+              else 
+              {
+                echo "Failure with loadGenre\n";
+                var_dump($g);
+              }
+            }
+          } 
+          else
+            Yii::log('Error saving tvShow after tvdb update', CLogger::LEVEL_ERROR);
+        }
+      }
+      tvShow::model()->updateByPk($scanned, array('lastTvdbUpdate'=>$now));
+      $transaction->commit();
+    } catch ( Exception $e ) {
+      $transaction->rollback();
+      throw $e;
+    }
   }
 }
 
