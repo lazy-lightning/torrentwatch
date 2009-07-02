@@ -73,6 +73,20 @@ class dbMaintinanceCommand extends CConsoleCommand {
     foreach($pruneFk as $item)
       $querys[] = "DELETE FROM {$item['table']} WHERE {$item['fk']} NOT IN (SELECT id FROM {$item['pktable']});";
 
+    // delete more than maxItemsPerFeed
+    $reader = $db->createCommand('SELECT id FROM feed')->query();
+    foreach($reader as $row)
+    {
+      $querys[] =
+        'DELETE FROM feedItem'.
+        ' WHERE id IN ( SELECT id FROM feedItem'.
+                      '  WHERE feed_id = '.$row['id'].
+                      '  ORDER BY pubDate'.
+                      '  LIMIT -1'.
+                      ' OFFSET '.Yii::app()->dvrConfig->maxItemsPerFeed.
+                      ');';
+    }
+
     foreach($querys as $sql)
       $db->createCommand($sql)->execute();
   }

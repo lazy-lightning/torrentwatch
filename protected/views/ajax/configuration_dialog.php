@@ -16,6 +16,10 @@
           <option value="Large">Large</option>
         </select>
       </div>
+      <div id="config_webItemsPerLoad">
+        <?php echo CHtml::activeLabel($config, 'webItemsPerLoad', array('class'=>'item')).': '.
+                   CHtml::activeTextField($config, 'webItemsPerLoad'); ?>
+      </div>
       <label class="category">Client Settings</label>
       <div id="config_downloaddir" title="Default directory to start items in">
         <?php echo CHtml::activeLabel($config, 'downloadDir', array('class'=>'item')).': '.
@@ -24,6 +28,15 @@
       <div id="config_savetorrent">
         <?php echo CHtml::activeCheckBox($config, 'saveFile').' '.
                    CHtml::activeLabel($config, 'saveFile', array('class'=>'item checkbox')); ?>
+      </div>
+      <label class="category">Database Settings</label>
+      <div id="config_feedItemLifetime">
+        <?php echo CHtml::activeLabel($config, 'feedItemLifetime', array('class'=>'item')).': '.
+                   CHtml::activeTextField($config, 'feedItemLifetime'); ?>
+      </div>
+      <div id="config_maxItemsPerFeed">
+        <?php echo CHtml::activeLabel($config, 'maxItemsPerFeed', array('class'=>'item')).': '.
+                   CHtml::activeTextField($config, 'maxItemsPerFeed'); ?>
       </div>
       <div class="buttonContainer">
         <a class="submitForm button" id="Save" href="#">Save</a>
