@@ -94,10 +94,13 @@ class feedItem extends ARwithQuality
   /**
    * @return string String representation of download type
    */
-  public function getDownloadTypeText() {
+  public static function getDownloadTypeText($downloadType=null) {
+    if($downloadType===null)
+      $downloadType = $this->downloadType;
+
     $options=$this->getDownloadTypeOptions();
-    return isset($options[$this->downloadType]) ? $options[$this->downloadType]
-        : "unknown ({$this->downloadType})";
+    return isset($options[$downloadType]) ? $options[$downloadType]
+        : "unknown ($downloadType)";
   }
 
   /**
