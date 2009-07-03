@@ -6,8 +6,9 @@ class downloadManager extends favoriteManager {
   private $opts; // the current item being started in the form of either
                  // a feedItem or a row from a matchingFavorite* view
 
-
-  // used for error reporting purposes
+  /**
+   * @return array valid attribute names for error reporting purposes only
+   */
   public function attributeNames() {
     return array(
         "downloadType",
@@ -15,13 +16,17 @@ class downloadManager extends favoriteManager {
     );
   }
 
+  /**
+   * Attributes safe to be massively assigned
+   * @return array
+   */
   public function safeAttributes() {
     return array(
     );
   }
 
   /**
-   * returns the options of the current item being started
+   * @return the options of the current item being started
    * @param none
    */
   public function getOpts() {
@@ -29,7 +34,7 @@ class downloadManager extends favoriteManager {
   }
 
   /**
-   * finds the feeditem id of the current item being started
+   * @return number feeditem id of the current item being started
    * @param none
    */
   public function getFeedItemId() {
@@ -37,7 +42,7 @@ class downloadManager extends favoriteManager {
   }
 
   /**
-   * finds the other id of the current item being started
+   * @return number other id of the current item being started
    * @param none
    */
   public function getOtherId() {
@@ -45,7 +50,7 @@ class downloadManager extends favoriteManager {
   }
 
   /**
-   * finds the movie id of the current item being started
+   * @return number movie id of the current item being started
    * @param none
    */
   public function getMovieId() {
@@ -53,7 +58,7 @@ class downloadManager extends favoriteManager {
   }
 
   /**
-   * finds the tvEpisode id of the current item being started
+   * @return number tvEpisode id of the current item being started
    * @param none
    */
   public function getTvEpisodeId() {
@@ -61,7 +66,7 @@ class downloadManager extends favoriteManager {
   }
 
   /**
-   * finds the url of the current item being started
+   * @return string url of the current item being started
    * @param none
    */
   public function getUrl() {
@@ -80,7 +85,7 @@ class downloadManager extends favoriteManager {
   }
 
   /**
-   * finds the title of the current item being started
+   * @return string title of the current item being started
    * @param none
    */
   public function getTitle() {
@@ -88,25 +93,42 @@ class downloadManager extends favoriteManager {
   }
 
   /**
-   * finds the download type of the current item being started
+   * @return string download type of the current item being started
    * @param none
    */
   public function getDownloadType() {
     return is_array($this->opts) ? $this->opts['feedItem_downloadType'] : $this->opts->downloadType;
   }
 
+  /**
+   * @return number id of the feed related to the item being started
+   * @param none
+   */
   public function getFeedId() {
     return is_array($this->opts) ? $this->opts['feed_id'] : $this->opts->feed_id;
   }
 
+  /**
+   * @return string title of the feed related to the item being started
+   * @param none
+   */
   public function getFeedTitle() {
     return is_array($this->opts) ? $this->opts['feed_title'] : $this->opts->feed->title;
   }
 
+  /**
+   * @return string name of the favorite starting this download, or 'Manual DL'
+   * @param none
+   */
   public function getFavoriteName() {
     return is_array($this->opts) ? $this->opts['favorite_name'] : 'Manual DL';
   }
 
+  /**
+   * @return string the type of favorite starting this download
+   * or null if not started by a favorite
+   * @param none
+   */
   public function getFavoriteType() {
     if(!is_array($this->opts))
       return null;
@@ -116,6 +138,10 @@ class downloadManager extends favoriteManager {
            isset($this->opts['favoriteStrings_id']) ? 'String' : null;
   }
 
+  /**
+   * @return mixed contents of itemTypeRecord related to current item being started
+   * @param none
+   */
   public function getItemTypeRecord() {
     if(is_array($this->opts))
     {
@@ -150,9 +176,13 @@ class downloadManager extends favoriteManager {
     );
   }
 
+  /**
+   * @return BaseClient object capable of starting the current item
+   */
   public function getClient() 
   {
     $type = $this->downloadType;
+    // maps client types to their key in Yii::app()->dvrConfig
     $clientMap = array(
         feedItem::TYPE_TORRENT=>'torClient',
         feedItem::TYPE_NZB=>'nzbClient',
@@ -174,6 +204,10 @@ class downloadManager extends favoriteManager {
     Yii::log("Unknown download type\n".print_r($this->opts, true), CLogger::LEVEL_ERROR);
   }
 
+  /**
+   * Runs actions to take place on successfull start of a download
+   * @return none
+   */
   public function afterDownload()
   {
     $transaction = Yii::app()->db->beginTransaction();
@@ -208,8 +242,8 @@ class downloadManager extends favoriteManager {
       if($record) 
       {
         $class = get_class($record);
-        $record->status = constant("$class::STATUS_DOWNLOADED");
-        $record->save();
+        Yii::log('Updating related '.$class);
+        $record->updateByPk($record->id, array('status'=>constant("$class::STATUS_DOWNLOADED")));
       }
       $transaction->commit();
     } catch ( Exception $e ) {
@@ -218,6 +252,10 @@ class downloadManager extends favoriteManager {
     }
   }
 
+  /**
+   * Runs actions to take place before each download is started
+   * @return boolean if the download should take place
+   */
   public function beforeDownload()
   {
     return True;
@@ -231,38 +269,35 @@ class downloadManager extends favoriteManager {
   }
 
   /**
-   * starts a download in the proper download client
-   * @param mixed either a feedItem object or a row returned from the various matching views in the db
-   * @param integer the status to set related feeditem to on successfull start,.  from feedItem::STATUS_*
+   * Entry point for downloading a feed item with a download client
+   * @param mixed $opts either a feedItem object or a row returned from the various matching views in the db
+   * @param integer $status the status to set related {@link feeditem} to on successfull start,.
    */
   public function startDownload($opts, $status) 
   {
-    Yii::log('Starting download');
-    $error = False;
+    Yii::trace("Starting download: $this->title");
 
     // $opts is used in the various get functions to make the following code cleaner
     $this->opts = $opts;
 
-    $client = $this->getClient();
     if($this->beforeDownload())
     {
+      $client = $this->getClient();
       if(is_object($client) ? $client->addByUrl($this->url) : False)
         $this->afterDownload($success);
       else
       {
-        $error = true;
         $this->addError("client", (is_object($client) ? $client->getError() : 'Unable to initialize client'));
         $status = feedItem::STATUS_FAILED_DL;
       }
       // not in afterDownload to allow failure to set STATUS_FAILED_DL
-      Yii::log("Setting feedItem {$this->feedItemId} to $status");
       feedItem::model()->updateByPk($this->feedItemId, array('status'=>$status));
     }
 
     // reset the options to null incase anything trys to access the stale information
     $this->opts = null;
 
-    return !$error;
+    return $status !== feedItem::STATUS_FAILED_DL;
   }
 
 }
