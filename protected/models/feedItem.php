@@ -50,6 +50,7 @@ class feedItem extends ARwithQuality
       array('tvEpisode_id', 'exist', 'attributeName'=>'id', 'className'=>'tvEpisode'),
       array('pubDate', 'default', 'value'=>time()),
       array('pubDate', 'numerical', 'allowEmpty'=>false, 'integerOnly'=>true, 'min'=>0),
+      array('status', 'default', 'value'=>self::STATUS_NEW),
       array('status', 'in', 'allowEmpty'=>false, 'range'=>array_keys($this->getStatusOptions())),
       array('downloadType', 'in', 'allowEmpty'=>false, 'range'=>array_keys(feedItem::getStatusOptions())),
     );
@@ -130,8 +131,6 @@ class feedItem extends ARwithQuality
     $this->lastUpdated = time();
 
     if($this->isNewRecord) {
-      $this->status = self::STATUS_NEW;
-      
       list($shortTitle, $quality, $season, $episode, $network) = $this->detectTitleParams();
   
       if(!empty($network))
