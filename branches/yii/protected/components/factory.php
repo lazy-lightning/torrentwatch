@@ -30,6 +30,16 @@ class factory {
     // Remove the preface
     if(strtolower(substr($title, 0, 4)) === 'the ')
       $title = substr($title, 4);
+    // convert common differences
+    $titleMap = array(
+        'BBC One'=>'BBC1', 'BBC-1'=>'BBC1', 'BBC 1'=>'BBC1',
+        'BBC Two'=>'BBC2', 'BBC-2'=>'BBC2', 'BBC 2'=>'BBC2',
+        'ITV One'=>'ITV1', 'ITV-1'=>'ITV1', 'ITV 1'=>'ITV1',
+        'Cartoon'=>'Cartoon Network',
+        'History'=>'History Channel',
+    );
+    if(isset($titleMap[$title]))
+      $title = $titleMap[$title];
 
     $network = network::model()->find('title LIKE :title', array(':title'=>$title));
     if($network === null) {
