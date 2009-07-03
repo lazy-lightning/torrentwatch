@@ -9,7 +9,7 @@
     <?php echo CHtml::beginForm(array('saveConfig'), 'post', array('id'=>'config_form')); ?>
       <label class="category">Web UI Settings</label>
       <div id="config_webui"> <!-- Only used by the javascript, selected via cookie -->
-        <label class="item select">Font Size:</label>
+        <label class="item select">Font Size</label>:
         <select name="webui">
           <option value="Small">Small</option>
           <option value="Medium" selected>Medium</option>
@@ -26,8 +26,8 @@
                    CHtml::activeTextField($config, 'downloadDir'); ?>
       </div>
       <div id="config_savetorrent">
-        <?php echo CHtml::activeCheckBox($config, 'saveFile').' '.
-                   CHtml::activeLabel($config, 'saveFile', array('class'=>'item checkbox')); ?>
+         <?php echo CHtml::activeLabel($config, 'saveFile', array('class'=>'item checkbox')).': '.
+                    CHtml::activeCheckBox($config, 'saveFile'); ?>
       </div>
       <label class="category">Database Settings</label>
       <div id="config_feedItemLifetime">

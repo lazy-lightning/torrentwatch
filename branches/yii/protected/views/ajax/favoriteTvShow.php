@@ -20,8 +20,12 @@
              CHtml::activeTextField($favorite, 'saveIn'); ?>
  </div>
  <div class="favorite_episodes">
-  <label class="item" title="Regexp Episode filter in form of 2x[1-8]">Episodes:</label>
-  <input type="text" name="favoriteTvShow[episodes]" value="" />
+   <?php echo CHtml::activeLabelEx($favorite, 'episodes').': <span>S'.
+              CHtml::activeTextField($favorite, 'minSeason').'-'.
+              CHtml::activeTextField($favorite, 'maxSeason').' E'.
+              CHtml::activeTextField($favorite, 'minEpisode').'-'.
+              CHtml::activeTextField($favorite, 'maxEpisode'); ?>
+  </span>
  </div>
  <div class="favorite_feed">
   <?php echo CHtml::activeLabelEx($favorite, 'feed_id').': '.
@@ -38,12 +42,13 @@
   ?>
  </div>
  <div class="favorite_onlynewer">
-  <?php echo CHtml::activeCheckBox($favorite, 'onlyNewer').' '.
-             CHtml::activeLabelEx($favorite, 'onlyNewer'); ?>
+   <?php echo CHtml::activeLabelEx($favorite, 'onlyNewer').': '.
+              CHtml::activeCheckBox($favorite, 'onlyNewer'); ?>
+  <p class='clear'></p>
  </div>
  <div class="favorite_queue">
-  <?php echo CHtml::activeCheckBox($favorite, 'queue').' '.
-             CHtml::activeLabelEx($favorite, 'queue'); ?>
+   <?php echo CHtml::activeLabelEx($favorite, 'queue').': '.
+              CHtml::activeCheckBox($favorite, 'queue'); ?>
  </div>
  <div class="buttonContainer">
    <a class="submitForm button" id="Update" href="#">Update</a>

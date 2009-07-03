@@ -36,8 +36,8 @@
   ?>
  </div>
  <div class="favorite_queue">
-  <?php echo CHtml::activeCheckBox($favorite, 'queue').' '.
-             CHtml::activeLabelEx($favorite, 'queue'); ?>
+   <?php echo CHtml::activeLabelEx($favorite, 'queue').': '.
+              CHtml::activeCheckBox($favorite, 'queue'); ?>
  </div>
  <div class="buttonContainer">
    <a class="submitForm button" id="Update" href="#">Update</a>
