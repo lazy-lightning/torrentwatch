@@ -253,7 +253,17 @@ class dvrConfigCategory extends BaseDvrConfig {
 class dvrConfig extends BaseDvrConfig {
 
   /**
-   *
+   * @return array customized attribute labels (name=>label)
+   */
+  public function attributeLabels()
+  {
+    return array(
+        'webItemsPerLoad'=>'Feed items per page',
+    );
+  }
+
+  /**
+   * Initializes all configuration values from the database
    */
   public function init() {
     $db = Yii::app()->db;
