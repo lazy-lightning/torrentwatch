@@ -28,6 +28,11 @@ class favoriteTvShow extends BaseFavorite
           array('onlyNewer', 'default', 'value'=>0),
           array('onlyNewer', 'in', 'allowEmpty'=>False, 'range'=>array(0, 1)),
           array('tvShow_id', 'exist', 'allowEmpty'=>False, 'attributeName'=>'id', 'className'=>'tvShow'),
+          array('minEpisode, maxEpisode, minSeason, maxSeason', 'default', 'value'=>0),
+          array('minEpisode', 'numerical', 'allowEmpty'=>false, 'integerOnly'=>true, 'min'=> 0, 'max'=> $this->maxEpisode),
+          array('maxEpisode', 'numerical', 'allowEmpty'=>false, 'integerOnly'=>true, 'min'=> $this->minEpisode),
+          array('minSeason', 'numerical', 'allowEmpty'=>false, 'integerOnly'=>true, 'min'=> 0, 'max'=> $this->maxSeason),
+          array('maxSeason', 'numerical', 'allowEmpty'=>false, 'integerOnly'=>true, 'min'=> $this->minSeason),
     ));
   }
 
