@@ -45,7 +45,11 @@ CREATE TABLE favoriteTvShows (
     feed_id INTEGER NOT NULL,
     saveIn TEXT,
     onlyNewer INTEGER NOT NULL,
-    queue INTEGER NOT NULL
+    queue INTEGER NOT NULL,
+    minSeason INTEGER NOT NULL,
+    maxSeason INTEGER NOT NULL,
+    minEpisode INTEGER NOT NULL,
+    maxEpisode INTEGER NOT NULL
 );
 CREATE TABLE favoriteTvShows_quality (
   favoriteTvShows_id INTEGER NOT NULL,
@@ -285,7 +289,17 @@ SELECT i.feedItem_id feedItem_id,
             AND feedItem_quality.quality_id = favoriteTvShows_quality.quality_id
             AND favoriteTvShows_quality.favoriteTvShows_id = f.id
        ) = fq.count
-   AND NOT i.tvEpisode_episode = 0;
+   AND NOT i.tvEpisode_episode = 0
+   AND ( ( f.minSeason = 0
+           AND f.maxSeason = 0
+           AND f.minEpisode = 0
+           AND f.maxEpisode = 0
+         )
+         OR
+         ( i.tvEpisode_season BETWEEN f.minSeason AND f.maxSeason
+           AND i.tvEpisode_episode BETWEEN f.minEpisode AND f.maxEpisode
+         )
+       );
 CREATE VIEW movieFeedItem AS
 SELECT feedItem.id feedItem_id,
        feedItem.title feedItem_title,
