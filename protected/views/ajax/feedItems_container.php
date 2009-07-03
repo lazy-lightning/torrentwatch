@@ -40,7 +40,7 @@
           }
         } 
       ?>
-      <li class='torrent loadMore<?php echo (++$n%2?'alt':'notalt'); ?>'>
+      <li class='torrent loadMore <?php echo (++$n%2?'alt':'notalt'); ?>'>
         <span class='torrent_name'>Load More <?php echo ucwords($type); ?></span>
       </li>
     </ul>
