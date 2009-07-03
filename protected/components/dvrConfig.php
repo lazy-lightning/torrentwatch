@@ -159,7 +159,7 @@ abstract class BaseDvrConfig extends CModel {
   {
     if($this->beforeSave())
     {
-      $transaction = Yii::app()->db->startTransaction();
+      $transaction = Yii::app()->db->beginTransaction();
       try {
         Yii::log('saving '.print_r($this, TRUE));
 
