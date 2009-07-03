@@ -1,7 +1,7 @@
 <?php
 
 // client class accessed by controllers to start downloads
-abstract class favoriteManager extends CComponent {
+abstract class favoriteManager extends CModel {
   abstract function startDownload($opts, $status);
 
   private $toStart = array();
