@@ -32,13 +32,7 @@ class feedAdapterNewzleech extends feedAdapter {
       preg_match('/Size: (\d+)(?:.\d+)? (KB|MB|GB)/', $item->get_description(), $regs);
       $type = $types[$regs[2]];
       if($type > $minType  || ($type == $minType && $regs[1] > $minSize)) 
-      {
         $out[] = $item;
-      } 
-      else 
-      {
-        Yii::log('Skipping item, too small: '.$regs[1].' '.$regs[2]);
-      }
     }
 
     return $out;

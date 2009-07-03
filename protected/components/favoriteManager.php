@@ -15,6 +15,7 @@ abstract class favoriteManager extends CModel {
    */
   public function checkFavorites($itemStatus = feedItem::STATUS_NEW) 
   {
+    Yii::trace('Checking for matching favorites');
     $transaction = Yii::app()->db->beginTransaction();
     try {
       $this->checkTvShowFavorites($itemStatus);
@@ -175,6 +176,7 @@ abstract class favoriteManager extends CModel {
   private function updateItemStatus($updateType)
   {
     // After matching has occured, updated item statuses
+    // The status of downloaded items have already been set.
     if(count($this->toQueue) !== 0)
       feedItem::model()->updateByPk($this->toQueue, array('status'=>feedItem::STATUS_QUEUED));
     if(count($this->duplicates) !== 0)

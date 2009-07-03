@@ -34,7 +34,6 @@ class feedAdapter extends SimplePie {
     $this->_feedAR->description = $this->get_description();
 
     $items = $this->get_items();
-    Yii::log(count($items)." items to consider");
     foreach($items as $item) {
       $hash = md5($item->get_id());
       if(false === feedItem::model()->exists('hash=:hash', array(':hash'=>$hash))) {

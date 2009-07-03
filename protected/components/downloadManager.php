@@ -133,9 +133,10 @@ class downloadManager extends favoriteManager {
     if(!is_array($this->opts))
       return null;
 
-    return isset($this->opts['favoriteTvShows_id']) ? 'tvShow' :
-           isset($this->opts['favoriteMovies_id']) ? 'Movie' :
-           isset($this->opts['favoriteStrings_id']) ? 'String' : null;
+
+    return (isset($this->opts['favoriteTvShows_id']) ? 'tvShow' :
+           (isset($this->opts['favoriteMovies_id']) ? 'Movie' :
+           (isset($this->opts['favoriteStrings_id']) ? 'String' : null)));
   }
 
   /**
@@ -144,17 +145,12 @@ class downloadManager extends favoriteManager {
    */
   public function getItemTypeRecord() {
     if(is_array($this->opts))
-    {
-      $class = 'favorite'.ucwords($this->getFavoriteType());
-      if($class !== 'favorite')
-        return CActiveRecord::model($class)->findByPk($this->opts[$class.'s_id']);
-      else
-        return null;
-    }
+      // FIXME: lazy, but short and it works
+      $item = feedItem::model()->findByPk($this->opts['feedItem_id']);
     else
-    {
-      return $this->opts->itemTypeRecord;
-    }
+      $item = $this->opts;
+
+    return $item->itemTypeRecord;
   }
 
   /**
@@ -210,6 +206,7 @@ class downloadManager extends favoriteManager {
    */
   public function afterDownload()
   {
+    Yii::trace('afterDownload called');
     $transaction = Yii::app()->db->beginTransaction();
     try {
       // mark queued items to duplicate if they match the started item
@@ -245,6 +242,9 @@ class downloadManager extends favoriteManager {
         Yii::log('Updating related '.$class);
         $record->updateByPk($record->id, array('status'=>constant("$class::STATUS_DOWNLOADED")));
       }
+      else
+        Yii::log('WTF, no related record for '.$this->feedItemId, CLogger::LEVEL_ERROR);
+
       $transaction->commit();
     } catch ( Exception $e ) {
       $transaction->rollback();
@@ -284,7 +284,7 @@ class downloadManager extends favoriteManager {
     {
       $client = $this->getClient();
       if(is_object($client) ? $client->addByUrl($this->url) : False)
-        $this->afterDownload($success);
+        $this->afterDownload();
       else
       {
         $this->addError("client", (is_object($client) ? $client->getError() : 'Unable to initialize client'));
