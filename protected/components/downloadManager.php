@@ -1,11 +1,24 @@
 <?php
 
 class downloadManager extends favoriteManager {
-  private $errors = array();
   private $_nzbClient, $_torClient;
 
   private $opts; // the current item being started in the form of either
                  // a feedItem or a row from a matchingFavorite* view
+
+
+  // used for error reporting purposes
+  public function attributeNames() {
+    return array(
+        "downloadType",
+        "client",
+    );
+  }
+
+  public function safeAttributes() {
+    return array(
+    );
+  }
 
   /**
    * returns the options of the current item being started
