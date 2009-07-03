@@ -52,14 +52,22 @@ class feedAdapter extends SimplePie {
   }
 }
 
-// attempt to detect imdb from description, can be overridden for a better match
 class feedAdapter_Item extends SimplePie_Item {
+  // attempt to detect imdb from description, can be overridden for a better match
   function get_imdbId() {
     $desc = $this->get_description();
     if(preg_match('/imdb.com\/title\/tt(\d+)/i', $desc, $regs))
       return $regs[1];
     else
       return 0;
+  }
+
+  function get_title() {
+    return html_entity_decode(parent::get_title());
+  }
+
+  function get_description() {
+    return html_entity_decode(parent::get_description());
   }
 }
 
