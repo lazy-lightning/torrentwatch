@@ -188,7 +188,8 @@ SELECT feedItem.id feedItem_id,
        tvEpisode.episode tvEpisode_episode,
        tvEpisode.status tvEpisode_status,
        tvShow.id tvShow_id,
-       tvShow.title tvShow_title
+       tvShow.title tvShow_title,
+       tvShow.network_id network_id
   FROM feed, feedItem, tvEpisode, tvShow
  WHERE feedItem.tvEpisode_id = tvEpisode.id
    AND tvEpisode.tvShow_id = tvShow.id
