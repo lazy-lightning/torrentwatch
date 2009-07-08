@@ -1,4 +1,4 @@
-<?php echo CHtml::beginForm(array('updateFavorite', 'id'=>$favorite->id), 'post', array('class'=>'favinfo', 'id'=>'favoriteStrings-'.$favorite->id));
+<?php echo CHtml::beginForm(array(($favorite->isNewRecord ? 'create' : 'update').'Favorite', 'id'=>$favorite->id), 'post', array('class'=>'favinfo', 'id'=>'favoriteStrings-'.$favorite->id));
       if(isset($responce['favoriteStrings-'.$favorite->id])) {
         $favorite = $responce['favoriteStrings-'.$favorite->id];
         echo CHtml::errorSummary($favorite);
@@ -40,8 +40,9 @@
               CHtml::activeCheckBox($favorite, 'queue'); ?>
  </div>
  <div class="buttonContainer">
-   <a class="submitForm button" id="Update" href="#">Update</a>
-   <a class="submitForm button" id="Delete" href="#">Delete</a>
+   <a class="submitForm button" id="Update" href="#"><?php echo $favorite->isNewRecord ? 'Create' : 'Update'; ?></a>
+   <?php if(!$favorite->isNewRecord)
+           echo CHtml::link('Delete', array('deleteFavorite', 'type'=>get_class($favorite), 'id'=>$favorite->id), array('class'=>'button ajaxSubmit')); ?>
    <a class="toggleDialog button" href="#">Close</a>
  </div>
-</form>
+<?php echo CHtml::endForm(); ?>

@@ -10,6 +10,10 @@ class AjaxController extends CController
    */
   public $defaultAction='fullResponce';
 
+  /**
+   * @var array valid favorite classes
+   */
+  private $favoriteWhitelist = array('favoriteTvShow', 'favoriteMovie', 'favoriteString');
   protected $responce = array();
 
   /**
@@ -39,11 +43,11 @@ class AjaxController extends CController
   {
     return array(
 /*      array('allow',  // allow all users
-        'actions'=>array(),
+        'actions'=>array('fullResponce'),
         'users'=>array('*'),
       ), */
       array('allow', // allow authenticated user
-        'actions'=>array('fullResponce', 'dlFeedItem', 'saveConfig', 'addFeed', 'addFavorite', 'updateFavorite', 'inspect', 'clearHistory'),
+        'actions'=>array('fullResponce', 'dlFeedItem', 'saveConfig', 'addFeed', 'addFavorite', 'updateFavorite', 'inspect', 'clearHistory', 'createFavorite', 'deleteFavorite'),
         'users'=>array('@'),
       ),
       array('allow', // allow admin user 
@@ -99,62 +103,65 @@ class AjaxController extends CController
       $this->responce['showTab'] = "#".$type;
     }
 
-    $this->actionFullResponce($this->responce);
+    $this->actionFullResponce();
+  }
+
+  protected function findFavoriteType() 
+  {
+    $class = null;
+    foreach($this->favoriteWhitelist as $item) 
+    {
+      if(isset($_POST[$item])) 
+        return $item;
+    }
+
+    $this->responce['dialog']['error'] = true;
+    $this->responce['dialog']['content'] = 'Unknown favorite type';
+    return false;
+  }
+
+  /**
+   * @param BaseFavorite a favorite to be updated
+   */
+  protected function updateFavorite($favorite)
+  {
+    $class = get_class($favorite);
+    if(isset($_POST['quality_id']))
+      $favorite->qualityIds = $_POST['quality_id'];
+
+    $favorite->attributes = $_POST[$class];
+    $favorite->save();
+    // Tell the view to bring up the changed favorite
+    $this->responce[$htmlId] = $favorite;
+    $this->responce['showFavorite'] = "#".$class.'s-'.$favorite->id;
+    $this->responce['showTab'] = "#".$class."s";
+  }
+
+  public function actionCreateFavorite()
+  {
+    $this->responce = array('dialog'=>array('header'=>'Create Favorite'));
+    $class = $this->findFavoriteType();
+    if($class)
+    {
+      Yii::trace('creating favorite');
+      $this->updateFavorite(new $class);
+    }
+
+    $this->actionFullResponce();
   }
 
   public function actionUpdateFavorite()
   {
     $this->responce = array('dialog'=>array('header'=>'Update Favorite'));
+    $class = $this->findFavoriteType();
 
-    foreach(array('favoriteTvShow', 'favoriteMovie', 'favoriteString') as $item) 
+    if($class && isset($_GET['id']) && is_numeric($_GET['id'])) 
     {
-      if(isset($_POST[$item])) 
-      {
-        $class = $item;
-        break;
-      }
-    }
-
-    try { 
-      if($class === null) 
-        throw new CException(self::ERROR_INVALID_ID);
-
+      Yii::trace('updating favorite');
       $model = new $class;
-
-      if(isset($_GET['id'], $_POST['button']) && is_numeric($_GET['id']) && $_POST['button'] === 'Delete') 
-      {
-        $this->responce = $this->deleteFavorite($model, $class);
-      } 
-      else 
-      {
-        if(isset($_GET['id']) && is_numeric($_GET['id'])) 
-        {
-          Yii::log('updating favorite');
-          $favorite = $model->findByPk($_GET['id']);
-          if($favorite === null)
-            throw new CException(self::ERROR_INVALID_ID);
-        } 
-        else 
-        {
-          Yii::log('creating favorite');
-          $favorite = $model;
-        }
-
-        if(isset($_POST['quality_id']))
-          $favorite->qualityIds = $_POST['quality_id'];
-
-        $favorite->attributes = $_POST[$class];
-        $favorite->save();
-        // Tell the view to bring up the changed favorite
-        $this->responce[$htmlId] = $favorite;
-        $this->responce['showFavorite'] = "#".$class.'s-'.$favorite->id;
-        $this->responce['showTab'] = "#".$class."s";
-      }
-    }
-    catch ( Exception $e )
-    {
-      $this->responce['dialog']['error'] = true;
-      $this->responce['dialog']['content'] = $e->error;
+      $favorite = $model->findByPk($_GET['id']);
+      if($favorite)
+        $this->updateFavorite($favorite);
     }
 
     $this->actionFullResponce($this->responce);
@@ -220,7 +227,6 @@ class AjaxController extends CController
     $this->render('dlResponce', array('responce' => $this->responce));
   }
 
-  // @param array an array of actions to be acted on from any part of the fullResponce view
   public function actionFullResponce()
   {
     $app = Yii::app();
@@ -294,15 +300,14 @@ class AjaxController extends CController
     $view = 'inspectError';
     $item = null;
     $opts = array();
-    if(isset($_GET['feedItem_id']) && is_numeric($_GET['feedItem_id']))
+
+    $feedItem = $this->loadFeedItem();
+    if($feedItem)
     {
-      $item = $opts['item'] = feedItem::model()->findByPk($_GET['feedItem_id']);
-      if($item !== null) 
-      {
-        $record = $item->itemTypeRecord;
-        $view = 'inspect'.ucwords(get_class($record));
-        $opts[get_class($record)] = $record;
-      }
+      $opts['item'] = $feedItem;
+      $record = $feedItem->itemTypeRecord;
+      $view = 'inspect'.ucwords(get_class($record));
+      $opts[get_class($record)] = $record;
     }
     $this->render($view, $opts);
   }
@@ -312,18 +317,15 @@ class AjaxController extends CController
     $this->responce = array('dialog'=>array('header'=>'Save Configuration'));
 
     $config = Yii::app()->dvrConfig;
-
     Yii::log(print_r($_POST, TRUE));
-
-    if(isset($_POST['category'], $_POST['type']) && 
-       $config->contains($_POST['category']))
+    if(isset($_POST['category']) && $config->contains($_POST['category']))
     {
       // empty dvrConfig allows still setting config client
       if(isset($_POST['dvrConfigCategory']))
         $config->$_POST['category']->attributes = $_POST['dvrConfigCategory'];
 
       // if this is a client category, also set the main config to use this client
-      if(in_array($_POST['type'], array('nzbClient', 'torClient')) &&
+      if(isset($_POST['type']) && in_array($_POST['type'], array('nzbClient', 'torClient')) &&
          substr($_POST['category'], 0, 6) === 'client')
         $config->$_POST['type'] = $_POST['category'];
     }
@@ -343,7 +345,7 @@ class AjaxController extends CController
       $this->responce['dialog']['content'] = 'There was an error saving the configuration';
     }
 
-    $this->actionFullResponce($this->responce);
+    $this->actionFullResponce();
   }
 
   private function prepareFeedItems($table) 
@@ -386,42 +388,47 @@ class AjaxController extends CController
   }
 
   public static function cmpItemStatus($a, $b) {
-    
     return($a['feedItem_status'] < $b['feedItem_status']);
   }
 
-  // this logic might be better served in a different class
-  public function deleteFavorite($model, $class) {
+  public function actionDeleteFavorite() {
     $this->responce = array('dialog'=>array('header'=>'Delete Favorite'));
 
-    $id = (integer)$_GET['id'];
-    Yii::log("deleting $class $id");
-
-    // Have to get the matching information before deleting the row
-    // Is casting id to integer enough to make it safe without bindValue?
-    $sql = "SELECT feedItem_id FROM matching${class}s WHERE ${class}s_id = $id AND feedItem_status NOT IN".
-                "('".feedItem::STATUS_AUTO_DL."', '".feedItem::STATUS_MANUAL_DL."');";
-
-    $reader = Yii::app()->db->CreateCommand($sql)->query();
-    $ids = array();
-    foreach($reader as $row) 
+    if(isset($_GET['id'], $_GET['type']) && is_numeric($_GET['id']) && in_array($_GET['type'], $this->favoriteWhitelist))
     {
-      $ids[] = $row['feedItem_id'];
+      $id = (integer)$_GET['id'];
+      $class = $_GET['type'];
+      $model = new $class; // verified safe by whitelist
+      Yii::log("deleting $class $id");
+
+      // this logic might be better served in BaseFavorite somehow
+      // Have to get the matching information before deleting the row
+      // Is casting id to integer enough to make it safe without bindValue?
+      $sql = "SELECT feedItem_id FROM matching${class}s WHERE ${class}s_id = $id AND feedItem_status NOT IN".
+                  "('".feedItem::STATUS_AUTO_DL."', '".feedItem::STATUS_MANUAL_DL."');";
+  
+      $reader = Yii::app()->db->CreateCommand($sql)->query();
+      $ids = array();
+      foreach($reader as $row) 
+      {
+        $ids[] = $row['feedItem_id'];
+      }
+   
+      if($model->deleteByPk($id))
+      {
+        // Reset feedItem status on anything this was matching, then rerun matching routine incase something else matches the reset items
+        feedItem::model()->updateByPk($ids, array('status'=>feedItem::STATUS_NEW));
+        Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NEW);
+        $this->responce['dialog']['content'] = 'Your favorite has been successfully deleted';
+      } 
+      else 
+      {
+        $this->responce['dialog']['content'] = 'That favorite does not exist ?';
+        $this->responce['dialog']['error'] = True;
+      }
     }
- 
-    if($model->deleteByPk($id))
-    {
-      // Reset feedItem status on anything this was matching, then rerun matching routine incase something else matches the reset items
-      feedItem::model()->updateByPk($ids, array('status'=>feedItem::STATUS_NEW));
-      Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NEW);
-      $this->responce['dialog']['content'] = 'Your favorite has been successfully deleted';
-    } 
-    else 
-    {
-      $this->responce['dialog']['content'] = 'That favorite does not exist ?';
-      $this->responce['dialog']['error'] = True;
-    }
 
+    $this->actionFullResponce();
   }
 
 }
