@@ -206,7 +206,6 @@ class downloadManager extends favoriteManager {
    */
   public function afterDownload()
   {
-    Yii::trace('afterDownload called');
     $transaction = Yii::app()->db->beginTransaction();
     try {
       // mark queued items to duplicate if they match the started item
@@ -275,10 +274,10 @@ class downloadManager extends favoriteManager {
    */
   public function startDownload($opts, $status) 
   {
-    Yii::trace("Starting download: $this->title");
-
     // $opts is used in the various get functions to make the following code cleaner
     $this->opts = $opts;
+
+    Yii::trace("Starting download: ".$this->title);
 
     if($this->beforeDownload())
     {
