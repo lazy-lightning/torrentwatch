@@ -2,13 +2,32 @@
   define('VIEWPATH','protected/views/ajax/');
   $logger = Yii::getLogger();
   Yii::log('start configuration_dialog: '.$logger->getExecutionTime(), CLogger::LEVEL_PROFILE);
-  include VIEWPATH.'configuration_dialog.php';
+  $this->renderPartial('configuration_dialog', array(
+        'config'=>$config,
+        'availClients'=>$availClients,
+        'feeds'=>$feeds,
+        'responce'=>$responce,
+  ));
   Yii::log('start favorites_dialog: '.$logger->getExecutionTime(), CLogger::LEVEL_PROFILE);
-  include VIEWPATH.'favorites_dialog.php';
-  Yii::log('start feedItems_dialog: '.$logger->getExecutionTime(), CLogger::LEVEL_PROFILE);
-  include VIEWPATH.'feedItems_container.php';
+  $this->renderPartial('favorites_dialog', array(
+        'feeds'=>$feeds,
+        'genres'=>$genres,
+        'qualitys'=>$qualitys,
+        'favoriteMovies'=>$favoriteMovies,
+        'favoriteStrings'=>$favoriteStrings,
+        'favoriteTvShows'=>$favoriteTvShows,
+  ));
+  Yii::log('start feedItems_container: '.$logger->getExecutionTime(), CLogger::LEVEL_PROFILE);
+  $this->renderPartial('feedItems_container', array(
+        'movies'=>$movies,
+        'others'=>$others,
+        'queued'=>$queued,
+        'tvEpisodes'=>$tvEpisodes,
+  ));
   Yii::log('start history_dialog: '.$logger->getExecutionTime(), CLogger::LEVEL_PROFILE);
-  include VIEWPATH.'history_dialog.php';
+  $this->renderPartial('history_dialog', array(
+        'history'=>$history,
+  ));
 
   if(isset($responce['dialog']))
   {
