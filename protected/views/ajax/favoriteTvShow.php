@@ -1,5 +1,8 @@
 <?php $htmlId = 'favoriteTvShows-'.$favorite->id;
-      echo CHtml::beginForm(array('updateFavorite', 'id'=>$favorite->id), 'post', array('class'=>'favinfo', 'id'=>$htmlId));
+      echo CHtml::beginForm(
+          array($favorite->isNewRecord ? 'createFavorite' : 'updateFavorite', 'id'=>$favorite->id), 
+          'post', array('class'=>'favinfo', 'id'=>$htmlId)
+      );
       if(isset($responce[$htmlId])) {
         $favorite = $responce[$htmlId];
         echo CHtml::errorSummary($favorite);
@@ -24,8 +27,7 @@
               CHtml::activeTextField($favorite, 'minSeason').'-'.
               CHtml::activeTextField($favorite, 'maxSeason').' E'.
               CHtml::activeTextField($favorite, 'minEpisode').'-'.
-              CHtml::activeTextField($favorite, 'maxEpisode'); ?>
-  </span>
+              CHtml::activeTextField($favorite, 'maxEpisode').'</span>'; ?>
  </div>
  <div class="favorite_feed">
   <?php echo CHtml::activeLabelEx($favorite, 'feed_id').': '.
@@ -51,8 +53,10 @@
               CHtml::activeCheckBox($favorite, 'queue'); ?>
  </div>
  <div class="buttonContainer">
-   <a class="submitForm button" id="Update" href="#">Update</a>
-   <a class="submitForm button" id="Delete" href="#">Delete</a>
+  
+   <a class="submitForm button" id="Update" href="#"><?php echo $favorite->isNewRecord ? 'Create' : 'Update'; ?></a>
+   <?php if(!$favorite->isNewRecord) 
+           echo CHtml::link('Delete', array('deleteFavorite', 'type'=>get_class($favorite), 'id'=>$favorite->id), array('class'=>'button ajaxSubmit')); ?>
    <a class="toggleDialog button" href="#">Close</a>
  </div>
-</form>
+<?php echo CHtml::endForm(); ?>
