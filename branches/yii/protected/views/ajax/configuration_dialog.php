@@ -1,8 +1,8 @@
 <div class="dialog_window" id="configuration">
   <ul>
    <li><a href="#global_config"><span>Main</span></a></li>
-   <li><a href="#torClient"><span>Torrent Client</span></a></href>
-   <li><a href="#nzbClient"><span>NZB Client</span></a></href>
+   <li><a href="#torClient"><span>Torrent Client</span></a></li>
+   <li><a href="#nzbClient"><span>NZB Client</span></a></li>
    <li><a href="#feeds"><span>Feeds</span></a></li>
   </ul>
   <div id="global_config">
@@ -43,7 +43,7 @@
         <a class='toggleDialog button' href='#'>Close</a>
         <a class='toggleDialog button' href='#welcome1'>Wizard</a>
       </div>
-    </form>
+    <?php echo CHtml::endForm(); ?>
   </div>
   <div class="client_config" id="torClient">
     <?php echo CHtml::activeLabel($config, 'torClient', array('class'=>'item select')).': '.
@@ -66,7 +66,7 @@
           <a class="submitForm button" id="Save" href="#">Save</a>
           <a class='toggleDialog button' href='#'>Close</a>
         </div>
-      </form>
+      <?php echo CHtml::endForm(); ?>
     <?php endforeach; ?>
   </div>
   <div class="client_config" id="nzbClient">
@@ -89,7 +89,7 @@
           <a class="submitForm button" id="Save" href="#">Save</a>
           <a class='toggleDialog button' href='#'>Close</a>
         </div>
-      </form>
+      <?php echo CHtml::endForm(); ?>
     <?php endforeach; ?>
   </div>
   <div id="feeds">
@@ -118,7 +118,7 @@
         <div class="buttonContainer">
           <a class='toggleDialog button' href='#'>Close</a>
         </div>
-      </form>
+      <?php echo CHtml::endForm(); ?>
     </div>
     <div class='clear'></div>
   </div>
