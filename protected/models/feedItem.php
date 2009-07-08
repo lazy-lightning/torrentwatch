@@ -7,10 +7,10 @@ class feedItem extends ARwithQuality
   const STATUS_NEW = 0;
   const STATUS_NOMATCH = 1;
   const STATUS_MATCH = 2;
-  const STATUS_FAILED_DL = 5;
   const STATUS_DUPLICATE = 6;
   const STATUS_OLD = 7;
   const STATUS_QUEUED = 15;
+  const STATUS_FAILED_DL = 19;
   const STATUS_AUTO_DL = 20;
   const STATUS_MANUAL_DL = 21;
 
@@ -142,7 +142,8 @@ class feedItem extends ARwithQuality
       $this->qualityIds = factory::qualityIdsByTitleArray($quality);
      
       if(($season >= 0 && $episode > 0) ||
-         ($season > 0 && $episode == 0)) {
+         ($season > 0 && $episode == 0)) 
+      {
         // Found a season and episode for this item
         $this->tvEpisode_id = factory::tvEpisodeByEpisode($shortTitle, $season, $episode)->id;
       }
@@ -215,8 +216,8 @@ class feedItem extends ARwithQuality
  
     $quality = array('Unknown');
     if(preg_match_all("/$qual_reg/i", $this->title, $qregs)) {
-      $q = array_change_key_case(array_flip($qregs[1]));
       // if 720p and hdtv strip hdtv to make hdtv more unique
+      $q = array_change_key_case(array_flip($qregs[1]));
       if(isset($q['720p'], $q['hdtv'])) {
         unset($qregs[1][$q['hdtv']]);
       }
@@ -274,7 +275,7 @@ class feedItem extends ARwithQuality
     $shortTitle = trim(strtr(str_replace("'", "&#39;", $shortTitle), $from, $to));
 
     // Custom handling for a few networks that show up as 'Foo.Channel.Show.Title.S02E02.Bar-ASDF'
-    if(preg_match('/^([a-z]+\bchannel)\b(.*)/i', $shortTitle, $regs))
+    if(preg_match('/^([a-zA-Z]+\bchannel)\b(.*)/i', $shortTitle, $regs))
     {
       $network = $regs[1];
       $shortTitle = $regs[2];
