@@ -26,7 +26,7 @@ Hint: You may login with <tt>demo/demo</tt> or <tt>admin/admin</tt>.
 <br/>
 <?php echo CHtml::submitButton('Login', array('class'=>'submitForm')); ?>
 </div>
-</form>
+<?php CHtml::endForm(); ?>>
 
 </div><!-- yiiForm -->
 </div>

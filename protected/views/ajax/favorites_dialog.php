@@ -32,7 +32,7 @@
           include VIEWPATH.$class.'.php';
       }
     ?>
-    <div class="clear"></div>
-   </div>
+    <div class='clear'></div>
+  </div>
  <?php endforeach; ?>
 </div>
