@@ -19,7 +19,6 @@ class feedAdapter_File extends SimplePie_File {
     $url = str_replace('&amp;', '&', $url);
 
     parent::SimplePie_File($url, $timeout, $redirects, $headers, $useragent, $force_fsockopen);
-    file_put_contents('/tmp/'.__FUNCTION__, serialize($this));
   }
 }
 
