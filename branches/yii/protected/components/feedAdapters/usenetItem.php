@@ -34,7 +34,7 @@ class usenetItem extends feedAdapter_Item {
           '/\[([^\]]+)\.(?:par2|part\d+\.rar|rar|r\d+|nzb|avi|mkv|nfo)\]/i' => 1,
           '/>+[^>]+>+([^<]+)<+[^<]+<+ \(\d+\/\d+\)/i' => 1,
           '/\d+-(.*) - ".*" yEnc/i' => 1,
-          '/<[\w\d.-]+> (.*) - File \d+ of \d+: /i' => 1
+          '/<[\w\d.-]+> (.*) - File \d+ of \d+: /i' => 1,
           '/"(.*)"/i' => 1,
       );
       $postClean = array(
