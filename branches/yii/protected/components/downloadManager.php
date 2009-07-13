@@ -70,14 +70,10 @@ class downloadManager extends favoriteManager {
    * @param none
    */
   public function getUrl() {
-    if(is_a($this->opts, 'feedItem')) {
-      $url = $this->opts->url;
-      $feed_url = $this->opts->feed->url;
-    } else {
-      $url = $this->opts['feedItem_url'];
-      $feed_url = $this->opts['feed_url'];
-    }
-
+    $is_a = is_a($this->opts, 'feedItem');
+    $url = $is_a ? $this->opts->url : $this->opts['feedItem_url'];
+    $feed_url = $is_a ? $this->opts->feed->url : $this->opts['feed_url'];
+    
     if($cookies = stristr($feed_url, ':COOKIE:')) {
       $url .= $cookies;
     }
@@ -145,7 +141,7 @@ class downloadManager extends favoriteManager {
    */
   public function getItemTypeRecord() {
     if(is_array($this->opts))
-      // FIXME: lazy, but short and it works
+      // FIXME: lazy, but short and it works. Should be able to do this without loading everything
       $item = feedItem::model()->findByPk($this->opts['feedItem_id']);
     else
       $item = $this->opts;
@@ -270,7 +266,7 @@ class downloadManager extends favoriteManager {
   /**
    * Entry point for downloading a feed item with a download client
    * @param mixed $opts either a feedItem object or a row returned from the various matching views in the db
-   * @param integer $status the status to set related {@link feeditem} to on successfull start,.
+   * @param integer $status the status to set related {@link feedItem} to on successfull start,.
    */
   public function startDownload($opts, $status) 
   {
