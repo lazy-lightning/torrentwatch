@@ -235,11 +235,11 @@ class AjaxController extends CController
     $startTime = microtime(true);
     $config = $app->dvrConfig;
     $time['dvrConfig'] = microtime(true);
-    $favoriteMovies = favoriteMovie::model()->findAll();
+    $favoriteMovies = favoriteMovie::model()->with('quality')->findAll();
     $time['favorietMovies'] = microtime(true);
-    $favoriteTvShows = favoriteTvShow::model()->findAll();
+    $favoriteTvShows = favoriteTvShow::model()->with('tvShow', 'quality')->findAll();
     $time['favoriteTvShows'] = microtime(true);
-    $favoriteStrings = favoriteString::model()->findAll();
+    $favoriteStrings = favoriteString::model()->with('quality')->findAll();
     $time['favoriteStrings'] = microtime(true);
     $feeds = feed::model()->findAll(); // todo: not id 0, which is 'All'
     $time['feeds'] = microtime(true);
