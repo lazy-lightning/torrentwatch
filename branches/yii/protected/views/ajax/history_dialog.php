@@ -3,7 +3,7 @@
  <ul>
   <?php if(!empty($history)): ?>
    <?php $n=0;foreach($history as $hItem): ?>
-    <li <?php echo ++$n%2?'class="alt"':''; ?>>
+    <li class='<?php echo ++$n%2?'alt':''; ?>'>
       <div class="date"><?php echo date('Y M d h:i a', $hItem->date); ?></div>
       <a href="#histItem<?php echo $hItem->id; ?>">
           <?php echo $hItem->feedItem_title; ?>
