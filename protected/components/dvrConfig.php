@@ -217,8 +217,8 @@ class dvrConfigCategory extends BaseDvrConfig {
     $this->_parent = $parent;
     $this->_title = $title;
     $this->_id = $id;
-    foreach($values as $row) {
-      $this->add($row['key'], $row['value']);
+    foreach($values as $key => $value) {
+      $this->add($key, $value);
     }
   }
 
@@ -277,7 +277,7 @@ class dvrConfig extends BaseDvrConfig {
       if($row['dvrConfigCategory_id'] === null) 
         $this->add($row['key'], $row['value']);
       else {
-        $data[$row['dvrConfigCategory_id']][] = $row;
+        $data[$row['dvrConfigCategory_id']][$row['key']] = $row['value'];
       }
     }
     // get all the category names
