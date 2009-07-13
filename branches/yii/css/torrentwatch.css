@@ -496,7 +496,7 @@ div.dialog_window#configuration {
 
 div.dialog_window#configuration select,
 div.dialog_window#configuration input[type=text] {
-  width: 185;
+  width: 185px;
   }
 
 div.dialog_window#configuration div {
@@ -540,7 +540,7 @@ div#configuration.dialog_window div.activeFeed #feed_url[type=text] {
  *`
  **********************************/
 div.dialog_window#favorites {
-  margin-left:287;
+  margin-left:287px;
   }
 
 ul.favorite {
@@ -650,8 +650,7 @@ div#history ul {
 div#history ul li {
   white-space: nowrap;
   overflow: hidden;
-  font-size: 0.9em
-  background: #e9e9e9;
+  font-size: 0.9em;
   min-height: 22px;
   }
 
@@ -731,7 +730,7 @@ div.context_menu ul li a:hover {
 div.dialog_window#history,
 div.dialog_window#favorites {
   width: 600px;
-  margin-left: -300;
+  margin-left: -300px;
 }
 
 div.timer {
