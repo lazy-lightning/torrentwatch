@@ -121,7 +121,8 @@ class AjaxController extends CController
   }
 
   /**
-   * @param BaseFavorite a favorite to be updated
+   * updates a favorite based on $_POST data.  Called from action[Create|Update]Favorite
+   * @param BaseFavorite the favorite to be updated
    */
   protected function updateFavorite($favorite)
   {
@@ -164,7 +165,7 @@ class AjaxController extends CController
         $this->updateFavorite($favorite);
     }
 
-    $this->actionFullResponce($this->responce);
+    $this->actionFullResponce();
   }
 
   public function actionAddFeed()
