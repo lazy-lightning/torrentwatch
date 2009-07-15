@@ -121,6 +121,11 @@ $(function() {
     });
     // Inspector
     $("li#inspector a").click($.toggleInspector);
+    // Feed Item Load More
+    $("li.loadMore a").live('click', function() {
+        $.get(this.href, '', $.loadMoreFeedItems, 'html');
+        return false;
+    });
   
 });
 
@@ -132,6 +137,16 @@ $(function() {
                 { right: (inspect_status? '+' : '-') + "=350" },
                 { duration: 600 }
         );
+    };
+    $.loadMoreFeedItems = function(html) {
+      var container = $("<div />");
+      var dest = '';
+      container[0].innerHTML = html;
+      container.find('div#feedItems_container').children().each(function() {
+        var dest = $('#'+this.id);
+        dest.find('li.loadMore').remove().end()
+            .append($(this).children('ul'));
+      });
     };
     // Remove old dynamic content, replace it with passed html(ajax success function)
     $.loadDynamicData = function(html) {
