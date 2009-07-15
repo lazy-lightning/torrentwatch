@@ -1,6 +1,8 @@
 <?php
   define('VIEWPATH','protected/views/ajax/');
   $logger = Yii::getLogger();
+  $this->renderPartial('resetData');
+
   Yii::log('start configuration_dialog: '.$logger->getExecutionTime(), CLogger::LEVEL_PROFILE);
   $this->renderPartial('configuration_dialog', array(
         'config'=>$config,
