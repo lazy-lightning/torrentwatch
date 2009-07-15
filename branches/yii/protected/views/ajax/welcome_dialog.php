@@ -14,6 +14,11 @@
         <span class="item">
             You will need to answer a few simple questions to get started.
         </span>
+        <div class="buttonContainer">
+            <a class="toggleDialog button" href="#welcome2">Next</a>
+            <a class="toggleDialog button" href="#configuration">Back</a>
+            <a class="toggleDialog button" href="#">Close</a>
+        </div>
     </div>
 
     <div id="welcome2" class="dialog_window welcome">
@@ -46,6 +51,11 @@
                 <label class="item"><?php echo $value; ?></label>
             </div>
         <?php endforeach; ?>
+        <div class="buttonContainer">
+            <a class="toggleDialog button" href="#welcome3">Next</a>
+            <a class="toggleDialog button" href="#welcome1">Back</a>
+            <a class="toggleDialog button" href="#">Close</a>
+        </div>
     </div>
 
     <div id="welcome3" class="dialog_window welcome">
@@ -68,7 +78,13 @@
             <input type="radio" name="feed[url]" value="http://www.tvnzb.com/tvnzb.rss" /><label class="item">TvNZB.com</label>
             <label class="item">TvNZB.com offers a feed of user submitted .nzb files</label>
         </div>
+        <div class="buttonContainer">
+            <a class="toggleDialog button" href="#welcome4">Next</a>
+            <a class="toggleDialog button" href="#welcome2">Back</a>
+            <a class="toggleDialog button" href="#">Close</a>
+        </div>
     </div>
+
     <div id="welcome4" class="dialog_window welcome">
         <h2 class="dialog_heading">The Basics</h2>
         <label class="item">
@@ -76,66 +92,63 @@
         </label>
         <label class="category">Note</label>
         <ul id='feedItems' class='feedItems'>
-            <li class='torrent match_nomatch'>
+            <li class='torrent match_Unmatched notalt'>
                 <div class='torrent_name'>No Match - Will not be downloaded</div>
             </li>
-            <li class='torrent match_duplicate alt'>
+            <li class='torrent match_Duplicate alt'>
                 <div class='torrent_name'>Duplicate Episode - Same episode downloaded previously.  Will not be downloaded.</div>
             </li>
-            <li class='torrent match_old'>
+            <li class='torrent match_Old notalt'>
                 <div class='torrent_name'>Old Episode - Episode is Older than the most recently downloaded episode. Will not be downloaded.</div>
             </li>
-            <li class='torrent match_auto alt'>
+            <li class='torrent match_Automatic alt'>
                 <div class='torrent_name'>Automatic DL - This item was automatically downloaded.</div>
              </li>
-            <li class='torrent match_test'>
-                <div class='torrent_name'>Test Hit - This item is ready to download.  Press Refresh to start all test hits.</div>
-            </li>
-            <li class='torrent match_match alt'>
-                <div class='torrent_name'>New Hit - This item has just been started.</div>
-            </li>
-            <li class="match_failed">
-                <div class="torrent_name">Failed Download - This item has failed to start.</div>
-            </li>
-            <li class="match_new">
-                <div class="torrent_name">New Item - This item has yet to be fully processed.</div>
-            </li>
-            <li class="torrent match_manual">
+            <li class="torrent match_Manual notalt">
                 <div class="torrent_name">Manual Download - This item was started from the user interface.</div>
             </li>
-            <li class="torrent match_queue">
+            <li class="torrent match_Queued alt">
                 <div class="torrent_name">Queued for User - This item has been marked by a favorite to queue up.</div>
             </li>
+            <li class="torrent match_Failed notalt">
+                <div class="torrent_name">Failed Download - This item has failed to start.</div>
+            </li>
+            <li class="torrent match_New alt">
+                <div class="torrent_name">New Item - This item has yet to be fully processed.</div>
+            </li>
         </ul>
+        <div class="buttonContainer">
+            <a class="toggleDialog button" href="#welcome5">Next</a>
+            <a class="toggleDialog button" href="#welcome3">Back</a>
+            <a class="toggleDialog button" href="#">Close</a>
+        </div>
     </div>
 
     <div id="welcome5" class="dialog_window welcome">
         <h2 class="dialog_heading">Settings</h2>
-        <label class="item">
-            NMTDVR has a few different settings that effect its behavior.
-        </label>
-        <label class="category">
+        <h2 class='dialog_heading'>NMTDVR has a few different settings that effect its behavior.</h2>
+        <div>
+            <p>Save the related .torrent or .nzb file in the download directory.</p>
             <?php echo CHtml::activeCheckBox($config, 'saveFile').
                        CHtml::activeLabel($config, 'saveFile'); ?>
-        </label>
-        <label class="item">
-            Save the related .torrent or .nzb file in the download directory.
-        </label>
-        <label class="category">
-            <?php echo CHtml::activeCheckBox($config, 'downloadDir').
-                       CHtml::activeLabel($config, 'downloadDir'); ?>
-        </label>
-        <label class="item">
-            The directory for all feed items to be downloaded to.
-        </label>
-        <label class="category">
-            <?php echo CHtml::activeCheckBox($config, 'feedItemLifetime').
-                       CHtml::activeLabel($config, 'feedItemLifetime'); ?>
-        </label>
-        <label class="item">
-            The time in days that a feed item will remain in the local database
-        </label>
+        </div>
+        <div>
+            <p>The directory for all feed items to be downloaded to.</p>
+            <?php echo CHtml::activeLabel($config, 'downloadDir').':'.
+                       CHtml::activeTextField($config, 'downloadDir'); ?>
+        </div>
+        <div>
+            <p>The time in days that a feed item will remain in the local database.</p>
+            <?php echo CHtml::activeLabel($config, 'feedItemLifetime').':'.
+                       CHtml::activeTextField($config, 'feedItemLifetime'); ?>
+        </div>
+        <div class="buttonContainer">
+            <a class="toggleDialog button" href="#welcome6">Next</a>
+            <a class="toggleDialog button" href="#welcome4">Back</a>
+            <a class="toggleDialog button" href="#">Close</a>
+        </div>
     </div>
+
     <div id="welcome6" class="dialog_window welcome">
         <h2 class="dialog_heading">Initial Configuration is Complete!</h2>
         <label class="item">
@@ -147,11 +160,11 @@
             Once a show is in your favorites it will automatically download
             every week.
         </label>
-        <label class="category">Note</label>
-        <label class="item">
-            Feeds only contain the most recent additions.  For more info please
-            visit your feeds website.
-        </label>
+        <div class="buttonContainer">
+            <a class="submitForm button" id="Apply" href="#">Apply</a>
+            <a class="toggleDialog button" href="#welcome5">Back</a>
+            <a class="toggleDialog button" href="#">Close</a>
+        </div>
     </div>
     <?php echo CHtml::endForm(); ?>
 </div>
