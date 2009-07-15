@@ -27,7 +27,7 @@
   <li id="config"><a class="toggleDialog" href="#configuration">Configure</a></li>
   <li class="divider">&nbsp;</li>
   <li id="view"><a class="toggleDialog" href="#history">View History</a></li>
-  <li id="empty"><a class="toggleDialog" href="#clear_cache">Empty Cache</a></li>
+  <li id="empty"><a class="toggleDialog" href="#reset_data">Reset Data</a></li>
   <li id="inspector"><a href="#inspector_container">Inspector</a></li>
   <li id='webui'><a href='#'>Client UI</a></li>
 </ul>
@@ -53,13 +53,6 @@
   </div>
   <div id="inspector_info"></div>
 </div>
-<div class="dialog_window" id="clear_cache"> 
-  <h2 class="dialog heading">Which Cache</h2>
-  <a class="toggleDialog button" href="#">Close</a>
-  <a class="button" href="index.cgi/clearCache?type=feeds">Feeds</a>
-  <a class="button" href="index.cgi/clearCache?type=torrents">Torrents</a>
-  <a class="button"href="index.cgi/clearCache?type=all">All</a>
-</div> 
 <form id="welcome_form" action="index.cgi/firstRun">
   <input type="hidden" name="firstRun" value="1">
   <input type="hidden" name="button" value="Add">

@@ -47,7 +47,10 @@ class AjaxController extends CController
         'users'=>array('*'),
       ), */
       array('allow', // allow authenticated user
-        'actions'=>array('fullResponce', 'dlFeedItem', 'saveConfig', 'addFeed', 'addFavorite', 'updateFavorite', 'inspect', 'clearHistory', 'createFavorite', 'deleteFavorite', 'loadFeedItems'),
+        'actions'=>array(
+            'fullResponce', 'dlFeedItem', 'saveConfig', 'addFeed', 'addFavorite', 'updateFavorite', 
+            'inspect', 'clearHistory', 'createFavorite', 'deleteFavorite', 'loadFeedItems', 'resetData',
+        ),
         'users'=>array('@'),
       ),
       array('allow', // allow admin user 
@@ -324,10 +327,9 @@ class AjaxController extends CController
     if(isset($_GET['type']) && in_array($_GET['type'], array_keys($whiteList)))
     {
       $type = $_GET['type'];
-      $page = isset($_GET['pg']) ? $_GET['pg'] : 2;
-      $items = $this->prepareFeedItems($_GET['type'], $page);
+      $before = isset($_GET['before']) ? $_GET['before'] : null;
+      $items = $this->prepareFeedItems($_GET['type'], $before);
       $this->render('feedItems_container', array(
-        'page' => $page,
         $type => $items,
         'tabs' => array(
             $whiteList[$type] => $type,
@@ -336,6 +338,54 @@ class AjaxController extends CController
     }
   }
 
+  public function actionResetData()
+  {
+    $whiteList = array('all', 'media', 'feedItems');
+    $this->responce = array('dialog'=>array('header'=>'Reset Data'));
+
+    if(isset($_GET['type']) && in_array($_GET['type'], $whiteList))
+    {
+      $type = $_GET['type'];
+      $transaction = Yii::app()->db->beginTransaction();
+      try
+      {
+        switch($type)
+        {
+        case 'all':
+          foreach(array('feedItem', 'feedItem_quality', 'history', 'movie', 'movie_genre', 'other', 'tvEpisode', 'tvShow') as $class) 
+          {
+            $model = new $class;
+            $class->deleteAll();
+          }
+          break;
+        case 'media':
+          movie::model()->updateAll(array('status'=>movie::STATUS_NEW));
+          other::model()->updateAll(array('status'=>other::STATUS_NEW));
+          tvEpisode::model()->updateAll(array('status'=>tvEpisode::STATUS_NEW));
+          break;
+        case 'feedItems':
+          feedItem::model()->updateAll(array('status'=>feedItem::STATUS_NOMATCH));
+          break;
+        }
+        $transaction->commit();
+      } 
+      catch (Exception $e)
+      {
+        $transaction->rollback();
+        throw $e;
+      }
+
+      if($type === 'all')
+      {
+        $feeds = feed::model()->findAll();
+        foreach($feeds as $feed)
+          $feed->updateFeedItems(False);
+      }
+
+      Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NOMATCH);
+    }
+    $this->actionFullResponce();
+  }
   public function actionSaveConfig()
   {
     $this->responce = array('dialog'=>array('header'=>'Save Configuration'));
@@ -372,18 +422,21 @@ class AjaxController extends CController
     $this->actionFullResponce();
   }
 
-  private function prepareFeedItems($table, $page = 1) 
+  private function prepareFeedItems($table, $before = null) 
   {
     $table = $table.'FeedItem';
     $db = Yii::app()->db;
     $config = Yii::app()->dvrConfig;
 
     // First get a listing if the first group of items, and put them in an array indexed by title
-    $sql= 'SELECT feed_title, feedItem_status, feedItem_description, feedItem_id, feedItem_title, feedItem_pubDate '.
-          '  FROM '.$table.' LIMIT '.($config->webItemsPerLoad*2);
-    if($page > 1)
-      $sql .= ' OFFSET '.($page*$config->webItemsPerLoad);
-    $reader = $db->createCommand($sql)->query();
+    $db->createCommand(
+        'CREATE TEMP TABLE prepareItems AS '.
+        'SELECT feed_title, feedItem_status, feedItem_description, feedItem_id, feedItem_title, feedItem_pubDate '.
+        '  FROM '.$table.
+        ($before === null ? '': ' WHERE feedItem_pubDate < '.$before).
+        ' LIMIT '.($config->webItemsPerLoad*2)
+    )->execute();
+    $reader = $db->createCommand('SELECT * FROM prepareItems')->query();
     $items = array();
     foreach($reader as $row) 
     {
@@ -392,10 +445,7 @@ class AjaxController extends CController
     // Then get a listing with a group by clause on the title to get distinct titles, and a count to let us know when
     // to look for extras in the first array
     $sql= 'SELECT count(*) as count, * '.
-          '  FROM ( SELECT feedItem_status, feedItem_description, feedItem_id, feedItem_title, feedItem_pubDate '.
-                 '    FROM '.$table.' LIMIT '.($config->webItemsPerLoad*2).
-                 ($page > 1 ? ' OFFSET '.($config->webItemsPerLoad*$page) : '').
-                 ')'.
+          '  FROM prepareItems'.
           ' GROUP BY feedItem_title'.
           ' ORDER BY feedItem_pubDate DESC'.
           ' LIMIT '.$config->webItemsPerLoad;
@@ -412,6 +462,7 @@ class AjaxController extends CController
         $output[] = $data;
       }
     }
+    $db->createCommand('DROP TABLE prepareItems;')->execute();
     return $output;
   }
 
