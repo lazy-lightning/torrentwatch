@@ -2,6 +2,10 @@
   define('VIEWPATH','protected/views/ajax/');
   $logger = Yii::getLogger();
   $this->renderPartial('resetData');
+  $this->renderPartial('welcome_dialog', array(
+        'availClients'=>$availClients,
+        'config'=>$config,
+  ));
 
   Yii::log('start configuration_dialog: '.$logger->getExecutionTime(), CLogger::LEVEL_PROFILE);
   $this->renderPartial('configuration_dialog', array(

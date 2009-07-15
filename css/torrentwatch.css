@@ -453,6 +453,15 @@ div.welcome input {
   clear: left;
   }
 
+div.welcome label {
+  float: none;
+  width: auto;
+  }
+
+div#welcome5 div {
+  margin-bottom: 1em;
+  }
+
 div#welcome1 label,
 div#welcome7 label {
   margin-top: 0.2em;
