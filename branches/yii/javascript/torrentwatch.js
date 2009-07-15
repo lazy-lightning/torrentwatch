@@ -144,6 +144,8 @@ $(function() {
       container[0].innerHTML = html;
       container.find('div#feedItems_container').children().each(function() {
         var dest = $('#'+this.id);
+        $(this).find("li.torrent").myContextMenu()
+               .filter(".hasDuplicates").initDuplicates();
         dest.find('li.loadMore').remove().end()
             .append($(this).children('ul'));
       });
@@ -158,9 +160,8 @@ $(function() {
             // Use innerHTML because some browsers choke with $(html) when html is many KB
             dynamic[0].innerHTML = html;
             dynamic.find("div#favorites").initFavorites().end()
-                    .find("li.torrent")
-                      .filter(".hasDuplicates").initDuplicates().end()
-                      .not(".hasDuplicates").myContextMenu().end().end()
+                    .find("li.torrent").myContextMenu()
+                      .filter(".hasDuplicates").initDuplicates().end().end()
                     .find("form").initForm().end()
                     .find("div#configuration").initConfigDialog().end()
                     .find("#feedItems_container").tabs().end()
