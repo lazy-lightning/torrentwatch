@@ -1,51 +1,60 @@
 <div id="feedItems_container">
-  <ul>
-    <li><a href="#tvEpisodes_container"><span>Tv Episodes</span></a></li>
-    <li><a href="#movies_container"><span>Movies</span></a></li>
-    <li><a href="#others_container"><span>Others</span></a></li>
-    <li><a href="#queued_container"><span>Queue</span></a></li>
-    <li><a href="#search_container"><span>Search</span></a></li>
-  </ul>
-  <?php foreach(array('tvEpisodes', 'movies', 'others', 'queued') as $type): ?>
-  <div class="feedItems" id="<?php echo $type; ?>_container">
+  <?php if(count($tabs) > 1): ?>
     <ul>
-      <?php
-        $n=0;
-        foreach($$type as $item1) {
-          if(isset($item1['feedItem_title']))
-          {
-            echo "<li class='torrent match_".strtok(feedItem::getStatusText($item1['feedItem_status']), ' ').(++$n%2?' alt':'')."' ".
-                 "    title='".CHtml::encode($item1['feedItem_description'])."'>".
-                 "  <input type='hidden' name='itemId' class='itemId' value='".$item1['feedItem_id']."'>".
-                 "  <span class='torrent_name'>".CHtml::encode($item1['feedItem_title'])."</span>".
-                 "  <span class='torrent_pubDate'>".CHtml::encode(date("Y M d h:i a", $item1['feedItem_pubDate']))."</span>".
-                 "</li>";
-          }
-          else
-          {
-            echo "<li class='torrent hasDuplicates match_".strtok(feedItem::getStatusText($item1[0]['feedItem_status']), ' ').(++$n%2?' alt':'')."' ".
-                 "  <span class='torrent_name'>".CHtml::encode($item1[0]['feedItem_title'])."</span>".
-                 "<ul class='duplicates'>";
-            $m=$n;
-            foreach($item1 as $item2)
-            {
-              echo "<li class='torrent duplicate match_".strtok(feedItem::getStatusText($item2['feedItem_status']), ' ').(++$m%2?' alt':' notalt')."' ".
-                   "    title='".CHtml::encode($item2['feedItem_description'])."'>".
-                   "  <input type='hidden' name='itemId' class='itemId' value='".$item2['feedItem_id']."'>".
-                   "  <span class='torrent_feed'>".CHtml::encode($item2['feed_title'])."</span>".
-                   "  <span class='torrent_pubDate'>".CHtml::encode(date("Y M d h:i a", $item2['feedItem_pubDate']))."</span>".
-                   "</li>";
-            }
-            echo "</ul></li>";
-          }
-        } 
+      <?php 
+        foreach($tabs as $title => $type)
+          echo '<li>'.CHtml::link("<span>$title</span>", '#'.$type.'_container').'</li>'; 
+      ?>
+      <li><a href="#search_container"><span>Search</span></a></li>
+    </ul>
+  <?php 
+    endif; 
+    foreach($tabs as $title => $type): 
+      echo "<div class='feedItems' id='{$type}_container'><ul>";
+      $n=0;
+      foreach($$type as $item1) {
+        $class = 'torrent';
+        if(isset($item1['feedItem_title']))
+        {
+          $items = array($item1);
+          $incr = 'n';
+        }
+        else
+        {
+          $items = $item1;
+          $incr = 'm';
+          $class .= ' duplicate';
+          echo "<li class='torrent hasDuplicates match_".strtok(feedItem::getStatusText($items[0]['feedItem_status']), ' ').(++$n%2?' alt':'')."' ".
+               "  <span class='torrent_name'>".CHtml::encode($items[0]['feedItem_title'])."</span>".
+               "<ul class='duplicates'>";
+          $m = $n;
+        }
+
+        foreach($items as $item2)
+        {
+          echo "<li class='{$class} match_".strtok(feedItem::getStatusText($item2['feedItem_status']), ' ').(++$$incr%2?' alt':' notalt')."' ".
+               "    title='".CHtml::encode($item2['feedItem_description'])."'>".
+               "  <input type='hidden' name='itemId' class='itemId' value='".$item2['feedItem_id']."'>".
+               "  <span class='torrent_name'>".CHtml::encode($item2['feedItem_title'])."</span>".
+               "  <span class='torrent_feed'>".CHtml::encode($item2['feed_title'])."</span>".
+               "  <span class='torrent_pubDate'>".CHtml::encode(date("Y M d h:i a", $item2['feedItem_pubDate']))."</span>".
+               "</li>";
+        }
+        if($incr === 'm')
+          echo "</ul></li>";
+      } 
       ?>
       <li class='torrent loadMore <?php echo (++$n%2?'alt':'notalt'); ?>'>
-        <span class='torrent_name'>Load More <?php echo ucwords($type); ?></span>
+         <span class='torrent_name'>
+           <?php echo CHtml::link('Load more '.$title, array('loadFeedItems', 'type'=>$type, 'pg'=>$page+1)); ?>
+         </span>
       </li>
     </ul>
   </div>
-  <?php endforeach;
-        include(VIEWPATH.'search_container.php'); ?>
+  <?php 
+    endforeach; 
+    if(count($tabs) > 1)
+      include(VIEWPATH.'search_container.php');
+  ?>
 </div>
 
