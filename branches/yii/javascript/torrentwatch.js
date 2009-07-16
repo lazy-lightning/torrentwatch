@@ -219,7 +219,7 @@ $(function() {
           $(this).find("a").toggleFavorite();
         });
 
-      return this.tabs({ fxAutoHeight: true }).find("input#favoriteMovies_rating").spin({ interval: 0.1, min: 0, max: 10 }).end();
+      return this.children('.content').tabs({ fxAutoHeight: true }).find("input#favoriteMovies_rating").spin({ interval: 0.1, min: 0, max: 10 }).end().end();
     };
 
     $.fn.initForm = function() {
@@ -296,7 +296,7 @@ $(function() {
         return this;
     };
     $.fn.initConfigDialog = function() {
-        this.tabs({fxAutoHeight: true });
+        this.children('.content').tabs({fxAutoHeight: true });
         this.find('.client_config select').change(function() {
             $(this).closest('.client_config').find('.config').hide().end()
               .find('#'+$(this).val()).show();
