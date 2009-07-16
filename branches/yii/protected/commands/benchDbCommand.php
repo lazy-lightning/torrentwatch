@@ -1,6 +1,6 @@
 <?
 
-class benchDbCommand extends CConsoleCommand {
+class benchDbCommand extends BaseConsoleCommand {
   public function run($args)
   {
     if( count($args) !== 2 ||

@@ -1,6 +1,6 @@
 <?php
 
-class pruneCacheCommand extends CConsoleCommand 
+class pruneCacheCommand extends BaseConsoleCommand 
 {
   public function run($args) 
   {

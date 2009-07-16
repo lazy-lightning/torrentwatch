@@ -1,6 +1,6 @@
 <?php
 
-class updateIMDbCommand extends CConsoleCommand {
+class updateIMDbCommand extends BaseConsoleCommand {
 
   public function run($args) {
     $this->updateMovies();

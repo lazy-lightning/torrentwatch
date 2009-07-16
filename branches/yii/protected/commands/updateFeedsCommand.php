@@ -1,6 +1,6 @@
 <?php
 
-class updateFeedsCommand extends CConsoleCommand {
+class updateFeedsCommand extends BaseConsoleCommand {
   public function run($args) {
 
     $feeds = feed::model()->findAll();
