@@ -1,0 +1,684 @@
+<!-- US TV Show Guide v1.0 -->
+<!-- AllanMC Copyright © 2009, All Right Reserved -->
+
+<html>
+<head>
+  <meta name="generator" content="HTML Tidy for Linux/x86 (vers 6 November 2007), see www.w3.org">
+
+  <title>US TV Show Guide</title>
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
+  <meta syabas-fullscreen="">
+  <meta syabas-playermode="msp">
+  <script type="text/javascript">
+function popup() {
+    var oSheet = document.styleSheets[1];
+    var oRule = oSheet.rules ? oSheet.rules[0] : oSheet.cssRules[0];
+    var action = "";
+    if (oRule.style.visibility=='visible') {
+      action = "hidden";
+    }
+    else {
+      action = "visible";
+    }
+    for (var i=0;i<=11;i=i+1)
+    {
+      oRule = oSheet.rules ? oSheet.rules[i] : oSheet.cssRules[i];
+      oRule.style.visibility=action;
+    }
+    return true;
+  }
+  </script>
+  <style type="text/css">
+#block1{left:176;top:81;width:250;height:89;position:absolute;}
+  #block2{left:388;top:81;width:250;height:89;position:absolute;}
+  #block3{left:600;top:81;width:250;height:89;position:absolute;}
+  #block4{left:812;top:81;width:144;height:89;position:absolute;}
+  #block5{left:918;top:81;width:144;height:89;position:absolute;}
+  #block6{left:388;top:135;width:250;height:89;position:absolute;}
+  #block7{left:600;top:135;width:250;height:89;position:absolute;}
+  #block8{left:812;top:135;width:250;height:89;position:absolute;}
+  #block9{left:600;top:189;width:144;height:89;position:absolute;}
+  #block10{left:706;top:189;width:144;height:89;position:absolute;}
+  #block11{left:812;top:189;width:250;height:89;position:absolute;}
+  #block12{left:176;top:243;width:462;height:89;position:absolute;}
+  #block13{left:600;top:243;width:462;height:89;position:absolute;}
+  #block14{left:388;top:297;width:250;height:89;position:absolute;}
+  #block15{left:600;top:297;width:144;height:89;position:absolute;}
+  #block16{left:706;top:297;width:144;height:89;position:absolute;}
+  #block17{left:812;top:297;width:144;height:89;position:absolute;}
+  #block18{left:918;top:297;width:144;height:89;position:absolute;}
+  #block19{left:176;top:351;width:250;height:89;position:absolute;}
+  #block20{left:388;top:351;width:250;height:89;position:absolute;}
+  #block21{left:600;top:351;width:250;height:89;position:absolute;}
+  #block22{left:812;top:351;width:250;height:89;position:absolute;}
+  #block23{left:176;top:405;width:144;height:89;position:absolute;}
+  #block24{left:282;top:405;width:144;height:89;position:absolute;}
+  #block25{left:388;top:405;width:144;height:89;position:absolute;}
+  #block26{left:494;top:405;width:144;height:89;position:absolute;}
+  #block27{left:600;top:405;width:250;height:89;position:absolute;}
+  #block28{left:812;top:405;width:250;height:89;position:absolute;}
+  #block29{left:176;top:459;width:144;height:89;position:absolute;}
+  #block30{left:282;top:459;width:144;height:89;position:absolute;}
+  #block31{left:388;top:459;width:144;height:89;position:absolute;}
+  #block32{left:494;top:459;width:144;height:89;position:absolute;}
+  #block33{left:600;top:459;width:144;height:89;position:absolute;}
+  #block34{left:706;top:459;width:144;height:89;position:absolute;}
+  #block35{left:812;top:459;width:144;height:89;position:absolute;}
+  #block36{left:918;top:459;width:144;height:89;position:absolute;}
+  #block37{left:388;top:513;width:250;height:89;position:absolute;}
+  #block38{left:600;top:513;width:250;height:89;position:absolute;}
+  #block39{left:812;top:513;width:250;height:89;position:absolute;}
+  #block40{left:388;top:567;width:356;height:89;position:absolute;}
+  #block41{left:706;top:567;width:356;height:89;position:absolute;}
+
+  </style>
+  <style type="text/css">
+#popupbox{visibility:visible;width:550px;height:500px;left:275px;top:78px;position:absolute;}
+  #screenshot{visibility:visible;width:480px;height:200px;position:absolute;top:100px;left:310px;}
+  #popuptext1{visibility:visible;font-family:arial,helvetica;font-size:18px;color:white;height:18px;position:absolute;top:367px;left:310px;}
+  #popuptext2{visibility:visible;font-family:arial,helvetica;font-size:18px;color:white;height:20px;position:absolute;top:387px;left:310px;}
+  #popuptext3{visibility:visible;font-family:arial,helvetica;font-size:18px;color:white;height:20px;position:absolute;top:407px;left:310px;}
+  #popuptext4{visibility:visible;font-family:arial,helvetica;font-size:18px;color:white;height:20px;position:absolute;top:427px;left:310px;}
+  #popuptext5{visibility:visible;font-family:arial,helvetica;font-size:18px;color:white;height:20px;position:absolute;top:447px;left:310px;}
+  #popuptext6{visibility:visible;font-family:arial,helvetica;font-size:18px;color:white;height:20px;position:absolute;top:467px;left:310px;}
+  #popuptext7{visibility:visible;font-family:arial,helvetica;font-size:18px;color:white;height:20px;position:absolute;top:487px;left:310px;}
+  #popuptitle{visibility:visible;font-family:arial,helvetica;font-size:18px;color:white;position:absolute;top:310px;left:310px;}
+  #episodeinfo{visibility:visible;font-family:arial,helvetica;font-size:16px;color:#bbbbbb;position:absolute;top:335px;left:310px;}
+  #episodetitle{visibility:visible;font-family:arial,helvetica;font-size:16px;color:#bbbbbb;position:absolute;top:335px;left:447px;}
+  </style>
+  <style type="text/css">
+#fox{left:69;top:103;width:120;position:absolute;}
+  #cbs{left:69;top:157;width:120;position:absolute;}
+  #abc{left:69;top:211;width:120;position:absolute;}
+  #fx{left:69;top:265;width:120;position:absolute;}
+  #cw{left:69;top:319;width:120;position:absolute;}
+  #usa{left:69;top:373;width:120;position:absolute;}
+  #fam{left:69;top:427;width:120;position:absolute;}
+  #scifi{left:69;top:481;width:120;position:absolute;}
+  #nbc{left:69;top:535;width:120;position:absolute;}
+  #hbo{left:69;top:589;width:120;position:absolute;}
+
+  #continuousfx{position:absolute;top:265;left:1040;width:9px;height:45px;}
+
+  #blockinfo1{left:202;}
+  #blockinfo2{left:308;}
+  #blockinfo3{left:414;}
+  #blockinfo4{left:520;}
+  #blockinfo5{left:626;}
+  #blockinfo6{left:732;}
+  #blockinfo7{left:838;}
+  #blockinfo8{left:944;}
+
+  body {
+  background-repeat: no-repeat;
+  color:#ffffff;
+  background-position: -90px -32px;margin:0;
+  }
+  </style>
+  <style type="text/css">
+:focus{-moz-outline-style: none;}
+  img {border-style: none;}
+  </style>
+  <script type="text/javascript" src="http://nmt.mcdvd.dk/tv/pc.js">
+</script>
+  <link rel="stylesheet" type="text/css" href="style_hd.css">
+</head>
+
+<body background="http://nmt.mcdvd.dk/tv/images/background-new.jpg" marginwidth="0" marginheight="0" border="0" focustext="#0000CC"
+bgcolor="#000000" onloadset="block1" focuscolor="#66CCFF">
+  <table align="left" valign="top" width="1100" height="656" border="0" padding="0" cellpadding="0" cellspacing="0">
+    <tr>
+      <td colspan="2" height="97" align="left" valign="top">
+        <table border="0" padding="0" cellpadding="0" cellspacing="0">
+          <tr>
+            <td><img src="http://nmt.mcdvd.dk/tv/images/tv.png" width="75" height="75"></td>
+
+            <td align="left" valign="middle"><span class="logotext">US TV Show<br>
+            Guide</span></td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr>
+      <td width="192" align="left" valign="bottom">&nbsp;</td>
+
+      <td align="left" valign="top">
+        <table border="0" padding="0" cellpadding="0" cellspacing="3">
+          <tr>
+            <td>
+              <table border="0" padding="0" cellpadding="0" cellspacing="3">
+                <tr>
+                  <td>
+                    <table border="0" padding="0" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td width="206" class="block" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg2-notrans.png">Judge Mathis</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="206" class="block" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg2-notrans.png">The Morning Show&amp; Juliet</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="206" class="block" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg2-notrans.png">The People's Court</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="100" class="block smallblock" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg1-notrans.png">Judge Hatchett</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="100" class="block smallblock" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg1-notrans.png">Judge David Young</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <table border="0" padding="0" cellpadding="0" cellspacing="3">
+                <tr>
+                  <td>
+                    <table border="0" padding="0" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td width="206">&nbsp;</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="206" class="block" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg2-notrans.png">The Bonnie Hunt Show</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="206" class="block" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg2-notrans.png">Guiding Light</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="206" class="block" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg2-notrans.png">The Price Is Right</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <table border="0" padding="0" cellpadding="0" cellspacing="3">
+                <tr>
+                  <td>
+                    <table border="0" padding="0" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td width="418">&nbsp;</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="100" class="block smallblock" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg1-notrans.png">Who Wants to Be a Mi...</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="100" class="block smallblock" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg1-notrans.png">Who Wants to Be a Mi...</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="206" class="block" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg2-notrans.png">The View</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <table border="0" padding="0" cellpadding="0" cellspacing="3">
+                <tr>
+                  <td>
+                    <table border="0" padding="0" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td width="418" class="block" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg4-notrans.png">Mortal Kombat Annihilation</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="418" class="block" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg4-notrans.png">Kingdom of Heaven</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <table border="0" padding="0" cellpadding="0" cellspacing="3">
+                <tr>
+                  <td>
+                    <table border="0" padding="0" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td width="206">&nbsp;</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="206" class="block" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg2-notrans.png">The Steve Wilkos Show</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="100" class="block smallblock" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg1-notrans.png">Tyler Perry's House ...</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="100" class="block smallblock" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg1-notrans.png">Tyler Perry's House ...</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="100" class="block smallblock" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg1-notrans.png">The Cosby Show</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="100" class="block smallblock" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg1-notrans.png">The Cosby Show</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <table border="0" padding="0" cellpadding="0" cellspacing="3">
+                <tr>
+                  <td>
+                    <table border="0" padding="0" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td width="206" class="block" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg2-notrans.png">In Plain Sight</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="206" class="block" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg2-notrans.png">In Plain Sight</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="206" class="block" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg2-notrans.png">In Plain Sight</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="206" class="block" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg2-notrans.png">NCIS</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <table border="0" padding="0" cellpadding="0" cellspacing="3">
+                <tr>
+                  <td>
+                    <table border="0" padding="0" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td width="100" class="block smallblock" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg1-notrans.png">Sabrina, the Teenage...</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="100" class="block smallblock" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg1-notrans.png">Sabrina, the Teenage...</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="100" class="block smallblock" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg1-notrans.png">Step by Step</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="100" class="block smallblock" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg1-notrans.png">700 Club Interactive</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="206" class="block" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg2-notrans.png">The 700 Club</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="206" class="block" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg2-notrans.png">Gilmore Girls</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <table border="0" padding="0" cellpadding="0" cellspacing="3">
+                <tr>
+                  <td>
+                    <table border="0" padding="0" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td width="100" class="block smallblock" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg1-notrans.png">The Twilight Zone</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="100" class="block smallblock" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg1-notrans.png">The Twilight Zone</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="100" class="block smallblock" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg1-notrans.png">The Twilight Zone</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="100" class="block smallblock" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg1-notrans.png">The Twilight Zone</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="100" class="block smallblock" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg1-notrans.png">The Twilight Zone</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="100" class="block smallblock" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg1-notrans.png">The Twilight Zone</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="100" class="block smallblock" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg1-notrans.png">The Twilight Zone</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="100" class="block smallblock" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg1-notrans.png">The Twilight Zone</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <table border="0" padding="0" cellpadding="0" cellspacing="3">
+                <tr>
+                  <td>
+                    <table border="0" padding="0" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td width="206">&nbsp;</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="206" class="block" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg2-notrans.png">Live</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="206" class="block" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg2-notrans.png">Today</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="206" class="block" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg2-notrans.png">Today</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <table border="0" padding="0" cellpadding="0" cellspacing="3">
+                <tr>
+                  <td>
+                    <table border="0" padding="0" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td width="206">&nbsp;</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="312" class="block" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg3-notrans.png">Dr. Seuss' Horton Hears a Who!</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+
+                        <td width="312" class="block" align="center" valign="middle" background=
+                        "http://nmt.mcdvd.dk/tv/images/bg3-notrans.png">The X-Files: I Want to Believe</td>
+
+                        <td width="6" class="spacer">&nbsp;</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table><img src="http://nmt.mcdvd.dk/tv/images/continuous-new.png" id="continuousfx"> <a href=
+  "?day=2009-07-03&amp;block=2&amp;select=0&amp;show=92" id="block1" name="block1" onkeydownset="block6" onkeyupset="" onkeyleftset=
+  "prev"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc="http://nmt.mcdvd.dk/tv/images/hl2.png" width="250" height="89"
+  border="0"></a> <a href="?day=2009-07-03&amp;block=2&amp;select=1&amp;show=93" id="block2" name="block2" onkeydownset="block6"
+  onkeyupset=""><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc="http://nmt.mcdvd.dk/tv/images/hl2.png" width="250" height=
+  "89" border="0"></a> <a href="?day=2009-07-03&amp;block=2&amp;select=2&amp;show=94" id="block3" name="block3" onkeydownset="block7"
+  onkeyupset=""><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc="http://nmt.mcdvd.dk/tv/images/hl2.png" width="250" height=
+  "89" border="0"></a> <a href="?day=2009-07-03&amp;block=2&amp;select=3&amp;show=95" id="block4" name="block4" onkeydownset="block8"
+  onkeyupset=""><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc="http://nmt.mcdvd.dk/tv/images/hl1.png" width="144" height=
+  "89" border="0"></a> <a href="?day=2009-07-03&amp;block=2&amp;select=4&amp;show=96" id="block5" name="block5" onkeydownset="block8"
+  onkeyupset="" onkeyrightset="next"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc="http://nmt.mcdvd.dk/tv/images/hl1.png"
+  width="144" height="89" border="0"></a> <a href="?day=2009-07-03&amp;block=2&amp;select=5&amp;show=129" id="block6" name="block6"
+  onkeydownset="block9" onkeyupset="block2" onkeyleftset="prev"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc=
+  "http://nmt.mcdvd.dk/tv/images/hl2.png" width="250" height="89" border="0"></a> <a href=
+  "?day=2009-07-03&amp;block=2&amp;select=6&amp;show=130" id="block7" name="block7" onkeydownset="block9" onkeyupset="block3"><img src=
+  "http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc="http://nmt.mcdvd.dk/tv/images/hl2.png" width="250" height="89" border="0"></a>
+  <a href="?day=2009-07-03&amp;block=2&amp;select=7&amp;show=131" id="block8" name="block8" onkeydownset="block11" onkeyupset="block5"
+  onkeyrightset="next"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc="http://nmt.mcdvd.dk/tv/images/hl2.png" width="250"
+  height="89" border="0"></a> <a href="?day=2009-07-03&amp;block=2&amp;select=8&amp;show=110" id="block9" name="block9" onkeydownset=
+  "block13" onkeyupset="block7" onkeyleftset="prev"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc=
+  "http://nmt.mcdvd.dk/tv/images/hl1.png" width="144" height="89" border="0"></a> <a href=
+  "?day=2009-07-03&amp;block=2&amp;select=9&amp;show=110" id="block10" name="block10" onkeydownset="block13" onkeyupset="block7"><img src=
+  "http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc="http://nmt.mcdvd.dk/tv/images/hl1.png" width="144" height="89" border="0"></a>
+  <a href="?day=2009-07-03&amp;block=2&amp;select=10&amp;show=111" id="block11" name="block11" onkeydownset="block13" onkeyupset="block8"
+  onkeyrightset="next"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc="http://nmt.mcdvd.dk/tv/images/hl2.png" width="250"
+  height="89" border="0"></a> <a href="?day=2009-07-03&amp;block=2&amp;select=11&amp;show=19263" id="block12" name="block12" onkeydownset=
+  "block14" onkeyupset="block6" onkeyleftset="prev"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc=
+  "http://nmt.mcdvd.dk/tv/images/hl4.png" width="462" height="89" border="0"></a> <a href=
+  "?day=2009-07-03&amp;block=2&amp;select=12&amp;show=20041" id="block13" name="block13" onkeydownset="block15" onkeyupset="block11"
+  onkeyrightset="next"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc="http://nmt.mcdvd.dk/tv/images/hl4.png" width="462"
+  height="89" border="0"></a> <a href="?day=2009-07-03&amp;block=2&amp;select=13&amp;show=182" id="block14" name="block14" onkeydownset=
+  "block20" onkeyupset="block12" onkeyleftset="prev"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc=
+  "http://nmt.mcdvd.dk/tv/images/hl2.png" width="250" height="89" border="0"></a> <a href=
+  "?day=2009-07-03&amp;block=2&amp;select=14&amp;episode=19649" id="block15" name="block15" onkeydownset="block21" onkeyupset=
+  "block13"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc="http://nmt.mcdvd.dk/tv/images/hl1.png" width="144" height="89"
+  border="0"></a> <a href="?day=2009-07-03&amp;block=2&amp;select=15&amp;episode=19650" id="block16" name="block16" onkeydownset="block21"
+  onkeyupset="block13"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc="http://nmt.mcdvd.dk/tv/images/hl1.png" width="144"
+  height="89" border="0"></a> <a href="?day=2009-07-03&amp;block=2&amp;select=16&amp;episode=19651" id="block17" name="block17"
+  onkeydownset="block22" onkeyupset="block13"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc=
+  "http://nmt.mcdvd.dk/tv/images/hl1.png" width="144" height="89" border="0"></a> <a href=
+  "?day=2009-07-03&amp;block=2&amp;select=17&amp;episode=19652" id="block18" name="block18" onkeydownset="block22" onkeyupset="block13"
+  onkeyrightset="next"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc="http://nmt.mcdvd.dk/tv/images/hl1.png" width="144"
+  height="89" border="0"></a> <a href="?day=2009-07-03&amp;block=2&amp;select=18&amp;episode=19667" id="block19" name="block19"
+  onkeydownset="block23" onkeyupset="block12" onkeyleftset="prev"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc=
+  "http://nmt.mcdvd.dk/tv/images/hl2.png" width="250" height="89" border="0"></a> <a href=
+  "?day=2009-07-03&amp;block=2&amp;select=19&amp;episode=5873" id="block20" name="block20" onkeydownset="block25" onkeyupset=
+  "block14"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc="http://nmt.mcdvd.dk/tv/images/hl2.png" width="250" height="89"
+  border="0"></a> <a href="?day=2009-07-03&amp;block=2&amp;select=20&amp;episode=5873" id="block21" name="block21" onkeydownset="block27"
+  onkeyupset="block16"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc="http://nmt.mcdvd.dk/tv/images/hl2.png" width="250"
+  height="89" border="0"></a> <a href="?day=2009-07-03&amp;block=2&amp;select=21&amp;episode=15366" id="block22" name="block22"
+  onkeydownset="block28" onkeyupset="block18" onkeyrightset="next"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc=
+  "http://nmt.mcdvd.dk/tv/images/hl2.png" width="250" height="89" border="0"></a> <a href=
+  "?day=2009-07-03&amp;block=2&amp;select=22&amp;episode=19504" id="block23" name="block23" onkeydownset="block29" onkeyupset="block19"
+  onkeyleftset="prev"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc="http://nmt.mcdvd.dk/tv/images/hl1.png" width="144"
+  height="89" border="0"></a> <a href="?day=2009-07-03&amp;block=2&amp;select=23&amp;episode=19505" id="block24" name="block24"
+  onkeydownset="block30" onkeyupset="block19"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc=
+  "http://nmt.mcdvd.dk/tv/images/hl1.png" width="144" height="89" border="0"></a> <a href=
+  "?day=2009-07-03&amp;block=2&amp;select=24&amp;episode=19720" id="block25" name="block25" onkeydownset="block31" onkeyupset=
+  "block20"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc="http://nmt.mcdvd.dk/tv/images/hl1.png" width="144" height="89"
+  border="0"></a> <a href="?day=2009-07-03&amp;block=2&amp;select=25&amp;show=18628" id="block26" name="block26" onkeydownset="block32"
+  onkeyupset="block20"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc="http://nmt.mcdvd.dk/tv/images/hl1.png" width="144"
+  height="89" border="0"></a> <a href="?day=2009-07-03&amp;block=2&amp;select=26&amp;show=70" id="block27" name="block27" onkeydownset=
+  "block33" onkeyupset="block21"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc="http://nmt.mcdvd.dk/tv/images/hl2.png"
+  width="250" height="89" border="0"></a> <a href="?day=2009-07-03&amp;block=2&amp;select=27&amp;episode=19510" id="block28" name="block28"
+  onkeydownset="block35" onkeyupset="block22" onkeyrightset="next"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc=
+  "http://nmt.mcdvd.dk/tv/images/hl2.png" width="250" height="89" border="0"></a> <a href=
+  "?day=2009-07-03&amp;block=2&amp;select=28&amp;episode=19730" id="block29" name="block29" onkeydownset="block37" onkeyupset="block23"
+  onkeyleftset="prev"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc="http://nmt.mcdvd.dk/tv/images/hl1.png" width="144"
+  height="89" border="0"></a> <a href="?day=2009-07-03&amp;block=2&amp;select=29&amp;episode=19731" id="block30" name="block30"
+  onkeydownset="block37" onkeyupset="block24"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc=
+  "http://nmt.mcdvd.dk/tv/images/hl1.png" width="144" height="89" border="0"></a> <a href=
+  "?day=2009-07-03&amp;block=2&amp;select=30&amp;episode=19732" id="block31" name="block31" onkeydownset="block37" onkeyupset=
+  "block25"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc="http://nmt.mcdvd.dk/tv/images/hl1.png" width="144" height="89"
+  border="0"></a> <a href="?day=2009-07-03&amp;block=2&amp;select=31&amp;episode=19733" id="block32" name="block32" onkeydownset="block37"
+  onkeyupset="block26"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc="http://nmt.mcdvd.dk/tv/images/hl1.png" width="144"
+  height="89" border="0"></a> <a href="?day=2009-07-03&amp;block=2&amp;select=32&amp;episode=19734" id="block33" name="block33"
+  onkeydownset="block38" onkeyupset="block27"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc=
+  "http://nmt.mcdvd.dk/tv/images/hl1.png" width="144" height="89" border="0"></a> <a href=
+  "?day=2009-07-03&amp;block=2&amp;select=33&amp;episode=19735" id="block34" name="block34" onkeydownset="block38" onkeyupset=
+  "block27"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc="http://nmt.mcdvd.dk/tv/images/hl1.png" width="144" height="89"
+  border="0"></a> <a href="?day=2009-07-03&amp;block=2&amp;select=34&amp;episode=19736" id="block35" name="block35" onkeydownset="block39"
+  onkeyupset="block28"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc="http://nmt.mcdvd.dk/tv/images/hl1.png" width="144"
+  height="89" border="0"></a> <a href="?day=2009-07-03&amp;block=2&amp;select=35&amp;episode=19737" id="block36" name="block36"
+  onkeydownset="block39" onkeyupset="block28" onkeyrightset="next"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc=
+  "http://nmt.mcdvd.dk/tv/images/hl1.png" width="144" height="89" border="0"></a> <a href=
+  "?day=2009-07-03&amp;block=2&amp;select=36&amp;show=155" id="block37" name="block37" onkeydownset="block40" onkeyupset="block32"
+  onkeyleftset="prev"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc="http://nmt.mcdvd.dk/tv/images/hl2.png" width="250"
+  height="89" border="0"></a> <a href="?day=2009-07-03&amp;block=2&amp;select=37&amp;show=6802" id="block38" name="block38" onkeydownset=
+  "block41" onkeyupset="block34"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc="http://nmt.mcdvd.dk/tv/images/hl2.png"
+  width="250" height="89" border="0"></a> <a href="?day=2009-07-03&amp;block=2&amp;select=38&amp;show=6802" id="block39" name="block39"
+  onkeydownset="block41" onkeyupset="block36" onkeyrightset="next"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc=
+  "http://nmt.mcdvd.dk/tv/images/hl2.png" width="250" height="89" border="0"></a> <a href=
+  "?day=2009-07-03&amp;block=2&amp;select=39&amp;show=19913" id="block40" name="block40" onkeydownset="" onkeyupset="block37" onkeyleftset=
+  "prev"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc="http://nmt.mcdvd.dk/tv/images/hl3.png" width="356" height="89"
+  border="0"></a> <a href="?day=2009-07-03&amp;block=2&amp;select=40&amp;show=19694" id="block41" name="block41" onkeydownset=""
+  onkeyupset="block39" onkeyrightset="next"><img src="http://nmt.mcdvd.dk/tv/images/trans.png" onfocussrc=
+  "http://nmt.mcdvd.dk/tv/images/hl3.png" width="356" height="89" border="0"></a> <a href="http://www.mspportal.com/community" id="home"
+  name="home" onkeyupset="prev" onkeyrightset="prev" onkeyleftset="home" onkeydownset="home"><img src=
+  "http://nmt.mcdvd.dk/tv/images/msp_off.png" onfocussrc="http://nmt.mcdvd.dk/tv/images/msp_on.png" width="47" height="50" border="0"></a>
+  <a href="?day=2009-07-03&amp;block=1" id="prev" name="prev" tvid="pgup" onkeyupset="block1" onkeyrightset="block1" onkeyleftset="home"
+  onkeydownset="home"><img src="http://nmt.mcdvd.dk/tv/images/hc_prev1.png" onfocussrc="http://nmt.mcdvd.dk/tv/images/hc_prev_on1.png"
+  height="67" width="37" border="0"></a> <a href="?day=2009-07-03&amp;block=3" id="next" name="next" tvid="pgdn" onkeyupset="block5"
+  onkeyleftset="next" onkeydownset="next"><img src="http://nmt.mcdvd.dk/tv/images/hc_next1.png" onfocussrc=
+  "http://nmt.mcdvd.dk/tv/images/hc_next_on1.png" height="67" width="37" border="0"></a>
+
+  <div id="day" class="info">
+    Friday, Jul 3, 2009
+  </div>
+
+  <div id="info1" class="info">
+    All times EST:
+  </div>
+
+  <div id="info2" class="info">
+    Fri 5:34 am
+  </div>
+
+  <div id="source1" class="info">
+    Source:
+  </div>
+
+  <div id="source2" class="info">
+    <b>TV.com</b>
+  </div><img src=
+  "http://www.google-analytics.com/__utm.gif?utmwv=1&amp;utmn=1395097953&amp;utmsr=-&amp;utmsc=-&amp;utmul=-&amp;utmje=0&amp;utmfl=-&amp;utmdt=-&amp;utmhn=mcdvd.dk&amp;utmr=http://nmt.mcdvd.dk/tv/&amp;utmp=/nmt/index.php&amp;utmac=UA-348364-6&amp;utmcc=__utma%3D97372401.1092323784.1246613682.1246613682.1246613682.2%3B%2B__utmb%3D97372401%3B%2B__utmc%3D97372401%3B%2B__utmz%3D97372401.1246613682.2.2.utmccn%3D(direct)%7Cutmcsr%3D(direct)%7Cutmcmd%3D(none)%3B%2B__utmv%3D97372401.-%3B"
+  style="visibility: hidden;"> <img src="http://nmt.mcdvd.dk/tv/images/channels/fox.png" id="fox" width="120" height="45"><img src=
+  "http://nmt.mcdvd.dk/tv/images/channels/cbs.png" id="cbs" width="120" height="45"><img src=
+  "http://nmt.mcdvd.dk/tv/images/channels/abc.png" id="abc" width="120" height="45"><img src=
+  "http://nmt.mcdvd.dk/tv/images/channels/fx.png" id="fx" width="120" height="45"><img src="http://nmt.mcdvd.dk/tv/images/channels/cw.png"
+  id="cw" width="120" height="45"><img src="http://nmt.mcdvd.dk/tv/images/channels/usa.png" id="usa" width="120" height="45"><img src=
+  "http://nmt.mcdvd.dk/tv/images/channels/fam.png" id="fam" width="120" height="45"><img src=
+  "http://nmt.mcdvd.dk/tv/images/channels/scifi.png" id="scifi" width="120" height="45"><img src=
+  "http://nmt.mcdvd.dk/tv/images/channels/nbc.png" id="nbc" width="120" height="45"><img src=
+  "http://nmt.mcdvd.dk/tv/images/channels/hbo.png" id="hbo" width="120" height="45">
+
+  <div class="blockinfo" id="blockinfo1">
+    8:00am
+  </div>
+
+  <div class="blockinfo" id="blockinfo2">
+    8:30am
+  </div>
+
+  <div class="blockinfo" id="blockinfo3">
+    9:00am
+  </div>
+
+  <div class="blockinfo" id="blockinfo4">
+    9:30am
+  </div>
+
+  <div class="blockinfo" id="blockinfo5">
+    10:00am
+  </div>
+
+  <div class="blockinfo" id="blockinfo6">
+    10:30am
+  </div>
+
+  <div class="blockinfo" id="blockinfo7">
+    11:00am
+  </div>
+
+  <div class="blockinfo" id="blockinfo8">
+    11:30am
+  </div><a href="?day=2009-07-02&amp;block=2" name="skip_prev_day" tvid="1"></a> <a href="?day=2009-07-04&amp;block=2" name="skip_next_day"
+  tvid="3"></a> <a href="channels.php" tvid="setup" name="setuplink"></a>
+</body>
+</html>

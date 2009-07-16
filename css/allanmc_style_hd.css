@@ -1,0 +1,136 @@
+body {
+  color:#ffffff;
+}
+a { 
+  text-decoration: none;
+}
+.block {
+  font-family: arial, helvetica;
+  height:45px;
+  background-color:#444444;
+  color:#ffffff;
+  font-size:16px;
+}
+a {
+  text-decoration:none;
+}
+#prev {
+  position:absolute;
+  top:300px;
+  left:5px;
+}
+#next {
+  position:absolute;
+  top:300px;
+  left: 1058px;
+}
+
+#day {
+  font-family: arial, helvetica;
+  font-size: 35px;
+  color:#ffffff;
+  top:5px;
+  left:360px;
+  position:absolute;
+}
+
+.info {
+  font-family: arial, helvetica;
+  font-size: 16px;
+  color:#06889f;
+  position:absolute;
+}
+
+#source1 {
+  font-size:13px;
+  top:643px;
+  left:1000px;
+  width:50px;
+  text-align:right;
+}
+
+#source2 {
+  font-size:13px;
+  top:643px;
+  left:1050px;
+  width:50px;
+  text-align:right;
+}
+
+#info1 {
+  top:5px;
+  left:950px;
+  width:150px;
+  text-align:right;
+}
+
+#info2 {
+  top:23px;
+  left:950px;
+  width:150px;
+  text-align:right;
+}
+
+#home {
+  top:606px;
+  left:1px;
+  position:absolute;
+}
+
+.blockinfo {
+  font-family: arial, helvetica;
+  font-size: 18px;
+  color:#a2a2a2;
+  position:absolute;
+  top:68px;
+}
+
+.logotext {
+  font-family: arial, helvetica;
+  font-size: 24px;
+  color:#06889f;
+}
+
+.smallblock {
+  font-size:13px;
+}
+
+.highlight {
+  color:#f9ff5b;/*Yellow*/
+}
+
+.highlight1 {
+  color:#ff8181;/*Red*/
+}
+
+.highlight2 {
+  color:#6bf84a;/*Green*/
+}
+
+.highlight3 {
+  color:#f9ff5b;/*Yellow*/
+}
+
+.highlight4 {
+  color:#81b0ff;/*Blue*/
+}
+
+
+.spacer {
+  font-size:1px;
+  width:6px;
+}
+
+.channelnumber {
+  font-size:25px;
+  color: #cccccc;
+}
+
+.channelnumberselected {
+  font-size:25px;
+  color: #1ca800;
+}
+
+.added {
+  text-decoration: underline;
+}
