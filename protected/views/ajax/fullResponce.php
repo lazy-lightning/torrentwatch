@@ -57,19 +57,24 @@
       </div>
     <?php
   }
+  $script = array();
   if(isset($responce['showDialog']))
     $hash = $responce['showDialog'];
   elseif(isset($responce['showTab']))
-    echo '<script type="text/javascript">$.showTab("'.$responce['showTab'].'");</script>';
+    $script[] = '$.showTab("'.$responce['showTab'].'");';
   elseif(isset($responce['dialog']))
     $hash = '#actionResponce';
   if(isset($hash))
-    echo '<script type="text/javascript">$.showDialog("'.$hash.'");</script>';
+    $script[] = '$.showDialog("'.$hash.'");';
 
   if(isset($responce['showFavorite']))
     $hash = $responce['showFavorite'];
   else
     $hash = '#favoriteTvShows-';
-  echo '<script type="text/javascript">$.showFavorite("'.$hash.'");</script>';
+  $script[] = '$.showFavorite("'.$hash.'");';
+
+  $scriptOut = "<script type='text/javascript'>"."\n$(function() {\n    ".implode("\n    ", $script)."\n});\n</script>\n";
+  Yii::trace($scriptOut);
+  echo $scriptOut;
  
 

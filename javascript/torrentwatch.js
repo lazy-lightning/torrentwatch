@@ -96,6 +96,7 @@ $(function() {
     $("#progressbar").ajaxStart(function() {
       $('.dialog_window:visible').toggleDialog();
       $(this).show();
+      $('div.expose').show();
     }).ajaxStop(function() {
       $(this).hide();
       $('div.expose').hide();
@@ -266,7 +267,7 @@ $(function() {
     };
 
     $.showTab = function(hash) {
-      var dialog = $(hash).parent();
+      var dialog = $(hash).closest('.dialog_window');
       $.showDialog('#'+dialog.get(0).id)
       dialog.find('ul.tabs-nav').find("a[href="+hash+"]").click();
     }
