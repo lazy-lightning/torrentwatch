@@ -71,6 +71,7 @@ label.item {
 .hidden {
   display: none;
   }
+
 /*-----------------
  *
  * T O P   M E N U
@@ -506,21 +507,9 @@ div.form_radio {
  * P R O G R E S S   B A R
  *
  ***************************/
-#progressbar {
-  background: #DBDBDB url('../images/ajaxload.gif') no-repeat center bottom;
+#progressbar img {
   display: block;
-  height: 30px;
-  top: 150px;
-  overflow: hidden;
-  z-index: 5;
-  width: 300px;
-  margin: -0.2em auto 0 -150px;
-  }
-
-#progressbar span {
-  text-align: center;
-  font-size: 1.2em;
-  padding-left: 125px;
+  margin: 0 auto;
   }
 
 /*****************************
