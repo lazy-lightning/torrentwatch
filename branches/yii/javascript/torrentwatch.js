@@ -168,7 +168,7 @@ $(function() {
                     .appendTo("body");
             setTimeout(function() {
                 var container = $("#feedItems_container > div:first");
-                if(container.length == 0 && $(".login_form").length == 0) {
+                if(container.children('ul').children().length == 1 && $(".login_form").length == 0) {
                     current_dialog = '#welcome1';
                     $(current_dialog).show();
                 } else {
@@ -190,6 +190,10 @@ $(function() {
             button = button[0];
         } else
             form = $(button).closest("form");
+        // close any open dialog
+        if(current_dialog)
+          $(current_dialog).toggleDialog();
+
         $.post(form.get(0).action, form.buildDataString(button), $.loadDynamicData, 'html');
     }; 
     $.fn.toggleDialog = function() {
