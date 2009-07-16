@@ -39,7 +39,7 @@
           </span>
           <?php foreach($availClients[feedItem::TYPE_TORRENT] as $key => $value): ?>
               <div class="form_radio">
-                  <input type="radio" name="config[torClient]" value="<?php echo $key; ?>" />
+                  <input type="radio" name="dvrConfig[torClient]" value="<?php echo $key; ?>" />
                   <label class="item"><?php echo $value; ?></label>
               </div>
           <?php endforeach; ?>
@@ -53,7 +53,7 @@
           </span>
           <?php foreach($availClients[feedItem::TYPE_NZB] as $key => $value): ?>
               <div class="form_radio">
-                  <input type="radio" name="config[nzbClient]" value="<?php echo $key; ?>" />
+                  <input type="radio" name="dvrConfig[nzbClient]" value="<?php echo $key; ?>" />
                   <label class="item"><?php echo $value; ?></label>
               </div>
           <?php endforeach; ?>

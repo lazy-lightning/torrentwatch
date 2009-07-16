@@ -50,6 +50,7 @@ class AjaxController extends CController
         'actions'=>array(
             'fullResponce', 'dlFeedItem', 'saveConfig', 'addFeed', 'addFavorite', 'updateFavorite', 
             'inspect', 'clearHistory', 'createFavorite', 'deleteFavorite', 'loadFeedItems', 'resetData',
+            'wizard',
         ),
         'users'=>array('@'),
       ),
@@ -419,6 +420,37 @@ class AjaxController extends CController
       $this->responce['dialog']['content'] = 'There was an error saving the configuration';
     }
 
+    $this->actionFullResponce();
+  }
+
+  public function actionWizard()
+  {
+    $this->responce = array('dialog'=>array('header'=>'Initial Configuration', 'content'=>''));
+
+    if(isset($_POST['dvrConfig']))
+    {
+      $config = Yii::app()->dvrConfig;
+      $config->attributes = $_POST['dvrConfig'];
+      $this->responce['dialog']['content'] .= ($config->save() ? 'Saved configuration' : 'Failed saving configuration').'<br>';
+    }
+
+    if(isset($_POST['feed']))
+    {
+      $feeds = array();
+      foreach(array('torUrl'=>feedItem::TYPE_TORRENT, 'nzbUrl'=>feedItem::TYPE_NZB) as $key => $type)
+      {
+        if(isset($_POST['feed'][$key]))
+        {
+          $feed = new feed;
+          $feed->url = $_POST['feed'][$key];
+          $feed->downloadType = $type;
+          $this->responce['dialog']['content'] .= ($feed->save() ? "Saved feed {$feed->title}" : "Failed saving feed {$feed->url}").'<br>';
+       }
+      }
+    }
+
+    if(empty($this->responce['dialog']['content']))
+      $this->responce['dialog']['content'] = 'No valid attributes passed to wizard';
     $this->actionFullResponce();
   }
 
