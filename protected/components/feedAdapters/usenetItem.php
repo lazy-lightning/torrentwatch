@@ -26,7 +26,7 @@ class usenetItem extends feedAdapter_Item {
     if($this->cleanTitle === null) {  
       $title = parent::get_title();
       $cleaners = array(
-          '/#[\w\d.]+@[\w\d.]+[\] ]-[\[ ](?:req \d+ -|[-\w .]+\]-\[)?([^\]]*)[\] ]?- ? ?\[?\d+\/\d+\]?/i' => 1,
+          '/#[\w\d.]+@[\w\d.]+[\] ]-[\[ ](?:req [x\d]+ -|[-\w .]+\]-\[)?([^\]]*)[\] ]?- ? ?\[?\d+\/\d+\]?/i' => 1,
           '/presents (.*) \[\d+ of \d+\] ".*"/i' => 1,
           '/\(([^):]+)\) \[\d+\/\d+\] - ".*"/i' => 1,
           '/^([\w\d.]+(?:-\w+)?) ?".*"/i' => 1,
