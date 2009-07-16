@@ -94,9 +94,11 @@ $(function() {
     });
     // Ajax progress bar
     $("#progressbar").ajaxStart(function() {
+      $('.dialog_window:visible').toggleDialog();
       $(this).show();
     }).ajaxStop(function() {
       $(this).hide();
+      $('div.expose').hide();
     });
     // Perform the first load of the dynamic information
     $.get('nmtdvr.php?r=ajax/fullResponce', '', $.loadDynamicData, 'html');
@@ -200,13 +202,21 @@ $(function() {
         this.each(function() {
             var last = current_dialog === '#' ? '' : current_dialog;
             var target = this.hash === '#' ? '#'+$(this).closest('.dialog_window').id : this.hash;
+            var hide = false;
+            var show = false;
             current_dialog = last === target ? '' : this.hash;
             if (last) {
                 $(last).fadeOut();
+                hide = true;
             }
             if (current_dialog && this.hash != '#') {
                 $(current_dialog).fadeIn();
+                show = true;
             }
+            if(hide && !show)
+              $('div.expose').hide();
+            if(!hide && show)
+              $('div.expose').show();
         });
         return this;
     };
