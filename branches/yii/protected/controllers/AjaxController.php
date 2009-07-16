@@ -103,6 +103,7 @@ class AjaxController extends CController
         $this->responce[$type.'-'] = $fav;
       }
       // After save to get the correct id
+      $this->responce['showDialog'] = '#favorites';
       $this->responce['showFavorite'] = '#'.$type.'-'.$fav->id;
       $this->responce['showTab'] = "#".$type;
     }
