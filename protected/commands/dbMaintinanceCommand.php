@@ -1,6 +1,6 @@
 <?php
 
-class dbMaintinanceCommand extends CConsoleCommand {
+class dbMaintinanceCommand extends BaseConsoleCommand {
   public function run($args) {
     $db = Yii::app()->db;
 

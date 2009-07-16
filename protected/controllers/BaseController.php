@@ -27,6 +27,7 @@ abstract class BaseController extends CController {
    * @return none
    */
   public function init() {
+    date_default_timezone_set(Yii::app()->dvrConfig->timezone);
     // sd if reported in user agent, otherwise default to hd
     $this->_resolution = stristr($_SERVER['HTTP_USER_AGENT'], 'Res720x576') === False?'hd':'sd';
     // if the user agent is an NMT give it local filepath, otherwise based off script

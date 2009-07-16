@@ -1,6 +1,6 @@
 <?php
 
-class updateTVDBCommand extends CConsoleCommand {
+class updateTVDBCommand extends BaseConsoleCommand {
 
   // array of loaded tvShows indexed by tvdbid
   private $tvShows = array();

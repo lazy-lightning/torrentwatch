@@ -1,6 +1,6 @@
 <?php
 
-class scanOthersCommand extends CConsoleCommand {
+class scanOthersCommand extends BaseConsoleCommand {
 
   public function run($args) {
     $this->scanForMovies();
