@@ -427,7 +427,7 @@ div.dialog_window .content {
 div.dialog_window:after {
   content: " ";
   display: block;
-  background-image: url(../images/overlay/white-bottom.png);
+  background: url(../images/overlay/white.png) 0 -493px;
   height: 32px;
   clear: both;
   }
