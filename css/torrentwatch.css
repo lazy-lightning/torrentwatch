@@ -417,7 +417,7 @@ div.expose {
 
 div.dialog_window .content {
   background-image: url(../images/overlay/white.png);
-  padding: 23px 23px 0 23px;
+  padding: 26px 23px 0 23px;
   }
 
 div.dialog_window:after {
