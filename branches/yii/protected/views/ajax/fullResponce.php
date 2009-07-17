@@ -74,7 +74,6 @@
   $script[] = '$.showFavorite("'.$hash.'");';
 
   $scriptOut = "<script type='text/javascript'>"."\n$(function() {\n    ".implode("\n    ", $script)."\n});\n</script>\n";
-  Yii::trace($scriptOut);
   echo $scriptOut;
  
 

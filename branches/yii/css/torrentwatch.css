@@ -531,6 +531,7 @@ div.form_radio {
  ****************************/
 
 #configuration label {
+  font-size: 1em;
   text-align: right;
   margin: 0 10px 0 100px;
   }
@@ -579,6 +580,7 @@ div.activeFeed label.item {
 div#configuration.dialog_window .feedForm select {
   display: inline;
   margin-left: 80px;
+  margin-top: 4px;
   position: relative;
   width: 8em;
   }
@@ -729,6 +731,11 @@ div#history a#clearhistory {
 
 div#history a.toggleDialog {
   right: 6.5em;
+  }
+
+.hItemDetails {
+  padding-left: 20px;
+  font-size: 0.8em;
   }
 
 /************************************

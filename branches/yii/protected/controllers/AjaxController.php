@@ -16,11 +16,9 @@ class AjaxController extends BaseController
   private $favoriteWhitelist = array('favoriteTvShow', 'favoriteMovie', 'favoriteString');
   protected $responce = array();
 
-  /**
-   * Initialize the Controller to the ajax layout
-   * @return none
-   */
-  public function init() {
+  public function init()
+  {
+    parent::init();
     $this->layout = 'ajax';
   }
 
