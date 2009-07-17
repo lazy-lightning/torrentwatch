@@ -9,6 +9,10 @@
     <div id="global_config">
       <?php echo CHtml::beginForm(array('saveConfig'), 'post', array('id'=>'config_form')); ?>
         <h2 class="dialog_heading">Web UI Settings</h2>
+        <div id="config_timezone">
+          <?php echo CHtml::activeLabel($config, 'timezone', array('class'=>'item')).': '.
+                     CHtml::activeTextField($config, 'timezone'); ?>
+        </div>
         <div id="config_webui"> <!-- Only used by the javascript, selected via cookie -->
           <label class="item select">Font Size</label>:
           <select name="webui">
