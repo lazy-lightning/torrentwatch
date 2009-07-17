@@ -1,6 +1,6 @@
 <?php
 
-class AjaxController extends CController
+class AjaxController extends BaseController
 {
 
   const ERROR_INVALID_ID = "Invalid ID paramater";
