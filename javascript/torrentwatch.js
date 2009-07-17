@@ -229,8 +229,16 @@ $(function() {
     };
     $.fn.initDuplicates = function() {
       this.click(function() {
-
-          $(this).children("ul").toggle(400);
+          var li = $(this);
+          var hide = false;
+          if(li.hasClass('open'))
+            hide = true;
+          else
+            li.addClass('open');
+          li.children("ul").slideToggle(400, function() {
+            if(hide)
+              li.removeClass('open');
+          });
       });
       return this;
     };
