@@ -238,7 +238,13 @@ class feedItem extends ARwithQuality
       Yii::log('date based episode '.print_r($regs, TRUE));
       // Item is a date based episode
       $shortTitle = trim($regs[1]);
+
+      // Use UTC for strtotime measurements
+      $tz = date_default_timezone_get();
+      date_default_timezone_set('UTC');
       $date = strtotime(str_replace(' ', '/', trim(strtr($regs[2], $from, $to))));
+      date_default_timezone_set($tz);
+
       $season = 0;
       $episode = (integer) $date; // cast false to 0
 
