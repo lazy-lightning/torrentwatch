@@ -6,12 +6,10 @@
     <?php $n=0;foreach($history as $hItem): ?>
       <li class='<?php echo ++$n%2?'alt':''; ?>'>
         <div class="date"><?php echo date('Y M d h:i a', $hItem->date); ?></div>
-        <a href="#histItem<?php echo $hItem->id; ?>">
-            <?php echo $hItem->feedItem_title; ?>
-        </a>
+        <span><?php echo CHtml::encode($hItem->feedItem_title); ?></span>
         <div class="hItemDetails" id="histItem<?php echo $hItem->id; ?>">
-          <div class="histFav"><?php echo $hItem->favorite_name; ?></div>
-          <div class="histFeed"><?php echo $hItem->feed_title; ?></div>
+          <div class="histFav">Started By: <?php echo CHtml::encode($hItem->favorite_name); ?></div>
+          <div class="histFeed">From Feed:<?php echo CHtml::encode($hItem->feed_title); ?></div>
         </div>
       </li>
      <?php endforeach; ?>

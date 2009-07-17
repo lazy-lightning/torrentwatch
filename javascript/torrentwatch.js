@@ -109,6 +109,12 @@ $(function() {
         e.stopImmediatePropagation();
         $.submitForm(this);
     });
+    // History details hide/reveal
+    $("div#history li").live('click', function() {
+        $(this).find(".hItemDetails").slideToggle(600);
+        return false;
+    });
+
     // Clear History ajax submit
     $("a.historySubmit").live('click', function() {
       $.get(this.href, '', function(html) {
