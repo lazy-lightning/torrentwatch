@@ -1,4 +1,5 @@
-cd $(dirname $0)
+#!/bin/sh
+cd $(echo $0 | sed 's,[^/]*$,,')
 protected/yiic updateFeeds
 protected/yiic dbMaintinance
 protected/yiic updateTVDB
