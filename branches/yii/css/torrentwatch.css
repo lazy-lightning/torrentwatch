@@ -105,34 +105,34 @@ ul.mainoptions li a {
   }
 
 ul.mainoptions li#refresh a {
-  background: url(../images/nuvola_refresh.png) no-repeat center 0;
+  background: url(../images/menusprites.png) no-repeat center -23px;
   }
 
 ul.mainoptions li#favoritesMenu a {
-  background: url(../images/nuvola_bookmark.png) no-repeat center 0;
+  background: url(../images/menusprites.png) no-repeat center -101px;
   }
 ul.mainoptions li#config a {
-  background: url(../images/nuvola_configure.png) no-repeat center 0;
+  background: url(../images/menusprites.png) no-repeat center -179px;
   }
 
 ul.mainoptions li#view a {
-  background: url(../images/nuvola_history.png) no-repeat center 0;
+  background: url(../images/menusprites.png) no-repeat center -257px;
   }
 
 ul.mainoptions li#empty a {
-  background: url(../images/remove.png) no-repeat center 0;
+  background: url(../images/menusprites.png) no-repeat center -335px;
   }
 
 ul.mainoptions li#webui a {
-  background: url(../images/webui.png) no-repeat center 0;
+  background: url(../images/menusprites.png) no-repeat center -555px;
   }
 
 ul.mainoptions li#inspector a {
-  background: url('../images/info.png') no-repeat center 0;
+  background: url('../images/menusprites.png') no-repeat center -413px;
   }
 
 ul.mainoptions li.divider {
-  background: transparent url('../images/menu_divider.png') no-repeat top right;
+  background: transparent url('../images/menusprites.png') center -633px;
   height: 2.3em;
   margin: 1.3em 0 0 0;
   }
@@ -200,7 +200,7 @@ input#filter_text_input {
   padding: 0.1em 0.5em 0.15em 1.5em;
   margin: 0.1em 0.5em;
   border-radius: 10px;
-  background: #FFF url('../images/filter_icon.png') top left no-repeat;
+  background: #FFF url('../images/menusprites.png') no-repeat -23px -491px;
   -o-border-radius: 8px; 
   -icab-border-radius: 8px;
   -khtml-border-radius: 8px;
@@ -329,35 +329,39 @@ li.torrent.hidden_bytext {
   }
 
 ul li.torrent.match_Unmatched {
-  background: transparent url('../images/nuvola_ledred.png') no-repeat 0.2em center;
+  background: transparent url('../images/nuvola_ledsprites.png') no-repeat -9px -225px;
   }
 
 ul li.torrent.match_Failed {
-  background: transparent url('../images/nuvola_ledorange.png') no-repeat 0.2em center;
+  background: transparent url('../images/nuvola_ledsprites.png') no-repeat -9px -137px;
   }
 
 ul li.torrent.match_Manual {
-  background: transparent url('../images/nuvola_ledlightgreen.png') no-repeat 0.2em center;
+  background: transparent url('../images/nuvola_ledsprites.png') no-repeat -9px -93px;
   }
 
 ul li.torrent.match_Automatic {
-  background: transparent url('../images/nuvola_ledgreen.png') no-repeat 0.2em center;
+  background: transparent url('../images/nuvola_ledsprites.png') no-repeat -9px -7px;
   }
 
 ul li.torrent.match_Duplicate {
-  background: transparent url('../images/nuvola_ledyellow.png') no-repeat 0.2em center;
+  background: transparent url('../images/nuvola_ledsprites.png') no-repeat -9px -313px;
   }
 
 ul li.torrent.match_Old {
-  background: transparent url('../images/nuvola_ledlightblue.png') no-repeat 0.2em center;
+  background: transparent url('../images/nuvola_ledsprites.png') no-repeat -9px -49px;
   }
 
 ul li.torrent.match_Queued {
-  background: transparent url('../images/nuvola_ledteal.png') no-repeat 0.2em center;
+  background: transparent url('../images/nuvola_ledsprites.png') no-repeat -9px -269px;
   }
 
 ul li.torrent.match_New {
-  background: transparent url('../images/nuvola_ledpurple.png') no-repeat 0.2em center;
+  background: transparent url('../images/nuvola_ledsprites.png') no-repeat -9px -187px;
+  }
+
+ul li.torrent.hasDuplicates.open {
+  background-image: none !important;
   }
 
 ul li.torrent.alt {
