@@ -279,6 +279,8 @@ class feedItem extends ARwithQuality
     }
     // Convert . and _ to spaces, and trim result
     $shortTitle = trim(strtr(str_replace("'", "&#39;", $shortTitle), $from, $to));
+    // Remove any marking of a second or third posting of an item
+    $shortTitle = trim(preg_replace('/\([23]\)/', '', $shortTitle));
 
     // Custom handling for a few networks that show up as 'Foo.Channel.Show.Title.S02E02.Bar-ASDF'
     if(preg_match('/^([a-zA-Z]+\bchannel)\b(.*)/i', $shortTitle, $regs))
