@@ -4,7 +4,7 @@ $(function() {
         $(this).toggleDialog();
     });
     // Vary the font-size
-    $("select#config_webui").live('change', function() {
+    $("div#config_webui select").live('change', function() {
         var f = $(this).val();
         $.cookie('twFontSize', f);
         switch (f) {
