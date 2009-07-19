@@ -62,7 +62,8 @@ class updateTVDBCommand extends BaseConsoleCommand {
       echo count($toSave)." tv Episodes to save\n";
       foreach($toSave as $record)
         $record->save();
-      tvEpisode::model()->updateByPk($scanned, array('lastTvdbUpdate'=>$now));
+      if(count($scanned))
+        tvEpisode::model()->updateByPk($scanned, array('lastTvdbUpdate'=>$now));
       $transaction->commit();
     } catch ( Exception $e ) {
       $transaction->rollback();
@@ -140,7 +141,8 @@ class updateTVDBCommand extends BaseConsoleCommand {
           Yii::log(print_r($tvShow->errors, TRUE));
         }
       }
-      tvShow::model()->updateByPk($scanned, array('lastTvdbUpdate'=>$now));
+      if(count($scanned))
+        tvShow::model()->updateByPk($scanned, array('lastTvdbUpdate'=>$now));
       $transaction->commit();
     } catch ( Exception $e ) {
       $transaction->rollback();
