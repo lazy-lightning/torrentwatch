@@ -46,7 +46,7 @@
       ?>
       <li class='torrent loadMore <?php echo (++$n%2?'alt':'notalt'); ?>'>
          <span class='torrent_name'>
-           <?php echo CHtml::link('Load more '.$title, array('loadFeedItems', 'type'=>$type, 'before'=>$item2['feedItem_pubDate'])); ?>
+           <?php echo isset($item2) ? CHtml::link('Load more '.$title, array('loadFeedItems', 'type'=>$type, 'before'=>$item2['feedItem_pubDate'])) : ''; ?>
          </span>
       </li>
     </ul>
