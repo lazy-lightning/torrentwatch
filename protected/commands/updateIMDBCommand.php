@@ -26,7 +26,8 @@ class updateIMDbCommand extends BaseConsoleCommand {
 
       if($scraper->accuracy < 75) {
         $scanned[] = $row['id'];
-        echo "Failed scrape\n";
+        Yii::log("Failed scrape of $title\n", CLogger::LEVEL_INFO);
+        echo "Failed scrape of $title with accuracy of {$scraper->accuracy} and a guess of {$scraper->title}\n";
         continue;
       }
 
@@ -51,7 +52,8 @@ class updateIMDbCommand extends BaseConsoleCommand {
         other::model()->deleteByPk($id);
         $this->updateMovieFromScraper($movie, $scraper);
       }
-      other::model()->updateByPk($scanned, array('lastImdbUpdate'=>time()));
+      if(count($scanned))
+        other::model()->updateByPk($scanned, array('lastImdbUpdate'=>time()));
       $transaction->commit();
     } catch ( Exception $e ) {
       $transaction->rollback();
@@ -90,7 +92,8 @@ class updateIMDbCommand extends BaseConsoleCommand {
       foreach($toSave as $id => $scraper)
         $this->updateMovieFromScraper($id, $scraper);
 
-      movie::model()->updateByPk($scanned, array('lastImdbUpdate'=>$now));
+      if(count($scanned))
+        movie::model()->updateByPk($scanned, array('lastImdbUpdate'=>$now));
       $transaction->commit();
     } catch ( Exception $e) {
       $transaction->rollback();
