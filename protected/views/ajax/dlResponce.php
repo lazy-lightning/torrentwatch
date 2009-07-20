@@ -1,7 +1,7 @@
 <?php
 //  if(isset($error)) {
 //    echo '<h2>Download Error!</h2><pre>';
-    var_dump($error);
+    if(isset($error)) var_dump($error);
 //    echo '</pre>';
 //  }
 
