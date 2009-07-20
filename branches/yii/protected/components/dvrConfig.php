@@ -159,6 +159,7 @@ abstract class BaseDvrConfig extends CModel {
   {
     if($this->beforeSave())
     {
+      $toSave = array();
       $transaction = Yii::app()->db->beginTransaction();
       try {
         Yii::log('saving '.print_r($this, TRUE));
@@ -169,20 +170,22 @@ abstract class BaseDvrConfig extends CModel {
         {
           $value = $this->$key;
           if(is_object($value))
-            $value->save();
+            $toSave[] = $value;
           else 
             $this->updateByKey($key, $value);
         }
   
         $this->afterSave();
         $transaction->commit();
-        return true;
       } 
       catch ( Exception $e ) 
       {
         $transaction->rollback();
         throw $e;
       }
+      foreach($toSave as $item)
+        $item->save();
+      return true;
     }
 
     return false;
