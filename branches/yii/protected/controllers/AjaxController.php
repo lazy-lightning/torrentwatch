@@ -135,7 +135,7 @@ class AjaxController extends BaseController
     $favorite->attributes = $_POST[$class];
     $favorite->save();
     // Tell the view to bring up the changed favorite
-    $htmlId = get_class($fav).'s-'.$fav->id;
+    $htmlId = $class.'s-'.$favorite->id;
     $this->responce[$htmlId] = $favorite;
     $this->responce['showFavorite'] = "#".$class.'s-'.$favorite->id;
     $this->responce['showTab'] = "#".$class."s";
