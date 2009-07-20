@@ -49,7 +49,7 @@
       <div class="dialog_window" id="actionResponce">
         <div class="content">
           <h2 class="dialog_heading"><?php echo $opts['header']; ?></h2>
-          <p><?php echo $opts['content']; ?></p>
+          <p><?php echo isset($opts['content']) ? $opts['content'] : ' '; ?></p>
           <div class="buttonContainer clearFix">
             <a href="#actionResponce" class="toggleDialog button">Close</a>
           </div>

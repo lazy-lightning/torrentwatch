@@ -21,7 +21,7 @@ class feedAdapter extends SimplePie {
 
     if($this->error()) {
       $this->_feedAR->status = feed::STATUS_ERROR;
-      Yii::log("Error loading feed {$this->_feed->title}: ".$this->error());
+      Yii::log("Error loading feed {$this->_feedAR->title}: ".$this->error());
       if(empty($this->_feedAR->title)) {
         // new record
         $this->_feedAR->title = 'Error initializing feed';
@@ -33,8 +33,7 @@ class feedAdapter extends SimplePie {
     $this->_feedAR->title = $this->get_title();
     $this->_feedAR->description = $this->get_description();
 
-    $items = $this->get_items();
-    foreach($items as $item) {
+    foreach($this->get_items() as $item) {
       $hash = md5($item->get_id());
       if(false === feedItem::model()->exists('hash=:hash', array(':hash'=>$hash))) {
         factory::feedItemByAttributes(array(

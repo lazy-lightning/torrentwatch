@@ -225,6 +225,7 @@ class feedItem extends ARwithQuality
     }
 
     Yii::log($this->title);
+    $network = null;
     if(preg_match("/$title_reg$episode_reg/i", $this->title, $regs)) 
     {
       Yii::log('episode match'.print_r($regs, TRUE));

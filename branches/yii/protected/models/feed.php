@@ -32,7 +32,7 @@ class feed extends CActiveRecord
       array('lastUpdated', 'default', 'setOnEmpty'=>false, 'value'=>time()),
       array('downloadType', 'in', 'allowEmpty'=>false, 'range'=>array_keys(feedItem::getDownloadTypeOptions())),
       array('url', 'url', 'allowEmpty'=>false),
-      array('status', 'default', value=>self::STATUS_NEW),
+      array('status', 'default', 'value'=>self::STATUS_NEW),
       array('status', 'in', 'allowEmpty'=>false, 'range'=>array_keys($this->getStatusOptions())),
     );
   }
@@ -130,7 +130,6 @@ class feed extends CActiveRecord
   public function updateFeedItems($checkFavorites = True) {
     // id 0 is generic 'All Feeds' placeholder
     if($this->id == 0) {
-      Yii::log("Skip all feeds placeholder");
       return;
     }
 
