@@ -135,6 +135,7 @@ class AjaxController extends BaseController
     $favorite->attributes = $_POST[$class];
     $favorite->save();
     // Tell the view to bring up the changed favorite
+    $htmlId = get_class($fav).'s-'.$fav->id;
     $this->responce[$htmlId] = $favorite;
     $this->responce['showFavorite'] = "#".$class.'s-'.$favorite->id;
     $this->responce['showTab'] = "#".$class."s";
@@ -354,7 +355,7 @@ class AjaxController extends BaseController
           foreach(array('feedItem', 'feedItem_quality', 'history', 'movie', 'movie_genre', 'other', 'tvEpisode', 'tvShow') as $class) 
           {
             $model = new $class;
-            $class->deleteAll();
+            $model->deleteAll();
           }
           break;
         case 'media':
@@ -363,7 +364,7 @@ class AjaxController extends BaseController
           tvEpisode::model()->updateAll(array('status'=>tvEpisode::STATUS_NEW));
           break;
         case 'feedItems':
-          feedItem::model()->updateAll(array('status'=>feedItem::STATUS_NOMATCH));
+          feedItem::model()->updateAll(array('status'=>feedItem::STATUS_NEW));
           break;
         }
         $transaction->commit();
@@ -381,7 +382,7 @@ class AjaxController extends BaseController
           $feed->updateFeedItems(False);
       }
 
-      Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NOMATCH);
+      Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NEW);
     }
     $this->actionFullResponce();
   }
@@ -428,6 +429,7 @@ class AjaxController extends BaseController
     if(isset($_POST['dvrConfig']))
     {
       $config = Yii::app()->dvrConfig;
+      Yii::log('Saving initial config '.print_r($_POST['dvrConfig'], true), CLogger::LEVEL_INFO);
       $config->attributes = $_POST['dvrConfig'];
       $this->responce['dialog']['content'] .= ($config->save() ? 'Saved configuration' : 'Failed saving configuration').'<br>';
     }
