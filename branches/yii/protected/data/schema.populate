@@ -24,8 +24,8 @@ INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('watchDir','/hom
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('saveFile',1,NULL);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('tempDir','/tmp',NULL);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('feedItemLifetime',7,NULL);
-INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('torClient','clientNZBGet',NULL);
-INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('nzbClient','clientTrans122',NULL);
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('torClient','clientFolder',NULL);
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('nzbClient','clientFolder',NULL);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('webItemsPerLoad', 50, NULL);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('maxItemsPerFeed', 500, NULL);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('timezone', 'America/Los_Angeles', NULL);
