@@ -95,6 +95,7 @@ class updateIMDbCommand extends BaseConsoleCommand {
       if(count($scanned))
         movie::model()->updateByPk($scanned, array('lastImdbUpdate'=>$now));
       $transaction->commit();
+      echo 'Saved '.count($toSave).' items'."\n";
     } catch ( Exception $e) {
       $transaction->rollback();
       throw $e;
