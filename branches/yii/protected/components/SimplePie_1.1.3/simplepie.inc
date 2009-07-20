@@ -7623,7 +7623,7 @@ class SimplePie_File
 					curl_setopt($fp, CURLOPT_ENCODING, 'none');
 					$this->headers = curl_exec($fp);
 				}
-				if (curl_errno($fp))
+				if (curl_errno($fp) && curl_errno($fp) != 18) // ERIK: allow broken servers that report wrong file size
 				{
 					$this->error = 'cURL error ' . curl_errno($fp) . ': ' . curl_error($fp);
 					$this->success = false;
