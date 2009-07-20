@@ -100,6 +100,11 @@ $(function() {
     }).ajaxStop(function() {
       $(this).hide();
       $('div.expose').hide();
+    }).ajaxError(function(event, XMLHttpRequest, ajaxOptions, thrownError){
+      $(this).unbind('ajaxStop')
+             .find('.content')
+             .empty()
+             .append(XMLHttpRequest.responseText);
     });
     // Perform the first load of the dynamic information
     $.get('nmtdvr.php?r=ajax/fullResponce', '', $.loadDynamicData, 'html');
