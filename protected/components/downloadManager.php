@@ -286,6 +286,7 @@ class downloadManager extends favoriteManager {
         $status = feedItem::STATUS_FAILED_DL;
       }
       // not in afterDownload to allow failure to set STATUS_FAILED_DL
+      Yii::log("Updating {$this->title} to status ".feedItem::getStatusText($status), CLogger::LEVEL_INFO);
       feedItem::model()->updateByPk($this->feedItemId, array('status'=>$status));
     }
 
