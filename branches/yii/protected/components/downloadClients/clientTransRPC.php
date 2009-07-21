@@ -30,26 +30,26 @@ class clientTransRPC extends BaseClient {
     $this->be->addPostData(json_encode(array('method'=>'torrent-add', 'arguments'=>$args)));
 
 
-    $responce = $this->be->file_get_contents($api);
+    $response = $this->be->file_get_contents($api);
 
     // Invalid session id, set it and try again
-    if(substr($responce, 0, 7) === '<h1>409')
+    if(substr($response, 0, 7) === '<h1>409')
     {
-      if(preg_match('/X-Transmission-Session-Id: ([A-Za-z0-9]+)/', $responce, $regs)) {
+      if(preg_match('/X-Transmission-Session-Id: ([A-Za-z0-9]+)/', $response, $regs)) {
         $this->be->addHeaderLine('X-Transmission-Session-Id', $regs[1]);
-        $responce = $this->be->file_get_contents($api);
+        $response = $this->be->file_get_contents($api);
       }
     }
         
-    $responce = json_decode($responce);
+    $response = json_decode($response);
 
-    if(isset($responce->result) AND ($responce->result == 'success' or $responce->result == 'duplicate torrent'))
+    if(isset($response->result) AND ($response->result == 'success' or $response->result == 'duplicate torrent'))
       return True;
 
-    file_put_contents('/tmp/transRpc.Failure', $this->be->lastRequest."\n\n".$this->be->lastResponce);
+    file_put_contents('/tmp/transRpc.Failure', $this->be->lastRequest."\n\n".$this->be->lastResponse);
 
-    if(isset($responce->result))
-      $this->_error = "Transmission RPC Error: ".print_r($responce);
+    if(isset($response->result))
+      $this->_error = "Transmission RPC Error: ".print_r($response);
     else 
       $this->_error = "Failure connecting to Transmission RPC at ";
 
