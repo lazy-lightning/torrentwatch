@@ -101,10 +101,16 @@ $(function() {
       $(this).hide();
       $('div.expose').hide();
     }).ajaxError(function(event, XMLHttpRequest, ajaxOptions, thrownError){
+      var content;
+      if(XMLHttpRequest.responseText === '')
+        content = '<p>NMTDVR has errored in an untraceable manner</p>';
+      else
+        content = XMLHttpRequest.responseText;
+
       $(this).unbind('ajaxStop')
              .find('.content')
              .empty()
-             .append(XMLHttpRequest.responseText);
+             .append(content);
     });
     // Perform the first load of the dynamic information
     $.get('nmtdvr.php?r=ajax/fullResponce', '', $.loadDynamicData, 'html');
