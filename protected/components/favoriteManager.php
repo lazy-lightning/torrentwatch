@@ -21,7 +21,6 @@ abstract class favoriteManager extends CModel {
       $this->checkTvShowFavorites($itemStatus);
       $this->checkMovieFavorites($itemStatus);
       $this->checkStringFavorites($itemStatus);
-      $this->updateItemStatus($itemStatus);
       $transaction->commit();
     } catch ( Exception $e ) {
       $transaction->rollback();
@@ -29,6 +28,15 @@ abstract class favoriteManager extends CModel {
     }
 
     $this->startDownloads();
+
+    $transaction = Yii::app()->db->beginTransaction();
+    try {
+      $this->updateItemStatus($itemStatus);
+      $transaction->commit();
+    } catch ( Exception $e ) {
+      $transaction->rollback();
+      throw $e;
+    }
   }
  
   /**
@@ -168,12 +176,14 @@ abstract class favoriteManager extends CModel {
   private function updateItemStatus($updateType)
   {
     // After matching has occured, updated item statuses
-    // The status of downloaded items have not yet been set so safe to set them and
-    // allow startDownload to set them properly
+    // The status of downloaded items have already been set.
     if(count($this->toQueue) !== 0)
       feedItem::model()->updateByPk($this->toQueue, array('status'=>feedItem::STATUS_QUEUED));
     if(count($this->duplicates) !== 0)
+    {
+      Yii::log('Marking duplicate feeditems: '.print_r($this->duplicates, true), CLogger::LEVEL_INFO);
       feedItem::model()->updateByPk($this->duplicates, array('status'=>feedItem::STATUS_DUPLICATE));
+    }
 
     // if we were checking new items, change all still new to nomatch
     if($updateType === feedItem::STATUS_NEW) 
