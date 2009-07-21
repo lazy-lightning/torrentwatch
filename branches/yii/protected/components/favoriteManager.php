@@ -21,6 +21,7 @@ abstract class favoriteManager extends CModel {
       $this->checkTvShowFavorites($itemStatus);
       $this->checkMovieFavorites($itemStatus);
       $this->checkStringFavorites($itemStatus);
+      $this->updateItemStatus($itemStatus);
       $transaction->commit();
     } catch ( Exception $e ) {
       $transaction->rollback();
@@ -28,15 +29,6 @@ abstract class favoriteManager extends CModel {
     }
 
     $this->startDownloads();
-
-    $transaction = Yii::app()->db->beginTransaction();
-    try {
-      $this->updateItemStatus($itemStatus);
-      $transaction->commit();
-    } catch ( Exception $e ) {
-      $transaction->rollback();
-      throw $e;
-    }
   }
  
   /**
@@ -176,7 +168,8 @@ abstract class favoriteManager extends CModel {
   private function updateItemStatus($updateType)
   {
     // After matching has occured, updated item statuses
-    // The status of downloaded items have already been set.
+    // The status of downloaded items have not yet been set so safe to set them and
+    // allow startDownload to set them properly
     if(count($this->toQueue) !== 0)
       feedItem::model()->updateByPk($this->toQueue, array('status'=>feedItem::STATUS_QUEUED));
     if(count($this->duplicates) !== 0)
