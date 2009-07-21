@@ -72,6 +72,7 @@ class BrowserEmulator {
   var $lastResponse = '';
   var $lastRequest = '';
   var $debug = false;
+  var $customHttp = False;
  
   function BrowserEmulator() {
     $this->resetHeaderLines();
@@ -217,12 +218,13 @@ class BrowserEmulator {
         if ($this->authUser!="" && $this->authPass!="") {
           $this->headerLines["Authorization"] = "Basic ".base64_encode($this->authUser.":".$this->authPass);
         }
-       
-        if (count($this->postData)==0) {
+      
+        if($this->customHttp)
+          $request = $this->customHttp." $path\r\n";
+        elseif (count($this->postData)==0)
           $request = "GET $path HTTP/1.0\r\n";
-        } else {
+        else
           $request = "POST $path HTTP/1.1\r\nHost: {$parts['host']}\r\n";
-        }
        
         if ($this->debug) echo $request;
         if (count($this->postData)>0) {
