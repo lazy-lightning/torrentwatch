@@ -108,7 +108,7 @@
         </div>
        <?php endforeach; ?>
       <?php endif; ?>
-      <?php $feed = isset($responce['activeFeed-']) ? $responce['activeFeed-'] : new feed; ?>
+      <?php $feed = isset($response['activeFeed-']) ? $response['activeFeed-'] : new feed; ?>
       <div class="activeFeed">
         <?php echo CHtml::beginForm(array('addFeed'), 'post', array('class'=>'feedform')); ?>
           <a class="submitForm button" id="Add" href="#">Add</a>

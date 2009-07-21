@@ -12,7 +12,7 @@
         'config'=>$config,
         'availClients'=>$availClients,
         'feeds'=>$feeds,
-        'responce'=>$responce,
+        'response'=>$response,
   ));
   Yii::log('start favorites_dialog: '.$logger->getExecutionTime(), CLogger::LEVEL_PROFILE);
   $this->renderPartial('favorites_dialog', array(
@@ -42,33 +42,33 @@
         'history'=>$history,
   ));
 
-  if(isset($responce['dialog']))
+  if(isset($response['dialog']))
   {
-    $opts = $responce['dialog'];
+    $opts = $response['dialog'];
     ?>
-      <div class="dialog_window" id="actionResponce">
+      <div class="dialog_window" id="actionResponse">
         <div class="content">
           <h2 class="dialog_heading"><?php echo $opts['header']; ?></h2>
           <p><?php echo isset($opts['content']) ? $opts['content'] : ' '; ?></p>
           <div class="buttonContainer clearFix">
-            <a href="#actionResponce" class="toggleDialog button">Close</a>
+            <a href="#actionResponse" class="toggleDialog button">Close</a>
           </div>
         </div>
       </div>
     <?php
   }
   $script = array();
-  if(isset($responce['showDialog']))
-    $hash = $responce['showDialog'];
-  elseif(isset($responce['showTab']))
-    $script[] = '$.showTab("'.$responce['showTab'].'");';
-  elseif(isset($responce['dialog']))
-    $hash = '#actionResponce';
+  if(isset($response['showDialog']))
+    $hash = $response['showDialog'];
+  elseif(isset($response['showTab']))
+    $script[] = '$.showTab("'.$response['showTab'].'");';
+  elseif(isset($response['dialog']))
+    $hash = '#actionResponse';
   if(isset($hash))
     $script[] = '$.showDialog("'.$hash.'");';
 
-  if(isset($responce['showFavorite']))
-    $hash = $responce['showFavorite'];
+  if(isset($response['showFavorite']))
+    $hash = $response['showFavorite'];
   else
     $hash = '#favoriteTvShows-';
   $script[] = '$.showFavorite("'.$hash.'");';
