@@ -206,6 +206,7 @@ class feedItem extends ARwithQuality
              .'1080p'   .'|'
              .'DTS'     .'|'
              .'AC3'     .'|'
+             .'XViD'    .'|'
              .'internal'.'|'
              .'limited' .'|'
              .'proper'  .'|'
