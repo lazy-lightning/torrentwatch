@@ -1,7 +1,7 @@
 {
     appinfo_format="1",
     name="NMTDVR",
-    version="0.9.0-beta4",
+    version="0.9.0-beta5",
     enabled="1",
     crontab="20,50 * * * * #PATH#/crontab.sh",
     daemon_script="daemon.sh",
