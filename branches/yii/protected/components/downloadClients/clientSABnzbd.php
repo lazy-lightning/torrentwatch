@@ -2,7 +2,7 @@
 class clientSABnzbd extends BaseClient {
 
   function addByData($data) {
-    Yii::trace(__CLASS__."::".__FUNCTION);
+    Yii::trace(__CLASS__."::".__FUNCTION__);
     // Emulate submitting the add file box on the sabnzbd+ home page
     $be = new browserEmulator();
     $be->multiPartPost = true;
