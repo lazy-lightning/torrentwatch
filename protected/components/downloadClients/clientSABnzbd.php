@@ -1,23 +1,36 @@
 <?
-class clientSABnzbd extends BaseClient {
 
-  function addByData($data) {
-    Yii::trace(__CLASS__."::".__FUNCTION__);
-    // Emulate submitting the add file box on the sabnzbd+ home page
-    $be = new browserEmulator();
-    $be->multiPartPost = true;
-    $be->addPostData('nzbfile', array('filename'=>$this->manager->title.'.nzb', 'contents'=>$data));
-    $be->addPostData('cat', 'Default');
-    $be->addPostData('pp', '-1');
-    $result = $be->file_get_contents($this->config->baseApi.'addFile');
+class clientSABnzbd extends clientPostFile {
 
-    Yii::log($result, CLogger::LEVEL_INFO);
-    $successString = 'This resource resides temporarily at';
-    return substr($result, 0, strlen($successString)) == $successString ? True : False;
+  public $fileExtension = '.nzb';
+  public $successString = 'This resource resides temporarily at';
+
+  protected function checkResult($result)
+  {
+    return substr($result, 0, strlen($this->successString)) == $this->successString ? True : False;
   }
 
-  function getClassName() {
+  protected function getApi()
+  {
+    return $this->config->baseApi.'addFile';
+  }
+
+  function getClassName() 
+  {
     return __CLASS__;
+  }
+
+  protected function getFilePostName()
+  {
+    return 'nzbfile';
+  }
+
+  protected function getPostData() 
+  {
+    return array(
+        'cat'=>'Default',
+        'pp'=>'-1',
+    );
   }
 }
 
