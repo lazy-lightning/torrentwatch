@@ -8,13 +8,17 @@ class AjaxController extends BaseController
   /**
    * @var string specifies the default action to be 'list'.
    */
-  public $defaultAction='fullResponce';
+  public $defaultAction='fullResponse';
 
   /**
    * @var array valid favorite classes
    */
   private $favoriteWhitelist = array('favoriteTvShow', 'favoriteMovie', 'favoriteString');
-  protected $responce = array();
+
+  /**
+   * @var array response data to be passed to the view
+   */
+  protected $response = array();
 
   public function init()
   {
@@ -41,12 +45,12 @@ class AjaxController extends BaseController
   {
     return array(
 /*      array('allow',  // allow all users
-        'actions'=>array('fullResponce'),
+        'actions'=>array('fullResponse'),
         'users'=>array('*'),
       ), */
       array('allow', // allow authenticated user
         'actions'=>array(
-            'fullResponce', 'dlFeedItem', 'saveConfig', 'addFeed', 'addFavorite', 'updateFavorite', 
+            'fullResponse', 'dlFeedItem', 'saveConfig', 'addFeed', 'addFavorite', 'updateFavorite', 
             'inspect', 'clearHistory', 'createFavorite', 'deleteFavorite', 'loadFeedItems', 'resetData',
             'wizard',
         ),
@@ -70,8 +74,8 @@ class AjaxController extends BaseController
     if(is_numeric($id))
       return feedItem::model()->with('quality')->findByPk($id);
 
-    $this->responce['dialog']['error'] = true;
-    $this->responce['dialog']['content'] = self::ERROR_INVALID_ID;
+    $this->response['dialog']['error'] = true;
+    $this->response['dialog']['content'] = self::ERROR_INVALID_ID;
     return false;
   }
 
@@ -80,7 +84,7 @@ class AjaxController extends BaseController
    */
   public function actionAddFavorite()
   {
-    $this->responce['dialog']['header'] = 'Add Favorite';
+    $this->response['dialog']['header'] = 'Add Favorite';
 
     $feedItem = $this->loadFeedItem();
 
@@ -91,21 +95,21 @@ class AjaxController extends BaseController
 
       if($fav->save()) 
       {
-        $this->responce['dialog']['content'] = 'New favorite successfully saved';
+        $this->response['dialog']['content'] = 'New favorite successfully saved';
         $htmlId = $type.'-'.$fav->id;
       }
       else
       {
-        $this->responce['dialog']['error'] = true;
-        $this->responce['dialog']['content'] = 'Failure saving new favorite';
-        $this->responce[$type.'-'] = $fav;
+        $this->response['dialog']['error'] = true;
+        $this->response['dialog']['content'] = 'Failure saving new favorite';
+        $this->response[$type.'-'] = $fav;
       }
       // After save to get the correct id
-      $this->responce['showFavorite'] = '#'.$type.'-'.$fav->id;
-      $this->responce['showTab'] = "#".$type;
+      $this->response['showFavorite'] = '#'.$type.'-'.$fav->id;
+      $this->response['showTab'] = "#".$type;
     }
 
-    $this->actionFullResponce();
+    $this->actionFullResponse();
   }
 
   protected function findFavoriteType() 
@@ -117,8 +121,8 @@ class AjaxController extends BaseController
         return $item;
     }
 
-    $this->responce['dialog']['error'] = true;
-    $this->responce['dialog']['content'] = 'Unknown favorite type';
+    $this->response['dialog']['error'] = true;
+    $this->response['dialog']['content'] = 'Unknown favorite type';
     return false;
   }
 
@@ -136,14 +140,14 @@ class AjaxController extends BaseController
     $favorite->save();
     // Tell the view to bring up the changed favorite
     $htmlId = $class.'s-'.$favorite->id;
-    $this->responce[$htmlId] = $favorite;
-    $this->responce['showFavorite'] = "#".$class.'s-'.$favorite->id;
-    $this->responce['showTab'] = "#".$class."s";
+    $this->response[$htmlId] = $favorite;
+    $this->response['showFavorite'] = "#".$class.'s-'.$favorite->id;
+    $this->response['showTab'] = "#".$class."s";
   }
 
   public function actionCreateFavorite()
   {
-    $this->responce = array('dialog'=>array('header'=>'Create Favorite'));
+    $this->response = array('dialog'=>array('header'=>'Create Favorite'));
     $class = $this->findFavoriteType();
     if($class)
     {
@@ -151,12 +155,12 @@ class AjaxController extends BaseController
       $this->updateFavorite(new $class);
     }
 
-    $this->actionFullResponce();
+    $this->actionFullResponse();
   }
 
   public function actionUpdateFavorite()
   {
-    $this->responce = array('dialog'=>array('header'=>'Update Favorite'));
+    $this->response = array('dialog'=>array('header'=>'Update Favorite'));
     $class = $this->findFavoriteType();
 
     if($class && isset($_GET['id']) && is_numeric($_GET['id'])) 
@@ -168,26 +172,26 @@ class AjaxController extends BaseController
         $this->updateFavorite($favorite);
     }
 
-    $this->actionFullResponce();
+    $this->actionFullResponse();
   }
 
   public function actionAddFeed()
   {
-    $this->responce['dialog']['header'] = 'Add Feed';
+    $this->response['dialog']['header'] = 'Add Feed';
     if(isset($_POST['feed']))
     {
       $feed=new feed;
       $feed->attributes=$_POST['feed'];
       if($feed->save()) 
-        $this->responce['dialog']['content'] = 'Feed Added.  Status: '.$feed->statusText;
+        $this->response['dialog']['content'] = 'Feed Added.  Status: '.$feed->statusText;
       else
       {
-        $this->responce['activeFeed-'] = $feed;
-        $this->responce['showTab'] = '#feeds';
+        $this->response['activeFeed-'] = $feed;
+        $this->response['showTab'] = '#feeds';
       }
     }
 
-    $this->actionFullResponce();
+    $this->actionFullResponse();
 
   }
 
@@ -200,39 +204,41 @@ class AjaxController extends BaseController
 
   public function actionDeleteFeed()
   {
-    $this->responce['dialog']['header'] = 'Delete Feed';
+    $this->response['dialog']['header'] = 'Delete Feed';
 
     // Verify numeric input, dont allow delete of generic 'All' feeds(with !empty)
     if(!empty($_GET['id']) && is_numeric($_GET['id'])) {
       feed::model()->deleteByPk((integer)$_GET['id']);
-      $this->responce['dialog']['content'] = 'Your feed has been successfully deleted';
+      $this->response['dialog']['content'] = 'Your feed has been successfully deleted';
     }
 
-    $this->actionFullResponce();
+    $this->actionFullResponse();
   }
 
   public function actionDlFeedItem()
   {
-    $this->responce['dialog']['header'] = 'Download Feed Item';
+    $this->response['dialog']['header'] = 'Download Feed Item';
     
     $feedItem = $this->loadFeedItem();
 
     if($feedItem)
     {
       if(Yii::app()->dlManager->startDownload($feedItem, feedItem::STATUS_MANUAL_DL))
-        $this->responce['dialog']['content'] = $feedItem->title.' has been Started';
+        $this->response['dialog']['content'] = $feedItem->title.' has been Started';
       else
       {
-        $this->responce['dialog']['error'] = true;
-        $this->responce['dialog']['content'] = CHtml::errorSummary(Yii::app()->dlManager);
+        $this->response['dialog']['error'] = true;
+        $this->response['dialog']['content'] = CHtml::errorSummary(Yii::app()->dlManager);
       }
     } 
 
-    $this->render('dlResponce', array('responce' => $this->responce));
+    $this->render('dlResponse', array('response' => $this->response));
   }
 
-  public function actionFullResponce()
+  public function actionFullResponse()
   {
+    include 'clientSABnzbd.php';
+
     $app = Yii::app();
     $logger = Yii::getLogger();
     $startTime = microtime(true);
@@ -280,7 +286,7 @@ class AjaxController extends BaseController
 
     Yii::log('Database timing '.print_r($time, true), CLogger::LEVEL_PROFILE);
     Yii::log("pre-render: ".$logger->getExecutionTime()."\n", CLogger::LEVEL_PROFILE);
-    $this->render('fullResponce', array(
+    $this->render('fullResponse', array(
           'availClients'=>$availClients,
           'config'=>$config,
           'favoriteTvShows'=>$favoriteTvShows,
@@ -293,7 +299,7 @@ class AjaxController extends BaseController
           'others'=>$others,
           'qualitys'=>$qualitys,
           'queued'=>$queued,
-          'responce'=>$this->responce,
+          'response'=>$this->response,
           'tvEpisodes'=>$tvEpisodes,
     ));
     Yii::log("end controller: ".$logger->getExecutionTime()."\n", CLogger::LEVEL_PROFILE);
@@ -341,7 +347,7 @@ class AjaxController extends BaseController
   public function actionResetData()
   {
     $whiteList = array('all', 'media', 'feedItems');
-    $this->responce = array('dialog'=>array('header'=>'Reset Data'));
+    $this->response = array('dialog'=>array('header'=>'Reset Data'));
 
     if(isset($_GET['type']) && in_array($_GET['type'], $whiteList))
     {
@@ -352,11 +358,12 @@ class AjaxController extends BaseController
         switch($type)
         {
         case 'all':
-          foreach(array('feedItem', 'feedItem_quality', 'history', 'movie', 'movie_genre', 'other', 'tvEpisode', 'tvShow') as $class) 
+          foreach(array('feedItem', 'feedItem_quality', 'history', 'movie', 'movie_genre', 'other', 'tvEpisode') as $class) 
           {
             $model = new $class;
             $model->deleteAll();
           }
+          tvShow::model()->deleteAll('id NOT IN (SELECT tvShow_id from favoriteTvShows)');
           break;
         case 'media':
           movie::model()->updateAll(array('status'=>movie::STATUS_NEW));
@@ -383,12 +390,13 @@ class AjaxController extends BaseController
       }
 
       Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NEW);
+      $this->response = 'Reset has been successfull';
     }
-    $this->actionFullResponce();
+    $this->actionFullResponse();
   }
   public function actionSaveConfig()
   {
-    $this->responce = array('dialog'=>array('header'=>'Save Configuration'));
+    $this->response = array('dialog'=>array('header'=>'Save Configuration'));
 
     $config = Yii::app()->dvrConfig;
     Yii::log(print_r($_POST, TRUE));
@@ -411,27 +419,26 @@ class AjaxController extends BaseController
     // Should add some sort of validation in the dvrConfig class
     if($config->save()) 
     {
-      $this->responce['dialog']['content'] = 'Configuration successfully saved';
+      $this->response['dialog']['content'] = 'Configuration successfully saved';
     }
     else
     {
-      $this->responce['dialog']['error'] = True;
-      $this->responce['dialog']['content'] = 'There was an error saving the configuration';
+      $this->response['dialog']['error'] = True;
+      $this->response['dialog']['content'] = 'There was an error saving the configuration';
     }
 
-    $this->actionFullResponce();
+    $this->actionFullResponse();
   }
 
   public function actionWizard()
   {
-    $this->responce = array('dialog'=>array('header'=>'Initial Configuration', 'content'=>''));
+    $this->response = array('dialog'=>array('header'=>'Initial Configuration', 'content'=>''));
 
     if(isset($_POST['dvrConfig']))
     {
       $config = Yii::app()->dvrConfig;
-      Yii::log('Saving initial config '.print_r($_POST['dvrConfig'], true), CLogger::LEVEL_INFO);
       $config->attributes = $_POST['dvrConfig'];
-      $this->responce['dialog']['content'] .= ($config->save() ? 'Saved configuration' : 'Failed saving configuration').'<br>';
+      $this->response['dialog']['content'] .= ($config->save() ? 'Saved configuration' : 'Failed saving configuration').'<br>';
     }
 
     if(isset($_POST['feed']))
@@ -444,14 +451,14 @@ class AjaxController extends BaseController
           $feed = new feed;
           $feed->url = $_POST['feed'][$key];
           $feed->downloadType = $type;
-          $this->responce['dialog']['content'] .= ($feed->save() ? "Saved feed {$feed->title}" : "Failed saving feed {$feed->url}").'<br>';
+          $this->response['dialog']['content'] .= ($feed->save() ? "Saved feed {$feed->title}" : "Failed saving feed {$feed->url}").'<br>';
        }
       }
     }
 
-    if(empty($this->responce['dialog']['content']))
-      $this->responce['dialog']['content'] = 'No valid attributes passed to wizard';
-    $this->actionFullResponce();
+    if(empty($this->response['dialog']['content']))
+      $this->response['dialog']['content'] = 'No valid attributes passed to wizard';
+    $this->actionFullResponse();
   }
 
   private function prepareFeedItems($table, $before = null) 
@@ -503,7 +510,7 @@ class AjaxController extends BaseController
   }
 
   public function actionDeleteFavorite() {
-    $this->responce = array('dialog'=>array('header'=>'Delete Favorite'));
+    $this->response = array('dialog'=>array('header'=>'Delete Favorite'));
 
     if(isset($_GET['id'], $_GET['type']) && is_numeric($_GET['id']) && in_array($_GET['type'], $this->favoriteWhitelist))
     {
@@ -530,16 +537,16 @@ class AjaxController extends BaseController
         // Reset feedItem status on anything this was matching, then rerun matching routine incase something else matches the reset items
         feedItem::model()->updateByPk($ids, array('status'=>feedItem::STATUS_NEW));
         Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NEW);
-        $this->responce['dialog']['content'] = 'Your favorite has been successfully deleted';
+        $this->response['dialog']['content'] = 'Your favorite has been successfully deleted';
       } 
       else 
       {
-        $this->responce['dialog']['content'] = 'That favorite does not exist ?';
-        $this->responce['dialog']['error'] = True;
+        $this->response['dialog']['content'] = 'That favorite does not exist ?';
+        $this->response['dialog']['error'] = True;
       }
     }
 
-    $this->actionFullResponce();
+    $this->actionFullResponse();
   }
 
 }

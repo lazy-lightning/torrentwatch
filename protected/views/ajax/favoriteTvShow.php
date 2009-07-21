@@ -3,8 +3,8 @@
           array($favorite->isNewRecord ? 'createFavorite' : 'updateFavorite', 'id'=>$favorite->id), 
           'post', array('class'=>'favinfo', 'id'=>$htmlId)
       );
-      if(isset($responce[$htmlId])) {
-        $favorite = $responce[$htmlId];
+      if(isset($response[$htmlId])) {
+        $favorite = $response[$htmlId];
         echo CHtml::errorSummary($favorite);
 //        echo '<pre>';var_dump($favorite);echo '</pre>';
       } ?>

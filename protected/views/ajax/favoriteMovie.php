@@ -1,6 +1,6 @@
 <?php echo CHtml::beginForm(array(($favorite->isNewRecord ? 'create' : 'update').'Favorite', 'id'=>$favorite->id), 'post', array('class'=>'favinfo', 'id'=>'favoriteMovies-'.$favorite->id));
-      if(isset($responce['favoriteMovies-'.$favorite->id])) {
-        $favorite = $responce['favoriteMovies-'.$favorite->id];
+      if(isset($response['favoriteMovies-'.$favorite->id])) {
+        $favorite = $response['favoriteMovies-'.$favorite->id];
         echo CHtml::errorSummary($favorite);
       } ?>
  <div class="favorite_name">
