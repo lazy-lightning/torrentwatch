@@ -156,6 +156,7 @@ class downloadManager extends favoriteManager {
     return array(
         feedItem::TYPE_TORRENT => array(
             'clientBTPD'     => 'BTPD',
+            'clientCTorrent' => 'CTorrent w/DCTCS',
             'clientTrans122' => 'Transmission 1.22',
             'clientTransRPC' => 'Transmission >= 1.3',
             'clientFolder'   => 'Save to Folder',

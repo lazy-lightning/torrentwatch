@@ -5,6 +5,7 @@ abstract class clientPostFile extends BaseClient {
   public $fileExtension = '';
 
   /**
+   * @param string result page returned from http post
    * @return boolean true if file was successfully started
    */
   abstract protected function checkResult($result);
@@ -30,6 +31,7 @@ abstract class clientPostFile extends BaseClient {
 
   /**
    * Starts a download using HTTP POST
+   * @param string data of the file to be posted
    * @return boolean was the download successfully started
    */
   function addByData($data) {
@@ -46,7 +48,6 @@ abstract class clientPostFile extends BaseClient {
     ));
     $result = $be->file_get_contents($this->getApi());
 
-    Yii::log($result, CLogger::LEVEL_INFO);
     return $this->checkResult($result);
   }
 
