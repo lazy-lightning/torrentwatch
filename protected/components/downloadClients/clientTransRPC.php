@@ -3,9 +3,11 @@
 class clientTransRPC extends BaseClient {
 
   /**
-   * @var browserEmulator an instance configured for communicating with transmission
+   * @var browserEmulator an instance configured for communicating via json
    */
   private $_be = null;
+
+  public $successWhitelist = array('success', 'duplicate torrent');
 
   /**
    * @param contents of a .torrent file to be added to transmission
@@ -22,7 +24,7 @@ class clientTransRPC extends BaseClient {
             ),
     )));
 
-    $response = $this->getTransmissionResponse($be);
+    $response = $this->getJsonResponse($be);
 
     return $this->checkResponse($response);
   }
@@ -33,7 +35,7 @@ class clientTransRPC extends BaseClient {
    */
   function checkResponse($response)
   {
-    if(isset($response->result) AND ($response->result == 'success' or $response->result == 'duplicate torrent'))
+    if(isset($response->result) && in_array($response->result, $this->successWhitelist))
       return True;
 
     if(isset($response->result))
@@ -83,7 +85,7 @@ class clientTransRPC extends BaseClient {
    * @param browserEmulator instance fully configured with post data to query transmission
    * @return mixed response from transmission
    */
-  function getTransmissionResponse($be)
+  function getJsonResponse($be)
   {
     $api = $this->getApi();
     $response = $be->file_get_contents($api);
