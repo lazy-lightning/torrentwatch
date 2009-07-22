@@ -320,7 +320,7 @@ $(function() {
                 },
                 'startDownloading': function(t) {
                     url = 'nmtdvr.php?r=ajax/dlFeedItem&feedItem_id='+$(t).find(".itemId").val();
-                    $.get(url); // Should make a response and do something with it
+                    $.get(url, '', $.loadDynamicData, 'html');
                 },
                 'inspect': function(t) {
                     $.get('nmtdvr.php', 'r=ajax/inspect&feedItem_id='+$(t).find(".itemId").val()+'&title='+
