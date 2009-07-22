@@ -112,7 +112,7 @@
       <div class="activeFeed">
         <?php echo CHtml::beginForm(array('addFeed'), 'post', array('class'=>'feedform')); ?>
           <a class="submitForm button" id="Add" href="#">Add</a>
-          <?php echo CHtml::errorSummary($feed); ?>
+          <?php if($feed->hasErrors()) echo CHtml::errorSummary($feed); ?>
           <div>
             <label class="item">New Feed</label>
             <?php echo CHtml::dropDownList('feed[downloadType]', $feed->downloadType, array(feedItem::TYPE_NZB=>'NZB', feedItem::TYPE_TORRENT=>'Torrent')); ?>
