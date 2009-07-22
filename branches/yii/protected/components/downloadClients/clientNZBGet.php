@@ -1,6 +1,6 @@
 <?php
 
-class clientNzbGet extends clientExecutable {
+class clientNZBGet extends clientExecutable {
 
   public function addByData($data) {
     $filename = $this->saveTemp($data);
