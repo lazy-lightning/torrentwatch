@@ -232,7 +232,7 @@ class AjaxController extends BaseController
       }
     } 
 
-    $this->render('dlResponse', array('response' => $this->response));
+    $this->actionFullResponse();
   }
 
   public function actionFullResponse()
