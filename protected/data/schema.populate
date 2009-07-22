@@ -19,8 +19,8 @@ INSERT INTO dvrConfigCategory (id, title) VALUES(7,'clientSABnzbd');
 
 -- Global Options
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('client','clientFolder',NULL);
-INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('downloadDir','/home/xbmc/NZB/',NULL);
-INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('watchDir','/home/xbmc/',NULL);
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('downloadDir','/share/Download/',NULL);
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('watchDir','/share/',NULL);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('saveFile',1,NULL);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('tempDir','/tmp',NULL);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('feedItemLifetime',7,NULL);
