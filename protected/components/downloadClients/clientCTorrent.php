@@ -5,16 +5,17 @@ class clientCTorrent extends clientPostFile
 
   private $_auth;
 
+  public $successResponse = 'FILE UPLOADED';
+
   protected function checkResult($result)
   {
-    return True; // Not sure yet how to test
+    return trim($result) === $this->successResponse;
   }
 
   protected function getApi()
   {
-    $paused = $this->config->startPaused;
     $auth = $this->getAuth();
-    return $this->config->baseApi.'/upload?'.$auth.'?'.$paused;
+    return rtrim($this->config->baseApi, '/')."/upload?{$auth}?{$this->config->startPaused}";
   }
 
   /**
@@ -22,17 +23,22 @@ class clientCTorrent extends clientPostFile
    */
   protected function getAuth()
   {
-    if(!empty($this->_auth))
+    if(empty($this->_auth))
     {
       $be = new browserEmulator();
       $be->customHttp = 'AUTH';
-      $challenge = $be->file_get_contents($this->config->baseApi.'?0');
-      $this->_auth = md5($this->config->username.trim($challenge).$this->config->password)
+      $challenge = trim($be->file_get_contents($this->config->baseApi.'0'));
+      Yii::log('CTorrent challenge: '.$challenge, CLogger::LEVEL_INFO);
+      $response = md5($this->config->username.$challenge.$this->config->password);
+      Yii::log('Our Response: '.$response, CLogger::LEVEL_INFO);
+      $cookie = trim($be->file_get_contents($this->config->baseApi.'1?'.$response));
+      Yii::log('CTorrent auth: '.$cookie, CLogger::LEVEL_INFO);
+      $this->_auth = $cookie;
     }
     return $this->_auth;
   }
 
-  protected function getClassName()
+  public function getClassName()
   {
     return __CLASS__;
   }
