@@ -5,8 +5,8 @@ class clientNZBGet extends clientExecutable {
   public function addByData($data) {
     $filename = $this->saveTemp($data);
 
-    $this->execClient(
-        '-c '.escapeshellarg($this->client->nzbgetConf).' -A '.escapeshellarg($filename)
+    return $this->execClient(
+        '-c '.escapeshellarg($this->config->nzbgetConf).' -A '.escapeshellarg($filename)
     );
   }
 
