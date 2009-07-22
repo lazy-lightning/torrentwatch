@@ -9,7 +9,7 @@ abstract class clientExecutable extends BaseClient {
     return $filename;
   }
 
-  function execClient($cmd, $options) {
+  function execClient($options) {
     $cmd = $this->config->executable;
     if(!file_exists($cmd)) {
       $this->_error = "client executable does not exist: $cmd";
@@ -20,6 +20,7 @@ abstract class clientExecutable extends BaseClient {
       return False;
     }
 
+    Yii::log(__CLASS__." running: $cmd $options", CLogger::LEVEL_ERROR);
     exec($cmd.' '.$options, $output, $return);
     if($return == 0)
       return True;

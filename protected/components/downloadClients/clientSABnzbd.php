@@ -1,4 +1,4 @@
-<?
+<?php
 
 class clientSABnzbd extends clientPostFile {
 
