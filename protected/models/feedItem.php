@@ -304,7 +304,7 @@ class feedItem extends ARwithQuality
     if($itemType === null || get_class($itemType) === 'other')
     {
       $fav = new favoriteString;
-      $fav->filter = $fav->name = $feedItem->title;
+      $fav->filter = $fav->name = $this->title;
     }
     else
     {
