@@ -200,7 +200,7 @@ class titleMatchDefault extends titleMatch
   {
     Yii::log('no match, strip quality');
     // No match, just strip everything after the quality
-    $shortTitle = preg_replace("/{qualityMatch::$qual_reg}.*/i", "", $this->title);
+    $shortTitle = preg_replace("/".qualityMatch::$qual_reg.".*/i", "", $title);
     return array($shortTitle, 0, 0);
   }
 }
