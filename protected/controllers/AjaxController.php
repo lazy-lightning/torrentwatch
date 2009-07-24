@@ -388,7 +388,7 @@ class AjaxController extends BaseController
       }
 
       Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NEW);
-      $this->response = 'Reset has been successfull';
+      $this->response['dialog']['content'] = 'Reset has been successfull';
     }
     $this->actionFullResponse();
   }
