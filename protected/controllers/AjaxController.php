@@ -237,8 +237,6 @@ class AjaxController extends BaseController
 
   public function actionFullResponse()
   {
-    include 'clientSABnzbd.php';
-
     $app = Yii::app();
     $logger = Yii::getLogger();
     $startTime = microtime(true);
