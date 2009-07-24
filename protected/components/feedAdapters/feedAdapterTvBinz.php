@@ -12,7 +12,7 @@ class feedAdapterTvBinz extends feedAdapter
   }
 }
 
-class tvBinzItem extends SimplePie_Item 
+class tvBinzItem extends feedAdapter_Item 
 {
   function get_title()
   {
