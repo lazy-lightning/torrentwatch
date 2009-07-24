@@ -84,8 +84,8 @@ abstract class titleMatch {
 
       // Convert . and _ to spaces, and trim result
       $shortTitle = trim(strtr(str_replace("'", "&#39;", $shortTitle), $this->trFrom, $this->trTo));
-      // Remove any marking of a second or third posting of an item
-      $shortTitle = trim(preg_replace('/\([23]\)/', '', $shortTitle));
+      // Remove any marking of a second or third posting from the end of an item
+      $shortTitle = trim(preg_replace('/\([23]\)$/', '', $shortTitle));
   
       // Custom handling for a few networks that show up as 'Foo.Channel.Show.Title.S02E02.Bar-ASDF'
       if(preg_match('/^([a-zA-Z]+\bchannel)\b(.*)/i', $shortTitle, $regs))
@@ -116,7 +116,6 @@ class titleMatchFull extends titleMatch
     Yii::log('episode match'.print_r($regs, TRUE));
     $shortTitle = trim($regs[1]);
     $episode_guess = trim(strtr($regs[2], $this->trFrom, $this->trTo));
-    // if match was a date season will receive it, guaranteed no x in the date from previous regexp so episode will be empty
     list($season,$episode) = explode('x', preg_replace('/(S(\d+) ?E(\d+)|(\d+)x(\d+)|(\d+) ?of ?(\d+))/i', '\2\4\6x\3\5\7', $episode_guess));
 
     return array($shortTitle, $season, $episode);
