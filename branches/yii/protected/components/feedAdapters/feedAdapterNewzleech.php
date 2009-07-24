@@ -29,7 +29,7 @@ class feedAdapterNewzleech extends feedAdapter {
           $minSize = 2;
         }
       }
-      preg_match('/Size: (\d+)(?:.\d+)? (KB|MB|GB)/', $item->get_description(), $regs);
+      preg_match('/Size: (\d+)(?:,\d+)? (KB|MB|GB)/', $item->get_description(), $regs);
       $type = $types[$regs[2]];
       if($type > $minType  || ($type == $minType && $regs[1] > $minSize)) 
         $out[] = $item;
