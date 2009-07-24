@@ -8,6 +8,7 @@ class feedAdapterRouter {
   static protected $adapters = array(
       // Class name                url regexp
       'feedAdapterNewzleech'  => '/newzleech.com/i',
+      'feedAdapterTvBinz'     => '/tvbinz.net/i',
   );
 
   static public function getAdapter($feed) {
