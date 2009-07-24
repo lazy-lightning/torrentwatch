@@ -360,6 +360,10 @@ ul li.torrent.match_New {
   background: transparent url('../images/nuvola_ledsprites.png') no-repeat -9px -187px;
   }
 
+ul li.torrent.hasDuplicates {
+  cursor: pointer;
+  }
+
 ul li.torrent.hasDuplicates.open {
   background-image: none !important;
   }
@@ -709,6 +713,7 @@ div#history ul li {
   overflow: hidden;
   font-size: 0.9em;
   min-height: 22px;
+  cursor: pointer
   }
 
 div#history ul li.alt {
