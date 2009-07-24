@@ -131,10 +131,8 @@ class feedItem extends ARwithQuality
   }
       
   public function beforeValidate($type) {
-    $this->lastUpdated = time();
-
     if($this->isNewRecord) {
-      list($shortTitle, $quality, $season, $episode, $network) = $this->detectTitleParams();
+      list($shortTitle, $season, $episode, $network, $quality) = mediaTitleParser::detect($this->title);
   
       if(!empty($network))
         $this->network_id = factory::networkByTitle($network)->id;
@@ -158,140 +156,6 @@ class feedItem extends ARwithQuality
       }
     }
     return parent::beforeValidate($type);
-  }
-
-  protected function detectTitleParams() {
-    // strtr values
-    $from = "._-";
-    $to = "   ";
-    // Series Title
-    $title_reg =
-           '^([^-\(]+)' // Series title: string not including - or (
-          .'(?:.+)?'; // Episode title: optinal, length is determined by the episode match
-    // Episode
-    $episode_reg =
-           '\b('  // must be a word boundry before the episode to prevent turning season 13 into season 3
-          .'S\d+[. _]?E\d+'.'|'  // S12E1 or S1.E22 or S4 E1
-          .'\d+x\d+' .'|'  // 1x23
-          .'\d+[. ]?of[. ]?\d+'  // 03of18
-          .')';
-    $episode_reg2 = '\b([SE])(\d+)\b';
-    $episode_reg3 = '\b(0?\d\d\d)\b..'; // three digits (four hits movie years, optional 0 to catch single digit season) with a 
-                                        // word boundry on each side, ex: some.show.402.hdtv
-                                        // with at least some data after it to not match a group name at the end
-    $episode_reg4 =
-           '\b('
-          .'\d\d\d\d[- ._]\d\d[- _.]\d\d'.'|' // 2008-03-23
-          .'\d\d[- _.]\d\d[- _.]\d\d\d\d'.'|' // 03.23.2008
-          .'\d\d[- _.]\d\d[- _.]\d\d'         // 03 23 08 
-          .')';
-
-    // Possible Qualitys
-    $qual_reg ='(DVB' .'|'
-             .'720p'   .'|'
-             .'DSR(ip)?|'
-             .'DVBRip'  .'|'
-             .'DVDR(ip)?|'
-             .'DVDScr'  .'|'
-             .'HR.HDTV' .'|'
-             .'HDTV'    .'|'
-             .'HR.PDTV' .'|'
-             .'PDTV'    .'|'
-             .'SatRip'  .'|'
-             .'SVCD'    .'|'
-             .'TVRip'   .'|'
-             .'WebRip'  .'|'
-             .'WS'      .'|'
-             .'1080i'   .'|'
-             .'1080p'   .'|'
-             .'DTS'     .'|'
-             .'AC3'     .'|'
-             .'XViD'    .'|'
-             .'internal'.'|'
-             .'limited' .'|'
-             .'proper'  .'|'
-             .'repack'  .'|'
-             .'subbed'  .'|'
-             .'x264'    .'|'
-             .'Blue?Ray)';
- 
-    $quality = array('Unknown');
-    if(preg_match_all("/$qual_reg/i", $this->title, $qregs)) {
-      // if 720p and hdtv strip hdtv to make hdtv more unique
-      $q = array_change_key_case(array_flip($qregs[1]));
-      if(isset($q['720p'], $q['hdtv'])) {
-        unset($qregs[1][$q['hdtv']]);
-      }
-      $quality = $qregs[1];
-    }
-
-    Yii::log($this->title);
-    $network = null;
-    if(preg_match("/$title_reg$episode_reg/i", $this->title, $regs)) 
-    {
-      Yii::log('episode match'.print_r($regs, TRUE));
-      $shortTitle = trim($regs[1]);
-      $episode_guess = trim(strtr($regs[2], $from, $to));
-      // if match was a date season will receive it, guaranteed no x in the date from previous regexp so episode will be empty
-      list($season,$episode) = explode('x', preg_replace('/(S(\d+) ?E(\d+)|(\d+)x(\d+)|(\d+) ?of ?(\d+))/i', '\2\4\6x\3\5\7', $episode_guess));
-    }
-    elseif(preg_match("/$title_reg$episode_reg4/i", $this->title, $regs))
-    {
-      Yii::log('date based episode '.print_r($regs, TRUE));
-      // Item is a date based episode
-      $shortTitle = trim($regs[1]);
-
-      // Use UTC for strtotime measurements
-      $tz = date_default_timezone_get();
-      date_default_timezone_set('UTC');
-      $date = strtotime(str_replace(' ', '/', trim(strtr($regs[2], $from, $to))));
-      date_default_timezone_set($tz);
-
-      $season = 0;
-      $episode = (integer) $date; // cast false to 0
-
-      // strtotime failed, append given date to title
-      if($date === False)
-        $shortTitle .= ' '.$season;
-      Yii::log("season: $season episode: $episode shortTitle: $shortTitle");
-    }
-    elseif(preg_match("/$title_reg$episode_reg2/i", $this->title, $regs))
-    {
-      Yii::log('episode or season, not both'.print_r($regs, TRUE));
-      // only episode or season, not both
-      $shortTitle = trim($regs[1]);
-      $season  = $regs[2] == 'S' ? trim($regs[3]) : 1;
-      $episode = $regs[2] == 'E' ? trim($regs[3]) : 0;
-    }
-    elseif(preg_match("/$title_reg$episode_reg3/i", $this->title, $regs)) 
-    {
-      Yii::log('3 digit season/episode identifier'.print_r($regs, TRUE));
-      // 3 digit season/episode identifier
-      $shortTitle = trim($regs[1]);
-      $episode_guess = $regs[2];
-      $episode = substr($episode_guess, -2);
-      $season = ($episode_guess-$episode)/100;
-    } 
-    else 
-    {
-      Yii::log('no match, strip quality');
-      // No match, just strip everything after the quality
-      $shortTitle = preg_replace("/$qual_reg.*/i", "", $this->title);
-      $season = $episode = 0;
-    }
-    // Convert . and _ to spaces, and trim result
-    $shortTitle = trim(strtr(str_replace("'", "&#39;", $shortTitle), $from, $to));
-    // Remove any marking of a second or third posting of an item
-    $shortTitle = trim(preg_replace('/\([23]\)/', '', $shortTitle));
-
-    // Custom handling for a few networks that show up as 'Foo.Channel.Show.Title.S02E02.Bar-ASDF'
-    if(preg_match('/^([a-zA-Z]+\bchannel)\b(.*)/i', $shortTitle, $regs))
-    {
-      $network = $regs[1];
-      $shortTitle = $regs[2];
-    }
-
-    return array($shortTitle, $quality, $season, $episode, $network);
   }
 
   /**
