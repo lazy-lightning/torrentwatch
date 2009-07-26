@@ -101,12 +101,4 @@ class SiteController extends BaseController
     $this->redirect(Yii::app()->homeUrl);
   }
 
-  public function actionTest()
-  {
-    $a = array(1,2,3,4,5,6,7,8,9);
-
-    $s = "('".implode("', '", $a)."')";
-    var_dump($s);
-
-  }
 }
