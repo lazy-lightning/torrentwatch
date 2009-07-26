@@ -137,23 +137,23 @@ class titleMatchDate extends titleMatch
   function foundMatch($title, $regs)
   {
     Yii::log('date based episode '.print_r($regs, TRUE));
-    // Item is a date based episode
     $shortTitle = trim($regs[1]);
 
-    // Use UTC for strtotime measurements
-    $tz = date_default_timezone_get();
-    date_default_timezone_set('UTC');
-    $date = strtotime(str_replace(' ', '/', trim(strtr($regs[2], $this->trFrom, $this->trTo))));
-    date_default_timezone_set($tz);
+    $cleanDate = str_replace(' ', '/', trim(strtr($regs[2], $this->trFrom, $this->trTo)));
+    // Use UTC for time measurements
+    try
+    {
+      $date = new DateTime($cleanDate, 'UTC');
+      $episode = $date->getTimestamp();
+    }
+    catch (Exception $e)
+    {
+      $episode = 0
+      $shortTitle .= ' '.$regs[2];
+    }
 
-    $season = 0;
-    $episode = (integer) $date; // cast false to 0
-
-    // strtotime failed, append given date to title
-    if($date === False)
-      $shortTitle .= ' '.$season;
     Yii::log("season: $season episode: $episode shortTitle: $shortTitle");
-    return array($shortTitle, $season, $episode);
+    return array($shortTitle, 0, $episode);
   }
 }
 
