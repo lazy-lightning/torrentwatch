@@ -85,7 +85,8 @@ class tvEpisode extends CActiveRecord
   /**
    * @return favoriteMovie a favoriteMovie object to match this movie
    */
-  public function generateFavorite($feedItem) {
+  public function generateFavorite($feedItem) 
+  {
     $fav = new favoriteTvShow;
     $fav->tvShow_id = $this->tvShow_id;
     $fav->onlyNewer = 1;
@@ -95,9 +96,13 @@ class tvEpisode extends CActiveRecord
   /**
    * @return string a string representation of this records episode
    */
-  public function getEpisodeString($empty = TRUE) {
-    if($this->episode > 10000)
-      return date('Y-m-d', $this->episode);
+  public function getEpisodeString($empty = TRUE) 
+  {
+    if($this->episode > 10000) 
+    {
+      $date = new DateTime($this->episode, 'UTC');
+      return $date->format('Y-m-d')
+    }
     elseif($this->season > 0 && $this->episode == 0)
       return sprintf('S%02dE??', $this->season);
     else 
