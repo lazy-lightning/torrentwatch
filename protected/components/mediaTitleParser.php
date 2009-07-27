@@ -7,22 +7,23 @@ class mediaTitleParser {
     'Date',
     'Partial',
     'Short',
-    'Default',
   );
 
   static public function detect($title)
   {
+    list($shortTitle, $quality) = qualityMatch::run($title);
+
     foreach(self::getMatchers() as $matcher)
     {
-      $result = $matcher->run($title);
+      $result = $matcher->run($shortTitle);
       if($result)
       {
-        $result[] = qualityMatch::run($title);
+        $result[] = $quality;
         return $result;
       }
     }
 
-    return null; // shouldn't happen, default matcher catches all
+    return array($shortTitle, 0, 0, '', $quality);
   }
 
   static public function getMatchers()
@@ -54,8 +55,11 @@ class qualityMatch {
         unset($regs[1][$q['hdtv']]);
       }
       $quality = $regs[1];
+      $shortTitle = preg_replace("/".qualityMatch::$qual_reg.".*/i", "", $title);
     }
-    return $quality;
+    else
+      $shortTitle = $title;
+    return array($shortTitle, $quality);
   }
 }
 
@@ -116,7 +120,7 @@ class titleMatchFull extends titleMatch
     Yii::log('episode match'.print_r($regs, TRUE));
     $shortTitle = trim($regs[1]);
     $episode_guess = trim(strtr($regs[2], $this->trFrom, $this->trTo));
-    list($season,$episode) = explode('x', preg_replace('/(S(\d+) ?E(\d+)|(\d+)x(\d+)|(\d+) ?of ?(\d+))/i', '\2\4\6x\3\5\7', $episode_guess));
+    list($season,$episode) = explode('x', preg_replace('/(S(\d+)[. _]?E(\d+)|(\d+)x(\d+)|(\d+)[. _]?of[. _]?(\d+))/i', '\2\4\6x\3\5\7', $episode_guess));
 
     return array($shortTitle, $season, $episode);
   }
@@ -143,16 +147,15 @@ class titleMatchDate extends titleMatch
     // Use UTC for time measurements
     try
     {
-      $date = new DateTime($cleanDate, 'UTC');
-      $episode = $date->getTimestamp();
+      $date = new DateTime($cleanDate, new DateTimeZone('UTC'));
+      $episode = $date->format('U');
     }
     catch (Exception $e)
     {
-      $episode = 0
+      $episode = 0;
       $shortTitle .= ' '.$regs[2];
     }
 
-    Yii::log("season: $season episode: $episode shortTitle: $shortTitle");
     return array($shortTitle, 0, $episode);
   }
 }
@@ -190,19 +193,4 @@ class titleMatchShort extends titleMatch
     return array($shortTitle, $season, $episode);
   }
 }
-
-class titleMatchDefault extends titleMatch
-{
-  public $title_reg = '.';
-  public $episode_reg = '';
-
-  function foundMatch($title, $regs)
-  {
-    Yii::log('no match, strip quality');
-    // No match, just strip everything after the quality
-    $shortTitle = preg_replace("/".qualityMatch::$qual_reg.".*/i", "", $title);
-    return array($shortTitle, 0, 0);
-  }
-}
-
 
