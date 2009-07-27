@@ -462,13 +462,16 @@ class AjaxController extends BaseController
   private function prepareFeedItems($table, $before = null) 
   {
     $table = $table.'FeedItem';
+    $group = 'feedItem_title';
+    $attrs = 'feed_title, feedItem_status, feedItem_description, feedItem_id, feedItem_title, feedItem_pubDate ';
+
     $db = Yii::app()->db;
     $config = Yii::app()->dvrConfig;
 
     // First get a listing if the first group of items, and put them in an array indexed by title
     $db->createCommand(
         'CREATE TEMP TABLE prepareItems AS '.
-        'SELECT feed_title, feedItem_status, feedItem_description, feedItem_id, feedItem_title, feedItem_pubDate '.
+        'SELECT '.$attrs.
         '  FROM '.$table.
         ($before === null ? '': ' WHERE feedItem_pubDate < '.$before).
         ' LIMIT '.($config->webItemsPerLoad*2)
@@ -477,13 +480,13 @@ class AjaxController extends BaseController
     $items = array();
     foreach($reader as $row) 
     {
-      $items[$row['feedItem_title']][] = $row;
+      $items[$row[$group]][] = $row;
     }
     // Then get a listing with a group by clause on the title to get distinct titles, and a count to let us know when
     // to look for extras in the first array
-    $sql= 'SELECT count(*) as count, * '.
+    $sql= 'SELECT count(*) as count, '.$attrs.
           '  FROM prepareItems'.
-          ' GROUP BY feedItem_title'.
+          ' GROUP BY '.$group.
           ' ORDER BY feedItem_pubDate DESC'.
           ' LIMIT '.$config->webItemsPerLoad;
     $reader = $db->createCommand($sql)->query();
@@ -494,7 +497,7 @@ class AjaxController extends BaseController
         $output[] = $row;
       else {
         // use reference to prevent making aditional copy of array on sort
-        $data =& $items[$row['feedItem_title']];
+        $data =& $items[$row[$group]];
         usort($data, array($this, 'cmpItemStatus'));
         $output[] = $data;
       }
@@ -503,7 +506,7 @@ class AjaxController extends BaseController
     return $output;
   }
 
-  public static function cmpItemStatus($a, $b) {
+  public function cmpItemStatus($a, $b) {
     return($a['feedItem_status'] < $b['feedItem_status']);
   }
 
