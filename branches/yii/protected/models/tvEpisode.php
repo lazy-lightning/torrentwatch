@@ -100,8 +100,9 @@ class tvEpisode extends CActiveRecord
   {
     if($this->episode > 10000) 
     {
-      $date = new DateTime($this->episode, 'UTC');
-      return $date->format('Y-m-d')
+      $date = new DateTime('Jan 1 1970', new DateTimeZone('UTC'));
+      $date->modify('+'.$this->episode.' secconds');
+      return $date->format('Y-m-d');
     }
     elseif($this->season > 0 && $this->episode == 0)
       return sprintf('S%02dE??', $this->season);
