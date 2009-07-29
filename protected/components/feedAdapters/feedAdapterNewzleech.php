@@ -13,7 +13,7 @@ class feedAdapterNewzleech extends feedAdapter {
   {
     $items = parent::get_items($start, $end);
     $out = array();
-    $types = array('KB'=>1, 'MB'=>2, 'GB'=>3);
+    $types = array('Byte'=>0, 'KB'=>1, 'MB'=>2, 'GB'=>3);
 
     foreach($items as $item) {
       $minSize = '100';
@@ -29,10 +29,16 @@ class feedAdapterNewzleech extends feedAdapter {
           $minSize = 2;
         }
       }
-      preg_match('/Size: (\d+)(?:,\d+)? (KB|MB|GB)/', $item->get_description(), $regs);
-      $type = $types[$regs[2]];
-      if($type > $minType  || ($type == $minType && $regs[1] > $minSize)) 
-        $out[] = $item;
+      if(preg_match('/Size: (\d+)(?:,\d+)? (Byte|KB|MB|GB)/', $item->get_description(), $regs))
+      {
+        $type = $types[$regs[2]];
+        if($type > $minType  || ($type == $minType && $regs[1] > $minSize)) 
+          $out[] = $item;
+      }
+      else
+      {
+        Yii::log('could not find size in newzleech description: '.$item->get_description(), CLogger::LEVEL_ERROR);
+      }
     }
 
     return $out;
