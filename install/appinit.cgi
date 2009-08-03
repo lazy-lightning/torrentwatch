@@ -37,6 +37,58 @@
 #       Ger Teunis: Renamed the script from .sh to .cgi and .appinfo folder to Appinfo
 #                   this will allow the script being called by sybhttpd
 #
+#   Version 0.8
+#       Ger Teunis: A lot of work has been done in fintuning the installation experience
+#
+#   Version 0.9
+#       Ger Teunis: Refactoring and finetuning, needs more testing though.
+#
+#   Version 1.0
+#       Ger Teunis: Added some more error messages
+#
+#   Version 1.1
+#       Ger Teunis: Fixed bug where app names can't contain spaces
+#                   Fixed backward compatability for old CSI when daemons are starting.
+#
+#   Version 1.2
+#       Ger Teunis: Added restart
+#
+#   Version 1.3
+#       Ger Teunis: Better compatibility with applicationnames containing spaces
+#                   During install make sure symblic links are copied as well
+#                   Store installation result in .setupresult in app folder
+#
+#   Version 1.4
+#       Ger Teunis: Added ServerName back to appinit httpd.conf
+#                   Better support for web applications.
+#
+#   Version 1.5
+#       Ger Teunis: Optimized installing speed by extracting appinfo.json first
+#                       and then extracting directly to the correct location
+#                   Optimized a lot of string manipulations by using
+#                       bash string manipulators instead of sed
+#
+#   Version 1.6
+#       Ger Teunis: Added support for tar archive with files store in a "." folder
+#
+#   Version 1.7
+#       Ger Teunis: Fixed a webservice remove and add bug, regression from
+#                   optimalisations of version 1.5
+#
+#   Version 1.8
+#       Ger Teunis: Fixed a bug causing the uninstall not to start correctly
+#                   when performing an application upgrade
+#
+#   Version 1.9
+#       Ger Teunis: Added cgi script capability to the appinit webserver
+#                   Also strip tabs in front of parameters in appinfo.json
+#
+#   Version 1.10
+#       Ger Teunis: Add support for 'real' JSON format
+#                   Store daemon start result in .daemonresult during app start
+#                   string_replace_all added, will replace all instances of string
+#                   fixed a installation bug for applications containing spaces
+#
 #-------------------------------------------------------------
 #   Legal: published under GPL v3
 #   http://www.gnu.org/licenses/gpl-3.0.txt
@@ -45,12 +97,16 @@
 
 
 
+
+
+#--------------- VARIABLES ---------------
+
 APPS_FOLDER="/share/Apps"
 APPS_MINIMAL_APPINFO_VERSION="1"
 APPINIT_NAME="Application Initializer"
 APPINIT_FILENAME="appinit.cgi"
 APPINIT_PROFILE="$APPS_FOLDER/AppInit"
-APPINIT_VERSION="0.7"
+APPINIT_VERSION="1.10"
 APPINIT_VERSION_URL="http://repository.nmtinstaller.com/appinit_version"
 APPINIT_UPGRADE_URL="http://repository.nmtinstaller.com/appinit.cgi"
 APPINIT_AUTOSTART_STATE="/tmp/appinit_state"
@@ -63,20 +119,24 @@ TAR="/bin/tar"
 
 
 
-auto_upgrade()
+
+
+#--------------- APPINIT HELPER METHODS ---------------
+
+appinit_auto_upgrade()
 {
     echo -n "Checking for new version: "
     if [ ! -d "$APPINIT_PROFILE" ]; then
         mkdir -p "$APPINIT_PROFILE"
     fi
     rm "$APPINIT_PROFILE/version_online" 2>/dev/null
-    wget -q -O "$APPINIT_PROFILE/version_online" $APPINIT_VERSION_URL 2>/dev/null
+    wget -T 3 -q -O "$APPINIT_PROFILE/version_online" $APPINIT_VERSION_URL 2>/dev/null
     if [ -f "$APPINIT_PROFILE/version_online" ] && [ -n "`cat "$APPINIT_PROFILE/version_online"`" ] ; then
         if [ "$APPINIT_VERSION" != "`cat "$APPINIT_PROFILE/version_online"`" ]; then
             wget -q -O "$APPINIT_PROFILE/$APPINIT_FILENAME" $APPINIT_UPGRADE_URL
             echo "Upgraded"
             chmod a+x "$APPINIT_PROFILE/$APPINIT_FILENAME"
-            eval "$APPINIT_PROFILE/$APPINIT_FILENAME" "$1" "$2"
+            eval "$APPINIT_PROFILE/$APPINIT_FILENAME \"$1\" \"$2\""
             exit 0
         else
            echo "up to date"
@@ -88,18 +148,17 @@ auto_upgrade()
 
 appinit_autostart_add()
 {
-    if [ -z "`crontab -l -u nmt 2>/dev/null | grep "$APPINIT_FILENAME"`" ]; then
-        crontab -l -u nmt > "$APPINIT_PROFILE/crontab" 2>/dev/null
-        echo "*/10 * * * * $APPINIT_PROFILE/$APPINIT_FILENAME start" >> "$APPINIT_PROFILE/crontab"
+    if [ -z "`cat "$APPINIT_PROFILE/cron" | grep "$APPINIT_FILENAME"`" ]; then
+        echo "*/10 * * * * $APPINIT_PROFILE/$APPINIT_FILENAME start" >> "$APPINIT_PROFILE/cron"
         CRONTAB_RELOAD="1"
     fi
 }
 
 appinit_autostart_remove()
 {
-    if [ -n "`crontab -l -u nmt 2>/dev/null | grep "$APPINIT_FILENAME"`" ]; then
-        TEMP="`crontab -l -u nmt 2>/dev/null | grep -v "$APPINIT_FILENAME"`"
-        echo "$TEMP" > "$APPINIT_PROFILE/crontab"
+    if [ -n "`cat "$APPINIT_PROFILE/cron" | grep "$APPINIT_FILENAME"`" ]; then
+        TEMP="`cat "$APPINIT_PROFILE/cron" | grep -v "$APPINIT_FILENAME"`"
+        echo "$TEMP" > "$APPINIT_PROFILE/cron"
         CRONTAB_RELOAD="1"
     fi
 }
@@ -109,8 +168,11 @@ appinit_bootstart_add()
 {
     if [ -z "`cat "/mnt/syb8634/etc/ftpserver.sh" | grep "$APPINIT_FILENAME"`" ]; then
         echo -n "Configuring system to start all applications on boot: "
-        escapedpath=`echo "$APPINIT_PROFILE" | sed 's/\\//\\\\\\//g'`
-        TEMP="`cat "/mnt/syb8634/etc/ftpserver.sh" | sed "s/case \\\"\\\$1\\\" in/$escapedpath\/$APPINIT_FILENAME \\\"\\\$1\\\"\ncase \\\"\\\$1\\\" in/g"`"
+        TEMP="`cat "/mnt/syb8634/etc/ftpserver.sh"`"
+        
+        TEMP="`string_replace "$TEMP" "case \\\"\\$1\\\" in" "$APPINIT_PROFILE/$APPINIT_FILENAME \\\"\\$1\\\"
+case \\\"\\$1\\\" in"`"
+        
         echo "$TEMP" > "/mnt/syb8634/etc/ftpserver.sh"
         echo "Done"
     fi
@@ -126,37 +188,18 @@ appinit_bootstart_remove()
     fi
 }
 
-
-parameter_value()
-{
-    escapedpath=`echo "$path" | sed 's/\\//\\\\\\//g'`
-    echo "`echo "$1" | sed 's/.*=\"\(.*\)\".*/\1/g' | sed 's/\\"/\"/g' | sed "s/#PATH#/$escapedpath/g"`"
-    #'
-}
-
-parameter_name()
-{
-    echo "`echo "$1" | sed 's/[ ]*\(.*\)=.*/\1/g'`"
-}
-
 appinit_profile_create()
 {
     echo -n "Checking $APPINIT_NAME profile: "
-
-    #fix old filename
-    if [ -d "$APPS_FOLDER/.appinit" ]; then
-        mv "$APPS_FOLDER/.appinit" "$APPINIT_PROFILE" >/dev/null 2>/dev/null
-        mv "$APPINIT_PROFILE/appinit.sh" "$APPINIT_PROFILE/$APPINIT_FILENAME" >/dev/null 2>/dev/null
-    fi
     
     if [ ! -d "$APPINIT_PROFILE" ] || [ ! -f "$APPINIT_PROFILE/version" ] || [ "`cat "$APPINIT_PROFILE/version"`" != "$APPINIT_VERSION" ] ; then
-
+    
         if [ ! -d "$APPINIT_PROFILE" ]; then
             mkdir -p "$APPINIT_PROFILE"
         fi
-        
+
         rm -Rf `ls -1 "$APPINIT_PROFILE" | grep -v "$APPINIT_FILENAME"` >/dev/null 2>&1
-        
+
         if [ ! -f "$APPINIT_PROFILE/$APPINIT_FILENAME" ]; then
             cp "$0" "$APPINIT_PROFILE/$APPINIT_FILENAME"
             rm -Rf "$0"
@@ -167,6 +210,9 @@ appinit_profile_create()
         chown nobody.99 "$APPINIT_PROFILE/websites"
         echo "$APPINIT_VERSION" > "$APPINIT_PROFILE/version"
         
+        IP=`ifconfig | grep "inet addr"`
+        IP=${IP#*:}
+        IP=${IP%% *}
         cat >"$APPINIT_PROFILE/httpd.conf" <<EOF
 Port 9999
 Listen 9999
@@ -175,97 +221,76 @@ Listen 9999
     AddType application/x-httpd-php5 .php
     Action application/x-httpd-php5 /php/php5-cgi
     DocumentRoot $APPINIT_PROFILE/websites
-    DirectoryIndex index.php index.html
-    Options +ExecCGI
-    AddHandler cgi-script .cgi
-    ServerName `ifconfig | grep "inet addr" | sed 's/.*inet addr:\s*\([0-9.]\+\).*/\1/g' | sed "2,$ d"`
+    DirectoryIndex index.php index.cgi index.html
+    ServerName $IP
 </VirtualHost>
+
+<Directory $APPINIT_PROFILE/websites>
+    Options +ExecCGI
+    AllowOverride All
+    AddHandler cgi-script .cgi
+</Directory>
 EOF
+
+        eval "$APPINIT_PROFILE/$APPINIT_FILENAME rescan"
         echo "Recreated"
     else
         echo "Valid"
     fi
 }
 
-crontab_remove()
+appinit_profile_cronupdate()
 {
-    if [ -n "`crontab -l -u nmt 2>/dev/null | grep "#APPINIT_${name}#"`" ]; then
-        crontab -u nmt -l | grep -v "#APPINIT_${1}#" 2>/dev/null > "$APPINIT_PROFILE/crontab"
-        CRONTAB_RELOAD="1"
-    fi
+    crontab -l > "$APPINIT_PROFILE/cron" 2>/dev/null
 }
 
-
-crontab_add()
-{
-    if [ -n "$crontab" ] && [ -z "`crontab -l -u nmt 2>/dev/null | grep "#APPINIT_${name}#"`" ]; then
-        echo "$crontab #APPINIT_${name}#" >> "$APPINIT_PROFILE/crontab"
-        CRONTAB_RELOAD="1"
-    fi
-}
-
-webservice_add()
-{
-    if [ -n "$1" -a -n "$2" ]; then
-        url="$2"
-        name="$1"
-        webservice_remove "$name" "$url"
-        
-        #Find a free id
-        id=3
-        test=`cat /opt/sybhttpd/default/webservices_edit.html | grep "option value=\"$id\""`
-        while [ -n  "$test" ] && [ "$id" -le "13" ]; do
-            id=$(( $id + 1 ))
-            test=`cat /opt/sybhttpd/default/webservices_edit.html | grep "option value=\"$id\""`
-        done
-        
-        if [ "$id" -le "12" ]; then
-            #then add it again
-            call="http://localhost:8883/webservices.cgi?%7Fadd=add&%7FhiDe=2&%7Faction=add&%7Fwebimg=&%7Fservlist=$id&_web_name_=$name&_web_url_=$url"
-            wget -q -O - $call >/dev/null
-        else
-            echo "<b>ADDING WEBSERVICE FAILED</b><br><br>"
-            echo "<h3>All ten positions already occuped</h3>Please remove a web service before adding one again."
-        fi
-    fi
-}
-
-
-webservice_remove()
-{
-    url="$2"
-    name="$1"
-    name_nice=`echo "$name" | sed 's/%20/ /g'`
-    
-    #first try to remove link, search by name
-    id=`cat /opt/sybhttpd/default/webservices_edit.html | grep "option value=\"" | grep "$name_nice" | sed 's/.*"\([0-9]\)".*/\1/g'`
-    call="http://localhost:8883/webservices.cgi?%7Fdel=remove&%7FhiDe=2&%7Faction=save&%7Fwebimg=&%7Fservlist=$id&_web_name_=$name&_web_url_=$url"
-    wget -q -O - $call >/dev/null
-}
-
-
-webserver_add()
+appinit_webserver_add()
 {
     TEST=`cat /mnt/syb8634/server/php5server/httpd.conf | grep "$APPINIT_PROFILE/httpd.conf"`
     if [ -z "$TEST" ]; then
-        escaped=`echo "$APPINIT_PROFILE" | sed 's/\\//\\\\\\//g'`
-        mv /mnt/syb8634/server/php5server/httpd.conf /mnt/syb8634/server/php5server/httpd_old.conf
-            cat /mnt/syb8634/server/php5server/httpd_old.conf | grep -v "\.appinit" | \
-                            sed "s/Include httpd_inc.conf/Include httpd_inc.conf\nInclude $escaped\/httpd.conf/g" > \
-                            /mnt/syb8634/server/php5server/httpd.conf
+        escaped="`echo "$APPINIT_PROFILE" | sed "s/\\//\\\\\\\\\\//g"`"
+        cp /mnt/syb8634/server/php5server/httpd.conf /mnt/syb8634/server/php5server/httpd_old.conf
+        cat /mnt/syb8634/server/php5server/httpd_old.conf | \
+            sed "s/Include httpd_inc.conf/Include httpd_inc.conf\nInclude $escaped\/httpd.conf/g" \
+            >/mnt/syb8634/server/php5server/httpd.conf
         rm /mnt/syb8634/server/php5server/httpd_old.conf
-        
-        su -c "cd /mnt/syb8634/server && ./apachectl_php5 restart" nobody >/dev/null 2>&1
+ 
+        su -pm -c "cd /mnt/syb8634/server && ./apachectl_php5 restart" nobody >/dev/null 2>&1
     fi
     
     #webserver is not running
-    if [ -z "`ps | grep "/mnt/syb8634/server/php5server/httpd" | grep -v "grep"`" ]; then
-        su -c "cd /mnt/syb8634/server && ./apachectl_php5 restart" nobody
+    if [ -z "`ps | grep "/httpd -d /mnt/syb8634/server/php5server/" | grep -v "grep"`" ]; then
+        su -pm -c "cd /mnt/syb8634/server && ./apachectl_php5 restart" nobody >/dev/null 2>&1
     fi
 }
 
 
-websites_add()
+
+
+
+
+
+#--------------- APPLICATION HELPER METHODS ---------------
+
+app_crontab_remove()
+{
+    if [ -n "`cat "$APPINIT_PROFILE/cron" | grep "#APPINIT_${name}#"`" ]; then
+        TEMP="`cat "$APPINIT_PROFILE/cron" | grep -v "#APPINIT_${1}#" 2>/dev/null`"
+        echo "$TEMP" > "$APPINIT_PROFILE/cron"
+        CRONTAB_RELOAD="1"
+    fi
+}
+
+
+app_crontab_add()
+{
+    if [ -n "$crontab" ] && [ -z "`cat "$APPINIT_PROFILE/cron" | grep "#APPINIT_${name}#"`" ]; then
+        echo "$crontab #APPINIT_${name}#" >> "$APPINIT_PROFILE/cron"
+        CRONTAB_RELOAD="1"
+    fi
+}
+
+app_websites_add()
 {
     if [ -d "$webui_path" ] && [ ! -d "$APPINIT_PROFILE/websites/${name}_web" ]; then
         ln -s "$webui_path" "$APPINIT_PROFILE/websites/${name}_web"
@@ -277,8 +302,7 @@ websites_add()
     fi
 }
 
-
-websites_remove()
+app_websites_remove()
 {
     if [ -d "$APPINIT_PROFILE/websites/${name}_web" ]; then
         rm -Rf "$APPINIT_PROFILE/websites/${name}_web"
@@ -290,28 +314,28 @@ websites_remove()
     fi
 }
 
-
 app_fixpermissions()
 {
     chown -R nmt.nmt "$1" >/dev/null 2>&1
     chmod -R 777 "$1" >/dev/null 2>&1
+    chmod g+s "$1" >/dev/null 2>&1
 }
-
-
 
 app_daemon_execute()
 {
     if [ -n "$daemon_script" ] && [ -f "$path/$daemon_script" ] ; then
-        chmod a+x "$path/$daemon_script"
-        cd "$path" && eval "./$daemon_script" "$1" >/dev/null 2>&1
+        umask 0000
+        cd "$path"
+        eval "./$daemon_script \"$1\"" >"$path/.daemonresult" 2>&1
     fi
 }
 
 app_setup_execute()
 {
     if [ -n "$1" ] && [ -n "$setup_script" ] && [ -f "$path/$setup_script" ]; then
-        chmod a+x "$path/$setup_script"
-        cd "$path" && eval "./$setup_script" "$1" >/dev/null 2>/dev/null
+        cd "$path"
+        rm -f "$path/.setupresult"
+        eval "./$setup_script \"$1\"" >>"$path/.setupresult" 2>>"$path/.setupresult"
 
         if [ "$1" == "install" ] && [ ! -f "$path/.installed" ]; then
             touch "$path/.installed"
@@ -323,17 +347,14 @@ app_setup_execute()
     fi
 }
 
-
-
 app_appinfo_parse()
 {
     appinfo_format=""
-    uniqueid=""
     name=""
     version=""
     enabled="0"
     daemon_script=""
-    path=`echo "$1" | sed 's/\(.*\)\/.*/\1/g'`
+    path="${1%/*}/"
     crontab=""
     setup_script=""
     gayaui_path=""
@@ -346,40 +367,35 @@ app_appinfo_parse()
     while read LINE ; do
         case "`parameter_name "$LINE"`" in
             appinfo_format)
-            appinfo_format=`parameter_value "$LINE"`
-            ;;
-            uniqueid)
-            uniqueid=`parameter_value "$LINE"`
+            appinfo_format="`parameter_value "$LINE"`"
             ;;
             name)
-            name=`parameter_value "$LINE"`
+            name="`parameter_value "$LINE"`"
             ;;
             version)
-            version=`parameter_value "$LINE"`
+            version="`parameter_value "$LINE"`"
             ;;
             enabled)
-            enabled=`parameter_value "$LINE"`
+            enabled="`parameter_value "$LINE"`"
             ;;
             daemon_script)
-            daemon_script=`parameter_value "$LINE"`
+            daemon_script="`parameter_value "$LINE"`"
             ;;
             crontab)
-            crontab=`parameter_value "$LINE"`
+            crontab="`parameter_value "$LINE"`"
             ;;
             setup_script)
-            setup_script=`parameter_value "$LINE"`
+            setup_script="`parameter_value "$LINE"`"
             ;;
             gayaui_path)
-            gayaui_path=`parameter_value "$LINE"`
+            gayaui_path="`parameter_value "$LINE"`"
             ;;
             webui_path)
-            webui_path=`parameter_value "$LINE"`
+            webui_path="`parameter_value "$LINE"`"
             ;;
         esac
     done < "$1"
 }
-
-
 
 app_autoinstall()
 {
@@ -387,7 +403,6 @@ app_autoinstall()
         app_setup_execute install
     fi
 }
-
 
 app_startstate_isstarted()
 {
@@ -398,7 +413,6 @@ app_startstate_isstarted()
     fi
 }
 
-
 app_startstate_add()
 {
     app_startstate_isstarted
@@ -407,140 +421,92 @@ app_startstate_add()
     fi
 }
 
-
 app_startstate_remove()
 {
     TEMP="`cat "$APPINIT_AUTOSTART_STATE"`"
     echo "$TEMP" | grep -v "#${name}#" > "$APPINIT_AUTOSTART_STATE"
 }
 
-
-app_process()
+app_enable()
 {
-    for appinfo in `ls -1d $APPS_FOLDER/*/appinfo.json 2>/dev/null`
-    do
-        app_appinfo_parse "$appinfo"
-        
-        if  [ "$APPS_MINIMAL_APPINFO_VERSION" -le "$appinfo_format" ]; then
-            if [ -z "$2" ] || [ "$2" == "$name" ]; then 
-                if [ "$enabled" == "1" ]; then
-                    app_fixpermissions "$path"
-                    cd "$path"
-                
-                    case "$1" in
-                        start)
-                        echo -n "Starting $name: "
-                        app_startstate_isstarted
-                        if [ "$?" == "0" ]; then
-                            app_autoinstall
-                            websites_add
-                            crontab_add
-                            app_daemon_execute "$1"
-                            app_startstate_add
-                            echo "Done"
-                        else
-                            echo "Already started"
-                        fi
-                        ;;
-                    
-                        stop)
-                        echo -n "Stopping $name: "
-                        app_startstate_isstarted
-                        if [ "$?" == "1" ]; then
-                            websites_remove
-                            crontab_remove "$name"
-                            app_daemon_execute "$1"
-                            app_startstate_remove
-                            echo "Done"
-                        else
-                            echo "Already stopped"
-                        fi
-                        ;;
-     
-                        rescan)
-                        if [ -n "$2" ]; then
-                            echo -n "Rescanning $name: "
-                            app_startstate_isstarted
-                            if [ "$?" == "1" ]; then
-                                websites_remove
-                                crontab_remove "$name"
-                                websites_add
-                                crontab_add
-                                echo "Done"
-                            else
-                                echo "Application not started"
-                            fi
-                        fi
-                        ;;
-                        
-                        uninstall)
-                        if [ -n "$2" ]; then
-                            echo "Uninstalling $name: "
-                            crontab_remove "$name"
-                            websites_remove
-                            app_startstate_isstarted
-                            if [ "$?" == "1" ]; then
-                                app_daemon_execute stop
-                            fi
-                            app_startstate_remove
-                            app_setup_execute "$1"
-                            rm -Rf "$path"
-                            echo "Done"
-                        fi
-                        ;;
-                        
-                        info)
-                        escapedpath=`echo "$path" | sed 's/\\//\\\\\\//g'`
-                        cat "$path/appinfo.json" | sed "s/{/{\n    path=\"$escapedpath\",/g"
-                        echo
-                        ;;
-                    esac
-                else
-                    echo -n "Disabeling application $name: "
-                    websites_remove
-                    crontab_remove "$name"
-                    app_startstate_isstarted
-                    if [ "$?" == "1" ]; then
-                        app_daemon_execute stop
-                    fi
-                    app_startstate_remove
-                    echo "Done"
-                fi
-            fi
-        fi
-    done
+    TEMP="`cat "$path/appinfo.json" | grep -v "enabled"`"
+    TEMP="`string_replace "$TEMP" "{" "{
+    enabled=\\\"1\\\","`"
+    echo "$TEMP" > "$path/appinfo.json"
 }
 
+app_disable()
+{
+    TEMP="`cat "$path/appinfo.json" | grep -v "enabled"`"
+    TEMP="`string_replace "$TEMP" "{" "{
+    enabled=\\\"0\\\","`"
+    echo "$TEMP" > "$path/appinfo.json"
+}
 
 app_install_fromfile()
 {
-    echo -n "Installing application from file $1: "
+    file="$1"
+    if [ -z "`echo "$1" | grep "^/"`" ] && [ -f "/share/$1" ]; then
+        file="/share/$1"
+    fi
+    
+    if [ ! -f "$file" ]; then
+        return 1
+    fi
+
+    echo -n "Installing application from file $file: "
     rm -Rf "$APPINIT_PROFILE/temp" >/dev/null 2>/dev/null
     mkdir -p "$APPINIT_PROFILE/temp"
     cd "$APPINIT_PROFILE/temp"
     
-    if [ -n "`echo "$1" | grep "\.rar$"`" ]; then
-        eval "$UNRAR x \"$1\" >/dev/null 2>/dev/null"
-    fi
-    
-    if [ -n "`echo "$1" | grep "\.tar$"`" ]; then
-        eval "$TAR xvf \"$1\" >/dev/null 2>/dev/null"
-    fi
-    
+    #first we need only the appinfo
+    #so we can uninstall the current version first
+    case "`tolower "$file"`" in
+        *.tar)
+        eval "$TAR -x appinfo.json -vf \"$file\"" >/dev/null 2>/dev/null
+        if [ ! -f "appinfo.json" ]; then
+            eval "$TAR -x \"./appinfo.json\" -vf \"$file\"" >/dev/null 2>/dev/null
+        fi
+        ;;
+        
+        *.rar)  
+        eval "$UNRAR x \"$file\" appinfo.json" >/dev/null 2>/dev/null
+        if [ ! -f "appinfo.json" ]; then
+            eval "$UNRAR x \"$file\" \"./appinfo.json\"" >/dev/null 2>/dev/null
+        fi
+        ;;
+    esac
     
     if [ -f "$APPINIT_PROFILE/temp/appinfo.json" ]; then
         app_appinfo_parse "$APPINIT_PROFILE/temp/appinfo.json"
+        path="$APPS_FOLDER/$name"
 
         if [ -d "$APPS_FOLDER/$name" ]; then
             echo -n "(and uninstalling current) "
-            eval "$APPINIT_PROFILE/$APPINIT_FILENAME uninstall $name >/dev/null 2>/dev/null"
-            rm -Rf "$APPS_FOLDER/$name" >/dev/null 2>/dev/null
+            application_uninstall
+        fi
+        
+        if [ ! -d "$APPS_FOLDER/$name" ]; then
+            mkdir -p "$APPS_FOLDER/$name"
         fi
 
-        rm -Rf "$APPS_FOLDER/$name"
-        mv "$APPINIT_PROFILE/temp" "$APPS_FOLDER/$name"
+        #real untar to the desired location
+        cd "$APPS_FOLDER/$name"
+        
+        case "`tolower "$file"`" in
+            *.tar)
+            eval "$TAR xvf \"$file\"" >/dev/null 2>/dev/null
+            ;;
+            
+            *.rar)  
+            eval "$UNRAR x -y \"$file\"" >/dev/null 2>/dev/null
+            ;;
+        esac
     fi
+
     rm -Rf "$APPINIT_PROFILE/temp" >/dev/null 2>/dev/null
+    
+    app_appinfo_parse "$APPS_FOLDER/$name/appinfo.json"
     
     if [ -n "$name" ]; then
         echo "Done"
@@ -551,90 +517,418 @@ app_install_fromfile()
 }
 
 
+
+
+
+
+#--------------- GENERIC HELPER METHODS ---------------
+
+string_replace()
+{
+    STRING="$1"
+    FIND="$2"
+    REPLACE="$3"
+
+    RIGHT="${STRING#*$FIND}"
+    LEFT="${STRING%%$FIND*}"
+    
+    if [ "$LEFT" != "$STRING" ] && [ "$RIGHT" != "$STRING" ]; then
+        STRING="${LEFT}${REPLACE}${RIGHT}"
+    fi
+    
+    echo "${STRING}"
+}
+
+string_replace_all()
+{
+    STRING="$1"
+    FIND="$2"
+    REPLACE="$3"
+
+    while [ "$COMPARE" != "$STRING" ]; do
+        COMPARE="$STRING"
+        RIGHT="${STRING#*$FIND}"
+        LEFT="${STRING%%$FIND*}"
+        
+        if [ "$LEFT" != "$STRING" ] && [ "$RIGHT" != "$STRING" ]; then
+            STRING="${LEFT}${REPLACE}${RIGHT}"
+        fi
+    done
+    
+    echo "${STRING}"
+}
+
+parameter_value()
+{
+    PAR="$1"
+    PAR="${PAR#*=}"
+    PAR="${PAR#*:}"
+    PAR="${PAR%,*}"
+    
+    PAR="${PAR#*\"}"
+    PAR="${PAR%\"*}"
+    
+    PAR="`string_replace "$PAR" "#PATH#" "$path"`"
+    echo "$PAR"
+}
+
+parameter_name()
+{
+    PAR="$1"
+    PAR="${PAR%=*}"
+    PAR="${PAR%:*}"
+    PAR="${PAR#*\"}"
+    PAR="${PAR%\"*}"
+    PAR="`string_replace_all "$PAR" " " ""`"
+    PAR="`string_replace_all "$PAR" "   " ""`"
+    
+    echo "$PAR"
+}
+
+webservice_add()
+{
+    if [ -n "$1" -a -n "$2" ]; then
+        url="$2"
+        name="$1"
+        webservice_remove "$name" "$url"
+        
+        #make url-nice, spaces to %20
+        name_nice="`string_replace_all "$name" " " "%20"`"
+        url_nice="`string_replace_all "$url" " " "%20"`"
+        
+        #Find a free id
+        id=3
+        test=`cat /opt/sybhttpd/default/webservices_edit.html | grep "option value=\"$id\""`
+        while [ -n  "$test" ] && [ "$id" -le "13" ]; do
+            id=$(( $id + 1 ))
+            test=`cat /opt/sybhttpd/default/webservices_edit.html | grep "option value=\"$id\""`
+        done
+        
+        if [ "$id" -le "12" ]; then
+            #then add it again
+            call="http://localhost:8883/webservices.cgi?%7Fadd=add&%7FhiDe=2&%7Faction=add&%7Fwebimg=&%7Fservlist=$id&_web_name_=$name_nice&_web_url_=$url_nice"
+            wget -q -O - $call >/dev/null
+        else
+            echo "<b>ADDING WEBSERVICE FAILED</b><br><br>"
+            echo "<h3>All ten positions already occuped</h3>Please remove a web service before adding one again."
+        fi
+    fi
+}
+
+webservice_remove()
+{
+    url="$2"
+    name="$1"
+
+    name_nice="`string_replace_all "$name" "%20" " "`"
+    url_nice="`string_replace_all "$url" " " "%20"`"
+    
+    #first try to remove link, search by name
+    id=`cat /opt/sybhttpd/default/webservices_edit.html | grep "option value=\"" | grep "$name_nice"`
+    id=${id##*value=\"}
+    id=${id%%\"*}
+    call="http://localhost:8883/webservices.cgi?%7Fdel=remove&%7FhiDe=2&%7Faction=save&%7Fwebimg=&%7Fservlist=$id&_web_name_=$name&_web_url_=$url_nice"
+    wget -q -O - $call >/dev/null
+}
+
+tolower()
+{
+    echo "$1" | sed "y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/"
+}
+
+url_decode()
+{
+    url="$1"
+    url="`string_replace_all "$url" "%2F" "/"`"
+    url="`string_replace_all "$url" "%22" "\\\""`"
+    url="`string_replace_all "$url" "%20" " "`"
+    url="`string_replace_all "$url" "+" " "`"
+    
+    echo "$url"
+}
+
+
+
+#--------------- MAIN METHODS ---------------
+
+application_start()
+{
+    echo -n "Starting $name: "
+    app_startstate_isstarted
+    if [ "$?" == "0" ]; then
+        app_fixpermissions "$path"
+        app_autoinstall
+        app_websites_add
+        app_crontab_add
+        app_daemon_execute start
+        app_startstate_add
+        echo "Done"
+    else
+        echo "Already started"
+    fi
+}
+
+application_stop()
+{
+    echo -n "Stopping $name: "
+    app_startstate_isstarted
+    if [ "$?" == "1" ]; then
+        app_websites_remove
+        app_crontab_remove "$name"
+        app_daemon_execute stop
+        app_startstate_remove
+        echo "Done"
+    else
+        echo "Already stopped"
+    fi
+}
+
+application_rescan()
+{
+    echo -n "Rescanning $name: "
+    app_startstate_isstarted
+    if [ "$?" == "1" ]; then
+        app_websites_remove
+        app_crontab_remove "$name"
+        app_websites_add
+        app_crontab_add
+        echo "Done"
+    else
+        echo "Application not started"
+    fi
+}
+
+application_uninstall()
+{
+    echo -n "Uninstalling $name: "
+
+    app_crontab_remove "$name"
+    app_websites_remove
+    app_startstate_isstarted
+    if [ "$?" == "1" ]; then
+        app_daemon_execute stop
+    fi
+    app_startstate_remove
+    app_setup_execute uninstall
+    echo "Done"
+
+}
+
+application_enable()
+{
+    app_enable
+}
+
+application_disable()
+{
+    app_disable
+}
+
+application_info()
+{
+    TEMP="`cat "$path/appinfo.json"`"
+    TEMP="`string_replace "$TEMP" "{" "{
+    path=\\\"$path\\\","`"
+    if [ -n "`cat "$APPINIT_AUTOSTART_STATE" 2>/dev/null | grep "$name"`" ]; then
+        TEMP="`string_replace "$TEMP" "{" "{
+    started=\\\"1\\\","`"
+    else
+        TEMP="`string_replace "$TEMP" "{" "{
+    started=\\\"0\\\","`"
+    fi
+    echo "$TEMP"
+}
+
+application_install()
+{
+    app_install_fromfile "$1"
+    
+    if [ "$?" == "0" ]; then
+        application_start
+    else
+        echo "Can't find file."
+    fi
+}
+
+appinit_prepare()
+{
+    #appinit hookup and prepare
+    appinit_auto_upgrade "$1" "$2"
+    appinit_profile_create
+    appinit_profile_cronupdate
+    appinit_webserver_add
+    
+    #and autostarts
+    if [ "$APPINIT_APPS_AUTOSTART" == "1" ]; then
+        appinit_autostart_add
+    else
+        appinit_autostart_remove
+    fi
+    
+    if [ "$APPINIT_APPS_BOOTSTART" == "1" ]; then
+        appinit_bootstart_add
+    else
+        appinit_bootstart_remove
+    fi
+}
+
+
+
+
+
+
+#--------------- ENTRY LEVEL METHODS ---------------
+
+process()
+{
+    ProcessedApplication="0"
+
+    IFS=$(echo -en "\n\b")
+    for appinfo in `ls -1d $APPS_FOLDER/*/appinfo.json 2>/dev/null`
+    do
+        app_appinfo_parse "$appinfo"
+        
+        if  [ "$APPS_MINIMAL_APPINFO_VERSION" -le "$appinfo_format" ]; then
+            
+            namelower="`tolower "$name"`"
+            parameter="`tolower "$2"`"
+                            
+            #no second given means all
+            #so name must be same as second parameter or no second parameter given
+            if [ -z "$parameter" ] || [ "$parameter" == "$namelower" ]; then
+            
+                #In case of All applications do not process disabled applications
+                if [ "$enabled" == "1" ] || [ -n "$2" ] || [ "$1" == "info" ]; then
+                    
+                    ProcessedApplication="1"
+                    cd "$path"
+                   
+                    case "$1" in
+                        start)
+                        application_start
+                        ;;
+                    
+                        stop)
+                        application_stop
+                        ;;
+                        
+                        restart)
+                        application_stop
+                        sleep 1
+                        application_start
+                        ;;
+     
+                        rescan)
+                        application_rescan
+                        ;;
+                        
+                        uninstall)
+                        application_uninstall
+                        rm -Rf "$path"
+                        ;;
+                        
+                        enable)
+                        application_enable
+                        ;;
+                        
+                        disable)
+                        application_disable
+                        ;;
+                        
+                        info)
+                        application_info
+                        ;;
+                    esac
+                else
+                    application_stop
+                fi
+            fi
+        fi
+    done
+
+    if [ -n "$2" ] && [ "$ProcessedApplication" == "0" ]; then
+        echo "Unknown application"
+    fi
+}
+
+
+
+
+
+
+#--------------- MAIN ---------------
+
 echo
 echo
 echo "$APPINIT_NAME version $APPINIT_VERSION"
 echo "---------------------------------------"
 
+process="1"
 
-auto_upgrade "$1" "$2"
-appinit_profile_create
-webserver_add
+#prepare appinit (integrate into NMT)
+appinit_prepare "$1" "$2"
 
 #Fix webcall parameters
-if [ -n "$1" ] && [ -z "$2" ] && [ -n "`echo "$1" | grep "&"`" ] ; then
-    vars="`echo "$1" | sed "s/\&/ /g" | sed "s/%2F/\//g"`"
+if [ -n "$1" ] && [ -z "$2" ] && [ -n "`echo "$1" | grep "&"`" ]; then
+    vars="`string_replace_all "${1}" "&" " "`"
     set `echo "$vars" `
 fi
 
-if [ "$APPINIT_APPS_AUTOSTART" == "1" ]; then
-    appinit_autostart_add
-else
-    appinit_autostart_remove
-fi
+command="`url_decode "$1"`"
+parameter="`url_decode "$2"`"
 
-if [ "$APPINIT_APPS_BOOTSTART" == "1" ]; then
-    appinit_bootstart_add
-else
-    appinit_bootstart_remove
-fi
-
-
-case "$1" in
-    rescan)
-    app_process "$1" "$2"
-    ;;
-
-    start)
-    app_process "$1" "$2"
-    ;;
-    
-    stop)
-    app_process "$1" "$2"
-    ;;
-    
-    restart)
-    app_process stop "$2"
-    app_process start "$2"
-    ;;
-    
-    uninstall)
-    app_process "$1" "$2"
-    ;;
-    
-    install)
-    if [ -n "$2" ]; then
-        app_install_fromfile "$2"
-        app_process start ""$name""
-    fi
-    ;;
-    
-    info)
-    echo "Content-type: text/html\n\n"
-    app_process "$1" "$2"
-    cat "/tmp/appinit_state"
+#Check command
+case "$command" in
+    install|uninstall|start|stop|restart|info|rescan|enable|disable)
     ;;
     
     *)
     echo
     echo "Usage: "
-    echo "# $APPINIT_FILENAME {start|stop|restart|install|uninstall|rescan} [application name]"
-    echo "    [application name] is not optional for install, uninstall and rescan"
+    echo "# $APPINIT_FILENAME {start|stop|restart|uninstall|rescan|enable|disable} [application name]"
+    echo "    [application name] is not optional for some of these commands"
     echo "    this will control already installed applications."
     echo
-    echo "# $APPINIT_FILENAME {filename} (tar or rar)"
+    echo "# $APPINIT_FILENAME install {filename} (tar or rar)"
     echo "    This will install a application from tar or rar file."
     echo
     echo "# $APPINIT_FILENAME info"
     echo "    Will display some systems stats, to be used by CSI."
-
+    echo
+    echo "ERROR: Invalid or no command given!"
+    process="0"
     ;;
 esac
 
+
+# check number of parameters
+if [ -z "$parameter" ]; then
+    case "$command" in
+        uninstall|enable|disable|install)
+        echo "Invalid number of parameters, command $command requires two parameters"
+        process="0"
+        ;;
+    esac
+fi
+
+
+if [ "$process" == "1" ]; then
+    #in case of an install do not process via normal route
+    if [ "$command" == "install" ]; then
+        application_install "$parameter"
+    else
+        process "$command" "$parameter"
+    fi
+fi
+
+#reload updated crontab
 if [ "$CRONTAB_RELOAD" == "1" ]; then
-    #reload updated crontab
-    crontab "$APPINIT_PROFILE/crontab" -u nmt
+    crontab "$APPINIT_PROFILE/cron"
     CRONTAB_RELOAD="0"
 fi
 
+
+#send EOF
 echo
+echo -e "\x04"
+echo "</html>"
