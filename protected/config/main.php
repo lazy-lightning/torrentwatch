@@ -22,6 +22,9 @@ return array(
 
   // application components
   'components'=>array(
+    'cache'=>array(
+      'class'=>function_exists('apc_add')?'CApcCache':'CDbCache',
+    ),
     'dlManager'=>array(
       'class'=>'downloadManager',
     ),
@@ -48,6 +51,7 @@ return array(
     ),
     'db'=>array(
       'connectionString'=>'sqlite:protected/data/source.db',
+      'schemaCachingDuration'=>3600,
     ),
   ),
 
