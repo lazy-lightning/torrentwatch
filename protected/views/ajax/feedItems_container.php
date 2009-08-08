@@ -3,7 +3,16 @@
     <ul>
       <?php 
         foreach($tabs as $title => $type)
-          echo '<li>'.CHtml::link("<span>$title</span>", '#'.$type.'_container').'</li>'; 
+        {
+          $url = "#{$type}_container";
+          $htmlOpt = array();
+          if(empty($$type))
+          {
+            $htmlOpt = array('rel'=>$url);
+            $url = array('loadFeedItems', 'type'=>$type);
+          }
+          echo '<li>'.CHtml::link("<span>$title</span>", $url, $htmlOpt).'</li>'; 
+        }
       ?>
       <li><a href="#search_container"><span>Search</span></a></li>
     </ul>
