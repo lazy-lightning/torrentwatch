@@ -23,20 +23,6 @@
         'favoriteStrings'=>$favoriteStrings,
         'favoriteTvShows'=>$favoriteTvShows,
   ));
-  Yii::log('start feedItems_container: '.$logger->getExecutionTime(), CLogger::LEVEL_PROFILE);
-  $this->renderPartial('feedItems_container', array(
-        'movie'=>$movies,
-        'other'=>$others,
-        'page'=>1,
-        'queued'=>$queued,
-        'tv'=>$tvEpisodes,
-        'tabs'=>array(
-          'TV Episodes' =>'tv', 
-          'Movies' => 'movie', 
-          'Others' => 'other', 
-          'Queued' => 'queued',
-        ),
-  ));
   Yii::log('start history_dialog: '.$logger->getExecutionTime(), CLogger::LEVEL_PROFILE);
   $this->renderPartial('history_dialog', array(
         'history'=>$history,
