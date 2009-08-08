@@ -224,20 +224,24 @@ $.fn.tabs = function(initial, settings) {
                 $('<div id="' + id + '" class="' + settings.containerClass + '"></div>').appendTo(container);
 
                 $(this).bind('loadRemoteTab', function(e, callback) {
-                    var $$ = $(this).addClass(settings.loadingClass), span = $('span', this)[0], tabTitle = span.innerHTML;
-                    if (settings.spinner) {
-                        // TODO if spinner is image
-                        span.innerHTML = '<em>' + settings.spinner + '</em>'; // WARNING: html(...) crashes Safari with jQuery 1.1.2
+                    if($(hash).is(':empty')) {
+                        var $$ = $(this).addClass(settings.loadingClass), span = $('span', this)[0], tabTitle = span.innerHTML;
+                        if (settings.spinner) {
+                            // TODO if spinner is image
+                            span.innerHTML = '<em>' + settings.spinner + '</em>'; // WARNING: html(...) crashes Safari with jQuery 1.1.2
+                        }
+                        setTimeout(function() { // Timeout is again required in IE, "wait" for id being restored
+                            $(hash).load(url, function() {
+                                if (settings.spinner) {
+                                    span.innerHTML = tabTitle; // WARNING: html(...) crashes Safari with jQuery 1.1.2
+                                }
+                                $$.removeClass(settings.loadingClass);
+                                callback && callback();
+                            });
+                        }, 0);
+                    } else {
+                        callback && callback();
                     }
-                    setTimeout(function() { // Timeout is again required in IE, "wait" for id being restored
-                        $(hash).load(url, function() {
-                            if (settings.spinner) {
-                                span.innerHTML = tabTitle; // WARNING: html(...) crashes Safari with jQuery 1.1.2
-                            }
-                            $$.removeClass(settings.loadingClass);
-                            callback && callback();
-                        });
-                    }, 0);
                 });
 
             });
@@ -287,7 +291,7 @@ $.fn.tabs = function(initial, settings) {
         containers.filter(':eq(' + settings.initial + ')').show().end().not(':eq(' + settings.initial + ')').addClass(settings.hideClass);
         $('li', nav).removeClass(settings.selectedClass).eq(settings.initial).addClass(settings.selectedClass); // we need to remove classes eventually if hash takes precedence over class
         // trigger load of initial tab
-        tabs.eq(settings.initial).trigger('loadRemoteTab').end();
+        tabs.eq(settings.initial).trigger('loadRemoteTab', settings.onShow).end();
 
         // setup auto height
         if (settings.fxAutoHeight) {
