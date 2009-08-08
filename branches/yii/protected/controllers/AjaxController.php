@@ -266,6 +266,17 @@ class AjaxController extends BaseController
     array_unshift($qualitys, $q);
     $time['qualitys'] = microtime(true);
 
+    // Query the various feeditems from the database
+    // not AR classes because it takes too much time on the NMT
+    $tvEpisodes = $this->prepareFeedItems('tv');
+    $time['tvEpisodes'] = microtime(true);
+    $movies = $this->prepareFeedItems('movie');
+    $time['movies'] = microtime(true);
+    $others = $this->prepareFeedItems('other');
+    $time['others'] = microtime(true);
+    $queued = $this->prepareFeedItems('queued');
+    $time['queued'] = microtime(true);
+
     foreach($time as $key => $value) {
       $time[$key] = $value-$startTime;
       $startTime = $value;
@@ -282,8 +293,12 @@ class AjaxController extends BaseController
           'feeds'=>$feeds,
           'genres'=>$genres,
           'history'=>$history,
+          'movies'=>$movies,
+          'others'=>$others,
           'qualitys'=>$qualitys,
+          'queued'=>$queued,
           'response'=>$this->response,
+          'tvEpisodes'=>$tvEpisodes,
     ));
     Yii::log("end controller: ".$logger->getExecutionTime()."\n", CLogger::LEVEL_PROFILE);
   }
