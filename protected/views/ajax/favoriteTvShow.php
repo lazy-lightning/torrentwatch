@@ -1,13 +1,13 @@
-<?php $htmlId = 'favoriteTvShows-'.$favorite->id;
+<?php $feedsListData = isset($feedsListData) ? $feedsListData : $response['feedsListData'];
+      $genresListData = isset($genresListData) ? $genresListData : $response['genresListData'];
+      $qualitysListData = isset($qualitysListData) ? $qualitysListData : $response['qualitysListData'];
+      $htmlId = 'favoriteTvShows-'.$favorite->id;
       echo CHtml::beginForm(
           array($favorite->isNewRecord ? 'createFavorite' : 'updateFavorite', 'id'=>$favorite->id), 
           'post', array('class'=>'favinfo', 'id'=>$htmlId)
       );
-      if(isset($response[$htmlId])) {
-        $favorite = $response[$htmlId];
-        echo CHtml::errorSummary($favorite);
-//        echo '<pre>';var_dump($favorite);echo '</pre>';
-      } ?>
+      echo CHtml::errorSummary($favorite);
+      ?>
  <div class="favorite_name">
   <?php 
     echo CHtml::activeLabelEx($favorite, 'tvShow_id').': ';

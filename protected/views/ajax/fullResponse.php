@@ -16,30 +16,10 @@
   ));
   Yii::log('start favorites_dialog: '.$logger->getExecutionTime(), CLogger::LEVEL_PROFILE);
   $this->renderPartial('favorites_dialog', array(
-        'feeds'=>$feeds,
-        'genres'=>$genres,
-        'qualitys'=>$qualitys,
         'favoriteMovies'=>$favoriteMovies,
         'favoriteStrings'=>$favoriteStrings,
         'favoriteTvShows'=>$favoriteTvShows,
-  ));
-  Yii::log('start feedItems_container: '.$logger->getExecutionTime(), CLogger::LEVEL_PROFILE);
-  $this->renderPartial('feedItems_container', array(
-        'movie'=>$movies,
-        'other'=>$others,
-        'page'=>1,
-        'queued'=>$queued,
-        'tv'=>$tvEpisodes,
-        'tabs'=>array(
-          'TV Episodes' =>'tv', 
-          'Movies' => 'movie', 
-          'Others' => 'other', 
-          'Queued' => 'queued',
-        ),
-  ));
-  Yii::log('start history_dialog: '.$logger->getExecutionTime(), CLogger::LEVEL_PROFILE);
-  $this->renderPartial('history_dialog', array(
-        'history'=>$history,
+        'response'=>$response,
   ));
 
   if(isset($response['dialog']))
@@ -68,12 +48,11 @@
     $script[] = '$.showDialog("'.$hash.'");';
 
   if(isset($response['showFavorite']))
-    $hash = $response['showFavorite'];
-  else
-    $hash = '#favoriteTvShows-';
-  $script[] = '$.showFavorite("'.$hash.'");';
-
-  $scriptOut = "<script type='text/javascript'>"."\n$(function() {\n    ".implode("\n    ", $script)."\n});\n</script>\n";
-  echo $scriptOut;
+    $script[] = '$.showFavorite("'.$response['showFavorite'].'");';
+ 
+  if(count($script)) {
+    $scriptOut = "<script type='text/javascript'>"."\n$(function() {\n    ".implode("\n    ", $script)."\n});\n</script>\n";
+    echo $scriptOut;
+  }
  
 

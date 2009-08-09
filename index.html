@@ -26,7 +26,7 @@
   <li id="favoritesMenu"><a class="toggleDialog" href="#favorites">Favorites</a></li>
   <li id="config"><a class="toggleDialog" href="#configuration">Configure</a></li>
   <li class="divider">&nbsp;</li>
-  <li id="view"><a class="toggleDialog" href="#history">View History</a></li>
+  <li id="view"><a class="toggleDialog" href="nmtdvr.php?r=ajax/getHistory#history">View History</a></li>
   <li id="empty"><a class="toggleDialog" href="#reset_data">Reset Data</a></li>
   <li id="inspector"><a href="#inspector_container">Inspector</a></li>
   <li id='webui'><a href='#'>Client UI</a></li>
@@ -55,5 +55,12 @@
     <h2>Right click any feed item and select Inspect</h2>
   </div>
   <div id="inspector_info"></div>
+</div>
+<div id="feedItems_container">
+  <ul>
+    <li><a href="nmtdvr.php?r=ajax/loadFeedItems&type=tv"><span>TV Episodes</span></a></li>
+    <li><a href="nmtdvr.php?r=ajax/loadFeedItems&type=movie"><span>Movies</span></a></li>
+    <li><a href="nmtdvr.php?r=ajax/loadFeedItems&type=other"><span>Others</span></a></li>
+    <li><a href="nmtdvr.php?r=ajax/loadFeedItems&type=queued"><span>Queued</span></a></li>
 </div>
 </body></html>

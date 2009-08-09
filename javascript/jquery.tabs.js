@@ -291,7 +291,10 @@ $.fn.tabs = function(initial, settings) {
         containers.filter(':eq(' + settings.initial + ')').show().end().not(':eq(' + settings.initial + ')').addClass(settings.hideClass);
         $('li', nav).removeClass(settings.selectedClass).eq(settings.initial).addClass(settings.selectedClass); // we need to remove classes eventually if hash takes precedence over class
         // trigger load of initial tab
-        tabs.eq(settings.initial).trigger('loadRemoteTab', settings.onShow).end();
+        if(tabs.eq(settings.initial).is(':empty'))
+          tabs.eq(settings.initial).trigger('loadRemoteTab');
+        else if(settings.onShow)
+          settings.onShow(tabs, tabs.eq(settings.initial), null)
 
         // setup auto height
         if (settings.fxAutoHeight) {

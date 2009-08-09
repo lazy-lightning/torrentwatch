@@ -2,8 +2,15 @@
   <?php if(count($tabs) > 1): ?>
     <ul>
       <?php 
-        foreach($tabs as $title => $type)
-          echo '<li>'.CHtml::link("<span>$title</span>", '#'.$type.'_container').'</li>'; 
+        foreach($tabs as $title => $type) {
+          $url = '#'.$type.'_container';
+          $htmlAttrs = array();
+          if(false === isset($$type)) {
+            $htmlAttrs['rel'] = $url;
+            $url = array('loadFeedItems', 'type'=>$type);
+          }
+          echo '<li>'.CHtml::link("<span>$title</span>", $url, $htmlAttrs).'</li>'; 
+        }
       ?>
       <li><a href="#search_container"><span>Search</span></a></li>
     </ul>
@@ -11,6 +18,10 @@
     endif; 
     foreach($tabs as $title => $type): 
       echo "<div class='feedItems' id='{$type}_container'><ul>";
+      if(false === isset($$type)) {
+        echo '</ul></div>';
+        continue;
+      }
       $n=0;
       foreach($$type as $item1) {
         $class = 'torrent';
