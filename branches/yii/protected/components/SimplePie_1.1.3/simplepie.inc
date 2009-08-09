@@ -7704,7 +7704,6 @@ class SimplePie_File
 						$out .= "$key: $value\r\n";
 					}
 					$out .= "Connection: Close\r\n\r\n";
-          file_put_contents('/tmp/feedAdapter_out', $out);
 					fwrite($fp, $out);
 
 					$info = stream_get_meta_data($fp);
