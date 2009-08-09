@@ -17,6 +17,9 @@ class feedAdapter extends SimplePie {
   }
 
   function init() {
+    // time limit 0 so we dont timeout doing long operation
+    set_time_limit(0);
+
     parent::init();
 
     if($this->error()) {
@@ -33,6 +36,8 @@ class feedAdapter extends SimplePie {
     $this->_feedAR->title = $this->get_title();
     $this->_feedAR->description = $this->get_description();
 
+    $transaction = Yii::app()->db->beginTransaction();
+    try {
     foreach($this->get_items() as $item) {
       $hash = md5($item->get_id());
       if(false === feedItem::model()->exists('hash=:hash', array(':hash'=>$hash))) {
@@ -47,6 +52,11 @@ class feedAdapter extends SimplePie {
               'pubDate'     => $item->get_date('U'),
         ));
       }
+    }
+    $transaction->commit();
+    } catch (Exception $e) {
+      $transaction->rollback();
+      throw $e;
     }
   }
 }
