@@ -10,7 +10,7 @@ EXCLUDES="install testing protected/data/source.db.BACKUP protected/data/source.
 
 if [ -f testing/yuicompressor-2.4.2.jar ]; then
   echo "Building all.min.js"
-  cat $(cat index.html | grep \.js | grep -ve 'all|min' | sed 's,^.*javascript/\(.*\).js.*$,javascript/\1.js,') | java -jar testing/yuicompressor-2.4.2.jar --type js -o javascript/all.min.js
+#  cat $(cat index.html | grep \.js | grep -ve 'all|min' | sed 's,^.*javascript/\(.*\).js.*$,javascript/\1.js,') | java -jar testing/yuicompressor-2.4.2.jar --type js -o javascript/all.min.js
   echo "Done."
 fi
 
@@ -40,6 +40,6 @@ if [ x"$CHAR" = x"Y" ];then
 fi
 
 if [ x"$CHAR" = x"U" ];then
-  echo "put \"$NAME.zip\"" | lftp $LFTP_NET_BOOKMARK
+  echo "put \"$NAME-$VERSION.zip\"" | lftp $LFTP_NET_BOOKMARK
 fi
 
