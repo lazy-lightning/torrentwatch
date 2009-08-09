@@ -1,7 +1,256 @@
+
+(function($) {
+    var current_favorite, current_dialog, inspect_status;
+    $.toggleInspector = function() {
+        inspect_status = !inspect_status;
+        $("div#feedItems_container,div#feedItems_container > div,ul#filterbar_container,div#inspector_container").stop(true,true).animate(
+                { right: (inspect_status? '+' : '-') + "=350" },
+                { duration: 600 }
+        );
+    };
+    $.loadMoreFeedItems = function(html) {
+      var container = $("<div />");
+      var dest = '';
+      container[0].innerHTML = html;
+      setTimeout(function() {
+        container.find('div#feedItems_container').children().each(function() {
+          var dest = $('#'+this.id);
+          $(this)
+          .find("li.torrent")
+          .myContextMenu()
+          .filter(".hasDuplicates")
+          .initDuplicates();
+          
+          dest.find('li.loadMore')
+          .remove()
+          .end()
+          .append(
+            $(this).children('ul')
+          );
+        });
+      }, 0);
+    };
+    // Remove old dynamic content, replace it with passed html(ajax success function)
+    $.loadDynamicData = function(html) {
+        $("#feedItems_container").children('div')
+          .each(function() {
+            $(this).empty();
+          }).end()
+          .find('.tabs-selected')
+          .removeClass('tabs-selected')
+          .children("a")
+          .click();
+        
+        $("#dynamicdata").remove();
+        setTimeout(function() {
+            $(current_dialog).toggleDialog();
+            current_dialog = '';
+            var dynamic = $("<div id='dynamicdata'/>");
+            // Use innerHTML because some browsers choke with $(html) when html is many KB
+            dynamic[0].innerHTML = html;
+            dynamic.find("div#favorites").initFavorites().end()
+                    .find("form").initForm().end()
+                    .find("div#configuration").initConfigDialog().end()
+                    .appendTo("body");
+            setTimeout(function() {
+                var container = $("#feedItems_container > div:first");
+                if(container.children('ul').children().length == 1 && $(".login_form").length == 0) {
+                    current_dialog = '#welcome1';
+                    $(current_dialog).show();
+                } else {
+                    container.slideDown(400, function() {
+                        if(inspect_status)
+                            container.css('right', 350);
+                    });
+                }
+            }, 50);
+        }, 100);
+    };
+    $.submitForm = function(button) {
+        var form;
+        if($(button).is('form')) { // User pressed enter
+            form = $(button);
+            button = form.find('a');
+            if(button.length == 0)
+              button = form.find('input[type=submit]');
+            button = button[0];
+        } else
+            form = $(button).closest("form");
+        // close any open dialog
+        if(current_dialog)
+          $(current_dialog).toggleDialog();
+
+        $.post(form.get(0).action, form.buildDataString(button), $.loadDynamicData, 'html');
+    }; 
+    $.fn.toggleDialog = function() {
+        this.each(function() {
+            var last = current_dialog === '#' ? '' : current_dialog;
+            var target = this.hash === '#' ? '#'+$(this).closest('.dialog_window').id : this.hash;
+            var hide = false;
+            var show = false;
+            current_dialog = last === target ? '' : this.hash;
+            if (last) {
+                $(last).fadeOut();
+                hide = true;
+            }
+            if (current_dialog && this.hash != '#') {
+                show = true;
+                if($(current_dialog).length == 0) {
+                  $.get(this.href, '', function(html) {
+                    $('#dynamicdata').append(html);
+                    $(current_dialog).fadeIn();
+                  }, 'html');
+                } else 
+                  $(current_dialog).fadeIn();
+            }
+            if(hide && !show)
+              $('div.expose').hide();
+            if(!hide && show)
+              $('div.expose').show();
+        });
+        return this;
+    };
+    $.fn.initDuplicates = function() {
+      this.click(function() {
+          var li = $(this);
+          var hide = false;
+          if(li.hasClass('open'))
+            hide = true;
+          else
+            li.addClass('open');
+          li.children("ul").slideToggle(400, function() {
+            if(hide)
+              li.removeClass('open');
+          });
+      });
+      return this;
+    };
+
+    $.fn.initFavorites = function() {
+      this.find("ul.favorite > li").not(":first").tsort("a").end().click(function() {
+          $(this).find("a").toggleFavorite();
+        });
+
+      return this.children('.content').tabs({ fxAutoHeight: true }).find("input#favoriteMovies_rating").spin({ interval: 0.1, min: 0, max: 10 }).end().end();
+    };
+
+    $.fn.initForm = function() {
+        this.submit(function(e) {
+            $.submitForm(this);
+            return false;
+        });
+        var f = $.cookie('twFontSize');
+        if(f)
+            this.find("#config_webui").val(f).change();
+        return this;
+    };
+    $.fn.toggleFavorite = function() {
+        this.each(function() {
+            var last = current_favorite;
+            current_favorite = this.hash;
+            var onDone = function() {
+              if (!last) {
+                  $(current_favorite).show();
+              } else {
+                  $(last).fadeOut(600, function() {
+                      $(current_favorite).fadeIn(600);
+                  });
+              }
+            };
+            if($(current_favorite).length == 0) {
+              var tabs = $(this).closest('.tabs-container');
+              $.get('nmtdvr.php?r=ajax/loadFavorite&id='+current_favorite.substr(1), null, function(html) {
+                  tabs.append(html);
+                  onDone();
+                  }, 'html');
+            } else 
+              onDone();
+        });
+        return this;
+    };
+
+    $.showFavorite = function(hash) {
+      $('<a href="'+hash+'"/>').toggleFavorite();
+    };
+
+    $.showTab = function(hash) {
+      var dialog = $(hash).closest('.dialog_window');
+      $.showDialog('#'+dialog.get(0).id)
+      dialog.find('ul.tabs-nav').find("a[href="+hash+"]").click();
+    }
+
+    $.showDialog = function(hash) {
+      $('<a href="'+hash+'"/>').toggleDialog();
+    };
+
+    $.contextMenu.defaults({
+        menuStyle: {
+            textAlign: "left",
+            width: "160px"
+        },
+        itemStyle: {
+            fontSize: "1.0em",
+            paddingLeft: "15px"
+        }
+    });
+    $.fn.myContextMenu = function() {
+        this.contextMenu("CM1", {
+            bindings: {
+                'addToFavorites': function(t) {
+                    url = 'nmtdvr.php?r=ajax/addFavorite&feedItem_id='+$(t).find(".itemId").val();
+                    $.get(url, '', $.loadDynamicData, 'html')
+                },
+                'startDownloading': function(t) {
+                    url = 'nmtdvr.php?r=ajax/dlFeedItem&feedItem_id='+$(t).find(".itemId").val();
+                    $.get(url, '', $.loadDynamicData, 'html');
+                },
+                'inspect': function(t) {
+                    $.get('nmtdvr.php', 'r=ajax/inspect&feedItem_id='+$(t).find(".itemId").val()+'&title='+
+                          encodeURIComponent($(t).find("span.torrent_name").text()), function(html) {
+                        $("div#inspector_container").html(html);
+                        if (!inspect_status) {
+                            $.toggleInspector();
+                        }
+                    }, 'html');
+                }
+            }
+        });
+        return this;
+    };
+    $.fn.initConfigDialog = function() {
+        this.children('.content').tabs({fxAutoHeight: true });
+        this.find('.client_config select').change(function() {
+            $(this).closest('.client_config').find('.config').hide().end()
+              .find('#'+$(this).val()).show();
+        }).change();
+        setTimeout(function() {
+            $('select#client').change();
+        }, 500);
+        return this;
+    };
+    $.fn.buildDataString = function(buttonElement) {
+        var dataString = $(this).filter('form').serialize();
+        if(buttonElement) {
+            dataString += (dataString.length == 0 ? '' : '&' ) + 'button=' + buttonElement.id;
+        }
+        return dataString;
+    };
+    $.fn.markAlt = function() {
+      return this.removeClass('alt').filter(":visible:even").addClass('alt');
+    };
+})(jQuery);
+
+//
+//
+// Everything below here initializes the page on first load
+//
+//
+
 $(function() { 
     // Menu Bar, and other buttons which show/hide a dialog
     $("a.toggleDialog").live('click', function() {
         $(this).toggleDialog();
+        return false;
     });
     // Vary the font-size
     $("div#config_webui select").live('change', function() {
@@ -94,12 +343,13 @@ $(function() {
     });
     // Ajax progress bar
     $("#progressbar").ajaxStart(function() {
-      $('.dialog_window:visible').toggleDialog();
+      $('.dialog_window:visible:not(#favorites,#history)').toggleDialog();
       $(this).show();
       $('div.expose').show();
     }).ajaxStop(function() {
       $(this).hide();
-      $('div.expose').hide();
+      if($('.dialog_window:visible:not(#progressbar)').length == 0) 
+        $('div.expose').hide();
     }).ajaxError(function(event, XMLHttpRequest, ajaxOptions, thrownError){
       var content;
       if(XMLHttpRequest.responseText === '')
@@ -114,6 +364,16 @@ $(function() {
     });
     // Perform the first load of the dynamic information
     $.get('nmtdvr.php?r=ajax/fullResponse', '', $.loadDynamicData, 'html');
+    $("#feedItems_container").tabs({ 
+        remote: true,
+        onShow: function(clicked, toShow, toHide) {
+          $("li.torrent:not(.initialized)", toShow)
+          .addClass('initialized')
+          .myContextMenu()
+          .filter(".hasDuplicates")
+          .initDuplicates();
+        },
+    });
 
     // Configuration, wizard, and update/delete favorite ajax submit
     $("a.submitForm,input.submitForm").live('click', function(e) {
@@ -148,213 +408,3 @@ $(function() {
     });
   
 });
-
-(function($) {
-    var current_favorite, current_dialog, inspect_status;
-    $.toggleInspector = function() {
-        inspect_status = !inspect_status;
-        $("div#feedItems_container,div#feedItems_container > div,ul#filterbar_container,div#inspector_container").stop(true,true).animate(
-                { right: (inspect_status? '+' : '-') + "=350" },
-                { duration: 600 }
-        );
-    };
-    $.loadMoreFeedItems = function(html) {
-      var container = $("<div />");
-      var dest = '';
-      container[0].innerHTML = html;
-      container.find('div#feedItems_container').children().each(function() {
-        var dest = $('#'+this.id);
-        $(this).find("li.torrent").myContextMenu()
-               .filter(".hasDuplicates").initDuplicates();
-        dest.find('li.loadMore').remove().end()
-            .append($(this).children('ul'));
-      });
-    };
-    // Remove old dynamic content, replace it with passed html(ajax success function)
-    $.loadDynamicData = function(html) {
-        $("#dynamicdata").remove();
-        setTimeout(function() {
-            $(current_dialog).toggleDialog();
-            current_dialog = '';
-            var dynamic = $("<div id='dynamicdata'/>");
-            // Use innerHTML because some browsers choke with $(html) when html is many KB
-            dynamic[0].innerHTML = html;
-            dynamic.find("div#favorites").initFavorites().end()
-                    .find("li.torrent").myContextMenu()
-                      .filter(".hasDuplicates").initDuplicates().end().end()
-                    .find("form").initForm().end()
-                    .find("div#configuration").initConfigDialog().end()
-                    .find("#feedItems_container").tabs().end()
-                    .appendTo("body");
-            setTimeout(function() {
-                var container = $("#feedItems_container > div:first");
-                if(container.children('ul').children().length == 1 && $(".login_form").length == 0) {
-                    current_dialog = '#welcome1';
-                    $(current_dialog).show();
-                } else {
-                    container.slideDown(400, function() {
-                        if(inspect_status)
-                            container.css('right', 350);
-                    });
-                }
-            }, 50);
-        }, 100);
-    };
-    $.submitForm = function(button) {
-        var form;
-        if($(button).is('form')) { // User pressed enter
-            form = $(button);
-            button = form.find('a');
-            if(button.length == 0)
-              button = form.find('input[type=submit]');
-            button = button[0];
-        } else
-            form = $(button).closest("form");
-        // close any open dialog
-        if(current_dialog)
-          $(current_dialog).toggleDialog();
-
-        $.post(form.get(0).action, form.buildDataString(button), $.loadDynamicData, 'html');
-    }; 
-    $.fn.toggleDialog = function() {
-        this.each(function() {
-            var last = current_dialog === '#' ? '' : current_dialog;
-            var target = this.hash === '#' ? '#'+$(this).closest('.dialog_window').id : this.hash;
-            var hide = false;
-            var show = false;
-            current_dialog = last === target ? '' : this.hash;
-            if (last) {
-                $(last).fadeOut();
-                hide = true;
-            }
-            if (current_dialog && this.hash != '#') {
-                $(current_dialog).fadeIn();
-                show = true;
-            }
-            if(hide && !show)
-              $('div.expose').hide();
-            if(!hide && show)
-              $('div.expose').show();
-        });
-        return this;
-    };
-    $.fn.initDuplicates = function() {
-      this.click(function() {
-          var li = $(this);
-          var hide = false;
-          if(li.hasClass('open'))
-            hide = true;
-          else
-            li.addClass('open');
-          li.children("ul").slideToggle(400, function() {
-            if(hide)
-              li.removeClass('open');
-          });
-      });
-      return this;
-    };
-
-    $.fn.initFavorites = function() {
-      this.find("ul.favorite > li").not(":first").tsort("a").end().click(function() {
-          $(this).find("a").toggleFavorite();
-        });
-
-      return this.children('.content').tabs({ fxAutoHeight: true }).find("input#favoriteMovies_rating").spin({ interval: 0.1, min: 0, max: 10 }).end().end();
-    };
-
-    $.fn.initForm = function() {
-        this.submit(function(e) {
-            $.submitForm(this);
-            return false;
-        });
-        var f = $.cookie('twFontSize');
-        if(f)
-            this.find("#config_webui").val(f).change();
-        return this;
-    };
-    $.fn.toggleFavorite = function() {
-        this.each(function() {
-            var last = current_favorite;
-            current_favorite = this.hash;
-            if (!last) {
-                $(current_favorite).show();
-            } else {
-                $(last).fadeOut(600, function() {
-                    $(current_favorite).fadeIn(600);
-                });
-            }
-        });
-        return this;
-    };
-
-    $.showFavorite = function(hash) {
-      $('<a href="'+hash+'"/>').toggleFavorite();
-    };
-
-    $.showTab = function(hash) {
-      var dialog = $(hash).closest('.dialog_window');
-      $.showDialog('#'+dialog.get(0).id)
-      dialog.find('ul.tabs-nav').find("a[href="+hash+"]").click();
-    }
-
-    $.showDialog = function(hash) {
-      $('<a href="'+hash+'"/>').toggleDialog();
-    };
-
-    $.contextMenu.defaults({
-        menuStyle: {
-            textAlign: "left",
-            width: "160px"
-        },
-        itemStyle: {
-            fontSize: "1.0em",
-            paddingLeft: "15px"
-        }
-    });
-    $.fn.myContextMenu = function() {
-        this.contextMenu("CM1", {
-            bindings: {
-                'addToFavorites': function(t) {
-                    url = 'nmtdvr.php?r=ajax/addFavorite&feedItem_id='+$(t).find(".itemId").val();
-                    $.get(url, '', $.loadDynamicData, 'html')
-                },
-                'startDownloading': function(t) {
-                    url = 'nmtdvr.php?r=ajax/dlFeedItem&feedItem_id='+$(t).find(".itemId").val();
-                    $.get(url, '', $.loadDynamicData, 'html');
-                },
-                'inspect': function(t) {
-                    $.get('nmtdvr.php', 'r=ajax/inspect&feedItem_id='+$(t).find(".itemId").val()+'&title='+
-                          encodeURIComponent($(t).find("span.torrent_name").text()), function(html) {
-                        $("div#inspector_container").html(html);
-                        if (!inspect_status) {
-                            $.toggleInspector();
-                        }
-                    }, 'html');
-                }
-            }
-        });
-        return this;
-    };
-    $.fn.initConfigDialog = function() {
-        this.children('.content').tabs({fxAutoHeight: true });
-        this.find('.client_config select').change(function() {
-            $(this).closest('.client_config').find('.config').hide().end()
-              .find('#'+$(this).val()).show();
-        }).change();
-        setTimeout(function() {
-            $('select#client').change();
-        }, 500);
-        return this;
-    };
-    $.fn.buildDataString = function(buttonElement) {
-        var dataString = $(this).filter('form').serialize();
-        if(buttonElement) {
-            dataString += (dataString.length == 0 ? '' : '&' ) + 'button=' + buttonElement.id;
-        }
-        return dataString;
-    };
-    $.fn.markAlt = function() {
-      return this.removeClass('alt').filter(":visible:even").addClass('alt');
-    };
-})(jQuery);
-

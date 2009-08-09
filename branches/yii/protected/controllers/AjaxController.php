@@ -52,7 +52,7 @@ class AjaxController extends BaseController
         'actions'=>array(
             'fullResponse', 'dlFeedItem', 'saveConfig', 'addFeed', 'addFavorite', 'updateFavorite', 
             'inspect', 'clearHistory', 'createFavorite', 'deleteFavorite', 'loadFeedItems', 'resetData',
-            'wizard',
+            'wizard', 'loadFavorite', 'getHistory',
         ),
         'users'=>array('@'),
       ),
@@ -64,6 +64,22 @@ class AjaxController extends BaseController
         'users'=>array('*'),
       ),
     );
+  }
+
+  public function loadFavorite($idString = null)
+  {
+    if($idString === null)
+      $idString = $_GET['id'];
+    list($class, $id) = explode('-', $idString);
+    $class = substr($class, 0, -1);
+    if(in_array($class, $this->favoriteWhitelist))
+    {
+      if(is_numeric($id))
+        return CActiveRecord::model($class)->findByPk($id);
+       elseif(empty($id))
+        return new $class;
+    }
+    return false;
   }
 
   public function loadFeedItem($id = null)
@@ -138,9 +154,18 @@ class AjaxController extends BaseController
 
     $favorite->attributes = $_POST[$class];
     $favorite->save();
+    // include data to display favorite in response
+    $this->response['genresListData'] = CHtml::listData(genre::model()->findAll(), 'id', 'title');
+    $this->response['feedsListData'] = CHtml::listData(feed::model()->findAll(), 'id', 'title');
+    // get qualitys for use in forms and prepend a blank quality to the list
+    $qualitys = quality::model()->findAll();
+    $q = new quality;
+    $q->title='';
+    $q->id=-1;
+    array_unshift($qualitys, $q);
+    $this->response['qualitysListData'] = CHtml::listData($qualitys, 'id', 'title');
     // Tell the view to bring up the changed favorite
-    $htmlId = $class.'s-'.$favorite->id;
-    $this->response[$htmlId] = $favorite;
+    $this->response[$class] = $favorite;
     $this->response['showFavorite'] = "#".$class.'s-'.$favorite->id;
     $this->response['showTab'] = "#".$class."s";
   }
@@ -242,40 +267,16 @@ class AjaxController extends BaseController
     $startTime = microtime(true);
     $config = $app->dvrConfig;
     $time['dvrConfig'] = microtime(true);
-    $favoriteMovies = favoriteMovie::model()->with('quality')->findAll();
-    $time['favorietMovies'] = microtime(true);
-    $favoriteTvShows = favoriteTvShow::model()->with('tvShow', 'quality')->findAll();
+    $favoriteMovies = favoriteMovie::model()->findAll(array('select'=>'id,name'));
+    $time['favoriteMovies'] = microtime(true);
+    $favoriteTvShows = favoriteTvShow::model()->with(array('tvShow'=>array('select'=>'id,title')))->findAll(array('select'=>'id'));
     $time['favoriteTvShows'] = microtime(true);
-    $favoriteStrings = favoriteString::model()->with('quality')->findAll();
+    $favoriteStrings = favoriteString::model()->findAll(array('select'=>'id,name'));
     $time['favoriteStrings'] = microtime(true);
     $feeds = feed::model()->findAll(); // todo: not id 0, which is 'All'
     $time['feeds'] = microtime(true);
-    $history = array_reverse(history::model()->findAll());
-    $time['history'] = microtime(true);
     $availClients = $app->dlManager->availClients;
     $time['availClients'] = microtime(true);
-    $genres = genre::model()->findAll();
-    $time['genres'] = microtime(true);
-
-
-    // get qualitys for use in forms and prepend a blank quality to the list 
-    $qualitys = quality::model()->findAll();
-    $q = new quality;
-    $q->title='';
-    $q->id=-1;
-    array_unshift($qualitys, $q);
-    $time['qualitys'] = microtime(true);
-
-    // Query the various feeditems from the database
-    // not AR classes because it takes too much time on the NMT
-    $tvEpisodes = $this->prepareFeedItems('tv');
-    $time['tvEpisodes'] = microtime(true);
-    $movies = $this->prepareFeedItems('movie');
-    $time['movies'] = microtime(true);
-    $others = $this->prepareFeedItems('other');
-    $time['others'] = microtime(true);
-    $queued = $this->prepareFeedItems('queued');
-    $time['queued'] = microtime(true);
 
     foreach($time as $key => $value) {
       $time[$key] = $value-$startTime;
@@ -291,16 +292,16 @@ class AjaxController extends BaseController
           'favoriteMovies'=>$favoriteMovies,
           'favoriteStrings'=>$favoriteStrings,
           'feeds'=>$feeds,
-          'genres'=>$genres,
-          'history'=>$history,
-          'movies'=>$movies,
-          'others'=>$others,
-          'qualitys'=>$qualitys,
-          'queued'=>$queued,
           'response'=>$this->response,
-          'tvEpisodes'=>$tvEpisodes,
     ));
     Yii::log("end controller: ".$logger->getExecutionTime()."\n", CLogger::LEVEL_PROFILE);
+  }
+
+  public function actionGetHistory()
+  {
+    $this->render('history_dialog', array(
+          'history'=>history::model()->findAll(),
+    ));
   }
 
   public function actionInspect()
@@ -320,6 +321,29 @@ class AjaxController extends BaseController
     $this->render($view, $opts);
   }
 
+  public function actionLoadFavorite()
+  {
+    $favorite = $this->loadFavorite();
+    if($favorite)
+    {
+      $genres = genre::model()->findAll();
+      $feeds = feed::model()->findAll(); // todo: not id 0, which is 'All'
+  
+      // get qualitys for use in forms and prepend a blank quality to the list 
+      $qualitys = quality::model()->findAll();
+      $q = new quality;
+      $q->title='';
+      $q->id=-1;
+      array_unshift($qualitys, $q);
+     
+      $this->render(get_class($favorite), array(
+            'favorite'=>$favorite,
+            'feedsListData'=>CHtml::listData($feeds, 'id', 'title'),
+            'genresListData'=>CHtml::listData($genres, 'id', 'title'),
+            'qualitysListData'=>CHtml::listData($qualitys, 'id', 'title'),
+      ));
+    }
+  }
   public function actionLoadFeedItems()
   {
     $whiteList = array(

@@ -7,9 +7,6 @@
    </ul> 
    <?php
      // Initialze some listData to be reused by all the favorites
-     $genresListData = CHtml::listData($genres, 'id', 'title');
-     $feedsListData = CHtml::listData($feeds, 'id', 'title');
-     $qualitysListData = CHtml::listData($qualitys, 'id', 'title');
      // Loop through the 3 favorites and display them all
      foreach(array('favoriteTvShows', 'favoriteMovies', 'favoriteStrings') as $favType):
        $class = substr($favType, 0, -1); ?>
@@ -23,14 +20,10 @@
              endif; ?>
       </ul>
       <?php 
-        // Empty favorite seen as 'New Favorite' above
-        $favorite = new $class;
-        include VIEWPATH.$class.'.php';
-        // $$ points to the variable named in the named variable
-        // so $favoriteTvShows, or whatever
-        if($$favType !== null) {
-          foreach($$favType as $favorite) 
-            include VIEWPATH.$class.'.php';
+        if(isset($response[$class]))
+        {
+          $favorite = $response[$class];
+          include VIEWPATH.$class.'.php';
         }
       ?>
     </div>
