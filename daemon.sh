@@ -40,3 +40,8 @@ fi
 # assets/ cache/ protected/runtime protected/data/source.db
 chmod -R 777 .
 
+# clear the APC cache
+pidof lighttpd >/dev/null
+if [ $? = 0 ]; then
+  wget -qO /dev/null 'http://localhost:9990/lighttpd_web/apc.php?SCOPE=A&SORT1=H&SORT2=D&COUNT=20&CC=1&OB=1'
+fi
