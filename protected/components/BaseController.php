@@ -30,7 +30,8 @@ abstract class BaseController extends CController {
     date_default_timezone_set(Yii::app()->dvrConfig->timezone);
     // sd if reported in user agent, otherwise default to hd
     $this->_resolution = stristr($_SERVER['HTTP_USER_AGENT'], 'Res720x576') === False?'hd':'sd';
-    // if the user agent is an NMT give it local filepath, otherwise based off script
+
+    // if the user agent is an NMT load images with file://, otherwise relative url
     if(stristr($_SERVER['HTTP_USER_AGENT'], 'Syabas') === False) 
       $this->imageRoot = dirname($_SERVER['SCRIPT_NAME']).'/assets/images/';
     else
@@ -43,6 +44,10 @@ abstract class BaseController extends CController {
       $this->layout = 'ajax';
     else
       $this->layout = 'main_'.$this->_resolution;
+
+    // Auto-login hack from localhost 
+    if(Yii::app()->user->isGuest() && $_SERVER['REMOTE_ADDR'] === '127.0.0.1')
+      Yii::app()->user->login(new LocalBrowserHackIdentity(), 3600*24*30);
   }
 
   /**
