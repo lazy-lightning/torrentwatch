@@ -41,12 +41,15 @@ abstract class BaseController extends CController {
 
     // Switch to ajax view when required
     if(Yii::app()->request->isAjaxRequest)
+    {
       $this->layout = 'ajax';
+//      Yii::app()->setTheme('classic');
+    }
     else
       $this->layout = 'main_'.$this->_resolution;
 
     // Auto-login hack from localhost 
-    if(Yii::app()->user->isGuest() && $_SERVER['REMOTE_ADDR'] === '127.0.0.1')
+    if(Yii::app()->user->getIsGuest() && $_SERVER['REMOTE_ADDR'] === '127.0.0.1')
       Yii::app()->user->login(new LocalBrowserHackIdentity(), 3600*24*30);
   }
 

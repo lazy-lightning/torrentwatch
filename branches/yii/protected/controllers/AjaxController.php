@@ -20,12 +20,6 @@ class AjaxController extends BaseController
    */
   protected $response = array();
 
-  public function init()
-  {
-    parent::init();
-    $this->layout = 'ajax';
-  }
-
   /**
    * @return array action filters
    */
