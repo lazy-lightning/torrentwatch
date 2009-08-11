@@ -19,10 +19,12 @@ class mediaTitleParser {
       if($result)
       {
         $result[] = $quality;
+        echo "Result found with ".get_class($matcher)."\n";
         return $result;
       }
     }
 
+    // default detect if no match found
     return array($shortTitle, 0, 0, '', $quality);
   }
 
@@ -81,9 +83,10 @@ abstract class titleMatch {
 
   public function run($title)
   {
-    if(preg_match($this->getRegExp(), $title, $regs))
+    if(preg_match($this->getRegExp(), $title, $regs) &&
+       false !== ($opts = $this->foundMatch($title, $regs)))
     {
-      list($shortTitle, $season, $episode) = $this->foundMatch($title, $regs);
+      list($shortTitle, $season, $episode) = $opts;
       $network = '';
 
       // Convert . and _ to spaces, and trim result
@@ -112,12 +115,11 @@ class titleMatchFull extends titleMatch
            '\b('  // must be a word boundry before the episode to prevent turning season 13 into season 3
           .'S\d+[. _]?E\d+'        // S12E1 or S1.E22 or S4 E1
           .'|\d+x\d+'              // or 1x23
-          .'|\d+[. ]?of[. ]?\d+)'; // or 03of18
+          .'|\d+[. _]?of[. _]?\d+)'; // or 03of18
   }
 
   function foundMatch($title, $regs)
   {
-    Yii::log('episode match'.print_r($regs, TRUE));
     $shortTitle = trim($regs[1]);
     $episode_guess = trim(strtr($regs[2], $this->trFrom, $this->trTo));
     list($season,$episode) = explode('x', preg_replace('/(S(\d+)[. _]?E(\d+)|(\d+)x(\d+)|(\d+)[. _]?of[. _]?(\d+))/i', '\2\4\6x\3\5\7', $episode_guess));
@@ -138,13 +140,18 @@ class titleMatchDate extends titleMatch
           .')';
   }
 
+  function fakeErrorHandler() { return False; }
+
   function foundMatch($title, $regs)
   {
-    Yii::log('date based episode '.print_r($regs, TRUE));
     $shortTitle = trim($regs[1]);
+    $episode = false;
 
     $cleanDate = str_replace(' ', '/', trim(strtr($regs[2], $this->trFrom, $this->trTo)));
     // Use UTC for time measurements
+    // php issues a warning, which yii exits on, and an exception,
+    // so temporarily replace the error handler.
+    $handler = set_error_handler(array($this, 'fakeErrorHandler'));
     try
     {
       $date = new DateTime($cleanDate, new DateTimeZone('UTC'));
@@ -152,11 +159,10 @@ class titleMatchDate extends titleMatch
     }
     catch (Exception $e)
     {
-      $episode = 0;
-      $shortTitle .= ' '.$regs[2];
+      $date = null;
     }
-
-    return array($shortTitle, 0, $episode);
+    restore_error_handler($handler);
+    return $date === null ? false : array($shortTitle, 0, $episode);
   }
 }
 
@@ -167,7 +173,6 @@ class titleMatchPartial extends titleMatch
 
   function foundMatch($title, $regs)
   {
-    Yii::log('episode or season, not both'.print_r($regs, TRUE));
     $shortTitle = trim($regs[1]);
     $season  = $regs[2] == 'S' ? trim($regs[3]) : 1;
     $episode = $regs[2] == 'E' ? trim($regs[3]) : 0;
@@ -184,7 +189,6 @@ class titleMatchShort extends titleMatch
  
   function foundMatch($title, $regs)
   {
-    Yii::log('3 digit season/episode identifier'.print_r($regs, TRUE));
     // 3 digit season/episode identifier
     $shortTitle = trim($regs[1]);
     $episode_guess = $regs[2];
