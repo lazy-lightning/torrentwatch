@@ -15,18 +15,15 @@
       setTimeout(function() {
         container.find('div#feedItems_container').children().each(function() {
           var dest = $('#'+this.id);
+          if(!dest.is('ul'))
+            dest = dest.children('ul');
+
           $(this)
-          .find("li.torrent")
-          .myContextMenu()
-          .filter(".hasDuplicates")
-          .initDuplicates();
+          .find("li.torrent").myContextMenu()
+          .filter(".hasDuplicates").initDuplicates();
           
-          dest.find('li.loadMore')
-          .remove()
-          .end()
-          .append(
-            $(this).children('ul')
-          );
+          dest.find('li.loadMore').remove().end()
+          .children('ul').append(dest.children('li'));
         });
       }, 0);
     };
@@ -113,15 +110,20 @@
     $.fn.initDuplicates = function() {
       this.click(function() {
           var li = $(this);
-          var hide = false;
+          var ul = li.children("ul");
+          var callback = null;
+          var onDone = function() { ul.slideToggle(400, callback); };
+
           if(li.hasClass('open'))
-            hide = true;
+            callback = function() { li.removeClass('open'); };
           else
             li.addClass('open');
-          li.children("ul").slideToggle(400, function() {
-            if(hide)
-              li.removeClass('open');
-          });
+
+          if(ul.children("li").length == 0) {
+            ul.load('nmtdvr.php?r=feedItem/list&filter='+encodeURIComponent(li.id), '', onDone);
+          } else
+           onDone();
+
       });
       return this;
     };
@@ -149,14 +151,10 @@
             var last = current_favorite;
             current_favorite = this.hash;
             var onDone = function() {
-              if (!last) {
-                  $(current_favorite).show();
-              } else {
-                  $(last).fadeOut(600, function() {
-                      $(current_favorite).fadeIn(600);
-                  });
-              }
+              $(current_favorite).show();
             };
+            if(last)
+              $(last).hide();
             if($(current_favorite).length == 0) {
               var tabs = $(this).closest('.tabs-container');
               $.get('nmtdvr.php?r=ajax/loadFavorite&id='+current_favorite.substr(1), null, function(html) {
