@@ -527,6 +527,10 @@ div.form_radio {
  * P R O G R E S S   B A R
  *
  ***************************/
+#progressbar {
+  z-index: 9999 !important;
+  }
+
 #progressbar img {
   display: block;
   margin: 0 auto;
