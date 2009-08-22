@@ -76,11 +76,11 @@
         </span>
         <label class="category">Bit Torrent</label>
         <div class="form_radio">
-            <input type="radio" name="feed[torUrl]" value="http://tvrss.net/feed/eztv/" /><label class="item">tvRSS.net - EzTV</label>
+            <input type="radio" name="feed[torUrl]" value="http://rss.bt-chat.com/?group=3" /><label class="item">BT-Chat.com - EzTV</label>
             <label class="item">The EzTV feed from tvRSS.net</label>
         </div>
         <div class="form_radio">
-            <input type="radio" name="feed[torUrl]" value="http://tvrss.net/feed/vtv/" /><label class="item">tvRSS.net - VTV</label>
+            <input type="radio" name="feed[torUrl]" value="http://rss.bt-chat.com/?group=2" /><label class="item">BT-Chat.com - VTV</label>
             <label class="item">The VTV feed from tvRSS.net contains only the most popular tv shows</label>
         </div>
         <label class="category">NZB</label>
