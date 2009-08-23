@@ -5,6 +5,19 @@ class dbMaintinanceCommand extends BaseConsoleCommand {
     $db = Yii::app()->db;
 
     $querys = array(
+        // create temp table containing feeditems that point to others that are also in movies
+        'CREATE TEMP TABLE convert AS'.
+        ' SELECT i.id as feedItem_id, m.id as movie_id, o.id as other_id'.
+        ' FROM movie m,other o,feedItem i'.
+        ' WHERE i.other_id = o.id'.
+        ' AND m.title LIKE o.title;',
+        // point all feeditems found to those movies
+        'UPDATE feedItem'.
+        '   SET movie_id=(SELECT movie_id FROM convert c WHERE c.feedItem_id = feedItem.id),'.
+        '       other_id = null'.
+        ' WHERE feedItem.id IN(select feedItem_id FROM convert);',
+        // drop temp table
+        'DROP TABLE convert;',
         //  Delete items more than the configured  days old
         'DELETE FROM feedItem'.
         ' WHERE feedItem.pubDate < '.(time()-(3600*24*Yii::app()->dvrConfig->feedItemLifetime)).';',
@@ -38,7 +51,6 @@ class dbMaintinanceCommand extends BaseConsoleCommand {
         'DELETE FROM genre'.
         ' WHERE id NOT IN (SELECT genre_id from favoriteMovies)'.
         '   AND id NOT IN (SELECT genre_id from movie_genre);',
-        //
     );
     // SQLite doesn't do anything with foreign keys, so clean out MANY_MANY relationships that point to
     // non-existant things
@@ -91,7 +103,6 @@ class dbMaintinanceCommand extends BaseConsoleCommand {
       
       foreach($querys as $sql)
       {
-        echo $sql."\n";
         $db->createCommand($sql)->execute();
       }
 
