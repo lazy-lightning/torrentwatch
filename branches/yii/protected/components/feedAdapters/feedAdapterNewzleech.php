@@ -11,11 +11,10 @@ class feedAdapterNewzleech extends feedAdapter {
   // Prune out any feed item less than 100 MB
   public function get_items($start = 0, $end = 0) 
   {
-    $items = parent::get_items($start, $end);
     $out = array();
     $types = array('Byte'=>0, 'KB'=>1, 'MB'=>2, 'GB'=>3);
 
-    foreach($items as $item) {
+    foreach(parent::get_items($start, $end) as $item) {
       $minSize = '100';
       $minType = $types['MB'];
 
@@ -29,6 +28,7 @@ class feedAdapterNewzleech extends feedAdapter {
           $minSize = 2;
         }
       }
+
       if(preg_match('/Size: (\d+)(?:,\d+)? (Byte|KB|MB|GB)/', $item->get_description(), $regs))
       {
         $type = $types[$regs[2]];
