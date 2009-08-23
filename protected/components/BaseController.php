@@ -27,24 +27,29 @@ abstract class BaseController extends CController {
    * @return none
    */
   public function init() {
+    $app = Yii::app();
     date_default_timezone_set(Yii::app()->dvrConfig->timezone);
+
     // sd if reported in user agent, otherwise default to hd
     $this->_resolution = stristr($_SERVER['HTTP_USER_AGENT'], 'Res720x576') === False?'hd':'sd';
 
     // if the user agent is an NMT load images with file://, otherwise relative url
     if(stristr($_SERVER['HTTP_USER_AGENT'], 'Syabas') === False) 
-      $this->imageRoot = dirname($_SERVER['SCRIPT_NAME']).'/assets/images/';
+    {
+      $this->imageRoot = dirname($_SERVER['SCRIPT_NAME']).'/images/';
+      $app->setTheme($app->dvrConfig->webuiTheme);
+    }
     else
+    {
+      $app->setTheme($app->dvrConfig->gayauiTheme);
       $this->imageRoot = 'file:///opt/sybhttpd/localhost.images/';
+    }
 
     $this->imageRoot .= $this->_resolution.'/';
 
     // Switch to ajax view when required
     if(Yii::app()->request->isAjaxRequest)
-    {
       $this->layout = 'ajax';
-//      Yii::app()->setTheme('classic');
-    }
     else
       $this->layout = 'main_'.$this->_resolution;
 

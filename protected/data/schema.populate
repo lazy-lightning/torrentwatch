@@ -23,12 +23,14 @@ INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('downloadDir','/
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('watchDir','/share/',NULL);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('saveFile',1,NULL);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('tempDir','/tmp',NULL);
-INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('feedItemLifetime',7,NULL);
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('feedItemLifetime',2,NULL);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('torClient','clientFolder',NULL);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('nzbClient','clientFolder',NULL);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('webItemsPerLoad', 50, NULL);
-INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('maxItemsPerFeed', 500, NULL);
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('maxItemsPerFeed', 100, NULL);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('timezone', 'America/Los_Angeles', NULL);
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('webuiTheme', 'classic', NULL);
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('gayauiTheme', 'gaya', NULL);
 -- BTPD
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('executable','/mnt/syb8634/bin/btcli',2);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('directory','/share/.btpd',2);
