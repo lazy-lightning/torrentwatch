@@ -24,16 +24,17 @@ class updateIMDbCommand extends BaseConsoleCommand {
       echo "Searching IMDb for $title\n";
       $scraper = new IMDbScraper($title);
 
-      if($scraper->accuracy < 75) {
+      if($scraper->accuracy < 75) 
+      {
         $scanned[] = $row['id'];
         Yii::log("Failed scrape of $title\n", CLogger::LEVEL_INFO);
         echo "Failed scrape of $title with accuracy of {$scraper->accuracy} and a guess of {$scraper->title}\n";
-        continue;
       }
-
-      echo "Found! Updating to ".$scraper->title."\n";
-
-      $toSave[] = array($row['id'], $row['title'], $movie, $scraper);
+      else
+      {
+        echo "Found! Updating to ".$scraper->title."\n";
+        $toSave[] = array($row['id'], $row['title'], $movie, $scraper);
+      }
     }
 
     $transaction = Yii::app()->db->beginTransaction();
