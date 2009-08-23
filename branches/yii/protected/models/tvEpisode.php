@@ -8,7 +8,7 @@ class tvEpisode extends CActiveRecord
 
   public function getStatusOptions() {
     return array(
-        self::STATUS_NEW=>'New',
+        self::STATUS_NEW=>'Unmatched',
         self::STATUS_DOWNLOADED=>'Downloaded',
     );
   }
@@ -57,7 +57,7 @@ class tvEpisode extends CActiveRecord
   public function relations()
   {
     return array(
-        'feedItems'=>array(self::HAS_MANY, 'feedItem', 'tvEpisode_id'),
+        'feedItem'=>array(self::HAS_MANY, 'feedItem', 'tvEpisode_id'),
         'tvShow'=>array(self::BELONGS_TO, 'tvShow', 'tvShow_id'),
     );
   }
@@ -83,7 +83,7 @@ class tvEpisode extends CActiveRecord
   }
 
   /**
-   * @return favoriteMovie a favoriteMovie object to match this movie
+   * @return favoriteMovie a favoriteMovie object to match this episode
    */
   public function generateFavorite($feedItem) 
   {
@@ -98,16 +98,19 @@ class tvEpisode extends CActiveRecord
    */
   public function getEpisodeString($empty = TRUE) 
   {
-    if($this->episode > 10000) 
+    // Performance hack, was spending 10% of a query calling this 100 times
+    $e = $this->episode;
+    $s = $this->season;  
+    if($e > 10000) 
     {
       $date = new DateTime('Jan 1 1970', new DateTimeZone('UTC'));
-      $date->modify('+'.$this->episode.' secconds');
+      $date->modify('+'.$e.' secconds');
       return $date->format('Y-m-d');
     }
-    elseif($this->season > 0 && $this->episode == 0)
-      return sprintf('S%02dE??', $this->season);
+    elseif($s > 0 && $e == 0)
+      return sprintf('S%02dE??', $s);
     else 
-      return sprintf('S%02dE%02d', $this->season, $this->episode);
+      return sprintf('S%02dE%02d', $s, $e);
   }
 
 }
