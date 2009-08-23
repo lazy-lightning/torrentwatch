@@ -108,12 +108,34 @@ abstract class BaseDvrConfig extends CModel {
   }
 
   /**
+   * called from implementing classes to load from APC
+   */
+  protected function loadAPC($key)
+  {
+    $success = false;
+    if(function_exists('apc_fetch'))
+    {
+      $data = apc_fetch($key, $success);
+      if($success)
+        $this->_ar = unserialize($data);
+    }
+    return $success;
+  }
+
+  /**
    * unused with override of the setAttributes function
    */
   public function safeAttributes()
   {
   }
 
+  public function saveAPC($key)
+  {
+    if(function_exists('apc_store'))
+    {
+      apc_store($key, serialize($this->_ar));
+    }
+  }
   /**
    * save any changed values to the database
    * @param boolean weather to perform validation before saving the record
@@ -221,7 +243,7 @@ class dvrConfigCategory extends BaseDvrConfig {
     $this->_title = $title;
     $this->_id = $id;
     foreach($values as $key => $value) {
-      $this->add($key, $value);
+      parent::add($key, $value);
     }
   }
 
@@ -255,6 +277,12 @@ class dvrConfigCategory extends BaseDvrConfig {
 
 class dvrConfig extends BaseDvrConfig {
 
+  public function afterSave()
+  {
+    $this->saveAPC('NMTDVR_Config');
+    parent::afterSave();
+  }
+
   /**
    * @return array customized attribute labels (name=>label)
    */
@@ -266,35 +294,39 @@ class dvrConfig extends BaseDvrConfig {
   }
 
   /**
-   * Initializes all configuration values from the database
+   * Initializes all configuration values from the database(or APC if available)
    */
-  public function init() {
-    $db = Yii::app()->db;
-    // Get our configuration information out of the database
-    $reader = Yii::app()->db->createCommand(
-        "SELECT key,value,dvrConfigCategory_id FROM dvrConfig"
-    )->query();
-    // add anything not in a group to the main config, organize anything else into groups to be added
-    $data = array();
-    foreach($reader as $row) {
-      if($row['dvrConfigCategory_id'] === null) 
+  public function init() 
+  {
+    if($this->loadAPC('NMTDVR_Config') === False)
+    {
+      $db = Yii::app()->db;
+      // Get our configuration information out of the database
+      $reader = Yii::app()->db->createCommand(
+          "SELECT key,value,dvrConfigCategory_id FROM dvrConfig"
+      )->queryAll();
+      // add anything not in a group to the main config, organize anything else into groups to be added
+      $data = array();
+      foreach($reader as $row) {
+        if($row['dvrConfigCategory_id'] === null) 
         $this->add($row['key'], $row['value']);
-      else {
-        $data[$row['dvrConfigCategory_id']][$row['key']] = $row['value'];
+        else {
+          $data[$row['dvrConfigCategory_id']][$row['key']] = $row['value'];
+        }
       }
+      // get all the category names
+      $reader = $db->createCommand(
+          "SELECT id, title FROM dvrConfigCategory"
+      )->queryAll();
+      // loop through and create categories
+      foreach($reader as $row) {
+        $id = $row['id'];
+        $c = new dvrConfigCategory($this, $id, $row['title'], empty($data[$id]) ? array() : $data[$id]);
+        // dvrConfigCategory will add to parent on successfull init
+        $c->init();
+      }
+      $this->saveAPC('NMTDVR_Config');
     }
-    // get all the category names
-    $reader = $db->createCommand(
-        "SELECT id, title FROM dvrConfigCategory"
-    )->query();
-    // loop through and create categories
-    foreach($reader as $row) {
-      $id = $row['id'];
-      $c = new dvrConfigCategory($this, $id, $row['title'], empty($data[$id]) ? array() : $data[$id]);
-      // dvrConfigCategory will add to parent on successfull init
-      $c->init();
-    }
-
     parent::init();
   }
 
