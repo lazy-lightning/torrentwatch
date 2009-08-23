@@ -39,7 +39,7 @@ class clientTransRPC extends BaseClient {
       return True;
 
     if(isset($response->result))
-      $this->_error = "Transmission RPC Error: ".print_r($response);
+      $this->_error = "Transmission RPC Error: ".print_r($response, true);
     else 
       $this->_error = "Failure connecting to Transmission RPC at ".$this->getApi();
 
@@ -91,12 +91,11 @@ class clientTransRPC extends BaseClient {
     $response = $be->file_get_contents($api);
 
     // Invalid session id, set it and try again
-    if(substr($response, 0, 7) === '<h1>409')
+    if(substr($response, 0, 7) === '<h1>409' &&
+       preg_match('/X-Transmission-Session-Id: ([A-Za-z0-9]+)/', $response, $regs)) 
     {
-      if(preg_match('/X-Transmission-Session-Id: ([A-Za-z0-9]+)/', $response, $regs)) {
-        $be->addHeaderLine('X-Transmission-Session-Id', $regs[1]);
-        $response = $be->file_get_contents($api);
-      }
+      $be->addHeaderLine('X-Transmission-Session-Id', $regs[1]);
+      $response = $be->file_get_contents($api);
     }
         
     return json_decode($response);
