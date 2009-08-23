@@ -352,10 +352,9 @@ class AjaxController extends BaseController
       $before = isset($_GET['before']) ? $_GET['before'] : null;
       $items = $this->prepareFeedItems($_GET['type'], $before);
       $this->render('feedItems_container', array(
-        $type => $items,
-        'tabs' => array(
-            $whiteList[$type] => $type,
-        ),
+        'type'  => $type,
+        'name'  => $whiteList[$type],
+        'items' => $items,
       ));
     }
   }
@@ -494,7 +493,7 @@ class AjaxController extends BaseController
         ($before === null ? '': ' WHERE feedItem_pubDate < '.$before).
         ' LIMIT '.($config->webItemsPerLoad*2)
     )->execute();
-    $reader = $db->createCommand('SELECT * FROM prepareItems')->query();
+    $reader = $db->createCommand('SELECT * FROM prepareItems')->queryAll();
     $items = array();
     foreach($reader as $row) 
     {
@@ -507,7 +506,7 @@ class AjaxController extends BaseController
           ' GROUP BY '.$group.
           ' ORDER BY feedItem_pubDate DESC'.
           ' LIMIT '.$config->webItemsPerLoad;
-    $reader = $db->createCommand($sql)->query();
+    $reader = $db->createCommand($sql)->queryAll();
     $output = array();
     foreach($reader as $row) 
     {
@@ -544,7 +543,7 @@ class AjaxController extends BaseController
       $sql = "SELECT feedItem_id FROM matching${class}s WHERE ${class}s_id = $id AND feedItem_status NOT IN".
                   "('".feedItem::STATUS_AUTO_DL."', '".feedItem::STATUS_MANUAL_DL."');";
   
-      $reader = Yii::app()->db->CreateCommand($sql)->query();
+      $reader = Yii::app()->db->CreateCommand($sql)->queryAll();
       $ids = array();
       foreach($reader as $row) 
       {

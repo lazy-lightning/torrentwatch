@@ -14,7 +14,7 @@
     if($favorite->isNewRecord) {
       echo CHtml::activeTextField($favorite, 'tvShow_id');
     } else {
-      echo CHtml::encode($favorite->name);
+      echo '<span>'.CHtml::encode($favorite->name).'</span>';
     }
   ?>
  </div>
@@ -24,9 +24,9 @@
  </div>
  <div class="favorite_episodes">
    <?php echo CHtml::activeLabelEx($favorite, 'episodes').': <span>S'.
-              CHtml::activeTextField($favorite, 'minSeason').'-'.
+              CHtml::activeTextField($favorite, 'minSeason', array('class'=>'min')).'-'.
               CHtml::activeTextField($favorite, 'maxSeason').' E'.
-              CHtml::activeTextField($favorite, 'minEpisode').'-'.
+              CHtml::activeTextField($favorite, 'minEpisode', array('class'=>'min')).'-'.
               CHtml::activeTextField($favorite, 'maxEpisode').'</span>'; ?>
  </div>
  <div class="favorite_feed">

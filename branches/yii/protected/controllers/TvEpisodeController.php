@@ -111,13 +111,20 @@ class TvEpisodeController extends BaseController
    */
   public function actionList()
   {
-    $criteria=new CDbCriteria;
+    $criteria=new CDbCriteria(array(
+          'select'=>'id, status, title, season, episode', 
+          'order'=>'tvEpisode.lastUpdated DESC',
+    )) ;
 
     $pages=new CPagination(tvEpisode::model()->count($criteria));
-    $pages->pageSize=self::PAGE_SIZE;
+    $pages->pageSize=Yii::app()->dvrConfig->webItemsPerLoad;
     $pages->applyLimit($criteria);
-
-    $tvepisodeList=tvEpisode::model()->findAll($criteria);
+    
+    $tvepisodeList=tvEpisode::model()->with(array(
+          'tvShow'=>array(
+            'select'=>'id,title',
+          ),
+    ))->findAll($criteria);
 
     $this->render('list',array(
       'tvepisodeList'=>$tvepisodeList,
