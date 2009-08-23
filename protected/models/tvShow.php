@@ -59,12 +59,12 @@ class tvShow extends CActiveRecord
   /**
    * @return string description with max 256 characters
    */
-  public function getShortDescription()
+  public function getShortDescription($length = 256, $append = ' ...')
   {
-    if(strlen($this->description) <= 256)
+    if(strlen($this->description) <= $length)
       $desc = $this->description;
     else
-      $desc = substr($this->description, 0, 252).' ...';
+      $desc = substr($this->description, 0, 256-strlen($append)).$append;
     return $desc;
   }
 }
