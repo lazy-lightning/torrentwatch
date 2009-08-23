@@ -198,14 +198,14 @@ class Scraper {
     // If we are sure that we found a good result, then get the file details.
     if ($best_match["pc"] > 75)
     {
-      Yii::log(6,'Possible matches are:',$haystack);
-      Yii::log(4,'Best guess: ['.$best_match["id"].'] - '.$haystack[$best_match["id"]]);
+      Yii::log('Possible matches are:',$haystack);
+      Yii::log('Best guess: ['.$best_match["id"].'] - '.$haystack[$best_match["id"]]);
       $this->accuracy = $best_match["pc"];
       return $best_match["id"];
     }
     else
     {
-      Yii::log(4,'Multiple Matches found, No match > 75%',$haystack);
+      Yii::log('Multiple Matches found, No match > 75%',$haystack);
       return false;
     }
   }
@@ -227,7 +227,7 @@ class IMDbScraper extends Scraper {
     $site_url    = 'http://www.imdb.com/';
     $search_url  = $site_url.'find?s=tt;q=';
 
-    Yii::log(4,"Searching for details about ".$title." online at '$site_url'");
+    Yii::log("Searching for details about ".$title." online at '$site_url'");
 
     if (preg_match("/\[(tt\d+)\]/",$title, $imdbtt) != 0)
     {
@@ -290,7 +290,7 @@ class IMDbScraper extends Scraper {
       $this->accuracy = 100;
     }
 
-    // Determine attributes for the movie and update the database
+    // Determine attributes for the movie and update the object properties
     if ($this->accuracy >= 75)
     {
       // Find Title
