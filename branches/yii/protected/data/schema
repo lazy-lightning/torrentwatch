@@ -116,6 +116,7 @@ CREATE TABLE movie (
     runtime TEXT,
     rating INTEGER,
     plot TEXT, 
+    lastUpdated INTEGER,
     lastImdbUpdate INTEGER DEFAULT 0
 );
 CREATE TABLE movie_genre (
@@ -132,6 +133,7 @@ CREATE TABLE other (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     title TEXT, 
     status NOT NULL DEFAULT 0, 
+    lastUpdated INTEGER,
     lastImdbUpdate NOT NULL DEFAULT 0
 );
 CREATE TABLE quality (

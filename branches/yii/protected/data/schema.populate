@@ -44,7 +44,7 @@ INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('seedRatio',0,5)
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('username','',5);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('password','',5);
 -- SABnzbd+
-INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('category','',7);
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('category','Default',7);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('baseApi','http://127.0.0.1:8080/sabnzbd/',7);
 -- CTorrent
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('baseApi', 'http://127.0.0.1:9002/', 3);
