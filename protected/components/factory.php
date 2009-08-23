@@ -5,12 +5,19 @@
 // new feedItems and their related models
 
 class factory {
+  // @param array must contain at least 'hash' key for feedItem
   public static function feedItemByAttributes($attributes)
   {
-    $item = new feedItem;
-    $item->attributes = $attributes;
-    if(!$item->save())
-      throw new CException("New feed item failed to save");
+    if(!isset($attributes['hash']))
+      throw new CException("No hash provided for ".__FUNCTION__);
+    $item = feedItem::model()->find('hash = :hash', array('hash'=>$attributes['hash']));
+    if($item === null)
+    {
+      $item = new feedItem;
+      $item->attributes = $attributes;
+      if(!$item->save())
+        throw new CException("New feed item failed to save");
+    }
 
     return $item;
   }
@@ -56,7 +63,6 @@ class factory {
       $tvShow = self::tvShowByTitle($tvShow);
     }
     $tvEpisode = tvEpisode::model()->find(array(
-          'select' => 'id',
           'condition' => 'tvShow_id=:id AND season=:season AND episode=:episode',
           'params' => array(':id'=>$tvShow->id, ':season'=>$season, ':episode'=>$episode)
     ));
@@ -79,7 +85,6 @@ class factory {
     }
 
     $tvShow = tvShow::model()->find(array(
-          'select'=>'id',
           'condition' => 'title LIKE :title',
           'params' => array(':title'=>$title)
     ));
@@ -95,7 +100,6 @@ class factory {
 
   public static function qualityByTitle($title) {
     $record = quality::model()->find(array(
-          'select' => 'id',
           'condition' => 'title LIKE :quality',
           'params' => array(':quality'=>$title)
     ));
@@ -120,7 +124,6 @@ class factory {
 
   public static function movieByImdbId($imdbId, $title) {
     $record = movie::model()->find(array(
-          'select' => 'id',
           'condition' => 'imdbId = :imdbId',
           'params' => array(':imdbId'=>$imdbId)
     ));
@@ -137,7 +140,6 @@ class factory {
 
   public static function otherByTitle($title) {
     $record = other::model()->find(array(
-          'select' => 'id',
           'condition' => 'title LIKE :title',
           'params' => array(':title'=>$title)
     ));

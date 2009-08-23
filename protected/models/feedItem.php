@@ -43,7 +43,6 @@ class feedItem extends ARwithQuality
     return array(
       array('lastUpdated', 'default', 'setOnEmpty'=>false, 'value'=>time()),
       array('hash', 'length', 'allowEmpty'=>false, 'is'=>32),
-      array('feed_id', 'default', 'value'=>0),
       array('feed_id', 'exist', 'allowEmpty'=>false, 'attributeName'=>'id', 'className'=>'feed'),
       array('movie_id', 'exist', 'attributeName'=>'id', 'className'=>'movie'),
       array('other_id', 'exist',  'attributeName'=>'id', 'className'=>'other'),
@@ -123,37 +122,55 @@ class feedItem extends ARwithQuality
 
   // static to allow translation directly from query row in a view without AR model
   public static function getStatusText($status = null) {
+    static $options = null;
     if($status === null)
       $status = $this->status;
-    $options=self::getStatusOptions();
+    if($options === null)
+      $options=self::getStatusOptions();
     return isset($options[$status]) ? $options[$status]
         : "unknown ({$status})";
   }
       
   public function beforeValidate($type) {
     if($this->isNewRecord) {
-      list($shortTitle, $season, $episode, $network, $quality) = mediaTitleParser::detect($this->title);
-  
+      list($shortTitle, $episodeTitle, $season, $episode, $network, $quality) = mediaTitleParser::detect($this->title);
+ 
       if(!empty($network))
         $this->network_id = factory::networkByTitle($network)->id;
 
       $this->qualityIds = factory::qualityIdsByTitleArray($quality);
      
+      // TODO: perhaps mediaTitleParser should return the tvEpisode/movie/other object
+      //       or something that interfaces with mediaTitleParser
       if(($season >= 0 && $episode > 0) ||
          ($season > 0 && $episode == 0)) 
       {
         // Found a season and episode for this item
-        $this->tvEpisode_id = factory::tvEpisodeByEpisode($shortTitle, $season, $episode)->id;
+        $model = factory::tvEpisodeByEpisode($shortTitle, $season, $episode);
+        $this->tvEpisode_id = $model->id;
+        // mark the tvEpisode as having a new feeditem
+        // set the title if given
+        if(!empty($episodeTitle)) 
+          $model->title = $episodeTitle;
       }
       elseif($this->imdbId > 1000) 
       {
         // IMdB id is not best differentiator, but will work for now
-        $this->movie_id = factory::movieByImdbId($this->imdbId, $shortTitle)->id;
+        $model = factory::movieByImdbId($this->imdbId, $shortTitle);
+        $this->movie_id = $model->id;
+      }
+      elseif(null !== ($model = movie::model()->find('title LIKE :title', array(':title'=>$shortTitle))))
+      {
+        // movie of like name exists
+        $this->movie_id = $model->id;
       }
       else 
       {
-        $this->other_id = factory::otherByTitle($shortTitle)->id;
+        $model = factory::otherByTitle($shortTitle);
+        $this->other_id = $model->id;
       }
+      // trigger lastUpdated update
+      $model->save();
     }
     return parent::beforeValidate($type);
   }
