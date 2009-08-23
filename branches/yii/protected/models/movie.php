@@ -31,6 +31,7 @@ class movie extends CActiveRecord
     return array(
       array('status', 'default', 'value'=>self::STATUS_NEW),
       array('imdbId', 'numerical', 'integerOnly'=>true),
+      array('lastUpdated', 'default', 'setOnEmpty'=>false, 'value'=>time()),
     );
   }
 
@@ -99,5 +100,20 @@ class movie extends CActiveRecord
   public function getFullTitle()
   {
     return empty($this->name) ? $this->title : $this->name;
+  }
+
+  public function getStatusOptions()
+  {
+    return array(
+        self::STATUS_NEW        => 'Unmatched Episode',
+        self::STATUS_DOWNLOADED => 'Downloaded',
+    );
+  }
+
+  public function getStatusText()
+  {
+    $options=$this->getStatusOptions();
+    return isset($options[$this->status]) ? $options[$this->status]
+              : "unknown ({$this->status})";
   }
 }

@@ -30,6 +30,7 @@ class other extends CActiveRecord
   {
     return array(
         array('status', 'default', 'value'=>self::STATUS_NEW),
+        array('lastUpdated', 'default', 'setOnEmpty'=>false, 'value'=>time()),
         array('lastImdbUpdate', 'default', 'value'=>0),
     );
   }
