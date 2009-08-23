@@ -9,6 +9,10 @@ class mediaTitleParser {
     'Short',
   );
 
+  /**
+   * @return array 6 element array in the following order:
+   *     show title, episode title, season, episode, network, quality
+   */
   static public function detect($title)
   {
     list($shortTitle, $quality) = qualityMatch::run($title);
@@ -19,13 +23,12 @@ class mediaTitleParser {
       if($result)
       {
         $result[] = $quality;
-        echo "Result found with ".get_class($matcher)."\n";
         return $result;
       }
     }
 
     // default detect if no match found
-    return array($shortTitle, 0, 0, '', $quality);
+    return array($shortTitle, '', 0, 0, '', $quality);
   }
 
   static public function getMatchers()
@@ -57,7 +60,7 @@ class qualityMatch {
         unset($regs[1][$q['hdtv']]);
       }
       $quality = $regs[1];
-      $shortTitle = preg_replace("/".qualityMatch::$qual_reg.".*/i", "", $title);
+      $shortTitle = trim(preg_replace("/".qualityMatch::$qual_reg.".*/i", "", $title), '- _.[]{}<>()@#$%^&*|\/;~`');
     }
     else
       $shortTitle = $title;
@@ -86,13 +89,15 @@ abstract class titleMatch {
     if(preg_match($this->getRegExp(), $title, $regs) &&
        false !== ($opts = $this->foundMatch($title, $regs)))
     {
-      list($shortTitle, $season, $episode) = $opts;
+      list($shortTitle, $episodeTitle, $season, $episode) = $opts;
       $network = '';
 
       // Convert . and _ to spaces, and trim result
       $shortTitle = trim(strtr(str_replace("'", "&#39;", $shortTitle), $this->trFrom, $this->trTo));
+      $episodeTitle = trim(strtr(str_replace("'", "&#39;", $episodeTitle), $this->trFrom, $this->trTo));
       // Remove any marking of a second or third posting from the end of an item
       $shortTitle = trim(preg_replace('/\([23]\)$/', '', $shortTitle));
+      $episodeTitle = trim(preg_replace('/\([23]\)$/', '', $episodeTitle));
   
       // Custom handling for a few networks that show up as 'Foo.Channel.Show.Title.S02E02.Bar-ASDF'
       if(preg_match('/^([a-zA-Z]+\bchannel)\b(.*)/i', $shortTitle, $regs))
@@ -101,7 +106,7 @@ abstract class titleMatch {
         $shortTitle = $regs[2];
       }
   
-      return array($shortTitle, $season, $episode, $network);
+      return array($shortTitle, $episodeTitle, $season, $episode, $network);
     }
   }
 }
@@ -113,7 +118,7 @@ class titleMatchFull extends titleMatch
   {
     $this->episode_reg = 
            '\b('  // must be a word boundry before the episode to prevent turning season 13 into season 3
-          .'S\d+[. _]?E\d+'        // S12E1 or S1.E22 or S4 E1
+          .'S\d+[. _]?E(?:P ?)?\d+'        // S12E1 or S1.E22 or S4 EP 1
           .'|\d+x\d+'              // or 1x23
           .'|\d+[. _]?of[. _]?\d+)'; // or 03of18
   }
@@ -121,10 +126,15 @@ class titleMatchFull extends titleMatch
   function foundMatch($title, $regs)
   {
     $shortTitle = trim($regs[1]);
-    $episode_guess = trim(strtr($regs[2], $this->trFrom, $this->trTo));
-    list($season,$episode) = explode('x', preg_replace('/(S(\d+)[. _]?E(\d+)|(\d+)x(\d+)|(\d+)[. _]?of[. _]?(\d+))/i', '\2\4\6x\3\5\7', $episode_guess));
+    $episodeTitle = '';
+    $end = strpos($title, $regs[0])+strlen($regs[0]);
+    if($end < strlen($title))
+      $episodeTitle = substr($title, $end);
 
-    return array($shortTitle, $season, $episode);
+    $episode_guess = trim(strtr($regs[2], $this->trFrom, $this->trTo));
+    list($season,$episode) = explode('x', preg_replace('/(S(\d+)[. _]?E(?:P ?)?(\d+)|(\d+)x(\d+)|(\d+)[. _]?of[. _]?(\d+))/i', '\2\4\6x\3\5\7', $episode_guess));
+
+    return array($shortTitle, $episodeTitle, $season, $episode);
   }
 }
 
@@ -145,12 +155,17 @@ class titleMatchDate extends titleMatch
   function foundMatch($title, $regs)
   {
     $shortTitle = trim($regs[1]);
+    $episodeTitle = '';
+    $end = strpos($title, $regs[0])+strlen($regs[0]);
+    if($end < strlen($title))
+      $episodeTitle = substr($title, $end);
+
     $episode = false;
 
     $cleanDate = str_replace(' ', '/', trim(strtr($regs[2], $this->trFrom, $this->trTo)));
     // Use UTC for time measurements
     // php issues a warning, which yii exits on, and an exception,
-    // so temporarily replace the error handler.
+    // on bad input so temporarily replace the error handler.
     $handler = set_error_handler(array($this, 'fakeErrorHandler'));
     try
     {
@@ -162,21 +177,25 @@ class titleMatchDate extends titleMatch
       $date = null;
     }
     restore_error_handler($handler);
-    return $date === null ? false : array($shortTitle, 0, $episode);
+    return $date === null ? false : array($shortTitle, $episodeTitle, 0, $episode);
   }
 }
 
 class titleMatchPartial extends titleMatch
 {
   // only episode or season, not both
-  public $episode_reg = '\b([SE])(\d+)\b';
+  public $episode_reg = '\b(S|EP?)[ _.]?(\d+)\b';
 
   function foundMatch($title, $regs)
   {
     $shortTitle = trim($regs[1]);
+    $episodeTitle = '';
+    $end = strpos($title, $regs[0])+strlen($regs[0]);
+    if($end < strlen($title))
+      $episodeTitle = substr($title, $end);
     $season  = $regs[2] == 'S' ? trim($regs[3]) : 1;
-    $episode = $regs[2] == 'E' ? trim($regs[3]) : 0;
-    return array($shortTitle, $season, $episode);
+    $episode = $regs[2][0] == 'E' ? trim($regs[3]) : 0;
+    return array($shortTitle, $episodeTitle, $season, $episode);
   }
 }
 
@@ -191,10 +210,14 @@ class titleMatchShort extends titleMatch
   {
     // 3 digit season/episode identifier
     $shortTitle = trim($regs[1]);
+    $episodeTitle = '';
+    $end = strpos($title, $regs[0])+strlen($regs[0]);
+    if($end < strlen($title))
+      $episodeTitle = substr($title, $end);
     $episode_guess = $regs[2];
     $episode = substr($episode_guess, -2);
     $season = ($episode_guess-$episode)/100;
-    return array($shortTitle, $season, $episode);
+    return array($shortTitle, $episodeTitle, $season, $episode);
   }
 }
 
