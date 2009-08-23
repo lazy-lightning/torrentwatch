@@ -28,7 +28,7 @@ class clientSABnzbd extends clientPostFile {
   protected function getPostData() 
   {
     return array(
-        'cat'=>'Default',
+        'cat'=>$this->config->category,
         'pp'=>'-1',
     );
   }
