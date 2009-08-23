@@ -11,6 +11,7 @@ class usenetItem extends feedAdapter_Item {
     foreach($cleaners as $reg => $pos) {
       if(preg_match($reg, $in, $regs)) {
         $out = trim($regs[$pos]);
+        // result title cannot be a number or less than 7 characters
         if(!is_numeric($out) && strlen($out) > 6)
           return $out;
       }
@@ -25,6 +26,7 @@ class usenetItem extends feedAdapter_Item {
   function get_title() {
     if($this->cleanTitle === null) {  
       $title = parent::get_title();
+      // regular expressions are good at parsing regular data, not random gibberish usenet titles
       $cleaners = array(
           '/#[\w\d.]+@[\w\d.]+[\] ]-[\[ ](?:req [x\d]+ -|[-\w .]+\]-\[)?([^\]]*)[\] ]?- ? ?\[?\d+\/\d+\]?/i' => 1,
           '/presents (.*) \[\d+ of \d+\] ".*"/i' => 1,
