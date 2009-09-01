@@ -1,6 +1,6 @@
 <?php
 
-class FavoriteTvShowsController extends BaseController
+class FavoriteTvShowController extends BaseController
 {
   const PAGE_SIZE=10;
 
@@ -55,7 +55,7 @@ class FavoriteTvShowsController extends BaseController
    */
   public function actionShow()
   {
-    $this->render('show',array('favorite'=>$this->loadfavorite()));
+    $this->render('show',array('model'=>$this->loadfavorite()));
   }
 
   /**
@@ -125,13 +125,16 @@ class FavoriteTvShowsController extends BaseController
    */
   public function actionList()
   {
-    $criteria=new CDbCriteria;
+    $criteria=new CDbCriteria(array('order'=>'title ASC'));
+    $pages=null;
+    if(false===Yii::app()->request->getIsAjaxRequest())
+    {
+      $pages=new CPagination(favoriteTvShow::model()->count($criteria));
+      $pages->pageSize=self::PAGE_SIZE;
+      $pages->applyLimit($criteria);
+    }
 
-    $pages=new CPagination(favoriteTvShow::model()->count($criteria));
-    $pages->pageSize=self::PAGE_SIZE;
-    $pages->applyLimit($criteria);
-
-    $favoriteList=favoriteTvShow::model()->findAll($criteria);
+    $favoriteList=favoriteTvShow::model()->with(array('tvShow'=>array('select'=>'id,title')))->findAll($criteria);
 
     $this->render('list',array(
       'favoriteList'=>$favoriteList,
@@ -176,7 +179,7 @@ class FavoriteTvShowsController extends BaseController
       if($id!==null || isset($_GET['id']))
         $this->_favorite=favoriteTvShow::model()->findbyPk($id!==null ? $id : $_GET['id']);
       if($this->_favorite===null)
-        throw new CHttpException(500,'The requested favorite does not exist.');
+        $this->_favorite=new favoriteTvShow();
     }
     return $this->_favorite;
   }
