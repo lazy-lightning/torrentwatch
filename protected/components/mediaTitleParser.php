@@ -59,7 +59,9 @@ class qualityMatch {
       if(isset($q['720p'], $q['hdtv'])) {
         unset($regs[1][$q['hdtv']]);
       }
-      $quality = $regs[1];
+      // FIXME: is this guaranteed an array? check reference
+      if(is_array($regs[1]) && count($regs[1]) > 0)
+        $quality = $regs[1];
       $shortTitle = trim(preg_replace("/".qualityMatch::$qual_reg.".*/i", "", $title), '- _.[]{}<>()@#$%^&*|\/;~`');
     }
     else
