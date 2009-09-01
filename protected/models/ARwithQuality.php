@@ -56,7 +56,6 @@ abstract class ARwithQuality extends CActiveRecord {
 
     // set quality relations
     foreach($this->qualityIds as $qualityId) {
-      Yii::log("load $class and set $id = {$this->id} and quality_id = $qualityId");
       $relation = new $class;
       $relation->$id = $this->id;
       $relation->quality_id = $qualityId;
