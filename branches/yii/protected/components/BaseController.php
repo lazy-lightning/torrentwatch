@@ -30,19 +30,23 @@ abstract class BaseController extends CController {
     $app = Yii::app();
     date_default_timezone_set(Yii::app()->dvrConfig->timezone);
 
-    // sd if reported in user agent, otherwise default to hd
-    $this->_resolution = stristr($_SERVER['HTTP_USER_AGENT'], 'Res720x576') === False?'hd':'sd';
+    $this->_resolution = 'hd';
+    if(isset($_SERVER['HTTP_USER_AGENT']))
+    {
+      // sd if reported in user agent, otherwise default to hd
+      $this->_resolution = stristr($_SERVER['HTTP_USER_AGENT'], 'Res720x576') === False?'hd':'sd';
 
-    // if the user agent is an NMT load images with file://, otherwise relative url
-    if(stristr($_SERVER['HTTP_USER_AGENT'], 'Syabas') === False) 
-    {
-      $this->imageRoot = dirname($_SERVER['SCRIPT_NAME']).'/images/';
-      $app->setTheme($app->dvrConfig->webuiTheme);
-    }
-    else
-    {
-      $app->setTheme($app->dvrConfig->gayauiTheme);
-      $this->imageRoot = 'file:///opt/sybhttpd/localhost.images/';
+      // if the user agent is an NMT load images with file://, otherwise relative url
+      if(stristr($_SERVER['HTTP_USER_AGENT'], 'Syabas') === False) 
+      {
+        $this->imageRoot = dirname($_SERVER['SCRIPT_NAME']).'/images/';
+        $app->setTheme($app->dvrConfig->webuiTheme);
+      }
+      else
+      {
+        $this->imageRoot = 'file:///opt/sybhttpd/localhost.images/';
+        $app->setTheme($app->dvrConfig->gayauiTheme);
+      }
     }
 
     $this->imageRoot .= $this->_resolution.'/';
@@ -50,11 +54,9 @@ abstract class BaseController extends CController {
     // Switch to ajax view when required
     if(Yii::app()->request->isAjaxRequest)
       $this->layout = 'ajax';
-    else
-      $this->layout = 'main_'.$this->_resolution;
 
     // Auto-login hack from localhost 
-    if(Yii::app()->user->getIsGuest() && $_SERVER['REMOTE_ADDR'] === '127.0.0.1')
+    if(isset($_SERVER['REMOTE_ADDR']) && Yii::app()->user->getIsGuest() && $_SERVER['REMOTE_ADDR'] === '127.0.0.1')
       Yii::app()->user->login(new LocalBrowserHackIdentity(), 3600*24*30);
   }
 
