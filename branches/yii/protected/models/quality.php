@@ -46,4 +46,18 @@ class quality extends CActiveRecord
     return array(
     );
   }
+
+  public static function getCHtmlListData($load = null)
+  {
+    static $list=null;
+    if($load!==null)
+      $list=$load;
+    if($list===null)
+    {
+      $list=CHtml::listData(self::model()->findAll(array('select'=>'id,title')), 'id', 'title');
+      // prepend a fake empty id as -1
+      $list=array('-1'=>'')+$list;
+    }
+    return $list;
+  }
 }
