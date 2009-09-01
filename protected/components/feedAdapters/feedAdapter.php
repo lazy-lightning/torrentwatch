@@ -39,18 +39,24 @@ class feedAdapter extends SimplePie {
     $transaction = Yii::app()->db->beginTransaction();
     try {
       foreach($this->get_items() as $item) {
-        $hash = md5($item->get_id());
-        if(false === feedItem::model()->exists('hash=:hash', array(':hash'=>$hash))) {
-          factory::feedItemByAttributes(array(
-                'hash'        => $hash,
-                'feed_id'     => $this->_feedAR->id,
-                'downloadType'=> $this->_feedAR->downloadType,
-                'imdbId'      => $item->get_imdbId(),
-                'title'       => $item->get_title(),
-                'url'         => $item->get_link(),
-                'description' => $item->get_description(),
-                'pubDate'     => $item->get_date('U'),
-          ));
+        try {
+          $title = $item->get_title();
+          $description = $item->get_description();
+          $hash = md5($item->get_id());
+          if(false === feedItem::model()->exists('hash=:hash', array(':hash'=>$hash))) {
+            factory::feedItemByAttributes(array(
+                  'hash'        => $hash,
+                  'feed_id'     => $this->_feedAR->id,
+                  'downloadType'=> $this->_feedAR->downloadType,
+                  'imdbId'      => $item->get_imdbId(),
+                  'title'       => $item->get_title(),
+                  'url'         => $item->get_link(),
+                  'description' => $item->get_description(),
+                  'pubDate'     => $item->get_date('U'),
+            ));
+          }
+        } catch (Exception $e) {
+          Yii::log('feedItem failed to save.', CLogger::LEVEL_ERROR);
         }
       }
       $transaction->commit();
