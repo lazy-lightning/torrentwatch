@@ -192,12 +192,11 @@ abstract class BaseDvrConfig extends CModel {
         {
           $value = $this->$key;
           if(is_object($value))
-            $toSave[] = $value;
+            $toSave[] = $value; // cant save now due to nested transactions
           else 
             $this->updateByKey($key, $value);
         }
   
-        $this->afterSave();
         $transaction->commit();
       } 
       catch ( Exception $e ) 
@@ -207,6 +206,7 @@ abstract class BaseDvrConfig extends CModel {
       }
       foreach($toSave as $item)
         $item->save();
+      $this->afterSave();
       return true;
     }
 
@@ -330,5 +330,24 @@ class dvrConfig extends BaseDvrConfig {
     parent::init();
   }
 
+  /**
+   * Returns the validation rules for attributes
+   */
+  public function rules()
+  {
+    return array(
+        // could possibly be accomplished with the 'in' validator class
+        array('timezone', 'validTimezone'),
+    );
+  }
+
+  public function validTimezone($attr)
+  {
+    if(in_array($this->$attr, DateTimeZone::listIdentifiers()))
+      return true;
+    
+    $this->addError($attr, 'Invalid DateTimeZone');
+    return false;
+  }
 }
 
