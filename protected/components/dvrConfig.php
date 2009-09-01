@@ -133,7 +133,7 @@ abstract class BaseDvrConfig extends CModel {
   {
     if(function_exists('apc_store'))
     {
-      apc_store($key, serialize($this->_ar));
+      apc_store($key, serialize($this->_ar), 3600);
     }
   }
   /**
