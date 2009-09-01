@@ -294,7 +294,7 @@ class AjaxController extends BaseController
   public function actionGetHistory()
   {
     $this->render('history_dialog', array(
-          'history'=>history::model()->findAll(),
+          'history'=>history::model()->findAll(array('order'=>'date DESC')),
     ));
   }
 
