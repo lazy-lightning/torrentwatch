@@ -431,7 +431,6 @@ class AjaxController extends BaseController
       $config->attributes = $_POST['dvrConfig'];
     }
 
-    // Should add some sort of validation in the dvrConfig class
     if($config->save()) 
     {
       $this->response['dialog']['content'] = 'Configuration successfully saved';
@@ -440,6 +439,8 @@ class AjaxController extends BaseController
     {
       $this->response['dialog']['error'] = True;
       $this->response['dialog']['content'] = 'There was an error saving the configuration';
+      $this->response['dvrConfig'] = $config;
+      $this->response['showDialog'] = '#configuration';
     }
 
     $this->actionFullResponse();

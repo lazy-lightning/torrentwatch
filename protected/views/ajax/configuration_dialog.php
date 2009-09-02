@@ -8,6 +8,11 @@
     </ul>
     <div id="global_config">
       <?php echo CHtml::beginForm(array('saveConfig'), 'post', array('id'=>'config_form')); ?>
+      <?php 
+      if(isset($response['dvrConfig'])) { 
+        $config = $response['dvrConfig']; 
+        echo CHtml::errorSummary($config); 
+      } ?>
         <h2 class="dialog_heading">Web UI Settings</h2>
         <div id="config_timezone">
           <?php echo CHtml::activeLabel($config, 'timezone', array('class'=>'item')).': '.

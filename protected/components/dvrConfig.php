@@ -338,9 +338,27 @@ class dvrConfig extends BaseDvrConfig {
     return array(
         // could possibly be accomplished with the 'in' validator class
         array('timezone', 'validTimezone'),
+        array('downloadDir,watchDiri,tmpDir', 'writableDirectory'),
+        array('saveFile','in','allowEmpty'=>false,'range'=>array(0,1)),
+        array('feedItemLifetime,webItemsPerLoad,maxItemsPerFeed','numerical','integerOnly'=>true,'min'=>1),
+        array('torClient', 'in', 'allowEmpty'=>false, 'range'=>array_keys(Yii::app()->dlManager->availClients[feedItem::TYPE_TORRENT])),
+        array('torClient', 'in', 'allowEmpty'=>false, 'range'=>array_keys(Yii::app()->dlManager->availClients[feedItem::TYPE_NZB])),
     );
   }
 
+  /**
+   * Validation function
+   * Copied from BaseFavorite, needs to be centralized
+   */
+  public function writableDirectory($attribute, $params) {
+    if(!empty($this->$attribute) &&
+       False == (is_dir($this->$attribute) && is_writable($this->$attribute)))
+      $this->addError($attribute, $this->$attribute." is not a writable directory");
+  }
+
+  /**
+   * Validation function ensures attr is a valid DateTimeZone
+   */
   public function validTimezone($attr)
   {
     if(in_array($this->$attr, DateTimeZone::listIdentifiers()))
