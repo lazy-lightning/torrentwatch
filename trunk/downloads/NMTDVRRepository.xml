@@ -42,8 +42,8 @@
 
     <Application>
       <Name>lighttpd</Name>
-      <Version>1.4.23-nmt1</Version>
-      <DownloadURL>http://torrentwatch.googlecode.com/svn/trunk/downloads/lighttpd-1.4.23-nmt1.zip</DownloadURL>
+      <Version>1.4.23-nmt2</Version>
+      <DownloadURL>http://torrentwatch.googlecode.com/svn/trunk/downloads/lighttpd-1.4.23-nmt2.zip</DownloadURL>
       <Author>journey4712</Author>
       <Maintainer>journey4712</Maintainer>
       <Description>
