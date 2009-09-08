@@ -1,0 +1,69 @@
+<Repository>
+    <DistributedRepositories/>
+    <Applications>
+
+    <Application>
+      <Name>TorrentWatch</Name>
+      <Version>0.7.11-1</Version>
+      <DownloadURL>http://repository.nmtinstaller.com/Applications/torrentwatch-dev-0.7.11-1.zip</DownloadURL>
+      <Author>journey4712</Author>
+      <Maintainer>journey4712</Maintainer>
+      <Description>Enabled automatic downloading of torrents using RSS/Atom feeds.</Description>
+      <Homepage>http://www.networkedmediatank.com/showthread.php?tid=5446</Homepage>
+      <InstallScript>torrentwatch-installer.cgi?install</InstallScript>
+      <WebInterfaceURL>http://[NMT_IP]:8883/torrentwatch/index.html</WebInterfaceURL>
+      <GayaInterfaceURL />
+      <Screenshots>
+          <URL>http://img165.imageshack.us/img165/6230/torrentwatchsampleyx6.png</URL>
+      </Screenshots>
+      <UsageInstructions />
+      <Forum />
+      <Changelog />
+    </Application>
+
+    <Application>
+      <Name>Mono.Wrapper</Name>
+      <Version>0.10</Version>
+      <DownloadURL>http://repository.nmtinstaller.com/Applications/Mono.Wrapper.zip</DownloadURL>
+      <Author>journey4712</Author>
+      <Maintainer>journey4712</Maintainer>
+      <Description>This program is called mono.wrapper.
+      When used together with a static jukebox like YAMJ or MLMJ stored on your internal disk you will no longer have to worry about a share being mounted to play a video off of it.
+      The software is configured to work with all configured NMT shares, NFS and SMB.</Description>
+      <Homepage>http://www.networkedmediatank.com/showthread.php?tid=17494</Homepage>
+      <InstallScript>Apps/AppInit/appinit.cgi?install&amp;Mono.Wrapper.tar</InstallScript>
+      <WebInterfaceURL />
+      <GayaInterfaceURL />
+      <Screenshots />
+      <UsageInstructions />
+      <Forum />
+      <Changelog />
+    </Application>
+
+    <Application>
+      <Name>lighttpd</Name>
+      <Version>1.4.23-nmt1</Version>
+      <DownloadURL>http://torrentwatch.googlecode.com/svn/trunk/downloads/lighttpd-1.4.23-nmt1.zip</DownloadURL>
+      <Author>journey4712</Author>
+      <Maintainer>journey4712</Maintainer>
+      <Description>
+      lighttpd replaces the web server on port 9999. The effect is that any php program that runs on port 9999 will run much faster than through the stock NMT webserver.
+      Any application that runs entirely on port 9999 should have a much snappier/faster interface. Requests that used to take a second or two should be shortened to a (large)fraction of a second. The programmers using lighttpd also have more development options(image generation/manipulation, https support, debugging support, xml transformation via xslt, more) than they did with the stock php server.
+      </Description>
+      <Homepage>http://www.networkedmediatank.com/showthread.php?tid=25850&amp;action=newpost</Homepage>
+      <InstallScript>Apps/AppInit/appinit.cgi?install&amp;lighttpd.tar</InstallScript>
+      <WebInterfaceURL/>
+      <GayaInterfaceURL/>
+      <Screenshots/>
+      <UsageInstructions />
+      <Forum />
+      <Changelog />
+    </Application>
+
+    </Applications>
+    <Themes/>
+    <Indexes/>
+    <WaitImageSets/>
+    <Webservices/>
+</Repository>
+
