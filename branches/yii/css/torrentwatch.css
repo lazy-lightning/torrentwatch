@@ -416,6 +416,17 @@ div.dialog_window {
   width: 656px;
   }
 
+/* default close button positioned on upper right corner */
+div.dialog_window div.close {
+  background-image:url(../images/overlay/close.png);
+  position:absolute;
+  right:5px;
+  top:5px;
+  cursor:pointer;
+  height:35px;
+  width:35px;
+  }
+
 div.expose {
   background-color: #CCC;
   display: block;

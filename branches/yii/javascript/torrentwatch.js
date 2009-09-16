@@ -82,8 +82,8 @@
         this.each(function() {
             var last = current_dialog === '#' ? '' : current_dialog;
             var target = this.hash === '#' ? '#'+$(this).closest('.dialog_window').id : this.hash;
-            var hide = false;
-            var show = false;
+            var hide = false, show = false;
+
             current_dialog = last === target ? '' : this.hash;
             if (last) {
                 $(last).fadeOut();
@@ -91,13 +91,19 @@
             }
             if (current_dialog && this.hash != '#') {
                 show = true;
-                if($(current_dialog).length == 0) {
+                var dialog = $(current_dialog);
+                var callback = function() { 
+                  dialog.fadeIn();
+                  if(!dialog.find('div.close').length)
+                    dialog.prepend('<div class="close"></div>');
+                };
+                if(!dialog.length) {
                   $.get(this.href, '', function(html) {
                     $('#dynamicdata').append(html);
-                    $(current_dialog).fadeIn();
+                    setTimeout(callback, 0);
                   }, 'html');
                 } else 
-                  $(current_dialog).fadeIn();
+                  callback();
             }
             if(hide && !show)
               $('div.expose').hide();
@@ -250,6 +256,11 @@ $(function() {
     // Menu Bar, and other buttons which show/hide a dialog
     $("a.toggleDialog").live('click', function() {
         $(this).toggleDialog();
+        return false;
+    });
+    // X button on all dialogs
+    $("div.close").live('click', function() {
+        $(this).closest('.dialog_window').toggleDialog();
         return false;
     });
     // Vary the font-size
