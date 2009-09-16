@@ -14,7 +14,7 @@
  </div>
  <div class="favorite_feed">
   <?php echo CHtml::activeLabelEx($favorite, 'feed_id').': '.
-             CHtml::dropDownList('favoriteMovie[feed_id]', $favorite->feed_id, $feedsListData); ?>
+             CHtml::dropDownList('favoriteMovie[feed_id]', $favorite->feed_id, feed::getCHtmlListData()); ?>
  </div>
  <div class="favorite_rating">
    <?php echo CHtml::activeLabelEx($favorite, 'rating').': '.
@@ -27,16 +27,16 @@
  </div>
  <div class="favorite_genre">
   <?php echo CHtml::activeLabelEx($favorite, 'genre_id').': '.
-             CHtml::dropDownList('favoriteMovie[genre_id]', $favorite->genre_id, $genresListData); ?>
+             CHtml::dropDownList('favoriteMovie[genre_id]', $favorite->genre_id, genre::getCHtmlListData()); ?>
  </div>
  <div class="favorite_quality">
   <?php  // show min 3 qualitys always, even if less are set
     echo CHtml::activeLabelEx($favorite, 'quality').': ';
     $j=0;foreach($favorite->quality as $quality) {
-      echo CHtml::dropDownList('quality_id['.++$j.']', $quality->id, $qualitysListData);
+      echo CHtml::dropDownList('quality_id['.++$j.']', $quality->id, quality::getCHtmlListData());
     }
     for(++$j;$j<4;++$j)
-      echo CHtml::dropDownList('quality_id['.$j.']', -1, $qualitysListData);
+      echo CHtml::dropDownList('quality_id['.$j.']', -1, quality::getCHtmlListData());
   ?>
  </div>
  <div class="favorite_queue">

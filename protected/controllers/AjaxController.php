@@ -112,9 +112,9 @@ class AjaxController extends BaseController
       {
         $this->response['dialog']['error'] = true;
         $this->response['dialog']['content'] = 'Failure saving new favorite';
-        $this->response[$type.'-'] = $fav;
       }
       // After save to get the correct id
+      $this->response[get_class($fav)] = $fav;
       $this->response['showFavorite'] = '#'.$type.'-'.$fav->id;
       $this->response['showTab'] = "#".$type;
     }
@@ -148,16 +148,7 @@ class AjaxController extends BaseController
 
     $favorite->attributes = $_POST[$class];
     $favorite->save();
-    // include data to display favorite in response
-    $this->response['genresListData'] = CHtml::listData(genre::model()->findAll(), 'id', 'title');
-    $this->response['feedsListData'] = CHtml::listData(feed::model()->findAll(), 'id', 'title');
-    // get qualitys for use in forms and prepend a blank quality to the list
-    $qualitys = quality::model()->findAll();
-    $q = new quality;
-    $q->title='';
-    $q->id=-1;
-    array_unshift($qualitys, $q);
-    $this->response['qualitysListData'] = CHtml::listData($qualitys, 'id', 'title');
+
     // Tell the view to bring up the changed favorite
     $this->response[$class] = $favorite;
     $this->response['showFavorite'] = "#".$class.'s-'.$favorite->id;

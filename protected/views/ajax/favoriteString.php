@@ -1,4 +1,9 @@
-<?php echo CHtml::beginForm(array(($favorite->isNewRecord ? 'create' : 'update').'Favorite', 'id'=>$favorite->id), 'post', array('class'=>'favinfo', 'id'=>'favoriteStrings-'.$favorite->id));
+<?php
+$feedsListData = isset($feedsListData) ? $feedsListData : feed::getCHtmlListData();
+$genresListData = isset($genresListData) ? $genresListData : genre::getCHtmlListData();
+$qualitysListData = isset($qualitysListData) ? $qualitysListData : quality::getCHtmlListData();
+
+echo CHtml::beginForm(array(($favorite->isNewRecord ? 'create' : 'update').'Favorite', 'id'=>$favorite->id), 'post', array('class'=>'favinfo', 'id'=>'favoriteStrings-'.$favorite->id));
       if(isset($response['favoriteStrings-'.$favorite->id])) {
         $favorite = $response['favoriteStrings-'.$favorite->id];
         echo CHtml::errorSummary($favorite);
