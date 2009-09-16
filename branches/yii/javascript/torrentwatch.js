@@ -10,7 +10,6 @@
     };
     $.loadMoreFeedItems = function(html) {
       var container = $("<div />");
-      var dest = '';
       container[0].innerHTML = html;
       setTimeout(function() {
         container.find('div#feedItems_container').children().each(function() {
@@ -23,7 +22,7 @@
           .filter(".hasDuplicates").initDuplicates();
           
           dest.find('li.loadMore').remove().end()
-          .children('ul').append(dest.children('li'));
+          .append($(this).children('ul').children('li'));
         });
       }, 0);
     };
@@ -119,8 +118,11 @@
           else
             li.addClass('open');
 
-          if(ul.children("li").length == 0) {
-            ul.load('nmtdvr.php?r=feedItem/list&filter='+encodeURIComponent(li.id), '', onDone);
+          if(ul.length == 0) {
+            $.get('nmtdvr.php', 'r=feedItem/list&filter='+encodeURIComponent(li[0].id), function(html) {
+              li.append(html);
+              setTimeout(onDone,0);
+            }, 'html');
           } else
            onDone();
 
