@@ -149,11 +149,6 @@
             <?php echo CHtml::activeLabel($config, 'downloadDir').':'.
                        CHtml::activeTextField($config, 'downloadDir'); ?>
         </div>
-        <div>
-            <p>The time in days that a feed item will remain in the local database.</p>
-            <?php echo CHtml::activeLabel($config, 'feedItemLifetime').':'.
-                       CHtml::activeTextField($config, 'feedItemLifetime'); ?>
-        </div>
         <div class="buttonContainer clearFix">
             <a class="toggleDialog button" href="#welcome6">Next</a>
             <a class="toggleDialog button" href="#welcome4">Back</a>
