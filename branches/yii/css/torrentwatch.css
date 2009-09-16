@@ -41,10 +41,6 @@ input, select {
   display: inline;
   }
 
-input[type=text] {
-  border: 1px solid #787878;
-  }
-
 input[type=hidden] {
   display: none;
   }
@@ -70,6 +66,14 @@ label.item {
 
 .hidden {
   display: none;
+  }
+
+input {
+  border: 0px; 
+  }
+
+input:hover, input:focus {
+  border: 1px solid black;
   }
 
 /*-----------------
@@ -340,6 +344,7 @@ ul li.torrent.match_Manual {
   background: transparent url('../images/nuvola_ledsprites.png') no-repeat -9px -93px;
   }
 
+ul li.torrent.match_Downloaded,
 ul li.torrent.match_Automatic {
   background: transparent url('../images/nuvola_ledsprites.png') no-repeat -9px -7px;
   }
@@ -599,7 +604,9 @@ div#configuration.dialog_window .feedForm select {
 
 div#configuration.dialog_window div.activeFeed #feed_url[type=text] {
   width: 490px;
+  border: 1px solid black;
   }
+
 
 
 /***********************************
@@ -665,6 +672,11 @@ form.favinfo input[type=text] {
   width: 16em;
   }
 
+
+div.favorite_name span {
+  margin-left: 1em;
+  }
+
 div.favorite_quality select {
   right: auto;
   width: 4.7em;
@@ -688,6 +700,10 @@ div.favorite_years span {
 
 div.favorite_episodes span {
   margin-left: 1em;
+  }
+
+div.favorite_episodes input.min {
+  text-align: right;
   }
 
 /******************************
