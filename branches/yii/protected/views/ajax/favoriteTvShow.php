@@ -1,6 +1,7 @@
-<?php $feedsListData = isset($feedsListData) ? $feedsListData : $response['feedsListData'];
-      $genresListData = isset($genresListData) ? $genresListData : $response['genresListData'];
-      $qualitysListData = isset($qualitysListData) ? $qualitysListData : $response['qualitysListData'];
+<?php $feedsListData = isset($feedsListData) ? $feedsListData : feed::getCHtmlListData();
+      $genresListData = isset($genresListData) ? $genresListData : genre::getCHtmlListData();
+      $qualitysListData = isset($qualitysListData) ? $qualitysListData : quality::getCHtmlListData();
+
       $htmlId = 'favoriteTvShows-'.$favorite->id;
       echo CHtml::beginForm(
           array($favorite->isNewRecord ? 'createFavorite' : 'updateFavorite', 'id'=>$favorite->id), 
