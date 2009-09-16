@@ -20,6 +20,7 @@ class feedAdapter extends SimplePie {
     // time limit 0 so we dont timeout doing long operation
     set_time_limit(0);
 
+    // get feed and populate object
     parent::init();
 
     if($this->error()) {
@@ -36,33 +37,49 @@ class feedAdapter extends SimplePie {
     $this->_feedAR->title = $this->get_title();
     $this->_feedAR->description = $this->get_description();
 
-    $transaction = Yii::app()->db->beginTransaction();
-    try {
-      foreach($this->get_items() as $item) {
+    foreach($this->get_items() as $item) {
+      $title = $item->get_title();
+      echo "Considering $title: ";
+      $hash = md5($item->get_id());
+      if(feedItem::model()->exists('hash=:hash', array(':hash'=>$hash))) 
+      {
+        echo " already exists";
+      } 
+      else 
+      {
+        $transaction = Yii::app()->db->beginTransaction();
         try {
-          $title = $item->get_title();
+          echo " creating record";
           $description = $item->get_description();
-          $hash = md5($item->get_id());
-          if(false === feedItem::model()->exists('hash=:hash', array(':hash'=>$hash))) {
-            factory::feedItemByAttributes(array(
-                  'hash'        => $hash,
-                  'feed_id'     => $this->_feedAR->id,
-                  'downloadType'=> $this->_feedAR->downloadType,
-                  'imdbId'      => $item->get_imdbId(),
-                  'title'       => $item->get_title(),
-                  'url'         => $item->get_link(),
-                  'description' => $item->get_description(),
-                  'pubDate'     => $item->get_date('U'),
-            ));
-          }
+
+          // Prefer a link from enclosure over link from item
+          $link = '';
+          $enclosure = $item->get_enclosure();
+          if($enclosure)
+            $link = $enclosure->get_link();
+          if(empty($link))
+            $link = $item->get_link();
+  
+          $record = factory::feedItemByAttributes(array(
+                'hash'        => $hash,
+                'feed_id'     => $this->_feedAR->id,
+                'downloadType'=> $this->_feedAR->downloadType,
+                'imdbId'      => $item->get_imdbId(),
+                'title'       => $item->get_title(),
+                'url'         => $link,
+                'description' => $item->get_description(),
+                'pubDate'     => $item->get_date('U'),
+          ));
+          echo " as ".$record->id;
+          echo " Commiting transaction . . . ";
+          $transaction->commit();
+          echo "Done\n".$record->description;
         } catch (Exception $e) {
-          Yii::log('feedItem failed to save.', CLogger::LEVEL_ERROR);
+          $transaction->rollback();
+          Yii::log('feedItem failed to save: '.$title, CLogger::LEVEL_ERROR);
         }
       }
-      $transaction->commit();
-    } catch (Exception $e) {
-      $transaction->rollback();
-      throw $e;
+      echo "\n";
     }
   }
 }
