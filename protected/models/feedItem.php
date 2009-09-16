@@ -218,7 +218,7 @@ class feedItem extends ARwithQuality
    * Validator routine to ensure a string doesn't contain unsupported multibyte chars
    * Function from http://us2.php.net/manual/en/function.mb-detect-encoding.php
    * by chris AT w3style.co DOT uk based on code by php-note-2005 at ryandesign dot com
-   * @param string the string to check
+   * @param string the attribute to check
    */
   function notMultibyte($attr)
   {

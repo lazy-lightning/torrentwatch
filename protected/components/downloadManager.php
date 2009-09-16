@@ -1,5 +1,6 @@
 <?php
 
+// not sure this class heirarchy makes sense
 class downloadManager extends favoriteManager {
   private $_nzbClient, $_torClient;
 
@@ -239,7 +240,7 @@ class downloadManager extends favoriteManager {
         $record->updateByPk($record->id, array('status'=>constant("$class::STATUS_DOWNLOADED")));
       }
       else
-        Yii::log('WTF dude, no related record for '.$this->feedItemId, CLogger::LEVEL_ERROR);
+        Yii::log('WTF dude weve hit an inconsistancy, no related record for '.$this->feedItemId, CLogger::LEVEL_ERROR);
 
       $transaction->commit();
     } catch ( Exception $e ) {

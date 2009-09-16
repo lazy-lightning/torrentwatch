@@ -3,6 +3,7 @@
 abstract class clientPostFile extends BaseClient {
 
   public $fileExtension = '';
+  public $filePrefix = '';
 
   /**
    * @param string result page returned from http post
@@ -43,7 +44,7 @@ abstract class clientPostFile extends BaseClient {
       $be->addPostData($key, $value);
 
     $be->addPostData($this->getFilePostName(), array(
-          'filename'=>$this->manager->title.$this->fileExtension,
+          'filename'=>$this->filePrefix.$this->manager->title.$this->fileExtension,
           'contents'=>$data,
     ));
     $result = $be->file_get_contents($this->getApi());
