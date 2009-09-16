@@ -30,6 +30,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 Changelog:
 
+v2.0.1-torrentwatch2 by Erik Bernhardson
+  multi-part post with file submit
+
 v2.0.1-torrentwatch by Erik Bernhardson
   converted file() to file_get_contents()
   converted lastResponse to string from array to mimic file_get_contents
@@ -190,12 +193,6 @@ class BrowserEmulator {
     $url = $this->preparseURL($url);
     $this->lastResponse = Array();
    
-/*    preg_match("~([a-z]*://)?([^:^/]*)(:([0-9]{1,5}))?(/.*)?~i", $url, $matches);
-   
-    $protocol = $matches[1];
-    $server = $matches[2];
-    $port = $matches[4];
-    $path = $matches[5]; */
     $parts = parse_url($url);
     $protocol = $parts['scheme'];
     $server = $parts['host'];
@@ -206,6 +203,7 @@ class BrowserEmulator {
     }
 
     if($protocol == 'https') {
+      // TODO: https is locked to port 443, why?
       $server = 'ssl://'.$server;
       $this->setPort(443);
     } elseif ($port!="") {
@@ -224,7 +222,9 @@ class BrowserEmulator {
         elseif (count($this->postData)==0)
           $request = "GET $path HTTP/1.0\r\n";
         else
-          $request = "POST $path HTTP/1.1\r\nHost: {$parts['host']}\r\n";
+          $request = "POST $path HTTP/1.1\r\n";
+
+        $request .= "Host: {$parts['host']}\r\n";
        
         if ($this->debug) echo $request;
         if (count($this->postData)>0) {
@@ -255,22 +255,19 @@ class BrowserEmulator {
     }
     $this->lastRequest = $request;
 
-    // specific block size.  When letting php decide previously sometimes the full upload on larger(100kb+)
-    // uploads didn't make it.
-    $bs = 16384; // 16KB
     for ($written = 0; $written < strlen($request); $written += $fwrite) {
-      $fwrite = fwrite($socket, substr($request, $written, $bs), $bs);
+      $fwrite = fwrite($socket, substr($request, $written));
       if (!$fwrite) {
         break;
       }
     }
     if ($this->debug) echo "\n";
     if ($socket) {
-      $line = fgets($socket, 1000);
+      $line = fgets($socket);
       if ($this->debug) echo $line;
       $this->lastResponse .= $line;
       $status = substr($line,9,3);
-      while (trim($line = fgets($socket, 1000)) != ""){
+      while (trim($line = fgets($socket)) != ""){
         if ($this->debug) echo "$line";
         $this->lastResponse .= $line;
         if ($status=="401" AND strpos($line,"WWW-Authenticate: Basic realm=\"")===0) {
@@ -294,10 +291,10 @@ class BrowserEmulator {
     $socket = $this->fopen($url);
     if ($socket) {
         while (!feof($socket)) {
-          $file .= fgets($socket, 10000);
+          $file .= fgets($socket);
         }
     } else {
-        _debug('Browser Emulator: file_get_contents bad socket', -1);
+        Yii::log('Browser Emulator: file_get_contents bad socket', CLogger::LEVEL_ERROR);
         return FALSE;
     }
     fclose($socket);
@@ -309,7 +306,6 @@ class BrowserEmulator {
       }
     }
 
-    file_put_contents('/tmp/fsockopen.'.rand(), $file);
     return $file;
   }
 
