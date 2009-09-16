@@ -340,7 +340,7 @@ class dvrConfig extends BaseDvrConfig {
         array('timezone', 'validTimezone'),
         array('downloadDir,watchDiri,tmpDir', 'writableDirectory'),
         array('saveFile','in','allowEmpty'=>false,'range'=>array(0,1)),
-        array('feedItemLifetime,webItemsPerLoad,maxItemsPerFeed','numerical','integerOnly'=>true,'min'=>1),
+        array('webItemsPerLoad,maxItemsPerFeed','numerical','integerOnly'=>true,'min'=>1),
         array('torClient', 'in', 'allowEmpty'=>false, 'range'=>array_keys(Yii::app()->dlManager->availClients[feedItem::TYPE_TORRENT])),
         array('torClient', 'in', 'allowEmpty'=>false, 'range'=>array_keys(Yii::app()->dlManager->availClients[feedItem::TYPE_NZB])),
     );

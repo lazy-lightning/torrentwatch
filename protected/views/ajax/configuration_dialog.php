@@ -40,10 +40,6 @@
                       CHtml::activeCheckBox($config, 'saveFile'); ?>
         </div>
         <h2 class="dialog_heading">Database Settings</h2>
-        <div id="config_feedItemLifetime">
-          <?php echo CHtml::activeLabel($config, 'feedItemLifetime', array('class'=>'item')).': '.
-                     CHtml::activeTextField($config, 'feedItemLifetime'); ?>
-        </div>
         <div id="config_maxItemsPerFeed">
           <?php echo CHtml::activeLabel($config, 'maxItemsPerFeed', array('class'=>'item')).': '.
                      CHtml::activeTextField($config, 'maxItemsPerFeed'); ?>

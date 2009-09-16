@@ -23,7 +23,6 @@ INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('downloadDir','/
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('watchDir','/share/',NULL);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('saveFile',1,NULL);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('tempDir','/tmp',NULL);
-INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('feedItemLifetime',2,NULL);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('torClient','clientFolder',NULL);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('nzbClient','clientFolder',NULL);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('webItemsPerLoad', 50, NULL);

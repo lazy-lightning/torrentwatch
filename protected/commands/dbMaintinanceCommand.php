@@ -4,6 +4,7 @@ class dbMaintinanceCommand extends BaseConsoleCommand {
   public function run($args) {
     $db = Yii::app()->db;
 
+    // NOTE: these querys are run after pruning the feed items table to a max count specified in dvrConfig
     $querys = array(
         // create temp table containing feeditems that point to others that are also in movies
         'CREATE TEMP TABLE convert AS'.
@@ -18,9 +19,6 @@ class dbMaintinanceCommand extends BaseConsoleCommand {
         ' WHERE feedItem.id IN(select feedItem_id FROM convert);',
         // drop temp table
         'DROP TABLE convert;',
-        //  Delete items more than the configured  days old
-        'DELETE FROM feedItem'.
-        ' WHERE feedItem.pubDate < '.(time()-(3600*24*Yii::app()->dvrConfig->feedItemLifetime)).';',
         // Delete others that dont point to a feed item anymore
         // Unless they have been marked downloaded, so it doesn't download same title in future
         'DELETE FROM other'.
@@ -41,7 +39,7 @@ class dbMaintinanceCommand extends BaseConsoleCommand {
         'DELETE FROM tvEpisode'.
         ' WHERE ( tvShow_id NOT IN (SELECT id FROM tvShow)'.
         '         OR'.
-        '         id NOT IN (SELECT tvEpisode_id FROM feedItem)'.
+        '         id NOT IN (SELECT tvEpisode_id FROM feedItem WHERE tvEpisode_id NOT NULL)'.
         '       )'.
         '   AND status = '.tvEpisode::STATUS_NEW.';',
         // Empty out unrelated networks
@@ -88,19 +86,20 @@ class dbMaintinanceCommand extends BaseConsoleCommand {
     $transaction = $db->beginTransaction();
     try {
       // delete more than maxItemsPerFeed
-      $reader = $db->createCommand('SELECT id FROM feed')->query();
+      $reader = $db->createCommand('SELECT id FROM feed')->queryAll();
       foreach($reader as $row)
       {
         $querys[] =
           'DELETE FROM feedItem'.
           ' WHERE id IN ( SELECT id FROM feedItem'.
                         '  WHERE feed_id = '.$row['id'].
-                        '  ORDER BY pubDate'.
+                        '  ORDER BY pubDate DESC'.
                         '  LIMIT -1'.
                         ' OFFSET '.(int)(Yii::app()->dvrConfig->maxItemsPerFeed).
                         ');';
       }
-      
+
+      // Run the pre-defined querys from above
       foreach($querys as $sql)
       {
         $db->createCommand($sql)->execute();
