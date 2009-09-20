@@ -30,9 +30,6 @@
         <div class="content">
           <h2 class="dialog_heading"><?php echo $opts['header']; ?></h2>
           <p><?php echo isset($opts['content']) ? $opts['content'] : ' '; ?></p>
-          <div class="buttonContainer clearFix">
-            <a href="#actionResponse" class="toggleDialog button">Close</a>
-          </div>
         </div>
       </div>
     <?php
