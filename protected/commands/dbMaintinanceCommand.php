@@ -49,6 +49,8 @@ class dbMaintinanceCommand extends BaseConsoleCommand {
         'DELETE FROM genre'.
         ' WHERE id NOT IN (SELECT genre_id from favoriteMovies)'.
         '   AND id NOT IN (SELECT genre_id from movie_genre);',
+        // VACUUM the database
+        'VACUUM',
     );
     // SQLite doesn't do anything with foreign keys, so clean out MANY_MANY relationships that point to
     // non-existant things
