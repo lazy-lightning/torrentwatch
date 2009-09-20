@@ -1,6 +1,7 @@
 <?php
 
 abstract class BaseDvrConfig extends CModel {
+  protected $_apcKey = 'NMTDVR_Config';
   private $_updateCommand; // CDbCommand that can update a value from this category
   private $_changed=array(); // changed items since load
   private $_ar = array(); // loaded values
@@ -42,7 +43,9 @@ abstract class BaseDvrConfig extends CModel {
     {
       $this->_ar[$key] = $value;
       $this->_changed[$key] = true;
+      return true;
     }
+    return false
   }
 
   /**
@@ -110,12 +113,12 @@ abstract class BaseDvrConfig extends CModel {
   /**
    * called from implementing classes to load from APC
    */
-  protected function loadAPC($key)
+  protected function loadAPC($key = '')
   {
     $success = false;
     if(function_exists('apc_fetch'))
     {
-      $data = apc_fetch($key, $success);
+      $data = apc_fetch(empty($key) ? $this->_apcKey : $key, $success);
       if($success)
         $this->_ar = unserialize($data);
     }
@@ -129,11 +132,11 @@ abstract class BaseDvrConfig extends CModel {
   {
   }
 
-  public function saveAPC($key)
+  public function saveAPC($key = '')
   {
     if(function_exists('apc_store'))
     {
-      apc_store($key, serialize($this->_ar), 3600);
+      apc_store(empty($key) ? $this->_apcKey : $key, serialize($this->_ar), 3600);
     }
   }
   /**
@@ -152,13 +155,14 @@ abstract class BaseDvrConfig extends CModel {
 
   /**
    * Override setAttributes from CModel to allow mass assignment
-   * for all attributes contained in the category
+   * for all attributes not prefixed with _ contained in the category
    */
   public function setAttributes($values, $scenario='') {
     Yii::log(__FUNCTION__.': '.print_r($values, true));
     foreach($values as $name=>$value)
     {
-      $this->add($name, $value);
+      if($name[0] !== '_')
+        $this->add($name, $value);
     }
   }
 
@@ -253,8 +257,10 @@ class dvrConfigCategory extends BaseDvrConfig {
    * @param mixed the value to be associated with said key
    */
   public function add($key, $value) {
-    parent::add($key, $value);
-    $this->_parent->setChanged($this->_title);
+    if(false === parent::add($key, $value))
+      return false;
+    $this->_parent->setChanged($this->_title) 
+    return true;
   }
 
   /**
@@ -279,7 +285,7 @@ class dvrConfig extends BaseDvrConfig {
 
   public function afterSave()
   {
-    $this->saveAPC('NMTDVR_Config');
+    $this->saveAPC();
     parent::afterSave();
   }
 
@@ -298,7 +304,7 @@ class dvrConfig extends BaseDvrConfig {
    */
   public function init() 
   {
-    if($this->loadAPC('NMTDVR_Config') === False)
+    if($this->loadAPC() === False)
     {
       $db = Yii::app()->db;
       // Get our configuration information out of the database
@@ -325,7 +331,7 @@ class dvrConfig extends BaseDvrConfig {
         // dvrConfigCategory will add to parent on successfull init
         $c->init();
       }
-      $this->saveAPC('NMTDVR_Config');
+      $this->saveAPC();
     }
     parent::init();
   }
@@ -338,7 +344,7 @@ class dvrConfig extends BaseDvrConfig {
     return array(
         // could possibly be accomplished with the 'in' validator class
         array('timezone', 'validTimezone'),
-        array('downloadDir,watchDiri,tmpDir', 'writableDirectory'),
+        array('downloadDir,watchDir,tmpDir', 'writableDirectory'),
         array('saveFile','in','allowEmpty'=>false,'range'=>array(0,1)),
         array('webItemsPerLoad,maxItemsPerFeed','numerical','integerOnly'=>true,'min'=>1),
         array('torClient', 'in', 'allowEmpty'=>false, 'range'=>array_keys(Yii::app()->dlManager->availClients[feedItem::TYPE_TORRENT])),
