@@ -45,7 +45,7 @@ abstract class BaseDvrConfig extends CModel {
       $this->_changed[$key] = true;
       return true;
     }
-    return false
+    return false;
   }
 
   /**
@@ -259,7 +259,7 @@ class dvrConfigCategory extends BaseDvrConfig {
   public function add($key, $value) {
     if(false === parent::add($key, $value))
       return false;
-    $this->_parent->setChanged($this->_title) 
+    $this->_parent->setChanged($this->_title);
     return true;
   }
 
