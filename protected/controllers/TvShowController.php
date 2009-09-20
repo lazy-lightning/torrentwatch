@@ -114,7 +114,7 @@ class TvShowController extends BaseController
     $criteria=new CDbCriteria;
 
     $pages=new CPagination(tvShow::model()->count($criteria));
-    $pages->pageSize=self::PAGE_SIZE;
+    $pages->pageSize=Yii::app()->dvrConfig->webItemsPerLoad;
     $pages->applyLimit($criteria);
 
 //    $tvshowList=tvShow::model()->findAll($criteria);
