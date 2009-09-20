@@ -33,17 +33,16 @@ abstract class BaseController extends CController {
     $this->_resolution = 'hd';
     if(isset($_SERVER['HTTP_USER_AGENT']))
     {
-      // sd if reported in user agent, otherwise default to hd
-      $this->_resolution = stristr($_SERVER['HTTP_USER_AGENT'], 'Res720x576') === False?'hd':'sd';
-
       // if the user agent is an NMT load images with file://, otherwise relative url
       if(stristr($_SERVER['HTTP_USER_AGENT'], 'Syabas') === False) 
-      {
+      { // Not A Syabas browser delivering request
         $this->imageRoot = dirname($_SERVER['SCRIPT_NAME']).'/images/';
         $app->setTheme($app->dvrConfig->webuiTheme);
       }
       else
       {
+        // sd if reported in user agent, otherwise default to hd
+        $this->_resolution = stristr($_SERVER['HTTP_USER_AGENT'], 'Res720x576') === False?'hd':'sd';
         $this->imageRoot = 'file:///opt/sybhttpd/localhost.images/';
         $app->setTheme($app->dvrConfig->gayauiTheme);
       }
@@ -52,12 +51,12 @@ abstract class BaseController extends CController {
     $this->imageRoot .= $this->_resolution.'/';
 
     // Switch to ajax view when required
-    if(Yii::app()->request->isAjaxRequest)
+    if($app->request->isAjaxRequest)
       $this->layout = 'ajax';
 
     // Auto-login hack from localhost 
-    if(isset($_SERVER['REMOTE_ADDR']) && Yii::app()->user->getIsGuest() && $_SERVER['REMOTE_ADDR'] === '127.0.0.1')
-      Yii::app()->user->login(new LocalBrowserHackIdentity(), 3600*24*30);
+    if(isset($_SERVER['REMOTE_ADDR']) && $app->user->getIsGuest() && $_SERVER['REMOTE_ADDR'] === '127.0.0.1')
+      $app->user->login(new LocalBrowserHackIdentity(), 3600*24*30);
   }
 
   /**
