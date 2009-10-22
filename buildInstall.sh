@@ -1,9 +1,13 @@
 #!/bin/sh
 # Build javascript.min
 
-LFTP_PCH_BOOKMARK="PCH"
+LFTP_A100_BOOKMARK="PCH"
+A100_ADDR="popcorn:8883/HARD_DISK"
+LFTP_C200_BOOKMARK="c200"
+C200_ADDR="c200:8883/SATA_DISK"
 LFTP_NET_BOOKMARK="asodown"
 
+APPINIT="Apps/AppInit/appinit.cgi"
 NAME=$(grep name appinfo.json | sed 's/[ ]*.*="\(.*\)",/\1/g')
 VERSION=$(grep version appinfo.json | sed 's/[ ]*.*="\(.*\)",/\1/g')
 EXCLUDES="install testing protected/data/source.db.BACKUP protected/data/source.db protected/runtime cache buildInstall.sh findNotSvn.sh assets"
@@ -20,7 +24,7 @@ for EX in $EXCLUDES; do
   EXSTRING="$EXSTRING --exclude=$EX"
 done
 
-tar -cvf install/NMTDVR.tar . $EXSTRING && cd install && zip $NAME-$VERSION.zip * -x \*.zip
+tar -cvf install/$NAME.tar . $EXSTRING && cd install && zip $NAME-$VERSION.zip * -x \*.zip
 
 if [ $? != 0 ]; then
   echo "Build Failed"
@@ -31,15 +35,25 @@ cat <<EOF
 
 Built install/$NAME-$VERSION.zip
 
-Upload to NMTand Install (Y/n) or Upload to net (U)
+Upload to A100 (A) / C200 (C) / Upload to net (U)
 EOF
 read CHAR
 
-if [ x"$CHAR" = x"Y" ];then
-  echo "put \"$NAME.tar\"" | lftp $LFTP_PCH_BOOKMARK && wget -q -O - "http://localhost.drives:8883/HARD_DISK/Apps/AppInit/appinit.cgi?install&%2Fshare%2F$NAME.tar"
+if [ x"$CHAR" = x"a" -o x"$CHAR" = x"A" ];then
+  BM=$LFTP_A100_BOOKMARK
+  REMOTE_ADDR=$A100_ADDR
 fi
 
-if [ x"$CHAR" = x"U" ];then
+if [ x"$CHAR" = x"c" -o x"$CHAR" = x"C" ]; then
+  BM=$LFTP_C200_BOOKMARK
+  REMOTE_ADDR=$C200_ADDR
+fi
+
+if [ -n $BM ]; then
+  echo "put \"$NAME.tar\"" | lftp $BM && wget -q --header "Host: localhost.drives" -O - "http://$REMOTE_ADDR/$APPINIT?install&%2Fshare%2F$NAME.tar"
+fi
+
+if [ x"$CHAR" = x"u" -o x"$CHAR" = x"U" ];then
   echo "put \"$NAME-$VERSION.zip\"" | lftp $LFTP_NET_BOOKMARK
 fi
 

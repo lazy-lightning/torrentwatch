@@ -147,7 +147,14 @@ class AjaxController extends BaseController
       $favorite->qualityIds = $_POST['quality_id'];
 
     $favorite->attributes = $_POST[$class];
-    $favorite->save();
+    try {
+      $transaction = Yii::app()->db->beginTransaction();
+      $favorite->save();
+      $transaction->commit();
+    } catch (Exception $e) {
+      $transaction->rollback();
+      throw $e;
+    }
 
     // Tell the view to bring up the changed favorite
     $this->response[$class] = $favorite;

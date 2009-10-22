@@ -24,7 +24,7 @@ class updateTVDBCommand extends BaseConsoleCommand {
                                  ' WHERE s.tvdbId NOT NULL'.
                                  '   AND s.id = e.tvShow_id'
 
-    )->query();
+    )->queryAll();
     foreach($reader as $row) {
       $scanned[] = $row['id'];
       // Dont have the class functions written for date based episode
@@ -57,8 +57,8 @@ class updateTVDBCommand extends BaseConsoleCommand {
       $toSave[] = $tvEpisode;
     }
 
-    $transaction = Yii::app()->db->beginTransaction();
     try {
+      $transaction = Yii::app()->db->beginTransaction();
       echo count($toSave)." tv Episodes to save\n";
       foreach($toSave as $record)
         $record->save();
@@ -78,7 +78,7 @@ class updateTVDBCommand extends BaseConsoleCommand {
     $reader = $db->createCommand('SELECT id,title FROM tvShow'.
                                  ' WHERE description IS NULL'.
                                  '   AND lastTvdbUpdate < '.($now-(3600*48))
-    )->query();
+    )->queryAll();
     foreach($reader as $row) 
     {
       $scanned[]= $row['id'];
@@ -95,7 +95,7 @@ class updateTVDBCommand extends BaseConsoleCommand {
     }
 
     echo count($toSave)." tv Shows to save\n";
-    $transaction = Yii::app()->db->beginTransaction();
+    $transaction = $db->beginTransaction();
     try {
       foreach($toSave as $id => $data)
       {

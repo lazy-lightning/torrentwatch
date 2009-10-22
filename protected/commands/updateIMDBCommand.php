@@ -3,9 +3,16 @@
 class updateIMDbCommand extends BaseConsoleCommand {
 
   public function run($args) {
-    $this->updateMovies();
-    // EXPERIMENTAL
-    $this->updateOthers();
+    try {
+      $transaction = Yii::app()->db->beginTransaction();
+      $this->updateMovies();
+      // EXPERIMENTAL
+      $this->updateOthers();
+      $transaction->commit();
+    } catch (Exception $e) {
+      $transaction->rollback();
+      throw $e;
+    }
   }
 
   protected function updateOthers() {
@@ -14,7 +21,7 @@ class updateIMDbCommand extends BaseConsoleCommand {
     $reader = $db->createCommand('SELECT id, title'.
                                  '  FROM other'.
                                  ' WHERE lastImdbUpdate = 0'
-    )->query();
+    )->queryAll();
     foreach($reader as $row) {
       $scanned[] = $row['id'];
       $title = $row['title'];
@@ -71,7 +78,7 @@ class updateIMDbCommand extends BaseConsoleCommand {
                                  ' WHERE lastImdbUpdate <'.($now-(3600*24)). // one update per 24hrs
                                  '   AND rating IS NULL;'
 
-    )->query();
+    )->queryAll();
     foreach($reader as $row) {
       $scanned[] = $row['id'];
 

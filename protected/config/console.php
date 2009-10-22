@@ -42,6 +42,7 @@ return array(
       'allowAutoLogin'=>true,
     ),
     'db'=>array(
+      'class'=>'SqliteConnection',
       'connectionString'=>'sqlite:protected/data/source.db',
     ),
   ),

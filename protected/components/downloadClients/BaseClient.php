@@ -17,7 +17,29 @@ abstract class baseClient {
 
   public function addByUrl($url) {
     $data = $this->getFile();
-    return $data === False ? False : $this->addByData($data);
+    if($this->beforeSend($data))
+    {
+      $retVal = $this->addByData($data);
+      $this->afterSend($retVal);
+      return $retVal;
+    }
+    return false;
+  }
+
+  protected function afterSend($retVal)
+  {
+    return;
+  }
+
+  // for now just check for html, but could do full sanity check
+  // to verify file is acceptable to send on to the client
+  protected function beforeSend($fileData)
+  {
+    // $type = $this->manager->getDownloadType();
+    if(empty($fileData) || strstr($fileData, '<html>') !== false)
+      return false;
+
+    return true;
   }
 
   public function getError() {
@@ -49,6 +71,5 @@ abstract class baseClient {
 
     return $saveIn;
   }
-
 }
 

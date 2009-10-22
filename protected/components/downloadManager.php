@@ -94,6 +94,7 @@ class downloadManager extends favoriteManager {
    * @param none
    */
   public function getDownloadType() {
+    // is this all repetative, can i just use array access on the object?
     return is_array($this->opts) ? $this->opts['feedItem_downloadType'] : $this->opts->downloadType;
   }
 
