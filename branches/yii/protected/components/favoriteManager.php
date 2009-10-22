@@ -64,7 +64,7 @@ abstract class favoriteManager extends CModel {
         'SELECT * FROM matchingFavoriteMovies'.
         ' WHERE feedItem_status='.$itemStatus.
         '   AND movie_status='.movie::STATUS_NEW
-    )->query();
+    )->queryAll();
 
     foreach($reader as $row) 
     {
@@ -88,7 +88,7 @@ abstract class favoriteManager extends CModel {
     $reader = $db->createCommand(
         'SELECT * FROM matchingFavoriteStrings'.
         '  WHERE feedItem_status='.$itemStatus
-    )->query();
+    )->queryAll();
 
     foreach($reader as $row) 
     {
@@ -135,7 +135,7 @@ abstract class favoriteManager extends CModel {
         'SELECT * FROM matchingFavoriteTvShows'.
         ' WHERE feedItem_status='.$itemStatus.
         '   AND tvEpisode_status='.tvEpisode::STATUS_NEW
-    )->query();
+    )->queryAll();
 
     // loop through the matching items
     foreach($reader as $row) 
@@ -206,14 +206,24 @@ abstract class favoriteManager extends CModel {
   {
     if(is_subclass_of($favorite, 'BaseFavorite'))
     {
-      $table = $favorite->tableName();
-      $favorite->dbConnection->createCommand(
-          'UPDATE feedItem SET status='.feedItem::STATUS_NOMATCH.
-          ' WHERE feedItem.id IN ( SELECT feedItem_id as id FROM matching'.$table.' m'.
-                                  ' WHERE m.'.$table.'_id = '.$favorite->id.
-                                  '   AND m.feedItem_status NOT IN ("'.
-                                    feedItem::STATUS_AUTO_DL.'", "'.feedItem::STATUS_MANUAL_DL.'"));'
-      )->execute();
+      $db = $favorite->dbConnection;
+      try {
+        $transaction=$db->beginTransaction();
+        $table = $favorite->tableName();
+        $favorite->dbConnection->createCommand(
+            'UPDATE feedItem SET status='.feedItem::STATUS_NOMATCH.
+            ' WHERE feedItem.id IN ( SELECT feedItem_id as id FROM matching'.$table.' m'.
+                                    ' WHERE m.'.$table.'_id = '.$favorite->id.
+                                    '   AND m.feedItem_status NOT IN ("'.
+                                      feedItem::STATUS_AUTO_DL.'", "'.feedItem::STATUS_MANUAL_DL.'"));'
+        )->execute();
+        $transaction->commit();
+      }
+      catch (Exception $e)
+      {
+        $transaction->rollback();
+        throw $e;
+      }
     }
   }
 

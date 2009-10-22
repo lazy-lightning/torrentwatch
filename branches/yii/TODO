@@ -1,7 +1,4 @@
 
-TV EPISODES DONT SEEM TO BE RECEIVING STATUS UPDATES WHEN DOWNLOAD SUCCEDES
-DELETE FEED BUTTON NOT CAUGHT BY JAVASCRIPT HANDLER
-
 Test Release Goals
 --------------------
 Completed backend 
@@ -16,21 +13,16 @@ NMT view to be partially completed, but not fully usable in first release
 
 TODO
 -----
-on feedItem creation if tv_episode.status = downloaded, set status to duplicate
 when tv_episode.status changes to downloaded, change all feedItems pointing to it of nomatch to duplicate
-Write inspector ajax action to get specific data from database
+- and on new item creation
 Fix and Document LED colors in webui
-Fix css selectors in javascript to point to correct items
-Create download history table and add to it from downloadManager
 Debug download clients
-Finish webui interface for multiple favorite types (tabs?)
-Better handling of multiple qualitys
 
 Future TODO's after first release
 -----------------------------------
 Make proper list and show views for all the AR classes
 favoriteTvShow quality fallback.  example: if set to hdtv, but we only know about a 720p release allow that to go through after X(4?) hours of not seeing an hdtv release
-new version of deep directories that takes a user formatted string (like mp3 renamers) and string replacement to generate the title
+new version of deep directories that takes a user formatted string (like mp3 renamers) and string replacement to generate the file path
 
 
 

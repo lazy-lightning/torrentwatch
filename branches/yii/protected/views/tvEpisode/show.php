@@ -48,7 +48,7 @@
 </tr>
 <tr>
   <th class="label">Available Quailtys</th>
-<?php $x=False;foreach($tvepisode->feedItems as $item): ?>
+<?php $x=False;foreach($tvepisode->feedItem as $item): ?>
   <?php if($x):?>
   <tr>
     <th>&nbsp;</th>
