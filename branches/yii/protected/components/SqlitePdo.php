@@ -68,7 +68,7 @@ class SqlitePdo extends PDO
         else 
         {
           throw $e;
-i        }
+        }
       }
     }
   }
