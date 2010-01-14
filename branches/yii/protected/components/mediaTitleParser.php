@@ -1,5 +1,4 @@
 <?php
-
 class mediaTitleParser {
 
   static protected $titleMatchers = array(
@@ -10,6 +9,12 @@ class mediaTitleParser {
   );
 
   /**
+   * This is the main programatic entrance from outside this object
+   * When passed a title this function will reaturn an array indicating
+   * the information it was able to detect from the title.
+   * NOTE: Perhaps this should instead be an object to be instantiated with
+   *       the title in the constructor, and the objects properties would reflect
+   *       detected information.
    * @return array 6 element array in the following order:
    *     show title, episode title, season, episode, network, quality
    */
@@ -55,6 +60,7 @@ class qualityMatch {
     if(preg_match_all("/".self::$qual_reg."/i", $title, $regs)) 
     {
       // if 720p and hdtv strip hdtv to make hdtv more unique
+      //
       $q = array_change_key_case(array_flip($regs[1]));
       if(isset($q['720p'], $q['hdtv'])) {
         unset($regs[1][$q['hdtv']]);
@@ -70,6 +76,10 @@ class qualityMatch {
   }
 }
 
+/**
+ * titleMatch is the base class from which all methods to 
+ * detect title information from an input string are based.
+ */
 // TODO: returning arrays isn't the way objects should work.
 // make all the array variables either public vars or protected vars
 // with getters/__get and return true/false 
@@ -121,6 +131,7 @@ abstract class titleMatch {
   }
 }
 
+// This class matches a full season and episode string found in the given title
 class titleMatchFull extends titleMatch
 {
 
@@ -148,6 +159,7 @@ class titleMatchFull extends titleMatch
   }
 }
 
+// This class matches a title that has a dated episode as oposed to season/episode
 class titleMatchDate extends titleMatch
 {
   function __construct()
@@ -191,6 +203,9 @@ class titleMatchDate extends titleMatch
   }
 }
 
+// This class matches a title that has only a season or episode marker
+// This is common for documentries with no season, or special features 
+// that dont have episode numbers but relate to a given season
 class titleMatchPartial extends titleMatch
 {
   // only episode or season, not both
@@ -209,6 +224,7 @@ class titleMatchPartial extends titleMatch
   }
 }
 
+// This class matches a short(3 digit, no S or E identifiers) episode identifier in the title
 class titleMatchShort extends titleMatch
 {
   // three digits (four hits movie years, optional 0 to catch single digit season) with a
