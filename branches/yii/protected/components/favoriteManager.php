@@ -16,21 +16,13 @@ abstract class favoriteManager extends CModel {
   public function checkFavorites($itemStatus = feedItem::STATUS_NEW) 
   {
     Yii::trace('Checking for matching favorites');
-    $transaction = Yii::app()->db->beginTransaction();
     $this->checkTvShowFavorites($itemStatus);
     $this->checkMovieFavorites($itemStatus);
     $this->checkStringFavorites($itemStatus);
 
     $this->startDownloads();
 
-    $transaction = Yii::app()->db->beginTransaction();
-    try {
-      $this->updateItemStatus($itemStatus);
-      $transaction->commit();
-    } catch ( Exception $e ) {
-      $transaction->rollback();
-      throw $e;
-    }
+    $this->updateItemStatus($itemStatus);
   }
  
   /**
@@ -132,6 +124,7 @@ abstract class favoriteManager extends CModel {
             '    FROM onlyNewerFeedItemFilter'.
             ')'
             )->execute();
+        $trans->commit();
     } catch (Exception $e) {
         $trans->rollback();
         throw $e;
