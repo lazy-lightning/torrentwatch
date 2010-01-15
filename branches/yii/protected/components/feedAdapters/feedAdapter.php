@@ -73,7 +73,7 @@ class feedAdapter extends SimplePie {
           echo " as ".$record->id;
           echo " Commiting transaction . . . ";
           $transaction->commit();
-          echo "Done\n".$record->description;
+          echo "Done\n";
         } catch (Exception $e) {
           $transaction->rollback();
           Yii::log('feedItem failed to save: '.$title, CLogger::LEVEL_ERROR);
