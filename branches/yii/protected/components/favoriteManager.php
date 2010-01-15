@@ -17,15 +17,9 @@ abstract class favoriteManager extends CModel {
   {
     Yii::trace('Checking for matching favorites');
     $transaction = Yii::app()->db->beginTransaction();
-    try {
-      $this->checkTvShowFavorites($itemStatus);
-      $this->checkMovieFavorites($itemStatus);
-      $this->checkStringFavorites($itemStatus);
-      $transaction->commit();
-    } catch ( Exception $e ) {
-      $transaction->rollback();
-      throw $e;
-    }
+    $this->checkTvShowFavorites($itemStatus);
+    $this->checkMovieFavorites($itemStatus);
+    $this->checkStringFavorites($itemStatus);
 
     $this->startDownloads();
 
@@ -48,16 +42,23 @@ abstract class favoriteManager extends CModel {
     Yii::log('Looking for movie favorites');
     $db = Yii::app()->db;
 
-    // Mark any previously downloaded movies that are now matching
-    $db->createCommand(
-      'UPDATE feedItem'.
-      '   SET status='.feedItem::STATUS_DUPLICATE.
-      ' WHERE feedItem.status = '.$itemStatus.
-      '   AND feedItem.id IN ( SELECT feedItem_id'.
-                            '    FROM matchingFavoriteMovies m'.
-                            '   WHERE m.movie_status = '.movie::STATUS_DOWNLOADED.
-                            ');'
-    )->execute();
+    try {
+        $trans = $db->beginTransaction();
+        // Mark any previously downloaded movies that are now matching
+        $db->createCommand(
+            'UPDATE feedItem'.
+            '   SET status='.feedItem::STATUS_DUPLICATE.
+            ' WHERE feedItem.status = '.$itemStatus.
+            '   AND feedItem.id IN ( SELECT feedItem_id'.
+            '    FROM matchingFavoriteMovies m'.
+            '   WHERE m.movie_status = '.movie::STATUS_DOWNLOADED.
+            ');'
+            )->execute();
+        $trans->commit();
+    } catch (Exception $e) {
+        $trans->rollback();
+        throw $e;
+    }
 
     // Get any matching items from the db
     $reader = $db->createCommand(
@@ -108,27 +109,34 @@ abstract class favoriteManager extends CModel {
     Yii::log('Looking for TvShow favorites');
     $db = Yii::app()->db;
 
-    // Mark any duplicate episodes
-    $db->createCommand(
-        'UPDATE feedItem'.
-        '   SET status='.feedItem::STATUS_DUPLICATE.
-        ' WHERE feedItem.status = '.$itemStatus.
-        '   AND feedItem.tvEpisode_id IN '.
-                 ' ( SELECT id FROM tvEpisode e'.
-                 '   WHERE e.status = '.tvEpisode::STATUS_DOWNLOADED.
-                 ' );'
-    )->execute();
+    try {
+        $trans = $db->beginTransaction();
+        // Mark any duplicate episodes
+        $db->createCommand(
+            'UPDATE feedItem'.
+            '   SET status='.feedItem::STATUS_DUPLICATE.
+            ' WHERE feedItem.status = '.$itemStatus.
+            '   AND feedItem.tvEpisode_id IN '.
+            ' ( SELECT id FROM tvEpisode e'.
+            '   WHERE e.status = '.tvEpisode::STATUS_DOWNLOADED.
+            ' );'
+            )->execute();
 
-    // Mark any old episodes with favorite set to only newer
-    // episodes(handled inside the view)
-    $db->createCommand(
-        'UPDATE feedItem'.
-        '   SET status='.feedItem::STATUS_OLD.
-        ' WHERE feedItem.status = '.$itemStatus.
-        '   AND feedItem.id IN ( SELECT feedItem_id'.
-                              '    FROM onlyNewerFeedItemFilter'.
-                              ')'
-    )->execute();
+        // Mark any old episodes with favorite set to only newer
+        // episodes(handled inside the view)
+        $db->createCommand(
+            'UPDATE feedItem'.
+            '   SET status='.feedItem::STATUS_OLD.
+            ' WHERE feedItem.status = '.$itemStatus.
+            '   AND feedItem.id IN ( SELECT feedItem_id'.
+            '    FROM onlyNewerFeedItemFilter'.
+            ')'
+            )->execute();
+    } catch (Exception $e) {
+        $trans->rollback();
+        throw $e;
+    }
+
 
     // get any matching items with the right itemStatus
     $reader = $db->createCommand(
@@ -176,26 +184,32 @@ abstract class favoriteManager extends CModel {
    */
   private function updateItemStatus($updateType)
   {
-    // After matching has occured, updated item statuses
-    // The status of downloaded items have already been set.
-    if(count($this->toQueue) !== 0)
-      feedItem::model()->updateByPk($this->toQueue, array('status'=>feedItem::STATUS_QUEUED));
-    if(count($this->duplicates) !== 0)
-    {
-      Yii::log('Marking duplicate feeditems: '.print_r($this->duplicates, true), CLogger::LEVEL_INFO);
-      feedItem::model()->updateByPk($this->duplicates, array('status'=>feedItem::STATUS_DUPLICATE));
+    try {
+      $model = feedItem::model();
+      $trans = Yii::app()->db->beginTransaction();
+      // After matching has occured, updated item statuses
+      // The status of downloaded items have already been set.
+      if(count($this->toQueue) !== 0)
+          $model->updateByPk($this->toQueue, array('status'=>feedItem::STATUS_QUEUED));
+      if(count($this->duplicates) !== 0) {
+          Yii::log('Marking duplicate feeditems: '.print_r($this->duplicates, true), CLogger::LEVEL_INFO);
+          $model->updateByPk($this->duplicates, array('status'=>feedItem::STATUS_DUPLICATE));
+      }
+
+      // if we were checking new items, change all still new to nomatch
+      if($updateType === feedItem::STATUS_NEW) {
+          $model->updateAll(
+              array('status'=>feedItem::STATUS_NOMATCH),
+              'status = :status',
+              array(':status'=>feedItem::STATUS_NEW)
+          );
+      }
+      $trans->commit();
+    } catch (Exception $e) {
+        $trans->rollback();
+        throw $e;
     }
 
-    // if we were checking new items, change all still new to nomatch
-    if($updateType === feedItem::STATUS_NEW) 
-    {
-      feedItem::model()->updateAll(
-          array('status'=>feedItem::STATUS_NOMATCH),
-          'status = :status',
-          array(':status'=>feedItem::STATUS_NEW)
-      );
-    }
-    
     $this->duplicates = $this->toQueue = array();
   }
 
