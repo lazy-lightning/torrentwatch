@@ -320,20 +320,12 @@ SELECT feedItem.id feedItem_id,
  WHERE feedItem.movie_id = movie.id
    AND feedItem.feed_id = feed.id
  ORDER BY feedItem.pubDate DESC;
-CREATE VIEW newestTvEpisode AS 
-SELECT * FROM tvEpisode new 
- WHERE NOT EXISTS( SELECT * FROM tvEpisode old 
-                    WHERE ( new.tvShow_id = old.tvShow_id 
-                            AND 
-                            ( new.season < old.season 
-                              OR 
-                              ( new.season = old.season 
-                                AND 
-                                new.episode < old.episode
-                              )
-                            )
-                          )
-                 );
+CREATE VIEW newestTvEpisode AS
+SELECT * 
+  FROM ( SELECT *  
+           FROM tvEpisode 
+          ORDER BY season, episode
+       ) GROUP BY tvShow_id;
 CREATE VIEW onlyNewerFeedItemFilter AS
 SELECT feedItem_id, feedItem_status, tvEpisode_status
   FROM matchingFavoriteTvShows m

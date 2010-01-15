@@ -113,13 +113,14 @@ abstract class favoriteManager extends CModel {
         'UPDATE feedItem'.
         '   SET status='.feedItem::STATUS_DUPLICATE.
         ' WHERE feedItem.status = '.$itemStatus.
-        '   AND feedItem.id IN ( SELECT feedItem_id'.
-                              '    FROM matchingFavoriteTvShows m'.
-                              '   WHERE m.tvEpisode_status = '.tvEpisode::STATUS_DOWNLOADED.
-                              ');'
+        '   AND feedItem.tvEpisode_id IN '.
+                 ' ( SELECT id FROM tvEpisode e'.
+                 '   WHERE e.status = '.tvEpisode::STATUS_DOWNLOADED.
+                 ' );'
     )->execute();
 
-    // Mark any old episodes with favorite set to only newer episodes(handled inside the view)
+    // Mark any old episodes with favorite set to only newer
+    // episodes(handled inside the view)
     $db->createCommand(
         'UPDATE feedItem'.
         '   SET status='.feedItem::STATUS_OLD.
@@ -130,14 +131,14 @@ abstract class favoriteManager extends CModel {
     )->execute();
 
     // get any matching items with the right itemStatus
-    $season = $episode = 0;
     $reader = $db->createCommand(
         'SELECT * FROM matchingFavoriteTvShows'.
         ' WHERE feedItem_status='.$itemStatus.
         '   AND tvEpisode_status='.tvEpisode::STATUS_NEW
     )->queryAll();
 
-    // loop through the matching items
+    // Go through the resulting dataset and seperate into the queue and start
+    // arrays
     foreach($reader as $row) 
     {
       if($row['favorite_queue'] == 1)
