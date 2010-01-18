@@ -28,9 +28,13 @@ fi
 # create a faux php cli interpreter in /bin/php
 if [ ! -x /bin/php ]; then
   rm /bin/php
+  PHP='/share/Apps/lighttpd/bin/php-cgi'
+  if [ ! -x /share/Apps/lighttpd/bin/php-cgi ]; then
+    PHP='/mnt/syb8634/server/php5-cgi'
+  fi
   cat >/bin/php <<EOF
 #!/bin/sh
-/mnt/syb8634/server/php5-cgi -qd register_argc_argv=1 \$*
+$PHP -qd register_argc_argv=1 \$*
 EOF
   chmod +x /bin/php
 fi
