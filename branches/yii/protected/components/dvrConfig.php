@@ -233,12 +233,14 @@ abstract class BaseDvrConfig extends CModel {
 }
 
 class dvrConfigCategory extends BaseDvrConfig {
+  // @var dvrConfig the object that created this category object instance
   private $_parent;
+  // @var string the title of this category
   private $_title;
 
   /**
    * Constructor.
-   * @param dvrConfig $parent the object instantiating this class
+   * @param dvrConfig the object instantiating this class
    * @param string the title of this category
    * @param array an array of key=>value pairs to assign to the category
    */
@@ -348,7 +350,7 @@ class dvrConfig extends BaseDvrConfig {
         array('saveFile','in','allowEmpty'=>false,'range'=>array(0,1)),
         array('webItemsPerLoad,maxItemsPerFeed','numerical','integerOnly'=>true,'min'=>1),
         array('torClient', 'in', 'allowEmpty'=>false, 'range'=>array_keys(Yii::app()->dlManager->availClients[feedItem::TYPE_TORRENT])),
-        array('torClient', 'in', 'allowEmpty'=>false, 'range'=>array_keys(Yii::app()->dlManager->availClients[feedItem::TYPE_NZB])),
+        array('nzbClient', 'in', 'allowEmpty'=>false, 'range'=>array_keys(Yii::app()->dlManager->availClients[feedItem::TYPE_NZB])),
     );
   }
 

@@ -105,7 +105,7 @@ class movie extends CActiveRecord
   public function getStatusOptions()
   {
     return array(
-        self::STATUS_NEW        => 'Unmatched Episode',
+        self::STATUS_NEW        => 'Unmatched Movie',
         self::STATUS_DOWNLOADED => 'Downloaded',
     );
   }
