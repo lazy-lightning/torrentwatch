@@ -149,7 +149,18 @@ class feed extends CActiveRecord
       Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NEW);
 
     // update the db with new title/description/update time and status
-    $this->save();
+    // Is this save necessary always?  on a run with no downloading and no
+    // updates this used 25% of the execution time.
+    try {
+        $trans = Yii::app()->db->beginTransaction();
+        $this->save();
+        $trans->commit();
+    } catch (Exception $e) {
+        $trans->rollback();
+        throw $e;
+    }
+
+
   }
 
   public static function getCHtmlListData($load = null)
