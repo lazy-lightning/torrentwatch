@@ -4,6 +4,8 @@
 // with the quality table.  This standardizes their setting
 // and getting
 
+// could this have been done cleaner as a behavior?  dont understand
+// yii behaviours well enough to say
 abstract class ARwithQuality extends CActiveRecord {
   private $_qualityIds;
 

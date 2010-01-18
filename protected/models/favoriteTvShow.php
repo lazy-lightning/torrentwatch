@@ -21,6 +21,8 @@ class favoriteTvShow extends BaseFavorite
 
   /**
    * @return array validation rules for model attributes.
+   * TODO: is rules() called to create the ruleset at the right time for the min/max
+   *       season/episode logic to work?
    */
   public function rules()
   {
@@ -68,6 +70,8 @@ class favoriteTvShow extends BaseFavorite
    */
   public function beforeValidate($type)
   {
+    // does it have to be a new record? what if the user wanted
+    // to change the title of an existing record
     if($this->isNewRecord && !is_numeric($this->tvShow_id)) {
       if(empty($this->tvShow_id))
       {
@@ -77,7 +81,7 @@ class favoriteTvShow extends BaseFavorite
       {
         $this->tvShow_id = factory::tvShowByTitle($this->tvShow_id)->id;
       } catch ( Exception $e) {
-        $this->addError("tvShow_id", "There was a problem initilizing a tvshow of that title");
+        $this->addError("tvShow_id", "There was a problem initilizing a tvshow of title: ".$this->tvShow_id);
       }
     }
 

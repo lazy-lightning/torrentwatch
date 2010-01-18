@@ -4,6 +4,8 @@
 // if an item doesn't exist it is created.  This is mostly used when initializing
 // new feedItems and their related models
 
+// The factory will throw CException if something fails to save to the database
+
 class factory {
   // @param array must contain at least 'hash' key for feedItem
   public static function feedItemByAttributes($attributes)
@@ -14,6 +16,7 @@ class factory {
     if($item === null)
     {
       $item = new feedItem;
+      // Should the attributes also be applied and saved when it already exists in the db?
       $item->attributes = $attributes;
       if(!$item->save())
         throw new CException("New feed item failed to save");

@@ -64,7 +64,7 @@ class tvShow extends CActiveRecord
     if(strlen($this->description) <= $length)
       $desc = $this->description;
     else
-      $desc = substr($this->description, 0, 256-strlen($append)).$append;
+      $desc = substr($this->description, 0, $length-strlen($append)).$append;
     return $desc;
   }
 }
