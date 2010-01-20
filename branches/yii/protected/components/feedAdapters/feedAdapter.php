@@ -76,7 +76,7 @@ class feedAdapter extends SimplePie {
           echo "Done\n";
         } catch (Exception $e) {
           $transaction->rollback();
-          Yii::log('feedItem failed to save: '.$title, CLogger::LEVEL_ERROR);
+          Yii::log('feedItem failed to save: '.$title.' : '.$e->getMessage(), CLogger::LEVEL_ERROR);
         }
       }
       echo "\n";
