@@ -4,7 +4,7 @@
  *
  * @author Ricardo Grana <rickgrana@yahoo.com.br>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2009 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2010 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -46,7 +46,7 @@ class COciColumnSchema extends CDbColumnSchema
 
 	protected function extractDefault($defaultValue)
 	{
-		if(strpos($dbType,'timestamp')!==false)
+		if(stripos($defaultValue,'timestamp')!==false)
 			$this->defaultValue=null;
 		else
 			parent::extractDefault($defaultValue);

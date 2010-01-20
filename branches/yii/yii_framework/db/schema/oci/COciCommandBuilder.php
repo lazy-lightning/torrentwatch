@@ -4,7 +4,7 @@
  *
  * @author Ricardo Grana <rickgrana@yahoo.com.br>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2009 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2010 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -12,7 +12,7 @@
  * COciCommandBuilder provides basic methods to create query commands for tables.
  *
  * @author Ricardo Grana <rickgrana@yahoo.com.br>
- * @version $Id: COciCommandBuilder.php 939 2009-04-15 19:37:34Z qiang.xue@gmail.com $
+ * @version $Id: COciCommandBuilder.php 1678 2010-01-07 21:02:00Z qiang.xue $
  * @package system.db.schema.oci
  * @since 1.0.5
  */
@@ -47,7 +47,7 @@ class COciCommandBuilder extends CDbCommandBuilder
 
 		$filters = array();
 		if($offset>0){
-			$filters[] = 'rowNumId >= '.(int)$offset;
+			$filters[] = 'rowNumId > '.(int)$offset;
 		}
 
 		if($limit>=0){
@@ -85,17 +85,19 @@ EOD;
 		$fields=array();
 		$values=array();
 		$placeholders=array();
+		$i=0;
 		foreach($data as $name=>$value)
 		{
 			if(($column=$table->getColumn($name))!==null && ($value!==null || $column->allowNull))
 			{
 				$fields[]=$column->rawName;
 				if($value instanceof CDbExpression)
-					$placeholders[]=(string)$value;
+					$placeholders[]=$value->expression;
 				else
 				{
-					$placeholders[]=':'.$name;
-					$values[':'.$name]=$column->typecast($value);
+					$placeholders[]=self::PARAM_PREFIX.$i;
+					$values[self::PARAM_PREFIX.$i]=$column->typecast($value);
+					$i++;
 				}
 			}
 		}
@@ -105,12 +107,12 @@ EOD;
 		if(is_string($table->primaryKey))
 		{
 			$sql.=" RETURNING ".$table->primaryKey." INTO :RETURN_ID";
-			$command=$this->_connection->createCommand($sql);
+			$command=$this->getDbConnection()->createCommand($sql);
 			$command->bindParam(':RETURN_ID', $this->returnID, PDO::PARAM_INT, 12);
 			$table->sequenceName='RETURN_ID';
 		}
 		else
-			$command=$this->_connection->createCommand($sql);
+			$command=$this->getDbConnection()->createCommand($sql);
 
 		foreach($values as $name=>$value)
 			$command->bindValue($name,$value);

@@ -4,11 +4,12 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2009 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2010 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
 require_once(Yii::getPathOfAlias('system.vendors.htmlpurifier').DIRECTORY_SEPARATOR.'HTMLPurifier.standalone.php');
+HTMLPurifier_Bootstrap::registerAutoload();
 
 /**
  * CHtmlPurifier is wrapper of {@link http://htmlpurifier.org HTML Purifier}.
@@ -24,7 +25,7 @@ require_once(Yii::getPathOfAlias('system.vendors.htmlpurifier').DIRECTORY_SEPARA
  * before saving to database.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CHtmlPurifier.php 433 2008-12-30 22:59:17Z qiang.xue $
+ * @version $Id: CHtmlPurifier.php 1678 2010-01-07 21:02:00Z qiang.xue $
  * @package system.web.widgets
  * @since 1.0
  */
@@ -57,7 +58,7 @@ class CHtmlPurifier extends COutputProcessor
 	public function purify($content)
 	{
 		$purifier=new HTMLPurifier($this->options);
-		$purifier->config->set('Cache','SerializerPath',Yii::app()->getRuntimePath());
+		$purifier->config->set('Cache.SerializerPath',Yii::app()->getRuntimePath());
 		return $purifier->purify($content);
 	}
 }

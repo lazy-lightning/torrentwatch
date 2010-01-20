@@ -4,7 +4,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2009 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2010 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -73,14 +73,13 @@
  *         'db'=>array(
  *             'class'=>'CDbConnection',
  *             'connectionString'=>'sqlite:path/to/dbfile',
- *             ),
  *         ),
  *     ),
  * )
  * </pre>
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CDbConnection.php 1008 2009-05-09 21:04:10Z qiang.xue $
+ * @version $Id: CDbConnection.php 1678 2010-01-07 21:02:00Z qiang.xue $
  * @package system.db
  * @since 1.0
  */
@@ -112,6 +111,13 @@ class CDbConnection extends CApplicationComponent
 	 */
 	public $schemaCachingExclude=array();
 	/**
+	 * @var string the ID of the cache application component that is used to cache the table metadata.
+	 * Defaults to 'cache' which refers to the primary cache application component.
+	 * Set this property to false if you want to disable caching table metadata.
+	 * @since 1.0.10
+	 */
+	public $schemaCacheID='cache';
+	/**
 	 * @var boolean whether the database connection should be automatically established
 	 * the component is being initialized. Defaults to true. Note, this property is only
 	 * effective when the CDbConnection object is used as an application component.
@@ -139,6 +145,20 @@ class CDbConnection extends CApplicationComponent
 	 * @since 1.0.5
 	 */
 	public $enableParamLogging=false;
+	/**
+	 * @var boolean whether to enable profiling the SQL statements being executed.
+	 * Defaults to false. This should be mainly enabled and used during development
+	 * to find out the bottleneck of SQL executions.
+	 * @since 1.0.6
+	 */
+	public $enableProfiling=false;
+	/**
+	 * @var string the default prefix for table names. Defaults to null, meaning no table prefix.
+	 * By setting this property, any token like '{{tableName}}' in {@link CDbCommand::text} will
+	 * be replaced by 'prefixTableName', where 'prefix' refers to this property value.
+	 * @since 1.1.0
+	 */
+	public $tablePrefix;
 
 	private $_attributes=array();
 	private $_active=false;
@@ -232,6 +252,7 @@ class CDbConnection extends CApplicationComponent
 				throw new CDbException(Yii::t('yii','CDbConnection.connectionString cannot be empty.'));
 			try
 			{
+				Yii::trace('Opening DB connection','system.db.CDbConnection');
 				$this->_pdo=$this->createPdoInstance();
 				$this->initConnection($this->_pdo);
 				$this->_active=true;
@@ -250,6 +271,7 @@ class CDbConnection extends CApplicationComponent
 	 */
 	protected function close()
 	{
+		Yii::trace('Closing DB connection','system.db.CDbConnection');
 		$this->_pdo=null;
 		$this->_active=false;
 		$this->_schema=null;
@@ -289,10 +311,7 @@ class CDbConnection extends CApplicationComponent
 		if($this->charset!==null)
 		{
 			if(strcasecmp($pdo->getAttribute(PDO::ATTR_DRIVER_NAME),'sqlite'))
-			{
-				$stmt=$pdo->prepare('SET NAMES ?');
-				$stmt->execute(array($this->charset));
-			}
+				$pdo->exec('SET NAMES '.$pdo->quote($this->charset));
 		}
 	}
 
@@ -613,5 +632,26 @@ class CDbConnection extends CApplicationComponent
 			$this->_pdo->setAttribute($name,$value);
 		else
 			$this->_attributes[$name]=$value;
+	}
+
+	/**
+	 * Returns the statistical results of SQL executions.
+	 * The results returned include the number of SQL statements executed and
+	 * the total time spent.
+	 * In order to use this method, {@link enableProfiling} has to be set true.
+	 * @return array the first element indicates the number of SQL statements executed,
+	 * and the second element the total time spent in SQL execution.
+	 * @since 1.0.6
+	 */
+	public function getStats()
+	{
+		$logger=Yii::getLogger();
+		$timings=$logger->getProfilingResults(null,'system.db.CDbCommand.query');
+		$count=count($timings);
+		$time=array_sum($timings);
+		$timings=$logger->getProfilingResults(null,'system.db.CDbCommand.execute');
+		$count+=count($timings);
+		$time+=array_sum($timings);
+		return array($count,$time);
 	}
 }

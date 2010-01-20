@@ -5,7 +5,7 @@
  * @link http://www.yiiframework.com/
  * @copyright Copyright &copy; 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
- * @version $Id: jquery.yii.js 252 2008-11-20 19:02:02Z qiang.xue $
+ * @version $Id: jquery.yii.js 1458 2009-10-16 15:03:59Z qiang.xue $
  */
 
 ;(function($) {
@@ -24,15 +24,21 @@ $.yii = {
 		if (typeof url == 'string' && url != '') {
 			f.action = url;
 		};
+		var inputs = [];
 		jQuery.each(params, function(name, value) {
 			var input = document.createElement("input");
 			input.setAttribute("type", "hidden");
 			input.setAttribute("name", name);
 			input.setAttribute("value", value);
 			f.appendChild(input);
+			inputs.push(input);
 		});
 
-		f.submit();
+		jQuery(f).trigger('submit');
+
+		jQuery.each(inputs, function() {
+			f.removeChild(this);
+		});
 	}
 };
 

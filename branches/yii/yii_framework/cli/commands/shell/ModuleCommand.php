@@ -4,7 +4,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2009 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2010 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  * @version $Id: ModuleCommand.php 433 2008-12-30 22:59:17Z qiang.xue $
  */
@@ -20,10 +20,12 @@
 class ModuleCommand extends CConsoleCommand
 {
 	/**
-	 * @var string the template file for the controller class.
-	 * Defaults to null, meaning using 'framework/cli/views/shell/controller/controller.php'.
+	 * @var string the directory that contains templates for the module command.
+	 * Defaults to null, meaning using 'framework/cli/views/shell/module'.
+	 * If you set this path and some views are missing in the directory,
+	 * the default views will be used.
 	 */
-	public $templateFile;
+	public $templatePath;
 
 	public function getHelp()
 	{
@@ -57,9 +59,7 @@ EOD;
 		$moduleClass=ucfirst($moduleID).'Module';
 		$modulePath=Yii::app()->getModulePath().DIRECTORY_SEPARATOR.$moduleID;
 
-		$sourceDir=realpath(dirname(__FILE__).'/../../views/shell/module');
-		if($sourceDir===false)
-			die('Unable to locate the source directory.');
+		$sourceDir=$this->templatePath===null?YII_PATH.'/cli/views/shell/module':$this->templatePath;
 		$list=$this->buildFileList($sourceDir,$modulePath);
 		$list['module.php']['target']=$modulePath.DIRECTORY_SEPARATOR.$moduleClass.'.php';
 		$list['module.php']['callback']=array($this,'generateModuleClass');

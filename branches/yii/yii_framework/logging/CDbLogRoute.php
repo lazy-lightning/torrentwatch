@@ -4,7 +4,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2009 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2010 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -18,7 +18,7 @@
  * and used under the application runtime directory.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CDbLogRoute.php 825 2009-03-12 14:21:30Z qiang.xue $
+ * @version $Id: CDbLogRoute.php 1678 2010-01-07 21:02:00Z qiang.xue $
  * @package system.logging
  * @since 1.0
  */
@@ -80,19 +80,17 @@ class CDbLogRoute extends CLogRoute
 		$db=$this->getDbConnection();
 		$db->setActive(true);
 
-		$sql="SELECT * FROM {$this->logTableName} WHERE 0=1";
-		try
+		if($this->autoCreateLogTable)
 		{
-			$db->createCommand($sql)->execute();
-		}
-		catch(Exception $e)
-		{
-			// The log table does not exist
-			if($this->autoCreateLogTable)
+			$sql="DELETE FROM {$this->logTableName} WHERE 0=1";
+			try
+			{
+				$db->createCommand($sql)->execute();
+			}
+			catch(Exception $e)
+			{
 				$this->createLogTable($db,$this->logTableName);
-			else
-				throw new CException(Yii::t('yii','CDbLogRoute requires database table "{table}" to store log messages.',
-					array('{table}'=>$this->logTableName)));
+			}
 		}
 	}
 
@@ -115,7 +113,7 @@ class CDbLogRoute extends CLogRoute
 CREATE TABLE $tableName
 (
 	$logID,
-	level INTEGER,
+	level VARCHAR(128),
 	category VARCHAR(128),
 	logtime INTEGER,
 	message TEXT

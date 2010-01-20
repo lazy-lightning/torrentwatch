@@ -4,7 +4,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2009 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2010 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -22,7 +22,7 @@
  * accessed via {@link CWebApplication::getRequest()}.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CHttpRequest.php 957 2009-04-21 19:23:37Z qiang.xue@gmail.com $
+ * @version $Id: CHttpRequest.php 1678 2010-01-07 21:02:00Z qiang.xue $
  * @package system.web
  * @since 1.0
  */
@@ -276,6 +276,8 @@ class CHttpRequest extends CApplicationComponent
 				$this->_scriptUrl=$_SERVER['ORIG_SCRIPT_NAME'];
 			else if(($pos=strpos($_SERVER['PHP_SELF'],'/'.$scriptName))!==false)
 				$this->_scriptUrl=substr($_SERVER['SCRIPT_NAME'],0,$pos).'/'.$scriptName;
+			else if(isset($_SERVER['DOCUMENT_ROOT']) && strpos($_SERVER['SCRIPT_FILENAME'],$_SERVER['DOCUMENT_ROOT'])===0)
+				$this->_scriptUrl=str_replace('\\','/',str_replace($_SERVER['DOCUMENT_ROOT'],'',$_SERVER['SCRIPT_FILENAME']));
 			else
 				throw new CException(Yii::t('yii','CHttpRequest is unable to determine the entry script URL.'));
 		}
@@ -458,12 +460,15 @@ class CHttpRequest extends CApplicationComponent
 	}
 
 	/**
+	 * Returns information about the capabilities of user browser.
+	 * @param string the user agent to be analyzed. Defaults to null, meaning using the
+	 * current User-Agent HTTP header information.
 	 * @return array user browser capabilities.
 	 * @see http://www.php.net/manual/en/function.get-browser.php
 	 */
-	public function getBrowser()
+	public function getBrowser($userAgent=null)
 	{
-		return get_browser();
+		return get_browser($userAgent,true);
 	}
 
 	/**
@@ -640,7 +645,7 @@ class CHttpRequest extends CApplicationComponent
  * </pre>
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CHttpRequest.php 957 2009-04-21 19:23:37Z qiang.xue@gmail.com $
+ * @version $Id: CHttpRequest.php 1678 2010-01-07 21:02:00Z qiang.xue $
  * @package system.web
  * @since 1.0
  */

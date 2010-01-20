@@ -4,7 +4,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2009 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2010 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -29,7 +29,7 @@
  * You may also call {@link prepare} to explicitly prepare an SQL statement.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CDbCommand.php 1008 2009-05-09 21:04:10Z qiang.xue $
+ * @version $Id: CDbCommand.php 1678 2010-01-07 21:02:00Z qiang.xue $
  * @package system.db
  * @since 1.0
  */
@@ -38,7 +38,7 @@ class CDbCommand extends CComponent
 	private $_connection;
 	private $_text='';
 	private $_statement=null;
-	private $_params;
+	private $_params=array();
 
 	/**
 	 * Constructor.
@@ -75,7 +75,10 @@ class CDbCommand extends CComponent
 	 */
 	public function setText($value)
 	{
-		$this->_text=$value;
+		if($this->_connection->tablePrefix!==null)
+			$this->_text=preg_replace('/{{(.*?)}}/',$this->_connection->tablePrefix.'\1',$value);
+		else
+			$this->_text=$value;
 		$this->cancel();
 	}
 
@@ -138,6 +141,7 @@ class CDbCommand extends CComponent
 	 * @param mixed Name of the PHP variable to bind to the SQL statement parameter
 	 * @param int SQL data type of the parameter. If null, the type is determined by the PHP type of the value.
 	 * @param int length of the data type
+	 * @return CDbCommand the current command being executed (this is available since version 1.0.8)
 	 * @see http://www.php.net/manual/en/function.PDOStatement-bindParam.php
 	 */
 	public function bindParam($name, &$value, $dataType=null, $length=null)
@@ -150,7 +154,8 @@ class CDbCommand extends CComponent
 		else
 			$this->_statement->bindParam($name,$value,$dataType,$length);
 		if($this->_connection->enableParamLogging)
-			$this->_params[]=$name.'=['.gettype($value).']';
+			$this->_params[$name]='['.gettype($value).']';
+		return $this;
 	}
 
 	/**
@@ -161,6 +166,7 @@ class CDbCommand extends CComponent
 	 * placeholders, this will be the 1-indexed position of the parameter.
 	 * @param mixed The value to bind to the parameter
 	 * @param int SQL data type of the parameter. If null, the type is determined by the PHP type of the value.
+	 * @return CDbCommand the current command being executed (this is available since version 1.0.8)
 	 * @see http://www.php.net/manual/en/function.PDOStatement-bindValue.php
 	 */
 	public function bindValue($name, $value, $dataType=null)
@@ -171,34 +177,54 @@ class CDbCommand extends CComponent
 		else
 			$this->_statement->bindValue($name,$value,$dataType);
 		if($this->_connection->enableParamLogging)
-			$this->_params[]=$name.'='.var_export($value,true);
+			$this->_params[$name]=var_export($value,true);
+		return $this;
 	}
 
 	/**
 	 * Executes the SQL statement.
 	 * This method is meant only for executing non-query SQL statement.
 	 * No result set will be returned.
+	 * @param array input parameters (name=>value) for the SQL execution. This is an alternative
+	 * to {@link bindParam} and {@link bindValue}. If you have multiple input parameters, passing
+	 * them in this way can improve the performance. Note that you pass parameters in this way,
+	 * you cannot bind parameters or values using {@link bindParam} or {@link bindValue}, and vice versa.
+	 * binding methods and  the input parameters this way can improve the performance.
+	 * This parameter has been available since version 1.0.10.
 	 * @return integer number of rows affected by the execution.
 	 * @throws CException execution failed
 	 */
-	public function execute()
+	public function execute($params=array())
 	{
-		$params=$this->_connection->enableParamLogging && !empty($this->_params) ? '. Bind with parameter ' . implode(', ',$this->_params) : '';
-		Yii::trace('Executing SQL: '.$this->getText().$params,'system.db.CDbCommand');
+		if($this->_connection->enableParamLogging && ($pars=array_merge($this->_params,$params))!==array())
+		{
+			foreach($pars as $name=>$value)
+				$pars[$name]=$name.'='.$value;
+			$par='. Bind with parameter ' .implode(', ',$pars);
+		}
+		else
+			$par='';
+		Yii::trace('Executing SQL: '.$this->getText().$par,'system.db.CDbCommand');
 		try
 		{
-			if($this->_statement instanceof PDOStatement)
-			{
-				$this->_statement->execute();
-				return $this->_statement->rowCount();
-			}
-			else
-				return $this->getConnection()->getPdoInstance()->exec($this->getText());
+			if($this->_connection->enableProfiling)
+				Yii::beginProfile('system.db.CDbCommand.execute('.$this->getText().')','system.db.CDbCommand.execute');
+
+			$this->prepare();
+			$this->_statement->execute($params===array() ? null : $params);
+			$n=$this->_statement->rowCount();
+
+			if($this->_connection->enableProfiling)
+				Yii::endProfile('system.db.CDbCommand.execute('.$this->getText().')','system.db.CDbCommand.execute');
+
+			return $n;
 		}
 		catch(Exception $e)
 		{
-			Yii::log('Error in executing SQL: '.$this->getText().$params,CLogger::LEVEL_ERROR,'system.db.CDbCommand');
-			throw new CDbException(Yii::t('yii','CDbCommand failed to execute the SQL statement: {error}',
+			if($this->_connection->enableProfiling)
+				Yii::endProfile('system.db.CDbCommand.execute('.$this->getText().')','system.db.CDbCommand.execute');
+			Yii::log('Error in executing SQL: '.$this->getText().$par,CLogger::LEVEL_ERROR,'system.db.CDbCommand');
+			throw new CDbException(Yii::t('yii','CDbCommand failed to execute the SQL statement: {error}'.$this->text,
 				array('{error}'=>$e->getMessage())));
 		}
 	}
@@ -206,25 +232,37 @@ class CDbCommand extends CComponent
 	/**
 	 * Executes the SQL statement and returns query result.
 	 * This method is for executing an SQL query that returns result set.
+	 * @param array input parameters (name=>value) for the SQL execution. This is an alternative
+	 * to {@link bindParam} and {@link bindValue}. If you have multiple input parameters, passing
+	 * them in this way can improve the performance. Note that you pass parameters in this way,
+	 * you cannot bind parameters or values using {@link bindParam} or {@link bindValue}, and vice versa.
+	 * binding methods and  the input parameters this way can improve the performance.
+	 * This parameter has been available since version 1.0.10.
 	 * @return CDbDataReader the reader object for fetching the query result
 	 * @throws CException execution failed
 	 */
-	public function query()
+	public function query($params=array())
 	{
-		return $this->queryInternal('',0);
+		return $this->queryInternal('',0,$params);
 	}
 
 	/**
 	 * Executes the SQL statement and returns all rows.
 	 * @param boolean whether each row should be returned as an associated array with
 	 * column names as the keys or the array keys are column indexes (0-based).
+	 * @param array input parameters (name=>value) for the SQL execution. This is an alternative
+	 * to {@link bindParam} and {@link bindValue}. If you have multiple input parameters, passing
+	 * them in this way can improve the performance. Note that you pass parameters in this way,
+	 * you cannot bind parameters or values using {@link bindParam} or {@link bindValue}, and vice versa.
+	 * binding methods and  the input parameters this way can improve the performance.
+	 * This parameter has been available since version 1.0.10.
 	 * @return array all rows of the query result. Each array element is an array representing a row.
 	 * An empty array is returned if the query results in nothing.
 	 * @throws CException execution failed
 	 */
-	public function queryAll($fetchAssociative=true)
+	public function queryAll($fetchAssociative=true,$params=array())
 	{
-		return $this->queryInternal('fetchAll',$fetchAssociative ? PDO::FETCH_ASSOC : PDO::FETCH_NUM);
+		return $this->queryInternal('fetchAll',$fetchAssociative ? PDO::FETCH_ASSOC : PDO::FETCH_NUM, $params);
 	}
 
 	/**
@@ -232,24 +270,36 @@ class CDbCommand extends CComponent
 	 * This is a convenient method of {@link query} when only the first row of data is needed.
 	 * @param boolean whether the row should be returned as an associated array with
 	 * column names as the keys or the array keys are column indexes (0-based).
+	 * @param array input parameters (name=>value) for the SQL execution. This is an alternative
+	 * to {@link bindParam} and {@link bindValue}. If you have multiple input parameters, passing
+	 * them in this way can improve the performance. Note that you pass parameters in this way,
+	 * you cannot bind parameters or values using {@link bindParam} or {@link bindValue}, and vice versa.
+	 * binding methods and  the input parameters this way can improve the performance.
+	 * This parameter has been available since version 1.0.10.
 	 * @return array the first row of the query result, false if no result.
 	 * @throws CException execution failed
 	 */
-	public function queryRow($fetchAssociative=true)
+	public function queryRow($fetchAssociative=true,$params=array())
 	{
-		return $this->queryInternal('fetch',$fetchAssociative ? PDO::FETCH_ASSOC : PDO::FETCH_NUM);
+		return $this->queryInternal('fetch',$fetchAssociative ? PDO::FETCH_ASSOC : PDO::FETCH_NUM, $params);
 	}
 
 	/**
 	 * Executes the SQL statement and returns the value of the first column in the first row of data.
 	 * This is a convenient method of {@link query} when only a single scalar
 	 * value is needed (e.g. obtaining the count of the records).
+	 * @param array input parameters (name=>value) for the SQL execution. This is an alternative
+	 * to {@link bindParam} and {@link bindValue}. If you have multiple input parameters, passing
+	 * them in this way can improve the performance. Note that you pass parameters in this way,
+	 * you cannot bind parameters or values using {@link bindParam} or {@link bindValue}, and vice versa.
+	 * binding methods and  the input parameters this way can improve the performance.
+	 * This parameter has been available since version 1.0.10.
 	 * @return mixed the value of the first column in the first row of the query result. False is returned if there is no value.
 	 * @throws CException execution failed
 	 */
-	public function queryScalar()
+	public function queryScalar($params=array())
 	{
-		$result=$this->queryInternal('fetchColumn',0);
+		$result=$this->queryInternal('fetchColumn',0,$params);
 		if(is_resource($result) && get_resource_type($result)==='stream')
 			return stream_get_contents($result);
 		else
@@ -260,38 +310,68 @@ class CDbCommand extends CComponent
 	 * Executes the SQL statement and returns the first column of the result.
 	 * This is a convenient method of {@link query} when only the first column of data is needed.
 	 * Note, the column returned will contain the first element in each row of result.
+	 * @param array input parameters (name=>value) for the SQL execution. This is an alternative
+	 * to {@link bindParam} and {@link bindValue}. If you have multiple input parameters, passing
+	 * them in this way can improve the performance. Note that you pass parameters in this way,
+	 * you cannot bind parameters or values using {@link bindParam} or {@link bindValue}, and vice versa.
+	 * binding methods and  the input parameters this way can improve the performance.
+	 * This parameter has been available since version 1.0.10.
 	 * @return array the first column of the query result. Empty array if no result.
 	 * @throws CException execution failed
 	 */
-	public function queryColumn()
+	public function queryColumn($params=array())
 	{
-		return $this->queryInternal('fetchAll',PDO::FETCH_COLUMN);
+		return $this->queryInternal('fetchAll',PDO::FETCH_COLUMN,$params);
 	}
 
 	/**
 	 * @param string method of PDOStatement to be called
 	 * @param mixed the first parameter to be passed to the method
+	 * @param array input parameters (name=>value) for the SQL execution. This is an alternative
+	 * to {@link bindParam} and {@link bindValue}. If you have multiple input parameters, passing
+	 * them in this way can improve the performance. Note that you pass parameters in this way,
+	 * you cannot bind parameters or values using {@link bindParam} or {@link bindValue}, and vice versa.
+	 * binding methods and  the input parameters this way can improve the performance.
+	 * This parameter has been available since version 1.0.10.
 	 * @return mixed the method execution result
 	 */
-	private function queryInternal($method,$mode)
+	private function queryInternal($method,$mode,$params=array())
 	{
-		$params=$this->_connection->enableParamLogging && !empty($this->_params) ? '. Bind with parameter ' . implode(', ',$this->_params) : '';
-		Yii::trace('Querying SQL: '.$this->getText().$params,'system.db.CDbCommand');
+		if($this->_connection->enableParamLogging && ($pars=array_merge($this->_params,$params))!==array())
+		{
+			foreach($pars as $name=>$value)
+				$pars[$name]=$name.'='.$value;
+			$par='. Bind with parameter ' .implode(', ',$pars);
+		}
+		else
+			$par='';
+		Yii::trace('Querying SQL: '.$this->getText().$par,'system.db.CDbCommand');
 		try
 		{
-			if($this->_statement instanceof PDOStatement)
-				$this->_statement->execute();
-			else
-				$this->_statement=$this->getConnection()->getPdoInstance()->query($this->getText());
+			if($this->_connection->enableProfiling)
+				Yii::beginProfile('system.db.CDbCommand.query('.$this->getText().')','system.db.CDbCommand.query');
+
+			$this->prepare();
+			$this->_statement->execute($params===array() ? null : $params);
+
 			if($method==='')
-				return new CDbDataReader($this);
-			$result=$this->_statement->{$method}($mode);
-			$this->_statement->closeCursor();
+				$result=new CDbDataReader($this);
+			else
+			{
+				$result=$this->_statement->{$method}($mode);
+				$this->_statement->closeCursor();
+			}
+
+			if($this->_connection->enableProfiling)
+				Yii::endProfile('system.db.CDbCommand.query('.$this->getText().')','system.db.CDbCommand.query');
+
 			return $result;
 		}
 		catch(Exception $e)
 		{
-			Yii::log('Error in querying SQL: '.$this->getText().$params,CLogger::LEVEL_ERROR,'system.db.CDbCommand');
+			if($this->_connection->enableProfiling)
+				Yii::endProfile('system.db.CDbCommand.query('.$this->getText().')','system.db.CDbCommand.query');
+			Yii::log('Error in querying SQL: '.$this->getText().$par,CLogger::LEVEL_ERROR,'system.db.CDbCommand');
 			throw new CDbException(Yii::t('yii','CDbCommand failed to execute the SQL statement: {error}',
 				array('{error}'=>$e->getMessage())));
 		}

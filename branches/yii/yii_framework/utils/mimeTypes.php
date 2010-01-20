@@ -7,9 +7,9 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2009 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2010 Yii Software LLC
  * @license http://www.yiiframework.com/license/
- * @version $Id: mimeTypes.php 964 2009-04-28 13:03:30Z qiang.xue $
+ * @version $Id: mimeTypes.php 1678 2010-01-07 21:02:00Z qiang.xue $
  */
 
 return array(
@@ -48,6 +48,7 @@ return array(
 	'f'=>'text/plain',
 	'f90'=>'text/plain',
 	'fli'=>'video/x-fli',
+	'flv'=>'video/x-flv',
 	'gif'=>'image/gif',
 	'gtar'=>'application/x-gtar',
 	'gz'=>'application/x-gzip',
