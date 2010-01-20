@@ -1,7 +1,14 @@
 <?php
 
-abstract class BaseFavorite extends ARwithQuality
+abstract class BaseFavorite extends CActiveRecord
 {
+
+  public function behaviors()
+  {
+    return array(
+        'quality' => array('class'=>'ARQualityBehavior'),
+    );
+  }
 
   public function rules()
   {

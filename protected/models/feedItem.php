@@ -1,6 +1,6 @@
 <?php
 
-class feedItem extends ARwithQuality
+class feedItem extends CActiveRecord
 {
 
   // Higher numbers so they can be sorted as "better" matches
@@ -36,6 +36,16 @@ class feedItem extends ARwithQuality
   }
 
   /**
+   * @return array behaviors to be attached
+   */
+  public function behaviors()
+  {
+    return array(
+        'quality' => array('class'=>'ARQualityBehavior')
+    );
+  }
+
+  /**
    * @return array validation rules for model attributes.
    */
   public function rules()
@@ -53,6 +63,7 @@ class feedItem extends ARwithQuality
       array('status', 'in', 'allowEmpty'=>false, 'range'=>array_keys($this->getStatusOptions())),
       array('downloadType', 'in', 'allowEmpty'=>false, 'range'=>array_keys(feedItem::getStatusOptions())),
       array('title,description', 'notMultibyte'),
+      array('url', 'url', 'allowEmpty'=>false),
     );
   }
 

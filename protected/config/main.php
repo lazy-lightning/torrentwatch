@@ -14,6 +14,7 @@ return array(
 
   // autoloading model and component classes
   'import'=>array(
+    'application.behaviors.*',
     'application.models.*',
     'application.components.*',
     'application.components.feedAdapters.*',
