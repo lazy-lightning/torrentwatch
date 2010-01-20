@@ -228,7 +228,7 @@ class AjaxController extends BaseController
   public function actionClearHistory()
   {
     try {
-      $model = history::model()
+      $model = history::model();
       $transaction = $model->db->beginTransaction();
       $model->deleteAll();
       $transaction->commit();
@@ -251,6 +251,9 @@ class AjaxController extends BaseController
         $transaction = $model->db->beginTransaction();
         $model->deleteByPk((integer)$_GET['id']);
         $transaction->commit();
+      } catch (Exception $e) {
+        $transaction->rollback();
+        throw $e;
       }
       $this->response['dialog']['content'] = 'Your feed has been successfully deleted';
     }
