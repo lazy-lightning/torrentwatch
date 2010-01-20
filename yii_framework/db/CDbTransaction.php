@@ -4,7 +4,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2009 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2010 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -30,7 +30,7 @@
  * </pre>
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CDbTransaction.php 850 2009-03-20 13:59:24Z qiang.xue $
+ * @version $Id: CDbTransaction.php 1678 2010-01-07 21:02:00Z qiang.xue $
  * @package system.db
  * @since 1.0
  */
@@ -58,6 +58,7 @@ class CDbTransaction extends CComponent
 	{
 		if($this->_active && $this->_connection->getActive())
 		{
+			Yii::trace('Committing transaction','system.db.CDbTransaction');
 			$this->_connection->getPdoInstance()->commit();
 			$this->_active=false;
 		}
@@ -73,6 +74,7 @@ class CDbTransaction extends CComponent
 	{
 		if($this->_active && $this->_connection->getActive())
 		{
+			Yii::trace('Rolling back transaction','system.db.CDbTransaction');
 			$this->_connection->getPdoInstance()->rollBack();
 			$this->_active=false;
 		}

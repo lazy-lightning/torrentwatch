@@ -4,15 +4,15 @@
  *
  * @author Ricardo Grana <rickgrana@yahoo.com.br>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2009 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2010 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
 /**
- * COciSchema is the class for retrieving metadata information from a PostgreSQL database.
+ * COciSchema is the class for retrieving metadata information from an Oracle database.
  *
- * @author Ricardo Grana <qiang.xue@gmail.com>
- * @version $Id: COciSchema.php 939 2009-04-15 19:37:34Z qiang.xue@gmail.com $
+ * @author Ricardo Grana <rickgrana@yahoo.com.br>
+ * @version $Id: COciSchema.php 1678 2010-01-07 21:02:00Z qiang.xue $
  * @package system.db.schema.oci
  * @since 1.0.5
  */
@@ -159,7 +159,7 @@ FROM ALL_TAB_COLUMNS A
 inner join ALL_OBJECTS B ON b.owner = a.owner and ltrim(B.OBJECT_NAME) = ltrim(A.TABLE_NAME)
 WHERE
     a.owner = '{$schemaName}'
-	and b.object_type = 'TABLE'
+	and (b.object_type = 'TABLE' or b.object_type = 'VIEW')
 	and b.object_name = '{$tableName}'
 ORDER by a.column_id
 EOD;
@@ -183,6 +183,7 @@ EOD;
 					$table->primaryKey=array($table->primaryKey,$c->name);
 				else
 					$table->primaryKey[]=$c->name;
+				$table->sequenceName='';
 			}
 		}
 		return true;
@@ -213,7 +214,7 @@ EOD;
 	protected function findConstraints($table)
 	{
 		$sql=<<<EOD
-		SELECT D.constraint_type, C.COLUMN_NAME, C.position, D.r_constraint_name,
+		SELECT D.constraint_type as CONSTRAINT_TYPE, C.COLUMN_NAME, C.position, D.r_constraint_name,
                 E.table_name as table_ref, f.column_name as column_ref
         FROM ALL_CONS_COLUMNS C
         inner join ALL_constraints D on D.OWNER = C.OWNER and D.constraint_name = C.constraint_name
@@ -227,10 +228,10 @@ EOD;
 		$command=$this->getDbConnection()->createCommand($sql);
 		foreach($command->queryAll() as $row)
 		{
-			if($row['constraint_type']==='R')   // foreign key
+			if($row['CONSTRAINT_TYPE']==='R')   // foreign key
 			{
 				$name = $row["COLUMN_NAME"];
-				$table->foreignKeys[$name]=array($row["TABLE_REF"], array($row["COLUMN_REF"]));
+				$table->foreignKeys[$name]=array($row["TABLE_REF"], $row["COLUMN_REF"]);
 				if(isset($table->columns[$name]))
 					$table->columns[$name]->isForeignKey=true;
 			}
@@ -245,21 +246,23 @@ EOD;
 	 */
 	protected function findTableNames($schema='')
 	{
-		/*if($schema===''){*/
-		$sql=<<<EOD
+		if($schema==='')
+		{
+			$sql=<<<EOD
 SELECT table_name, '{$schema}' as table_schema FROM user_tables
 EOD;
-	/*	}else{
+			$command=$this->getDbConnection()->createCommand($sql);
+		}
+		else
+		{
 			$sql=<<<EOD
-			SELECT object_name as table_name, owner as table_schema FROM all_objects
-			WHERE object_type = 'TABLE'
-			  and owner=:schema
-			order by 1
-			EOD;
-		}*/
+SELECT object_name as table_name, owner as table_schema FROM all_objects
+WHERE object_type = 'TABLE' AND owner=:schema
+EOD;
+			$command=$this->getDbConnection()->createCommand($sql);
+			$command->bindParam(':schema',$schema);
+		}
 
-		$command=$this->getDbConnection()->createCommand($sql);
-		//$command->bindParam(':schema',$schema);
 		$rows=$command->queryAll();
 		$names=array();
 		foreach($rows as $row)

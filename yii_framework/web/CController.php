@@ -4,7 +4,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2009 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2010 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -58,7 +58,7 @@
  * For object-based filters, the '+' and '-' operators are following the class name.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CController.php 1013 2009-05-10 04:12:05Z qiang.xue $
+ * @version $Id: CController.php 1678 2010-01-07 21:02:00Z qiang.xue $
  * @package system.web
  * @since 1.0
  */
@@ -101,6 +101,7 @@ class CController extends CBaseController
 	{
 		$this->_id=$id;
 		$this->_module=$module;
+		$this->attachBehaviors($this->behaviors());
 	}
 
 	/**
@@ -196,6 +197,32 @@ class CController extends CBaseController
 	 * @see createAction
 	 */
 	public function actions()
+	{
+		return array();
+	}
+
+	/**
+	 * Returns a list of behaviors that this controller should behave as.
+	 * The return value should be an array of behavior configurations indexed by
+	 * behavior names. Each behavior configuration can be either a string specifying
+	 * the behavior class or an array of the following structure:
+	 * <pre>
+	 * 'behaviorName'=>array(
+	 *     'class'=>'path.to.BehaviorClass',
+	 *     'property1'=>'value1',
+	 *     'property2'=>'value2',
+	 * )
+	 * </pre>
+	 *
+	 * Note, the behavior classes must implement {@link IBehavior} or extend from
+	 * {@link CBehavior}. Behaviors declared in this method will be attached
+	 * to the model when it is instantiated.
+	 *
+	 * For more details about behaviors, see {@link CComponent}.
+	 * @return array the behavior configurations (behavior name=>behavior configuration)
+	 * @since 1.0.6
+	 */
+	public function behaviors()
 	{
 		return array();
 	}
@@ -447,6 +474,15 @@ class CController extends CBaseController
 	}
 
 	/**
+	 * @return string the route (module ID, controller ID and action ID) of the current request.
+	 * @since 1.1.0
+	 */
+	public function getRoute()
+	{
+		return $this->getUniqueId().'/'.$this->getAction()->getId();
+	}
+
+	/**
 	 * @return CWebModule the module that this controller belongs to. It returns null
 	 * if the controller does not belong to any module
 	 * @since 1.0.3
@@ -564,12 +600,17 @@ class CController extends CBaseController
 	{
 		if(empty($viewName))
 			return false;
-		if($viewName[0]==='/')
-			$viewFile=$basePath.$viewName.'.php';
-		else if(strpos($viewName,'.'))
-			$viewFile=Yii::getPathOfAlias($viewName).'.php';
+
+		if(($renderer=Yii::app()->getViewRenderer())!==null)
+			$extension=$renderer->fileExtension;
 		else
-			$viewFile=$viewPath.DIRECTORY_SEPARATOR.$viewName.'.php';
+			$extension='.php';
+		if($viewName[0]==='/')
+			$viewFile=$basePath.$viewName.$extension;
+		else if(strpos($viewName,'.'))
+			$viewFile=Yii::getPathOfAlias($viewName).$extension;
+		else
+			$viewFile=$viewPath.DIRECTORY_SEPARATOR.$viewName.$extension;
 		return is_file($viewFile) ? Yii::app()->findLocalizedFile($viewFile) : false;
 	}
 
@@ -586,6 +627,23 @@ class CController extends CBaseController
 			return $this->_clips;
 		else
 			return $this->_clips=new CMap;
+	}
+
+	/**
+	 * Processes the request using another controller action.
+	 * This is like {@link redirect}, but the user browser's URL remains unchanged.
+	 * In most cases, you should call {@link redirect} instead of this method.
+	 * @param string the route of the new controller action. This can be an action ID, or a complete route
+	 * with module ID, controller ID and action ID. If the former, the action is assumed
+	 * to be located within the current controller.
+	 * @since 1.1.0
+	 */
+	public function forward($route)
+	{
+		if(strpos($route,'/')===false) // an action of the current controller
+			$this->run($route);
+		else
+			Yii::app()->runController($route);
 	}
 
 	/**
@@ -814,10 +872,13 @@ class CController extends CBaseController
 	 * The effect of this method call is the same as user pressing the
 	 * refresh button on the browser (without post data).
 	 * @param boolean whether to terminate the current application after calling this method
+	 * @param string the anchor that should be appended to the redirection URL.
+	 * Defaults to empty. Make sure the anchor starts with '#' if you want to specify it.
+	 * The parameter has been available since version 1.0.7.
 	 **/
-	public function refresh($terminate=true)
+	public function refresh($terminate=true,$anchor='')
 	{
-		$this->redirect(Yii::app()->getRequest()->getUrl(),$terminate);
+		$this->redirect(Yii::app()->getRequest()->getUrl().$anchor,$terminate);
 	}
 
 	/**
@@ -1003,7 +1064,7 @@ class CController extends CBaseController
 	 */
 	protected function loadPageStates()
 	{
-		if(isset($_POST[self::STATE_INPUT_NAME]) && !empty($_POST[self::STATE_INPUT_NAME]))
+		if(!empty($_POST[self::STATE_INPUT_NAME]))
 		{
 			if(($data=base64_decode($_POST[self::STATE_INPUT_NAME]))!==false)
 			{

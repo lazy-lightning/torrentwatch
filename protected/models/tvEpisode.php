@@ -75,11 +75,11 @@ class tvEpisode extends CActiveRecord
    * set firstAired if episode is an air date
    * @return if validation should continue
    */
-  public function beforeValidate($scenario)
+  public function beforeValidate()
   {
     if($this->episode > 10000 && empty($this->firstAired))
       $this->firstAired = $this->episode;
-    return parent::beforeValidate($scenario);
+    return parent::beforeValidate();
   }
 
   /**

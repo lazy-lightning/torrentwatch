@@ -68,7 +68,7 @@ class favoriteTvShow extends BaseFavorite
    * @return boolean continue validation process
    * TODO: convert into generic validation function or class
    */
-  public function beforeValidate($type)
+  public function beforeValidate()
   {
     // does it have to be a new record? what if the user wanted
     // to change the title of an existing record
@@ -85,7 +85,7 @@ class favoriteTvShow extends BaseFavorite
       }
     }
 
-    return parent::beforeValidate($type);
+    return parent::beforeValidate();
   }
 
   /**

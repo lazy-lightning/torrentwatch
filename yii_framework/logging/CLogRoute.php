@@ -4,7 +4,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2009 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2010 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -25,12 +25,17 @@
  * satisfying both filter conditions will they be returned.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CLogRoute.php 639 2009-02-08 16:16:26Z qiang.xue $
+ * @version $Id: CLogRoute.php 1678 2010-01-07 21:02:00Z qiang.xue $
  * @package system.logging
  * @since 1.0
  */
 abstract class CLogRoute extends CComponent
 {
+	/**
+	 * @var boolean whether to enable this log route. Defaults to true.
+	 * @since 1.0.7
+	 */
+	public $enabled=true;
 	/**
 	 * @var string list of levels separated by comma or space. Defaults to empty, meaning all levels.
 	 */
@@ -39,6 +44,21 @@ abstract class CLogRoute extends CComponent
 	 * @var string list of categories separated by comma or space. Defaults to empty, meaning all categories.
 	 */
 	public $categories='';
+	/**
+	 * @var mixed the additional filter (e.g. {@link CLogFilter}) that can be applied to the log messages.
+	 * The value of this property will be passed to {@link Yii::createComponent} to create
+	 * a log filter object. As a result, this can be either a string representing the
+	 * filter class name or an array representing the filter configuration.
+	 * In general, the log filter class should be {@link CLogFilter} or a child class of it.
+	 * Defaults to null, meaning no filter will be used.
+	 * @since 1.0.6
+	 */
+	public $filter;
+	/**
+	 * @var array the logs that are collected so far by this log route.
+	 * @since 1.1.0
+	 */
+	public $logs;
 
 
 	/**
@@ -65,12 +85,18 @@ abstract class CLogRoute extends CComponent
 	/**
 	 * Retrieves filtered log messages from logger for further processing.
 	 * @param CLogger logger instance
+	 * @param boolean whether to process the logs after they are collected from the logger
 	 */
-	public function collectLogs($logger)
+	public function collectLogs($logger, $processLogs=false)
 	{
 		$logs=$logger->getLogs($this->levels,$this->categories);
-		if(!empty($logs))
-			$this->processLogs($logs);
+		$this->logs=empty($this->logs) ? $logs : array_merge($this->logs,$logs);
+		if($processLogs && !empty($this->logs))
+		{
+			if($this->filter!==null)
+				Yii::createComponent($this->filter)->filter($this->logs);
+			$this->processLogs($this->logs);
+		}
 	}
 
 	/**

@@ -4,7 +4,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2009 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2010 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -15,7 +15,7 @@
  * method of every loaded application component.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: interfaces.php 951 2009-04-19 21:41:21Z qiang.xue@gmail.com $
+ * @version $Id: interfaces.php 1678 2010-01-07 21:02:00Z qiang.xue $
  * @package system.base
  * @since 1.0
  */
@@ -38,7 +38,7 @@ interface IApplicationComponent
  * This interface must be implemented by classes supporting caching feature.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: interfaces.php 951 2009-04-19 21:41:21Z qiang.xue@gmail.com $
+ * @version $Id: interfaces.php 1678 2010-01-07 21:02:00Z qiang.xue $
  * @package system.caching
  * @since 1.0
  */
@@ -50,6 +50,18 @@ interface ICache
 	 * @return mixed the value stored in cache, false if the value is not in the cache or expired.
 	 */
 	public function get($id);
+	/**
+	 * Retrieves multiple values from cache with the specified keys.
+	 * Some caches (such as memcache, apc) allow retrieving multiple cached values at one time,
+	 * which may improve the performance since it reduces the communication cost.
+	 * In case a cache doesn't support this feature natively, it will be simulated by this method.
+	 * @param array list of keys identifying the cached values
+	 * @return array list of cached values corresponding to the specified keys. The array
+	 * is returned in terms of (key,value) pairs.
+	 * If a value is not cached or expired, the corresponding array value will be false.
+	 * @since 1.0.8
+	 */
+	public function mget($ids);
 	/**
 	 * Stores a value identified by a key into cache.
 	 * If the cache already contains such a key, the existing value and
@@ -94,7 +106,7 @@ interface ICache
  * Objects implementing this interface must be able to be serialized and unserialized.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: interfaces.php 951 2009-04-19 21:41:21Z qiang.xue@gmail.com $
+ * @version $Id: interfaces.php 1678 2010-01-07 21:02:00Z qiang.xue $
  * @package system.caching
  * @since 1.0
  */
@@ -118,7 +130,7 @@ interface ICacheDependency
  * This interface must be implemented by all state persister classes (such as
  * {@link CStatePersister}.
  *
- * @version $Id: interfaces.php 951 2009-04-19 21:41:21Z qiang.xue@gmail.com $
+ * @version $Id: interfaces.php 1678 2010-01-07 21:02:00Z qiang.xue $
  * @package system.base
  * @since 1.0
  */
@@ -140,7 +152,7 @@ interface IStatePersister
 /**
  * IFilter is the interface that must be implemented by action filters.
  *
- * @version $Id: interfaces.php 951 2009-04-19 21:41:21Z qiang.xue@gmail.com $
+ * @version $Id: interfaces.php 1678 2010-01-07 21:02:00Z qiang.xue $
  * @package system.base
  * @since 1.0
  */
@@ -160,7 +172,7 @@ interface IFilter
 /**
  * IAction is the interface that must be implemented by controller actions.
  *
- * @version $Id: interfaces.php 951 2009-04-19 21:41:21Z qiang.xue@gmail.com $
+ * @version $Id: interfaces.php 1678 2010-01-07 21:02:00Z qiang.xue $
  * @package system.base
  * @since 1.0
  */
@@ -188,7 +200,7 @@ interface IAction
  * If this interface is implemented, the provider instance will be able
  * to intercept the remote method invocation (e.g. for logging or authentication purpose).
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: interfaces.php 951 2009-04-19 21:41:21Z qiang.xue@gmail.com $
+ * @version $Id: interfaces.php 1678 2010-01-07 21:02:00Z qiang.xue $
  * @package system.base
  * @since 1.0
  */
@@ -216,7 +228,7 @@ interface IWebServiceProvider
  * implemented in {@link CBaseController}.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: interfaces.php 951 2009-04-19 21:41:21Z qiang.xue@gmail.com $
+ * @version $Id: interfaces.php 1678 2010-01-07 21:02:00Z qiang.xue $
  * @package system.base
  * @since 1.0
  */
@@ -242,7 +254,7 @@ interface IViewRenderer
  * used with the {@link CWebApplication::user user application component}.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: interfaces.php 951 2009-04-19 21:41:21Z qiang.xue@gmail.com $
+ * @version $Id: interfaces.php 1678 2010-01-07 21:02:00Z qiang.xue $
  * @package system.base
  * @since 1.0
  */
@@ -285,7 +297,7 @@ interface IUserIdentity
  * for the current user.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: interfaces.php 951 2009-04-19 21:41:21Z qiang.xue@gmail.com $
+ * @version $Id: interfaces.php 1678 2010-01-07 21:02:00Z qiang.xue $
  * @package system.base
  * @since 1.0
  */
@@ -323,7 +335,7 @@ interface IWebUser
  * An auth manager is mainly responsible for providing role-based access control (RBAC) service.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: interfaces.php 951 2009-04-19 21:41:21Z qiang.xue@gmail.com $
+ * @version $Id: interfaces.php 1678 2010-01-07 21:02:00Z qiang.xue $
  * @package system.base
  * @since 1.0
  */
@@ -448,10 +460,10 @@ interface IAuthManager
 	 */
 	public function getAuthAssignment($itemName,$userId);
 	/**
-	 * Revokes an authorization item assignment.
-	 * @param string the item name
+	 * Returns the item assignments for the specified user.
 	 * @param mixed the user ID (see {@link IWebUser::getId})
-	 * @return boolean whether removal is successful
+	 * @return array the item assignment information for the user. An empty array will be
+	 * returned if there is no item assigned to the user.
 	 */
 	public function getAuthAssignments($userId);
 	/**
@@ -496,7 +508,7 @@ interface IAuthManager
  * are defined in the behavior class and not available in the component class.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: interfaces.php 951 2009-04-19 21:41:21Z qiang.xue@gmail.com $
+ * @version $Id: interfaces.php 1678 2010-01-07 21:02:00Z qiang.xue $
  * @package system.base
  * @since 1.0.2
  */
@@ -520,4 +532,82 @@ interface IBehavior
 	 * @param boolean whether this behavior is enabled
 	 */
 	public function setEnabled($value);
+}
+
+/**
+ * IWidgetFactory is the interface that must be implemented by a widget factory class.
+ *
+ * When calling {@link CBaseController::createWidget}, if a widget factory is available,
+ * it will be used for creating the requested widget.
+ *
+ * @author Qiang Xue <qiang.xue@gmail.com>
+ * @version $Id: interfaces.php 1678 2010-01-07 21:02:00Z qiang.xue $
+ * @package system.web
+ * @since 1.1
+ */
+interface IWidgetFactory
+{
+	/**
+	 * Creates a new widget based on the given class name and initial properties.
+	 * @param CBaseController the owner of the new widget
+	 * @param string the class name of the widget. This can also be a path alias (e.g. system.web.widgets.COutputCache)
+	 * @param array the initial property values (name=>value) of the widget.
+	 * @return CWidget the newly created widget whose properties have been initialized with the given values.
+	 */
+	public function createWidget($owner,$className,$properties=array());
+}
+
+/**
+ * IDataProvider is the interface that must be implemented by data provider classes.
+ *
+ * Data providers are components that can feed data for widgets such as data grid, data list.
+ * Besides providing data, they also support pagination and sorting.
+ *
+ * @author Qiang Xue <qiang.xue@gmail.com>
+ * @version $Id: interfaces.php 1678 2010-01-07 21:02:00Z qiang.xue $
+ * @package system.web
+ * @since 1.1
+ */
+interface IDataProvider
+{
+	/**
+	 * @return string the unique ID that identifies the data provider from other data providers.
+	 */
+	public function getId();
+	/**
+	 * Returns the number of data items in the current page.
+	 * This is equivalent to <code>count($provider->getData())</code>.
+	 * When {@link pagination} is set false, this returns the same value as {@link totalItemCount}.
+	 * @param boolean whether the number of data items should be re-calculated.
+	 * @return integer the number of data items in the current page.
+	 */
+	public function getItemCount($refresh=false);
+	/**
+	 * Returns the total number of data items.
+	 * When {@link pagination} is set false, this returns the same value as {@link itemCount}.
+	 * @param boolean whether the total number of data items should be re-calculated.
+	 * @return integer total number of possible data items.
+	 */
+	public function getTotalItemCount($refresh=false);
+	/**
+	 * Returns the data items currently available.
+	 * @param boolean whether the data should be re-fetched from persistent storage.
+	 * @return array the list of data items currently available in this data provider.
+	 */
+	public function getData($refresh=false);
+	/**
+	 * Returns the key values associated with the data items.
+	 * @param boolean whether the keys should be re-calculated.
+	 * @return array the list of key values corresponding to {@link data}. Each data item in {@link data}
+	 * is uniquely identified by the corresponding key value in this array.
+	 */
+	public function getKeys($refresh=false);
+	/**
+	 * @return CSort the sorting object. If this is false, it means the sorting is disabled.
+	 */
+	public function getSort();
+	/**
+	 * @return CPagination the pagination object. If this is false, it means the pagination is disabled.
+	 */
+	public function getPagination();
 }

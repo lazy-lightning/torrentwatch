@@ -4,7 +4,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2009 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2010 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -44,7 +44,7 @@
  * targets, even if the routes are of the same type.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CLogRouter.php 433 2008-12-30 22:59:17Z qiang.xue $
+ * @version $Id: CLogRouter.php 1678 2010-01-07 21:02:00Z qiang.xue $
  * @package system.logging
  * @since 1.0
  */
@@ -59,16 +59,14 @@ class CLogRouter extends CApplicationComponent
 	public function init()
 	{
 		parent::init();
-		foreach($this->_routes as $i=>$route)
+		foreach($this->_routes as $name=>$route)
 		{
-			if(is_array($route))
-			{
-				$route=Yii::createComponent($route);
-				$route->init();
-				$this->_routes[$i]=$route;
-			}
+			$route=Yii::createComponent($route);
+			$route->init();
+			$this->_routes[$name]=$route;
 		}
-		Yii::app()->attachEventHandler('onEndRequest',array($this,'collectLogs'));
+		Yii::getLogger()->attachEventHandler('onFlush',array($this,'collectLogs'));
+		Yii::app()->attachEventHandler('onEndRequest',array($this,'processLogs'));
 	}
 
 	/**
@@ -76,7 +74,7 @@ class CLogRouter extends CApplicationComponent
 	 */
 	public function getRoutes()
 	{
-		return $this->_routes;
+		return new CMap($this->_routes);
 	}
 
 	/**
@@ -89,23 +87,38 @@ class CLogRouter extends CApplicationComponent
 	 */
 	public function setRoutes($config)
 	{
-		foreach($config as $c)
-		{
-			if(is_string($c))
-				$c=array('class'=>$c);
-			$this->_routes[]=$c;
-		}
+		foreach($config as $name=>$route)
+			$this->_routes[$name]=$route;
 	}
 
 	/**
 	 * Collects log messages from a logger.
-	 * This method is an event handler to application's onEndRequest event.
-	 * @param mixed event parameter
+	 * This method is an event handler to the {@link CLogger::onFlush} event.
+	 * @param CEvent event parameter
 	 */
-	public function collectLogs($param)
+	public function collectLogs($event)
 	{
 		$logger=Yii::getLogger();
-		foreach($this->getRoutes() as $route)
-			$route->collectLogs($logger);
+		foreach($this->_routes as $route)
+		{
+			if($route->enabled)
+				$route->collectLogs($logger,false);
+		}
+	}
+
+	/**
+	 * Collects and processes log messages from a logger.
+	 * This method is an event handler to the {@link CApplication::onEndRequest} event.
+	 * @param CEvent event parameter
+	 * @since 1.1.0
+	 */
+	public function processLogs($event)
+	{
+		$logger=Yii::getLogger();
+		foreach($this->_routes as $route)
+		{
+			if($route->enabled)
+				$route->collectLogs($logger,true);
+		}
 	}
 }

@@ -4,7 +4,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2009 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2010 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -12,7 +12,7 @@
  * CClientScript manages JavaScript and CSS stylesheets for views.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CClientScript.php 942 2009-04-16 15:00:20Z qiang.xue@gmail.com $
+ * @version $Id: CClientScript.php 1678 2010-01-07 21:02:00Z qiang.xue $
  * @package system.web
  * @since 1.0
  */
@@ -219,9 +219,9 @@ class CClientScript extends CApplicationComponent
 	{
 		$html='';
 		foreach($this->_metas as $meta)
-			$html.=CHtml::metaTag($meta['content'],null,null,$meta);
+			$html.=CHtml::metaTag($meta['content'],null,null,$meta)."\n";
 		foreach($this->_links as $link)
-			$html.=CHtml::linkTag(null,null,null,null,$link);
+			$html.=CHtml::linkTag(null,null,null,null,$link)."\n";
 		foreach($this->cssFiles as $url=>$media)
 			$html.=CHtml::cssFile($url,$media)."\n";
 		foreach($this->_css as $css)
@@ -240,6 +240,7 @@ class CClientScript extends CApplicationComponent
 
 		if($html!=='')
 		{
+			$count=0;
 			$output=preg_replace('/(<title\b[^>]*>|<\\/head\s*>)/is','<###head###>$1',$output,1,$count);
 			if($count)
 				$output=str_replace('<###head###>',$html,$output);
@@ -265,6 +266,7 @@ class CClientScript extends CApplicationComponent
 
 		if($html!=='')
 		{
+			$count=0;
 			$output=preg_replace('/(<body\b[^>]*>)/is','$1<###begin###>',$output,1,$count);
 			if($count)
 				$output=str_replace('<###begin###>',$html,$output);
@@ -283,6 +285,7 @@ class CClientScript extends CApplicationComponent
 			&& !isset($this->scripts[self::POS_READY]) && !isset($this->scripts[self::POS_LOAD]))
 			return;
 
+		$fullPage=0;
 		$output=preg_replace('/(<\\/body\s*>)/is','<###end###>$1',$output,1,$fullPage);
 		$html='';
 		if(isset($this->scriptFiles[self::POS_END]))
@@ -371,7 +374,6 @@ class CClientScript extends CApplicationComponent
 
 	/**
 	 * Registers a CSS file
-	 * @param string ID that uniquely identifies this CSS file
 	 * @param string URL of the CSS file
 	 * @param string media that the CSS file should be applied to. If empty, it means all media types.
 	 */

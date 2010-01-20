@@ -4,7 +4,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2009 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2010 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -15,7 +15,7 @@
  * various filter conditions, including log levels and log categories.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CLogger.php 433 2008-12-30 22:59:17Z qiang.xue $
+ * @version $Id: CLogger.php 1678 2010-01-07 21:02:00Z qiang.xue $
  * @package system.logging
  * @since 1.0
  */
@@ -28,9 +28,20 @@ class CLogger extends CComponent
 	const LEVEL_PROFILE='profile';
 
 	/**
+	 * @var integer how many messages should be logged before they are flushed to destinations.
+	 * Defaults to 10,000, meaning for every 10,000 messages, the {@link flush} method will be
+	 * automatically invoked once. If this is 0, it means messages will never be flushed automatically.
+	 * @since 1.1.0
+	 */
+	public $autoFlush=10000;
+	/**
 	 * @var array log messages
 	 */
 	private $_logs=array();
+	/**
+	 * @var integer number of log messages
+	 */
+	private $_logCount=0;
 	/**
 	 * @var array log levels for filtering (used when filtering)
 	 */
@@ -39,6 +50,11 @@ class CLogger extends CComponent
 	 * @var array log categories for filtering (used when filtering)
 	 */
 	private $_categories;
+	/**
+	 * @var array the profiling results (category, token => time in seconds)
+	 * @since 1.0.6
+	 */
+	private $_timings;
 
 	/**
 	 * Logs a message.
@@ -51,6 +67,9 @@ class CLogger extends CComponent
 	public function log($message,$level='info',$category='application')
 	{
 		$this->_logs[]=array($message,$level,$category,microtime(true));
+		$this->_logCount++;
+		if($this->autoFlush>0 && $this->_logCount>=$this->autoFlush)
+			$this->flush();
 	}
 
 	/**
@@ -163,5 +182,93 @@ class CLogger extends CComponent
 				return isset($output[1]) ? $output[1]*1024 : 0;
 			}
 		}
+	}
+
+	/**
+	 * Returns the profiling results.
+	 * The results may be filtered by token and/or category.
+	 * If no filter is specified, the returned results would be an array with each element
+	 * being array($token,$category,$time).
+	 * If a filter is specified, the results would be an array of timings.
+	 * @param string token filter. Defaults to null, meaning not filtered by token.
+	 * @param string category filter. Defaults to null, meaning not filtered by category.
+	 * @param boolean whether to refresh the internal timing calculations. If false,
+	 * only the first time calling this method will the timings be calculated internally.
+	 * @return array the profiling results.
+	 * @since 1.0.6
+	 */
+	public function getProfilingResults($token=null,$category=null,$refresh=false)
+	{
+		if($this->_timings===null || $refresh)
+			$this->calculateTimings();
+		if($token===null && $category===null)
+			return $this->_timings;
+		$results=array();
+		foreach($this->_timings as $timing)
+		{
+			if(($category===null || $timing[1]===$category) && ($token===null || $timing[0]===$token))
+				$results[]=$timing[2];
+		}
+		return $results;
+	}
+
+	private function calculateTimings()
+	{
+		$this->_timings=array();
+
+		$stack=array();
+		foreach($this->_logs as $log)
+		{
+			if($log[1]!==CLogger::LEVEL_PROFILE)
+				continue;
+			list($message,$level,$category,$timestamp)=$log;
+			if(!strncasecmp($message,'begin:',6))
+			{
+				$log[0]=substr($message,6);
+				$stack[]=$log;
+			}
+			else if(!strncasecmp($message,'end:',4))
+			{
+				$token=substr($message,4);
+				if(($last=array_pop($stack))!==null && $last[0]===$token)
+				{
+					$delta=$log[3]-$last[3];
+					$this->_timings[]=array($message,$category,$delta);
+				}
+				else
+					throw new CException(Yii::t('yii','CProfileLogRoute found a mismatching code block "{token}". Make sure the calls to Yii::beginProfile() and Yii::endProfile() be properly nested.',
+						array('{token}'=>$token)));
+			}
+		}
+
+		$now=microtime(true);
+		while(($last=array_pop($stack))!==null)
+		{
+			$delta=$now-$last[3];
+			$this->_timings[]=array($last[0],$last[2],$delta);
+		}
+	}
+
+	/**
+	 * Removes all recorded messages from the memory.
+	 * This method will raise an {@link onFlush} event.
+	 * The attached event handlers can process the log messages before they are removed.
+	 * @since 1.1.0
+	 */
+	public function flush()
+	{
+		$this->onFlush(new CEvent($this));
+		$this->_logs=array();
+		$this->_logCount=0;
+	}
+
+	/**
+	 * Raises an <code>onFlush</code> event.
+	 * @param CEvent the event parameter
+	 * @since 1.1.0
+	 */
+	public function onFlush($event)
+	{
+		$this->raiseEvent('onFlush', $event);
 	}
 }

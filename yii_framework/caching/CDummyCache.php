@@ -4,7 +4,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2009 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2010 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -14,12 +14,28 @@
  * CDummyCache does not do/cache anything. It is used as the default 'cache' application component.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CDummyCache.php 996 2009-05-08 03:21:48Z qiang.xue $
+ * @version $Id: CDummyCache.php 1678 2010-01-07 21:02:00Z qiang.xue $
  * @package system.caching
  * @since 1.0
  */
 class CDummyCache extends CApplicationComponent implements ICache, ArrayAccess
 {
+	/**
+	 * @var string a string prefixed to every cache key so that it is unique. Defaults to {@link CApplication::getId() application ID}.
+	 */
+	public $keyPrefix;
+
+	/**
+	 * Initializes the application component.
+	 * This method overrides the parent implementation by setting default cache key prefix.
+	 */
+	public function init()
+	{
+		parent::init();
+		if($this->keyPrefix===null)
+			$this->keyPrefix=Yii::app()->getId();
+	}
+
 	/**
 	 * Retrieves a value from cache with a specified key.
 	 * @param string a key identifying the cached value
@@ -28,6 +44,25 @@ class CDummyCache extends CApplicationComponent implements ICache, ArrayAccess
 	public function get($id)
 	{
 		return false;
+	}
+
+	/**
+	 * Retrieves multiple values from cache with the specified keys.
+	 * Some caches (such as memcache, apc) allow retrieving multiple cached values at one time,
+	 * which may improve the performance since it reduces the communication cost.
+	 * In case a cache doesn't support this feature natively, it will be simulated by this method.
+	 * @param array list of keys identifying the cached values
+	 * @return array list of cached values corresponding to the specified keys. The array
+	 * is returned in terms of (key,value) pairs.
+	 * If a value is not cached or expired, the corresponding array value will be false.
+	 * @since 1.0.8
+	 */
+	public function mget($ids)
+	{
+		$results=array();
+		foreach($ids as $id)
+			$results[$id]=false;
+		return $results;
 	}
 
 	/**

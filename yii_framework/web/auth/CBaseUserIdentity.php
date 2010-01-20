@@ -4,7 +4,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2009 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2010 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -20,7 +20,7 @@
  * interface.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CBaseUserIdentity.php 433 2008-12-30 22:59:17Z qiang.xue $
+ * @version $Id: CBaseUserIdentity.php 1678 2010-01-07 21:02:00Z qiang.xue $
  * @package system.web.auth
  * @since 1.0
  */
@@ -98,15 +98,19 @@ abstract class CBaseUserIdentity extends CComponent implements IUserIdentity
 	 * Sets the named state with a given value.
 	 * @param string the name of the state
 	 * @param mixed the value of the named state
-	 * @param mixed the default value for the named state.
-	 * If the given value is the same as this value, the state will be removed
-	 * from the storage.
 	 */
-	public function setState($name,$value,$defaultValue=null)
+	public function setState($name,$value)
 	{
-		if($value===$defaultValue)
-			unset($this->_state[$name]);
-		else
-			$this->_state[$name]=$value;
+		$this->_state[$name]=$value;
+	}
+
+	/**
+	 * Removes the specified state.
+	 * @param string the name of the state
+	 * @since 1.0.8
+	 */
+	public function clearState($name)
+	{
+		unset($this->_state[$name]);
 	}
 }

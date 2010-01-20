@@ -4,7 +4,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2009 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2010 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -48,13 +48,23 @@
  * See {@link http://www.php.net/manual/en/function.memcache-addserver.php}
  * for more details.
  *
+ * Since version 1.0.6, CMemCache can also be used with {@link http://pecl.php.net/package/memcached memcached}.
+ * To do so, set {@link useMemcached} to be true.
+ *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CMemCache.php 433 2008-12-30 22:59:17Z qiang.xue $
+ * @version $Id: CMemCache.php 1678 2010-01-07 21:02:00Z qiang.xue $
  * @package system.caching
  * @since 1.0
  */
 class CMemCache extends CCache
 {
+	/**
+	 * @var boolean whether to use {@link http://pecl.php.net/package/memcached memcached}
+	 * as the underlying caching extension. Defaults to false, meaning using
+	 * {@link http://pecl.php.net/package/memcache memcache}.
+	 * @since 1.0.6
+	 */
+	public $useMemcached=false;
 	/**
 	 * @var Memcache the Memcache instance
 	 */
@@ -73,17 +83,16 @@ class CMemCache extends CCache
 	public function init()
 	{
 		parent::init();
-		if(!extension_loaded('memcache'))
-			throw new CException(Yii::t('yii','CMemCache requires PHP memcache extension to be loaded.'));
-
 		$servers=$this->getServers();
 		$cache=$this->getMemCache();
 		if(count($servers))
 		{
 			foreach($servers as $server)
 			{
-				$cache->addServer($server->host,$server->port,$server->persistent,
-					$server->weight,$server->timeout,$server->status);
+				if($this->useMemcached)
+					$cache->addServer($server->host,$server->port,$server->weight);
+				else
+					$cache->addServer($server->host,$server->port,$server->persistent,$server->weight,$server->timeout,$server->status);
 			}
 		}
 		else
@@ -91,14 +100,14 @@ class CMemCache extends CCache
 	}
 
 	/**
-	 * @return Memcache the memcache instance
+	 * @return mixed the memcache instance (or memcached if {@link useMemcached} is true) used by this component.
 	 */
-	protected function getMemCache()
+	public function getMemCache()
 	{
 		if($this->_cache!==null)
 			return $this->_cache;
 		else
-			return $this->_cache=new Memcache;
+			return $this->_cache=$this->useMemcached ? new Memcached : new Memcache;
 	}
 
 	/**
@@ -132,6 +141,17 @@ class CMemCache extends CCache
 	}
 
 	/**
+	 * Retrieves multiple values from cache with the specified keys.
+	 * @param array a list of keys identifying the cached values
+	 * @return array a list of cached values indexed by the keys
+	 * @since 1.0.8
+	 */
+	protected function getValues($keys)
+	{
+		return $this->useMemcached ? $this->_cache->getMulti($keys) : $this->_cache->get($keys);
+	}
+
+	/**
 	 * Stores a value identified by a key in cache.
 	 * This is the implementation of the method declared in the parent class.
 	 *
@@ -147,7 +167,7 @@ class CMemCache extends CCache
 		else
 			$expire=0;
 
-		return $this->_cache->set($key,$value,0,$expire);
+		return $this->useMemcached ? $this->_cache->set($key,$value,$expire) : $this->_cache->set($key,$value,0,$expire);
 	}
 
 	/**
@@ -166,7 +186,7 @@ class CMemCache extends CCache
 		else
 			$expire=0;
 
-		return $this->_cache->add($key,$value,0,$expire);
+		return $this->useMemcached ? $this->_cache->add($key,$value,$expire) : $this->_cache->add($key,$value,0,$expire);
 	}
 
 	/**
@@ -197,7 +217,7 @@ class CMemCache extends CCache
  * for detailed explanation of each configuration property.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CMemCache.php 433 2008-12-30 22:59:17Z qiang.xue $
+ * @version $Id: CMemCache.php 1678 2010-01-07 21:02:00Z qiang.xue $
  * @package system.caching
  * @since 1.0
  */

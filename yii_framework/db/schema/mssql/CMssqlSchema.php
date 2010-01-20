@@ -5,7 +5,7 @@
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @author Christophe Boulain <Christophe.Boulain@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2009 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2010 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -14,7 +14,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @author Christophe Boulain <Christophe.Boulain@gmail.com>
- * @version $Id: CMssqlSchema.php 930 2009-04-11 02:28:31Z qiang.xue@gmail.com $
+ * @version $Id: CMssqlSchema.php 1678 2010-01-07 21:02:00Z qiang.xue $
  * @package system.db.schema.mssql
  * @since 1.0.4
  */
@@ -65,7 +65,7 @@ class CMssqlSchema extends CDbSchema
 
 	/**
 	 * Creates a table instance representing the metadata for the named table.
-	 * @return CMysqlTableSchema driver dependent table metadata. Null if the table does not exist.
+	 * @return CMssqlTableSchema driver dependent table metadata. Null if the table does not exist.
 	 */
 	protected function createTable($name)
 	{
@@ -84,7 +84,7 @@ class CMssqlSchema extends CDbSchema
 
 	/**
 	 * Generates various kinds of table names.
-	 * @param CMysqlTableSchema the table instance
+	 * @param CMssqlTableSchema the table instance
 	 * @param string the unquoted table name
 	 */
 	protected function resolveTableNames($table,$name)
@@ -211,7 +211,7 @@ EOD;
 
 	/**
 	 * Collects the table column metadata.
-	 * @param CMysqlTableSchema the table metadata
+	 * @param CMssqlTableSchema the table metadata
 	 * @return boolean whether the table exists in the database
 	 */
 	protected function findColumns($table)

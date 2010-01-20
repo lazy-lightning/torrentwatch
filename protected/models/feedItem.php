@@ -132,7 +132,7 @@ class feedItem extends ARwithQuality
         : "unknown ({$status})";
   }
       
-  public function beforeValidate($type) {
+  public function beforeValidate() {
     if($this->isNewRecord) {
       list($shortTitle, $episodeTitle, $season, $episode, $network, $quality) = mediaTitleParser::detect($this->title);
  
@@ -173,7 +173,7 @@ class feedItem extends ARwithQuality
       // trigger lastUpdated update
       $model->save();
     }
-    return parent::beforeValidate($type);
+    return parent::beforeValidate();
   }
 
   /**
