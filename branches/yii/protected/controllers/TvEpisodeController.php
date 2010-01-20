@@ -114,12 +114,12 @@ class TvEpisodeController extends BaseController
     $pages = null;
     $criteria=new CDbCriteria(array(
           'select'=>'id, status, title, season, episode', 
-          'order'=>'tvEpisode.lastUpdated DESC',
+          'order'=>'t.lastUpdated DESC',
     )) ;
 
     if(isset($_GET['tvShow']))
     {
-      $criteria->condition = 'tvEpisode.tvShow_id = :tvShow_id';
+      $criteria->condition = 't.tvShow_id = :tvShow_id';
       $criteria->params = array(':tvShow_id'=>$_GET['tvShow']);
     }
 
