@@ -210,6 +210,10 @@
                     url = 'nmtdvr.php?r=ajax/dlFeedItem&feedItem_id='+$(t).find(".itemId").val();
                     $.get(url, '', $.loadDynamicData, 'html');
                 },
+                'hideShow': function(t) {
+                    url = 'nmtdvr.php?r=ajax/hideTvShow&feedItem_id='+$(t).find(".itemId").val();
+                    $.get(url, '', $.loadDynamicData, 'html');
+                },
                 'inspect': function(t) {
                     $.get('nmtdvr.php', 'r=ajax/inspect&feedItem_id='+$(t).find(".itemId").val()+'&title='+
                           encodeURIComponent($(t).find("span.torrent_name").text()), function(html) {

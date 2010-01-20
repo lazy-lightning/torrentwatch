@@ -18,15 +18,6 @@ class downloadManager extends favoriteManager {
   }
 
   /**
-   * Attributes safe to be massively assigned
-   * @return array
-   */
-  public function safeAttributes() {
-    return array(
-    );
-  }
-
-  /**
    * @return the options of the current item being started
    * @param none
    */
@@ -205,49 +196,42 @@ class downloadManager extends favoriteManager {
    */
   public function afterDownload()
   {
-    $transaction = Yii::app()->db->beginTransaction();
-    try {
-      // mark queued items to duplicate if they match the started item
-      Yii::app()->db->createCommand(
-          'UPDATE feedItem'.
-          '   SET status = '.feedItem::STATUS_DUPLICATE.
-          ' WHERE status = '.feedItem::STATUS_QUEUED.
-          '   AND EXISTS( SELECT two.id'.
-          '                 FROM feedItem two'.
-          '                WHERE two.id = '.$this->feedItemId.
-          '                  AND (    (feedItem.movie_id NOT NULL AND feedItem.movie_id = two.movie_id )'.
-          '                        OR (feedItem.other_id NOT NULL AND feedItem.other_id = two.other_id )'.
-          '                        OR (feedItem.tvEpisode_id NOT NULL AND feedItem.tvEpisode_id = two.tvEpisode_id )'.
-          '                      )'.
-          '              );'
-      )->execute();
-  
-      // create a new history record for this download
-      $history = new history;
-      $history->feedItem_id = $this->feedItemId;
-      $history->feedItem_title = $this->title;
-      $history->feed_id = $this->feedId;
-      $history->feed_title = $this->feedTitle;
-      $history->favorite_name = $this->favoriteName;
-      $history->favorite_type = $this->favoriteType;
-      $history->save();
-  
-      // mark the tvEpisode/movie/other as STATUS_DOWNLOADED
-      $record = $this->itemTypeRecord;
-      if($record) 
-      {
-        $class = get_class($record);
-        Yii::log('Updating related '.$class);
-        $record->updateByPk($record->id, array('status'=>constant("$class::STATUS_DOWNLOADED")));
-      }
-      else
-        Yii::log('WTF dude weve hit an inconsistancy, no related record for '.$this->feedItemId, CLogger::LEVEL_ERROR);
+    // mark queued items to duplicate if they match the started item
+    Yii::app()->db->createCommand(
+        'UPDATE feedItem'.
+        '   SET status = '.feedItem::STATUS_DUPLICATE.
+        ' WHERE status = '.feedItem::STATUS_QUEUED.
+        '   AND EXISTS( SELECT two.id'.
+        '                 FROM feedItem two'.
+        '                WHERE two.id = '.$this->feedItemId.
+        '                  AND (    (feedItem.movie_id NOT NULL AND feedItem.movie_id = two.movie_id )'.
+        '                        OR (feedItem.other_id NOT NULL AND feedItem.other_id = two.other_id )'.
+        '                        OR (feedItem.tvEpisode_id NOT NULL AND feedItem.tvEpisode_id = two.tvEpisode_id )'.
+        '                      )'.
+        '              );'
+    )->execute();
 
-      $transaction->commit();
-    } catch ( Exception $e ) {
-      $transaction->rollback();
-      throw $e;
+    // create a new history record for this download
+    $history = new history;
+    $history->feedItem_id = $this->feedItemId;
+    $history->feedItem_title = $this->title;
+    $history->feed_id = $this->feedId;
+    $history->feed_title = $this->feedTitle;
+    $history->favorite_name = $this->favoriteName;
+    $history->favorite_type = $this->favoriteType;
+    $history->save();
+
+    // mark the tvEpisode/movie/other as STATUS_DOWNLOADED
+    $record = $this->itemTypeRecord;
+    if($record) 
+    {
+      $class = get_class($record);
+      Yii::log('Updating related '.$class);
+      $record->updateByPk($record->id, array('status'=>constant("$class::STATUS_DOWNLOADED")));
     }
+    else
+      Yii::log('WTF dude weve hit an inconsistancy, no related record for '.$this->feedItemId, CLogger::LEVEL_ERROR);
+
   }
 
   /**
@@ -280,17 +264,24 @@ class downloadManager extends favoriteManager {
 
     if($this->beforeDownload())
     {
-      $client = $this->getClient();
-      if(is_object($client) ? $client->addByUrl($this->url) : False)
-        $this->afterDownload();
-      else
-      {
-        $this->addError("client", (is_object($client) ? $client->getError() : 'Unable to initialize client'));
-        $status = feedItem::STATUS_FAILED_DL;
+      try {
+        $transaction = Yii::app()->db->beginTransaction();
+        $client = $this->getClient();
+        if(is_object($client) ? $client->addByUrl($this->url) : False)
+          $this->afterDownload();
+        else
+        {
+          $this->addError("client", (is_object($client) ? $client->getError() : 'Unable to initialize client'));
+          $status = feedItem::STATUS_FAILED_DL;
+        }
+        // not in afterDownload to allow failure to set STATUS_FAILED_DL
+        Yii::log("Updating {$this->title} to status ".feedItem::getStatusText($status), CLogger::LEVEL_INFO);
+        feedItem::model()->updateByPk($this->feedItemId, array('status'=>$status));
+        $transaction->commit();
+      } catch ( Exception $e ) {
+        $transaction->rollback();
+        throw $e;
       }
-      // not in afterDownload to allow failure to set STATUS_FAILED_DL
-      Yii::log("Updating {$this->title} to status ".feedItem::getStatusText($status), CLogger::LEVEL_INFO);
-      feedItem::model()->updateByPk($this->feedItemId, array('status'=>$status));
     }
 
     // reset the options to null incase anything trys to access the stale information

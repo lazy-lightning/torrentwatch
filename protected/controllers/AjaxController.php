@@ -46,7 +46,7 @@ class AjaxController extends BaseController
         'actions'=>array(
             'fullResponse', 'dlFeedItem', 'saveConfig', 'addFeed', 'addFavorite', 'updateFavorite', 
             'inspect', 'clearHistory', 'createFavorite', 'deleteFavorite', 'loadFeedItems', 'resetData',
-            'wizard', 'loadFavorite', 'getHistory',
+            'wizard', 'loadFavorite', 'getHistory', 'hideShow', 'unHideTvShow',
         ),
         'users'=>array('@'),
       ),
@@ -325,6 +325,35 @@ class AjaxController extends BaseController
     ));
   }
 
+  public function actionHideTvShow()
+  {
+    $this->response['dialog']['header'] = 'Hide Tv Show';
+    $feedItem = $this->loadFeedItem();
+    if($feedItem && $feedItem->tvShow_id)
+    {
+      if(favoriteTvShow::model()->exists('tvShow_id = '.$feedItem->tvShow_id))
+      {
+        $this->respose['dialog']['content'] = 'This show cannot be hidden as it is favorited.';
+      }
+      else
+      {
+        $show = $feedItem->tvShow;
+        try {
+          $transaction = $feedItem->db->beginTransaction();
+          $show->hide = true;
+          $show->save();
+          $transaction->commit();
+          $this->response['dialog']['content'] = $show->title.' will no longer be displayed.';
+        } catch (Exception $e) {
+          $transaction->rollback();
+          throw $e;
+        }
+      }
+    }
+
+    $this->actionFullResponse();
+  }
+
   public function actionInspect()
   {
     $view = 'inspectError';
@@ -478,6 +507,27 @@ class AjaxController extends BaseController
     $this->actionFullResponse();
   }
 
+  public function actionUnHideTvShow()
+  {
+    if(isset($_GET['tvShow_id']) && is_array($_GET['tvShow_id']))
+    {
+      try {
+        Yii::app()->db->beginTransaction();
+        $shows = tvShow::model()->findAllByPk($_GET['tvShow_id']);
+        foreach($shows as $s)
+        {
+          $s->hide = false;
+          $s->save();
+        }
+        $transaction->commit();
+      } catch (Exception $e) {
+        $transaction->rollback();
+        throw $e;
+      }
+    }
+    $this->actionFullResponse();
+  }
+
   public function actionWizard()
   {
     $this->response = array('dialog'=>array('header'=>'Initial Configuration', 'content'=>''));
@@ -589,18 +639,24 @@ class AjaxController extends BaseController
       {
         $ids[] = $row['feedItem_id'];
       }
-   
-      if($model->deleteByPk($id))
-      {
-        // Reset feedItem status on anything this was matching, then rerun matching routine incase something else matches the reset items
-        feedItem::model()->updateByPk($ids, array('status'=>feedItem::STATUS_NEW));
-        Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NEW);
-        $this->response['dialog']['content'] = 'Your favorite has been successfully deleted';
-      } 
-      else 
-      {
-        $this->response['dialog']['content'] = 'That favorite does not exist ?';
-        $this->response['dialog']['error'] = True;
+      try {
+        $transaction = $model->db->beginTransaction();
+        if($model->deleteByPk($id))
+        {
+          // Reset feedItem status on anything this was matching, then rerun matching routine incase something else matches the reset items
+          feedItem::model()->updateByPk($ids, array('status'=>feedItem::STATUS_NEW));
+          Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NEW);
+          $this->response['dialog']['content'] = 'Your favorite has been successfully deleted';
+        } 
+        else 
+        {
+          $this->response['dialog']['content'] = 'That favorite does not exist ?';
+          $this->response['dialog']['error'] = True;
+        }
+        $transaction->commit();
+      } catch (Exception $e) {
+        $transaction->rollback();
+        throw $e;
       }
     }
 

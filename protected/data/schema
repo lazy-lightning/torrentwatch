@@ -160,6 +160,7 @@ CREATE TABLE tvShow (
     description TEXT, 
     rating INTEGER, 
     tvdbId INTEGER, 
+    hide INTEGER,
     lastTvdbUpdate INTEGER NOT NULL DEFAULT 0,
     FOREIGN KEY (network_id) REFERENCES network(id)
 );
