@@ -102,16 +102,22 @@ class AjaxController extends BaseController
     {
       $fav = $feedItem->generateFavorite();
       $type=get_class($fav).'s';
-
-      if($fav->save()) 
-      {
-        $this->response['dialog']['content'] = 'New favorite successfully saved';
-        $htmlId = $type.'-'.$fav->id;
-      }
-      else
-      {
-        $this->response['dialog']['error'] = true;
-        $this->response['dialog']['content'] = 'Failure saving new favorite';
+      try {
+        $transaction = $fav->db->beginTransaction();
+        if($fav->save()) 
+        {
+          $this->response['dialog']['content'] = 'New favorite successfully saved';
+          $htmlId = $type.'-'.$fav->id;
+        }
+        else
+        {
+          $this->response['dialog']['error'] = true;
+          $this->response['dialog']['content'] = 'Failure saving new favorite';
+        }
+        $transaction->commit();
+      } catch (Exception $e) {
+        $transaction->rollback();
+        throw $e;
       }
       // After save to get the correct id
       $this->response[get_class($fav)] = $fav;
@@ -198,13 +204,20 @@ class AjaxController extends BaseController
     if(isset($_POST['feed']))
     {
       $feed=new feed;
-      $feed->attributes=$_POST['feed'];
-      if($feed->save()) 
-        $this->response['dialog']['content'] = 'Feed Added.  Status: '.$feed->statusText;
-      else
-      {
-        $this->response['activeFeed-'] = $feed;
-        $this->response['showTab'] = '#feeds';
+      try {
+        $transaction = $feed->db->beginTransaction();
+        $feed->attributes=$_POST['feed'];
+        if($feed->save())
+          $this->response['dialog']['content'] = 'Feed Added.  Status: '.$feed->statusText;
+        else
+        {
+          $this->response['activeFeed-'] = $feed;
+          $this->response['showTab'] = '#feeds';
+        }
+        $transaction->commit();
+      } catch (Exception $e) {
+        $transaction->rollback();
+        throw $e;
       }
     }
 
@@ -214,7 +227,15 @@ class AjaxController extends BaseController
 
   public function actionClearHistory()
   {
-    history::model()->deleteAll();
+    try {
+      $model = history::model()
+      $transaction = $model->db->beginTransaction();
+      $model->deleteAll();
+      $transaction->commit();
+    } catch (Exception $e) {
+      $transaction->rollback();
+      throw $e;
+    }
     // no need to pass any variables, the history is now empty
     $this->render('history_dialog');
   }
@@ -225,7 +246,12 @@ class AjaxController extends BaseController
 
     // Verify numeric input, dont allow delete of generic 'All' feeds(with !empty)
     if(!empty($_GET['id']) && is_numeric($_GET['id'])) {
-      feed::model()->deleteByPk((integer)$_GET['id']);
+      try {
+        $model = feed::model();
+        $transaction = $model->db->beginTransaction();
+        $model->deleteByPk((integer)$_GET['id']);
+        $transaction->commit();
+      }
       $this->response['dialog']['content'] = 'Your feed has been successfully deleted';
     }
 
@@ -365,9 +391,9 @@ class AjaxController extends BaseController
     if(isset($_GET['type']) && in_array($_GET['type'], $whiteList))
     {
       $type = $_GET['type'];
-      $transaction = Yii::app()->db->beginTransaction();
       try
       {
+        $transaction = Yii::app()->db->beginTransaction();
         switch($type)
         {
         case 'all':
@@ -428,19 +454,24 @@ class AjaxController extends BaseController
     {
       $config->attributes = $_POST['dvrConfig'];
     }
-
-    if($config->save()) 
-    {
-      $this->response['dialog']['content'] = 'Configuration successfully saved';
+    try {
+      $transaction = Yii::app()->db->beginTransaction();
+      if($config->save()) 
+      {
+        $this->response['dialog']['content'] = 'Configuration successfully saved';
+      }
+      else
+      {
+        $this->response['dialog']['error'] = True;
+        $this->response['dialog']['content'] = 'There was an error saving the configuration';
+        $this->response['dvrConfig'] = $config;
+        $this->response['showDialog'] = '#configuration';
+      }
+      $transaction->commit();
+    } catch (Exception $e) {
+      $transaction->rollback();
+      throw $e;
     }
-    else
-    {
-      $this->response['dialog']['error'] = True;
-      $this->response['dialog']['content'] = 'There was an error saving the configuration';
-      $this->response['dvrConfig'] = $config;
-      $this->response['showDialog'] = '#configuration';
-    }
-
     $this->actionFullResponse();
   }
 
@@ -448,26 +479,33 @@ class AjaxController extends BaseController
   {
     $this->response = array('dialog'=>array('header'=>'Initial Configuration', 'content'=>''));
 
-    if(isset($_POST['dvrConfig']))
-    {
-      $config = Yii::app()->dvrConfig;
-      $config->attributes = $_POST['dvrConfig'];
-      $this->response['dialog']['content'] .= ($config->save() ? 'Saved configuration' : 'Failed saving configuration').'<br>';
-    }
-
-    if(isset($_POST['feed']))
-    {
-      $feeds = array();
-      foreach(array('torUrl'=>feedItem::TYPE_TORRENT, 'nzbUrl'=>feedItem::TYPE_NZB) as $key => $type)
+    try {
+      $transaction = $feed->db->beginTransaction();
+      if(isset($_POST['dvrConfig']))
       {
-        if(isset($_POST['feed'][$key]))
-        {
-          $feed = new feed;
-          $feed->url = $_POST['feed'][$key];
-          $feed->downloadType = $type;
-          $this->response['dialog']['content'] .= ($feed->save() ? "Saved feed {$feed->title}" : "Failed saving feed {$feed->url}").'<br>';
-       }
+        $config = Yii::app()->dvrConfig;
+        $config->attributes = $_POST['dvrConfig'];
+        $this->response['dialog']['content'] .= ($config->save() ? 'Saved configuration' : 'Failed saving configuration').'<br>';
       }
+
+      if(isset($_POST['feed']))
+      {
+        $feeds = array();
+        foreach(array('torUrl'=>feedItem::TYPE_TORRENT, 'nzbUrl'=>feedItem::TYPE_NZB) as $key => $type)
+        {
+          if(isset($_POST['feed'][$key]))
+          {
+            $feed = new feed;
+            $feed->url = $_POST['feed'][$key];
+            $feed->downloadType = $type;
+            $this->response['dialog']['content'] .= ($feed->save() ? "Saved feed {$feed->title}" : "Failed saving feed {$feed->url}").'<br>';
+          }
+        }
+      }
+      $transaction->commit();
+    } catch (Exception $e) {
+      $transaction->rollback();
+      throw $e;
     }
 
     if(empty($this->response['dialog']['content']))
