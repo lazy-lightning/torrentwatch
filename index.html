@@ -20,13 +20,14 @@
   <script type="text/javascript" src="javascript/torrentwatch.js"></script>
 </head>
 <body>
+<a id="fullResponseLink" href="nmtdvr.php?r=ajax/fullResponse"></a>
 <ul class="mainoptions" id="mainoptions">
   <li id="refresh"><a href="">Refresh</a></li>
   <li class="divider">&nbsp;</li>
   <li id="favoritesMenu"><a class="toggleDialog" href="#favorites">Favorites</a></li>
   <li id="config"><a class="toggleDialog" href="#configuration">Configure</a></li>
   <li class="divider">&nbsp;</li>
-  <li id="view"><a class="toggleDialog" href="nmtdvr.php?r=ajax/getHistory#history">View History</a></li>
+  <li id="view"><a class="toggleDialog" href="nmtdvr.php?r=history/list#history">View History</a></li>
   <li id="empty"><a class="toggleDialog" href="#reset_data">Reset Data</a></li>
   <li id="inspector"><a href="#inspector_container">Inspector</a></li>
   <li id='webui'><a href='#'>Client UI</a></li>
@@ -45,9 +46,8 @@
 <div class="expose">&nbsp;</div>
 <div class="context_menu" id="CM1">
   <ul>
-    <li id="addToFavorites">Add to favorites</li>
-    <li id="startDownloading">Start downloading</li>
-    <li id="hideShow">Hide tv show from list</li>
+    <li id="addToFavorites">Add to Favorites</li>
+    <li id="startDownloading">Start Downloading</li>
     <li id="inspect">Inspect</li>
   </ul>
 </div>
@@ -59,9 +59,9 @@
 </div>
 <div id="feedItems_container">
   <ul>
-    <li><a href="nmtdvr.php?r=ajax/loadFeedItems&type=tv"><span>TV Episodes</span></a></li>
-    <li><a href="nmtdvr.php?r=ajax/loadFeedItems&type=movie"><span>Movies</span></a></li>
-    <li><a href="nmtdvr.php?r=ajax/loadFeedItems&type=other"><span>Others</span></a></li>
+    <li><a href="nmtdvr.php?r=tvEpisode/list"><span>TV Episodes</span></a></li>
+    <li><a href="nmtdvr.php?r=movie/list"><span>Movies</span></a></li>
+    <li><a href="nmtdvr.php?r=other/list"><span>Others</span></a></li>
     <li><a href="nmtdvr.php?r=ajax/loadFeedItems&type=queued"><span>Queued</span></a></li>
 </div>
 </body></html>

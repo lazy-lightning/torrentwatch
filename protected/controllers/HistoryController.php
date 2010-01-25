@@ -32,16 +32,12 @@ class HistoryController extends BaseController
 	public function accessRules()
 	{
 		return array(
-			array('allow',  // allow all users to perform 'list' and 'show' actions
-				'actions'=>array('list','show'),
-				'users'=>array('*'),
-			),
-			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update'),
+			array('allow', // allow authenticated user
+				'actions'=>array('list', 'show', 'delete', 'deleteAll'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('admin','delete'),
+				'actions'=>array('admin'),
 				'users'=>array('admin'),
 			),
 			array('deny',  // deny all users
@@ -50,45 +46,23 @@ class HistoryController extends BaseController
 		);
 	}
 
-	/**
-	 * Shows a particular history.
-	 */
-	public function actionShow()
-	{
-		$this->render('show',array('history'=>$this->loadhistory()));
-	}
-
-	/**
-	 * Creates a new history.
-	 * If creation is successful, the browser will be redirected to the 'show' page.
-	 */
-	public function actionCreate()
-	{
-		$history=new history;
-		if(isset($_POST['history']))
-		{
-			$history->attributes=$_POST['history'];
-			if($history->save())
-				$this->redirect(array('show','id'=>$history->id));
-		}
-		$this->render('create',array('history'=>$history));
-	}
-
-	/**
-	 * Updates a particular history.
-	 * If update is successful, the browser will be redirected to the 'show' page.
-	 */
-	public function actionUpdate()
-	{
-		$history=$this->loadhistory();
-		if(isset($_POST['history']))
-		{
-			$history->attributes=$_POST['history'];
-			if($history->save())
-				$this->redirect(array('show','id'=>$history->id));
-		}
-		$this->render('update',array('history'=>$history));
-	}
+  public function actionDeleteAll()
+  {
+    if(Yii::app()->request->isPostRequest)
+    {
+      try {
+        $model = history::model();
+        $transaction = $model->dbConnection->beginTransaction();
+        $model->deleteAll();
+        $transaction->commit();
+      } catch (Exception $e) {
+        $transaction->rollback();
+        throw $e;
+      }
+      $this->redirect(array('list'));
+    } else
+			throw new CHttpException(500,'Invalid request. Please do not repeat this request again.');
+  }
 
 	/**
 	 * Deletes a particular history.
@@ -99,7 +73,15 @@ class HistoryController extends BaseController
 		if(Yii::app()->request->isPostRequest)
 		{
 			// we only allow deletion via POST request
-			$this->loadhistory()->delete();
+      try {
+        $model = history::model();
+        $transaction = $model->dbConnection->beginTransaction();
+  			$this->loadhistory()->delete();
+        $transaction->commit();
+      } catch (Exception $e) {
+        $transaction->rollback();
+        throw $e;
+      }
 			$this->redirect(array('list'));
 		}
 		else
@@ -127,6 +109,14 @@ class HistoryController extends BaseController
 			'historyList'=>$historyList,
 			'pages'=>$pages,
 		));
+	}
+
+	/**
+	 * Shows a particular history.
+	 */
+	public function actionShow()
+	{
+		$this->render('show',array('history'=>$this->loadhistory()));
 	}
 
 	/**

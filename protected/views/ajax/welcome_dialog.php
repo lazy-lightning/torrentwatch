@@ -1,5 +1,5 @@
 <div id="welcome_dialog">
-    <?php echo CHtml::beginForm(array('wizard'), 'post', array('id'=>'welcome_form')); ?>
+    <?php echo CHtml::beginForm(array('/dvrConfig/wizard'), 'post', array('id'=>'welcome_form')); ?>
     <div id="welcome1" class="dialog_window welcome">
       <div class="content clearFix">
         <h2 class="dialog_heading">Welcome to NMTDVR</h2>

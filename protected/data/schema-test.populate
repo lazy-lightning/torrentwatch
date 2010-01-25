@@ -1,0 +1,21 @@
+-- This is run after schema.populate to fill the test db with some sample data
+BEGIN TRANSACTION;
+
+INSERT INTO quality (title) VALUES('WS');
+INSERT INTO quality (title) VALUES('PDTV');
+INSERT INTO quality (title) VALUES('HDTV');
+INSERT INTO quality (title) VALUES('x264');
+INSERT INTO quality (title) VALUES('DSRip');
+INSERT INTO quality (title) VALUES('720p');
+INSERT INTO quality (title) VALUES('DVDRip');
+INSERT INTO quality (title) VALUES('AC3');
+
+INSERT INTO genre (title) VALUES('Comedy');
+INSERT INTO genre (title) VALUES('Drama');
+INSERT INTO genre (title) VALUES('Horror');
+INSERT INTO genre (title) VALUES('Sci-Fi');
+INSERT INTO genre (title) VALUES('Thriller');
+INSERT INTO genre (title) VALUES('Action');
+
+
+COMMIT;

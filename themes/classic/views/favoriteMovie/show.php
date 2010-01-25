@@ -1,6 +1,6 @@
 <?php 
   echo CHtml::beginForm(
-      array($model->isNewRecord ? 'create' : 'update', 'id'=>$model->id), 
+      array('/favoriteMovie/'.$model->isNewRecord ? 'create' : 'update', 'id'=>$model->id), 
       'post', 
       array('class'=>'favinfo', 'id'=>'favoriteMovie')
   );
@@ -17,7 +17,7 @@
  </div>
  <div class="favorite_feed">
   <?php echo CHtml::activeLabelEx($model, 'feed_id').': '.
-             CHtml::dropDownList('favoriteMovie[feed_id]', $model->feed_id, feeds::getCHtmlListData()); ?>
+             CHtml::dropDownList('favoriteMovie[feed_id]', $model->feed_id, $feedsListData); ?>
  </div>
  <div class="favorite_rating">
    <?php echo CHtml::activeLabelEx($model, 'rating').': '.
@@ -30,7 +30,7 @@
  </div>
  <div class="favorite_genre">
   <?php echo CHtml::activeLabelEx($model, 'genre_id').': '.
-             CHtml::dropDownList('favoriteMovie[genre_id]', $model->genre_id, genre::getCHtmlListData()); ?>
+             CHtml::dropDownList('favoriteMovie[genre_id]', $model->genre_id, $genresListData); ?>
  </div>
  <div class="favorite_quality">
   <?php  // show min 3 qualitys always, even if less are set

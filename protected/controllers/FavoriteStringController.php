@@ -14,6 +14,19 @@ class FavoriteStringController extends BaseController
 	 */
 	private $_favoritestring;
 
+  public function actions()
+  {
+    return array(
+        'delete' => 'deleteFavoriteAction',
+        'show' => 'showFavoriteAction',
+        'update' => 'updateFavoriteAction',
+        'create'=>array(
+          'class'=>'updateFavoriteAction',
+          'create'=>true
+        ),
+    );
+  }
+
 	/**
 	 * @return array action filters
 	 */
@@ -32,78 +45,14 @@ class FavoriteStringController extends BaseController
 	public function accessRules()
 	{
 		return array(
-			array('allow',  // allow all users to perform 'list' and 'show' actions
-				'actions'=>array('list','show'),
-				'users'=>array('*'),
-			),
-			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update'),
+			array('allow', // allow authenticated user
+				'actions'=>array('create','update', 'list', 'show', 'delete'),
 				'users'=>array('@'),
-			),
-			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('admin','delete'),
-				'users'=>array('admin'),
 			),
 			array('deny',  // deny all users
 				'users'=>array('*'),
 			),
 		);
-	}
-
-	/**
-	 * Shows a particular favoritestring.
-	 */
-	public function actionShow()
-	{
-		$this->render('show',array('model'=>$this->loadfavoriteString()));
-	}
-
-	/**
-	 * Creates a new favoritestring.
-	 * If creation is successful, the browser will be redirected to the 'show' page.
-	 */
-	public function actionCreate()
-	{
-		$favoritestring=new favoriteString;
-		if(isset($_POST['favoriteString']))
-		{
-			$favoritestring->attributes=$_POST['favoriteString'];
-			if($favoritestring->save())
-				$this->redirect(array('show','id'=>$favoritestring->id));
-		}
-		$this->render('create',array('favoritestring'=>$favoritestring));
-	}
-
-	/**
-	 * Updates a particular favoritestring.
-	 * If update is successful, the browser will be redirected to the 'show' page.
-	 */
-	public function actionUpdate()
-	{
-		$favoritestring=$this->loadfavoriteString();
-		if(isset($_POST['favoriteString']))
-		{
-			$favoritestring->attributes=$_POST['favoriteString'];
-			if($favoritestring->save())
-				$this->redirect(array('show','id'=>$favoritestring->id));
-		}
-		$this->render('update',array('favoritestring'=>$favoritestring));
-	}
-
-	/**
-	 * Deletes a particular favoritestring.
-	 * If deletion is successful, the browser will be redirected to the 'list' page.
-	 */
-	public function actionDelete()
-	{
-		if(Yii::app()->request->isPostRequest)
-		{
-			// we only allow deletion via POST request
-			$this->loadfavoriteString()->delete();
-			$this->redirect(array('list'));
-		}
-		else
-			throw new CHttpException(500,'Invalid request. Please do not repeat this request again.');
 	}
 
 	/**
@@ -130,31 +79,6 @@ class FavoriteStringController extends BaseController
 	}
 
 	/**
-	 * Manages all favoritestrings.
-	 */
-	public function actionAdmin()
-	{
-		$this->processAdminCommand();
-
-		$criteria=new CDbCriteria;
-
-		$pages=new CPagination(favoriteString::model()->count($criteria));
-		$pages->pageSize=self::PAGE_SIZE;
-		$pages->applyLimit($criteria);
-
-		$sort=new CSort('favoriteString');
-		$sort->applyOrder($criteria);
-
-		$favoritestringList=favoriteString::model()->findAll($criteria);
-
-		$this->render('admin',array(
-			'favoritestringList'=>$favoritestringList,
-			'pages'=>$pages,
-			'sort'=>$sort,
-		));
-	}
-
-	/**
 	 * Returns the data model based on the primary key given in the GET variable.
 	 * If the data model is not found, an HTTP exception will be raised.
 	 * @param integer the primary key value. Defaults to null, meaning using the 'id' GET variable
@@ -166,21 +90,8 @@ class FavoriteStringController extends BaseController
 			if($id!==null || isset($_GET['id']))
 				$this->_favoritestring=favoriteString::model()->findbyPk($id!==null ? $id : $_GET['id']);
 			if($this->_favoritestring===null)
-        $this->_favoritestring=new favoriteString();
+        throw new CHttpException(500, 'The requested favorite string could not be found.');
 		}
 		return $this->_favoritestring;
-	}
-
-	/**
-	 * Executes any command triggered on the admin page.
-	 */
-	protected function processAdminCommand()
-	{
-		if(isset($_POST['command'], $_POST['id']) && $_POST['command']==='delete')
-		{
-			$this->loadfavoriteString($_POST['id'])->delete();
-			// reload the current page to avoid duplicated delete actions
-			$this->refresh();
-		}
 	}
 }

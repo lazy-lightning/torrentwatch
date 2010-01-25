@@ -32,16 +32,12 @@ class FeedController extends BaseController
   public function accessRules()
   {
     return array(
-      array('allow',  // allow all users to perform 'list' and 'show' actions
-        'actions'=>array('list','show'),
-        'users'=>array('*'),
-      ),
-      array('allow', // allow authenticated user to perform 'create' and 'update' actions
-        'actions'=>array('create','update'),
+      array('allow', // allow authenticated user
+        'actions'=>array('create','update', 'list', 'show', 'delete'),
         'users'=>array('@'),
       ),
-      array('allow', // allow admin user to perform 'admin' and 'delete' actions
-        'actions'=>array('admin','delete'),
+      array('allow', // allow admin user to perform 'admin' actions
+        'actions'=>array('admin'),
         'users'=>array('admin'),
       ),
       array('deny',  // deny all users
@@ -60,16 +56,31 @@ class FeedController extends BaseController
 
   /**
    * Creates a new feed.
-   * If creation is successful, the browser will be redirected to the 'show' page.
+   * The browser will be redirected to ajax/fullResponse
    */
   public function actionCreate()
   {
     $feed=new feed;
     if(isset($_POST['feed']))
     {
-      $feed->attributes=$_POST['feed'];
-      if($feed->save())
-        $this->redirect(array('show','id'=>$feed->id));
+      $transaction = $feed->getDbConnection()->beginTransaction();
+      try {
+        $response = array('dialog'=>array('header'=>'Create Feed'));
+        $feed->attributes=$_POST['feed'];
+        if($feed->save())
+          $response['dialog']['content'] = 'Feed Added.  Status: '.$feed->getStatusText();
+        else
+        {
+          $response['activeFeed-'] = $feed;
+          $response['showTab'] = '#feeds';
+        }
+        $transaction->commit();
+      } catch (Exception $e) {
+        $transaction->rollback();
+        throw $e;
+      }
+      Yii::app()->user->setFlash('response', $response);
+      $this->redirect(array('/ajax/fullResponse', 'response'=>1));
     }
 
     $this->render('create',array('feed'=>$feed));
@@ -84,9 +95,16 @@ class FeedController extends BaseController
     $feed=$this->loadfeed();
     if(isset($_POST['feed']))
     {
-      $feed->attributes=$_POST['feed'];
-      if($feed->save())
-        $this->redirect(array('show','id'=>$feed->id));
+      $transaction = $feed->getDbConnection()->beginTransaction();
+      try {
+        $feed->attributes=$_POST['feed'];
+        $return = $feed->save());
+      } catch (Exception $e) {
+        $transaction->rollback();
+        throw $e;
+      }
+      if($return)
+       $this->redirect(array('show','id'=>$feed->id));
     }
     $this->render('update',array('feed'=>$feed));
   }
@@ -100,8 +118,19 @@ class FeedController extends BaseController
     if(Yii::app()->request->isPostRequest)
     {
       // we only allow deletion via POST request
-      $this->loadfeed()->delete();
-      $this->redirect(array('list'));
+      $response = array('dialog'=>array('header'=> 'Delete Feed'));
+      $feed = $this->loadfeed();
+      $transaction = $feed->getDbConnection()->beginTransaction();
+      try {
+        $feed->delete();
+        $transaction->commit();
+      } catch (Exception $e) {
+        $transaction->rollback();
+        throw $e;
+      }
+      $response['dialog']['content'] = 'Your feed has been successfully deleted.';
+      Yii::app()->getUser()->setFlash('response', $response);
+      $this->redirect(array('/ajax/fullResponse', 'response'=>1));
     }
     else
       throw new CHttpException(500,'Invalid request. Please do not repeat this request again.');

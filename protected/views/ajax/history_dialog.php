@@ -16,7 +16,7 @@
     <?php endif; ?>
    </ul>
   <div class="buttonContainer clearFix">
-     <?php echo CHtml::link('Clear', array('clearHistory'), array('class'=>'historySubmit button', 'id'=>'clearHistory')); ?>
+     <?php echo CHtml::link('Clear', array('/history/deleteAll'), array('class'=>'historySubmit button', 'id'=>'clearHistory')); ?>
      <a class="toggleDialog button" href="#">Close</a>
    </div>
  </div>
