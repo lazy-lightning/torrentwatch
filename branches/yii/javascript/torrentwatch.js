@@ -17,9 +17,7 @@
           if(!dest.is('ul'))
             dest = dest.children('ul');
 
-          $(this)
-          .find("li.torrent").myContextMenu()
-          .filter(".hasDuplicates").initDuplicates();
+          $(this).find("li.torrent.hasDuplicates").initDuplicates();
           
           dest.find('li.loadMore').remove().end()
           .append($(this).children('ul').children('li'));
@@ -50,9 +48,11 @@
                     .appendTo("body");
             setTimeout(function() {
                 var container = $("#feedItems_container > div:first");
-                if(container.children('ul').children().length == 1 && $(".login_form").length == 0) {
+                if(container.children('ul').children().length == 1 && $(".login_form").length == 0 &&
+                   window.showWelcomeScreen) {
                     current_dialog = '#welcome1';
                     $(current_dialog).show();
+                    window.showWelcomeScreen = false;
                 } else {
                     container.slideDown(400, function() {
                         if(inspect_status)
@@ -114,31 +114,25 @@
     };
     $.fn.initDuplicates = function() {
       this.click(function() {
-          var li = $(this);
-          var ul = li.children("ul");
-          var callback = null;
-          var onDone = function() { ul.slideToggle(400, callback); };
-
-          if(li.hasClass('open'))
-            callback = function() { li.removeClass('open'); };
-          else
-            li.addClass('open');
-
-          if(ul.length == 0) {
-            $.get('nmtdvr.php', 'r=feedItem/list&filter='+encodeURIComponent(li[0].id), function(html) {
-              li.append(html);
-              setTimeout(onDone,0);
-            }, 'html');
-          } else
-           onDone();
-
+        var li = $(this);
+        $.get('nmtdvr.php', 'r=feedItem/list&filter='+encodeURIComponent(li[0].id), function(html) {
+          li.replaceWith(html);
+          $('li.torrent').markAlt();
+        }, 'html');
       });
       return this;
     };
 
     $.fn.initFavorites = function() {
-      this.find("ul.favorite > li").not(":first").tsort("a").end().click(function() {
-          $(this).find("a").toggleFavorite();
+      this.find("ul.favorite > li").not(":first").tsort("a");
+      this.live('click', function(e) {
+          var target = $(e.target);
+          if(target.is('ul.favorite > li'))
+            target = target.find("a");
+          if(target.is('ul.favorite > li a')) {
+            target.toggleFavorite();
+            return false;
+          }
         });
 
       return this.children('.content').tabs({ fxAutoHeight: true }).find("input#favoriteMovies_rating").spin({ interval: 0.1, min: 0, max: 10 }).end().end();
@@ -165,7 +159,7 @@
               $(last).hide();
             if($(current_favorite).length == 0) {
               var tabs = $(this).closest('.tabs-container');
-              $.get('nmtdvr.php?r=ajax/loadFavorite&id='+current_favorite.substr(1), null, function(html) {
+              $.get(this.href, null, function(html) {
                   tabs.append(html);
                   onDone();
                   }, 'html');
@@ -188,51 +182,15 @@
     $.showDialog = function(hash) {
       $('<a href="'+hash+'"/>').toggleDialog();
     };
-
-    $.contextMenu.defaults({
-        menuStyle: {
-            textAlign: "left",
-            width: "160px"
-        },
-        itemStyle: {
-            fontSize: "1.0em",
-            paddingLeft: "15px"
-        }
-    });
-    $.fn.myContextMenu = function() {
-        this.contextMenu("CM1", {
-            bindings: {
-                'addToFavorites': function(t) {
-                    url = 'nmtdvr.php?r=ajax/addFavorite&feedItem_id='+$(t).find(".itemId").val();
-                    $.get(url, '', $.loadDynamicData, 'html')
-                },
-                'startDownloading': function(t) {
-                    url = 'nmtdvr.php?r=ajax/dlFeedItem&feedItem_id='+$(t).find(".itemId").val();
-                    $.get(url, '', $.loadDynamicData, 'html');
-                },
-                'hideShow': function(t) {
-                    url = 'nmtdvr.php?r=ajax/hideTvShow&feedItem_id='+$(t).find(".itemId").val();
-                    $.get(url, '', $.loadDynamicData, 'html');
-                },
-                'inspect': function(t) {
-                    $.get('nmtdvr.php', 'r=ajax/inspect&feedItem_id='+$(t).find(".itemId").val()+'&title='+
-                          encodeURIComponent($(t).find("span.torrent_name").text()), function(html) {
-                        $("div#inspector_container").html(html);
-                        if (!inspect_status) {
-                            $.toggleInspector();
-                        }
-                    }, 'html');
-                }
-            }
-        });
-        return this;
-    };
     $.fn.initConfigDialog = function() {
+        // initialize the tabs
         this.children('.content').tabs({fxAutoHeight: true });
+        // setup the auto switch of form information for client tabs
         this.find('.client_config select').change(function() {
             $(this).closest('.client_config').find('.config').hide().end()
               .find('#'+$(this).val()).show();
         }).change();
+        // First trigger of change() will hide the unselected client forms
         setTimeout(function() {
             $('select#client').change();
         }, 500);
@@ -246,7 +204,9 @@
         return dataString;
     };
     $.fn.markAlt = function() {
-      return this.removeClass('alt').filter(":visible:even").addClass('alt');
+      return this.removeClass('alt').removeClass('notalt').filter(":visible")
+        .filter(":even").addClass('alt').end()
+        .filter(":odd").addClass('notalt');
     };
 })(jQuery);
 
@@ -257,18 +217,58 @@
 //
 
 $(function() { 
-    // Menu Bar, and other buttons which show/hide a dialog
-    $("a.toggleDialog").live('click', function() {
-        $(this).toggleDialog();
+    // Handle button click events
+    $("#feedItems_container, #mainoptions, #dynamicdata").live('click', function(e) {
+      var target = $(e.target);
+      // Menu Bar, and other buttons which show/hide a dialog
+      if(target.is('a.toggleDialog')) {
+        target.toggleDialog();
         return false;
-    });
-    // X button on all dialogs
-    $("div.close").live('click', function() {
-        $(this).closest('.dialog_window').toggleDialog();
+      }
+      // X button on all dialogs
+      if(target.is('div.close')) {
+        target.closest('.dialog_window').toggleDialog();
         return false;
+      }
+      // Configuration, wizard, and update/delete favorite ajax submit
+      if(target.is('a.submitForm,input.submitForm')) {
+        $.submitForm(target[0]);
+        return false;
+      }
+      // History details hide/reveal
+      if(target.is("div#history li")) {
+        target.find(".hItemDetails").slideToggle(600);
+        return false;
+      }
+      // Clear History ajax submit
+      if(target.is("a.historySubmit")) {
+        $.get(this.href, '', function(html) {
+          // $(html).html() is used to strip the outer tag(<div#history></div>) and get the children
+          $("div#history").html($(html).html());
+        }, 'html');
+        return false;
+      }
+      // Standard ajax submit with reload
+      if(target.is("img") && target.parent().is("a.ajaxSubmit"))
+        target = target.parent();
+      if(target.is("a.ajaxSubmit")) {
+        $.get(target[0].href, '', $.loadDynamicData, 'html');
+        return false;
+      }
+      // Inspector
+      if(target.is("li#inspector a")) {
+        $.toggleInspector();
+        return false;
+      }
+      // Feed Item Load More
+      if(target.is("li.loadMore a")) {
+        $.get(target[0].href, '', $.loadMoreFeedItems, 'html');
+        return false;
+      }
     });
+
     // Vary the font-size
-    $("div#config_webui select").live('change', function() {
+    $("#config_webui select").live('change', function() {
         var f = $(this).val();
         $.cookie('twFontSize', f);
         switch (f) {
@@ -283,6 +283,7 @@ $(function() {
             break;
         }
     });
+
     // Filter Bar - Buttons
     $("ul#filterbar_container li:not(#filter_bytext)").click(function() {
         if($(this).is('.selected'))
@@ -304,58 +305,18 @@ $(function() {
             container.slideDown(400);
         });
     });
+
     // Filter Bar -- By Text
     $("input#filter_text_input").keyup(function() {
         var filter = $(this).val().toLowerCase();
-        $("li.torrent:not(.duplicate)").addClass('hidden_bytext').each(function() {
-            var item = $(this).find("span.torrent_name");
+        $("li.torrent").addClass('hidden_bytext').each(function() {
+            var item = $(this).find("span:first");
             if (item.text().toLowerCase().match(filter)) {
                 $(this).removeClass('hidden_bytext');
             }
         }).markAlt(); 
     });
-    // Switching visible items for different clients
-    $("select#client").live('change', function() {
-        $(".favorite_seedratio, #config_folderclient").css("display", "none");
-        $("#torrent_settings").css("display", "block");
-        var target = 'http://'+location.hostname;
-        switch ($(this).val()) {
-        case 'folder':
-            $("#config_watchdir, #config_savetorrent, #config_deepdir, #torrent_settings, div.favorite_savein").css("display", "none");
-            $("#config_folderclient, #config_downloaddir").css("display", "block");
-            $("form.favinfo, ul.favorite").css("height", 166);
-            target = '#';
-            break;
-        case 'transmission1.3x':
-            $("#config_downloaddir, #config_watchdir, #config_savetorrent, #config_deepdir, div.favorite_seedratio, div.favorite_savein").css("display", "block");
-            $("form.favinfo, ul.favorite").css("height", 214);
-            target += ':9091/transmission/web/';
-            break;
-        case 'transmission1.22':
-            $("#config_downloaddir, #config_deepdir, div.favorite_savein").css("display", "none");
-            $("#config_watchdir, #config_savetorrent").css("display", "block");
-            $("form.favinfo, ul.favorite").css("height", 166);
-            target += ':8077/';
-            break;
-        case 'btpd':
-            $("#config_downloaddir, #config_watchdir, #config_savetorrent, #config_deepdir, div.favorite_savein").css("display", "block");
-            $("ul.favorite, form.favinfo").css("height", 190);
-            target += ':8883/torrent/bt.cgi';
-            break;
-        case 'nzbget':
-            $("#config_watchdir").css("display", "block");
-            $("#config_downloaddir, #config_savetorrent, #config_deepdir, div.favorite_savein").css("display", "none");
-            $("ul.favorite, form.favinfo").css("height", 166);
-            target += ':8066/';
-            break;
-        case 'sabnzbd':
-            $("#config_downloaddir, #config_watchdir, #config_savetorrent, #config_deepdir, div.favorite_savein,#torrent_settings").css("display", "none");
-            $("ul.favorite, form.favinfo").css("height", 166);
-            target += ':8080/sabnzbd/';
-            break;
-        }
-        $("#webui a").text($(this).val())[0].href = target;
-    });
+
     // Ajax progress bar
     $("#progressbar").ajaxStart(function() {
       $('.dialog_window:visible:not(#favorites,#history)').toggleDialog();
@@ -377,49 +338,20 @@ $(function() {
              .empty()
              .append(content);
     });
+    
+    window.showWelcomeScreen = true;
     // Perform the first load of the dynamic information
-    $.get('nmtdvr.php?r=ajax/fullResponse', '', $.loadDynamicData, 'html');
+    $.get($('#fullResponseLink')[0].href, '', $.loadDynamicData, 'html');
+
+    // Initialize the tabs which will also load dynamic information
     $("#feedItems_container").tabs({ 
         remote: true,
         onShow: function(clicked, toShow, toHide) {
           $("li.torrent:not(.initialized)", toShow)
           .addClass('initialized')
-          .myContextMenu()
           .filter(".hasDuplicates")
           .initDuplicates();
         },
     });
 
-    // Configuration, wizard, and update/delete favorite ajax submit
-    $("a.submitForm,input.submitForm").live('click', function(e) {
-        e.stopImmediatePropagation();
-        $.submitForm(this);
-    });
-    // History details hide/reveal
-    $("div#history li").live('click', function() {
-        $(this).find(".hItemDetails").slideToggle(600);
-        return false;
-    });
-
-    // Clear History ajax submit
-    $("a.historySubmit").live('click', function() {
-      $.get(this.href, '', function(html) {
-          // $(html).html() is used to strip the outer tag(<div#history></div>) and get the children
-          $("div#history").html($(html).html());
-      }, 'html');
-      return false;
-    });
-    // Standard ajax submit with reload
-    $("a.ajaxSubmit").live('click', function() {
-      $.get(this.href, '', $.loadDynamicData, 'html');
-      return false;
-    });
-    // Inspector
-    $("li#inspector a").click($.toggleInspector);
-    // Feed Item Load More
-    $("li.loadMore a").live('click', function() {
-        $.get(this.href, '', $.loadMoreFeedItems, 'html');
-        return false;
-    });
-  
 });

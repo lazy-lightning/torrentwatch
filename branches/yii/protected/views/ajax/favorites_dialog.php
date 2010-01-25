@@ -10,21 +10,16 @@
      // Loop through the 3 favorites and display them all
      foreach(array('favoriteTvShows', 'favoriteMovies', 'favoriteStrings') as $favType):
        $class = substr($favType, 0, -1); ?>
-     <div id="<?php echo $favType; ?>">
+     <div id="<?php echo $favType; ?>" class="clearFix">
       <ul class="favorite">
-       <li><a href="#<?php echo $favType; ?>-">New Favorite</a></li>
-       <?php if($$favType !== null): 
-              foreach($$favType as $fav): ?>
-         <li><a href="#<?php echo $favType.'-'.$fav->id.'">'.$fav->name;?></a></li>
-        <?php endforeach;
-             endif; ?>
+       <li><?php echo CHtml::link('New Favorite', array("/$class/create", '#'=>$favType.'-')); ?></li>
+       <?php if($$favType !== null): foreach($$favType as $fav): ?>
+        <li><?php echo CHtml::link($fav->name, array("/$class/show", 'id'=>$fav->id, '#'=>$favType.'-'.$fav->id)); ?></li>
+       <?php endforeach; endif; ?>
       </ul>
       <?php 
         if(isset($response[$class]))
-        {
-          $favorite = $response[$class];
-          include VIEWPATH.$class.'.php';
-        }
+          Yii::app()->getController()->renderPartial("/$class/show", array('model'=>$response[$class]));
       ?>
     </div>
    <?php endforeach; ?>

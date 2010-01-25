@@ -300,6 +300,11 @@ div.yiiForm {
  * F E E D   I T E M   L I S T
  *
  * ----------------------------*/
+
+.tabs-container {
+  padding: 0 !important;
+  }
+
 div#feedItems_container {
   }
 
@@ -322,8 +327,6 @@ ul.duplicates {
 
 ul li.torrent {
   border-bottom: 1px solid #ccc;
-  padding: 0.2em 0.5em 0.3em 30px;
-  font-size: 0.9em;
   min-height: 2.3em;
   background: #FFF;
   }
@@ -332,37 +335,61 @@ li.torrent.hidden_bytext {
   display: none;
   }
 
-ul li.torrent.match_Unmatched {
-  background: transparent url('../images/nuvola_ledsprites.png') no-repeat -9px -225px;
+div.itemButtons, div.hideButton {
+  float: left;
+  height: 25px;
+  padding-top: 8px;
   }
 
-ul li.torrent.match_Failed {
-  background: transparent url('../images/nuvola_ledsprites.png') no-repeat -9px -137px;
+div.itemButtons {
+  width: 3.6em;
   }
 
-ul li.torrent.match_Manual {
-  background: transparent url('../images/nuvola_ledsprites.png') no-repeat -9px -93px;
+div.itemButtons a {
+  padding-left: .6em;
+}
+
+div.hideButton img {
+  border: 1px solid #b0b0b0;
+  margin: 0 .5em 0 .3em;
   }
 
-ul li.torrent.match_Downloaded,
-ul li.torrent.match_Automatic {
-  background: transparent url('../images/nuvola_ledsprites.png') no-repeat -9px -7px;
+div.itemDetails {
+  padding-top: .4em;
+  height: 28px;
   }
 
-ul li.torrent.match_Duplicate {
-  background: transparent url('../images/nuvola_ledsprites.png') no-repeat -9px -313px;
+ul li.torrent.match_Unmatched .itemButtons {
+  background-color: #FBBFBF;
   }
 
-ul li.torrent.match_Old {
-  background: transparent url('../images/nuvola_ledsprites.png') no-repeat -9px -49px;
+ul li.torrent.match_Failed .itemButtons {
+  background-color: #FFA900;
   }
 
-ul li.torrent.match_Queued {
-  background: transparent url('../images/nuvola_ledsprites.png') no-repeat -9px -269px;
+ul li.torrent.match_Manual .itemButtons {
+  background-color: #84E900;
   }
 
-ul li.torrent.match_New {
-  background: transparent url('../images/nuvola_ledsprites.png') no-repeat -9px -187px;
+ul li.torrent.match_Downloaded .itemButtons,
+ul li.torrent.match_Automatic .itemButtons {
+  background-color: #00C12B;
+}
+
+ul li.torrent.match_Duplicate .itemButtons {
+  background-color: #FFFFCC;
+  }
+
+ul li.torrent.match_Old .itemButtons {
+  background-color: #CCCCFF;
+  }
+
+ul li.torrent.match_Queued .itemButtons {
+  background-color: #38ADB8;
+  }
+
+ul li.torrent.match_New .itemButtons {
+  background-color: #E0428F;
   }
 
 ul li.torrent.hasDuplicates {
@@ -657,10 +684,9 @@ ul.favorite li:hover {
   }
 
 form.favinfo {
-  height: 230px;
   display: none;
   padding: 5px 0;
-  margin: 5px 0;
+  margin: .5em 1.5em .5em 0;
   width: 380px;
   float: right;
   }

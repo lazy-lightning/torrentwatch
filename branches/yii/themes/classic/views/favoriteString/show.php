@@ -1,6 +1,6 @@
 <?php 
   echo CHtml::beginForm(
-      array($model->isNewRecord ? 'create' : 'update', 'id'=>$model->id), 
+      array('/favoriteString/'.$model->isNewRecord ? 'create' : 'update', 'id'=>$model->id), 
       'post', 
       array('class'=>'favinfo', 'id'=>'favoriteString')
   );

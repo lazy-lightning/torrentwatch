@@ -14,6 +14,14 @@ class FeedItemController extends BaseController
 	 */
 	private $_feeditem;
 
+  public function actions()
+  {
+    return array(
+        'makeFavorite'=>'makeFavoriteAction',
+        'startDownload'=>'startDownloadAction',
+    );
+  }
+
 	/**
 	 * @return array action filters
 	 */
@@ -37,7 +45,7 @@ class FeedItemController extends BaseController
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update'),
+				'actions'=>array('create','update', 'startDownload', 'makeFavorite'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions

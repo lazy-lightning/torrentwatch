@@ -14,6 +14,14 @@ class TvEpisodeController extends BaseController
    */
   private $_tvepisode;
 
+  public function actions()
+  {
+    return array(
+      'startDownload'=>'startDownloadAction',
+      'makeFavorite'=>'makeFavoriteAction',
+    );
+  }
+
   /**
    * @return array action filters
    */
@@ -37,7 +45,7 @@ class TvEpisodeController extends BaseController
         'users'=>array('*'),
       ),
       array('allow', // allow authenticated user to perform 'create' and 'update' actions
-        'actions'=>array('create','update'),
+        'actions'=>array('create','update', 'startDownload', 'makeFavorite'),
         'users'=>array('@'),
       ),
       array('allow', // allow admin user to perform 'admin' and 'delete' actions

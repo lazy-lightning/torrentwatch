@@ -1,6 +1,6 @@
 <?php
 
-class OtherController extends CController
+class OtherController extends BaseController
 {
 	const PAGE_SIZE=10;
 
@@ -13,6 +13,15 @@ class OtherController extends CController
 	 * @var CActiveRecord the currently loaded data model instance.
 	 */
 	private $_other;
+
+  public function actions()
+  {
+    return array(
+        'startDownload' => 'startDownloadAction',
+        'makeFavorite' => 'makeFavoriteAction',
+        'hide' => 'hideRelatedAction',
+    );
+  }
 
 	/**
 	 * @return array action filters
@@ -112,9 +121,10 @@ class OtherController extends CController
 	public function actionList()
 	{
 		$criteria=new CDbCriteria(array('order'=>'lastUpdated DESC'));
-    
+    $pages = null;
+
 		$pages=new CPagination(other::model()->count($criteria));
-		$pages->pageSize=Yii::app()->dvrConfig->webItemsPerLoad;
+   	$pages->pageSize=Yii::app()->dvrConfig->webItemsPerLoad;
 		$pages->applyLimit($criteria);
 
 		$otherList=other::model()->findAll($criteria);

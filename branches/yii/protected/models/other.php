@@ -23,6 +23,13 @@ class other extends CActiveRecord
     return 'other';
   }
 
+  public function behaviors()
+  {
+    return array(
+        'statusText'=>'ARStatusTextBehavior'
+    );
+  }
+
   /**
    * @return array validation rules for model attributes.
    */

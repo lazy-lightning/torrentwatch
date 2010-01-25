@@ -7,7 +7,7 @@
      <li><a href="#feeds"><span>Feeds</span></a></li>
     </ul>
     <div id="global_config">
-      <?php echo CHtml::beginForm(array('saveConfig'), 'post', array('id'=>'config_form')); ?>
+      <?php echo CHtml::beginForm(array('/dvrConfig/update'), 'post', array('id'=>'config_form')); ?>
       <?php 
       if(isset($response['dvrConfig'])) { 
         $config = $response['dvrConfig']; 
@@ -55,7 +55,7 @@
       <h2 class="dialog_heading">Torrent Client</h2>
       <?php echo CHtml::dropDownList('dvrConfig[torClient]', $config->torClient, $availClients[feedItem::TYPE_TORRENT]);
             foreach($availClients[feedItem::TYPE_TORRENT] as $client => $title):
-              echo CHtml::beginForm(array('saveConfig'), 'post', array('id'=>$client, 'class'=>'config')); ?>
+              echo CHtml::beginForm(array('/dvrConfig/update'), 'post', array('id'=>$client, 'class'=>'config')); ?>
           <input type="hidden" name="category" value="<?php echo $client; ?>">
           <input type="hidden" name="type" value="torClient" >
           <?php 
@@ -79,7 +79,7 @@
       <h2 class="dialog_heading">NZB Client</h2>
       <?php echo CHtml::dropDownList('dvrConfig[nzbClient]', $config->nzbClient, $availClients[feedItem::TYPE_NZB]);
             foreach($availClients[feedItem::TYPE_NZB] as $client => $title):
-              echo CHtml::beginForm(array('saveConfig'), 'post', array('id'=>$client, 'class'=>'config')); ?>
+              echo CHtml::beginForm(array('/dvrConfig/update'), 'post', array('id'=>$client, 'class'=>'config')); ?>
           <input type="hidden" name="category" value="<?php echo $client; ?>">
           <input type="hidden" name="type" value="nzbClient" >
           <?php 
@@ -104,14 +104,14 @@
         <?php foreach($feeds as $feed):
                 if($feed->id === '0') continue; // the generic 'all' feeds ?>
         <div class="activeFeed" title="<?php echo CHtml::encode($feed->url); ?>">
-          <?php echo CHtml::link('Delete', array('deleteFeed', 'id'=>$feed->id), array('class'=>'button ajaxSubmit', 'id'=>'Delete')); ?>
+          <?php echo CHtml::link('Delete', array('/feed/delete', 'id'=>$feed->id), array('class'=>'button ajaxSubmit', 'id'=>'Delete')); ?>
           <?php echo CHtml::encode($feed->title); ?>
         </div>
        <?php endforeach; ?>
       <?php endif; ?>
       <?php $feed = isset($response['activeFeed-']) ? $response['activeFeed-'] : new feed; ?>
       <div class="activeFeed">
-        <?php echo CHtml::beginForm(array('addFeed'), 'post', array('class'=>'feedform')); ?>
+        <?php echo CHtml::beginForm(array('/feed/create'), 'post', array('class'=>'feedform')); ?>
           <a class="submitForm button" id="Add" href="#">Add</a>
           <?php if($feed->hasErrors()) echo CHtml::errorSummary($feed); ?>
           <div>

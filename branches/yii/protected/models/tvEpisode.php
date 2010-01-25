@@ -6,19 +6,6 @@ class tvEpisode extends CActiveRecord
   const STATUS_NEW = 0;
   const STATUS_DOWNLOADED = 1;
 
-  public function getStatusOptions() {
-    return array(
-        self::STATUS_NEW=>'Unmatched',
-        self::STATUS_DOWNLOADED=>'Downloaded',
-    );
-  }
-
-  public function getStatusText() {
-    $options = $this->getStatusOptions();
-    return isset($options[$this->status]) ? $options[$this->status]
-        : "unknown ({$this->status})";
-  }
-
   /**
    * Returns the static model of the specified AR class.
    * @return CActiveRecord the static model class
@@ -34,6 +21,13 @@ class tvEpisode extends CActiveRecord
   public function tableName()
   {
     return 'tvEpisode';
+  }
+
+  public function behaviors()
+  {
+    return array(
+        'statusText'=>'ARStatusTextBehavior',
+    );
   }
 
   /**

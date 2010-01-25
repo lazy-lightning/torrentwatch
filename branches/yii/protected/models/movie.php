@@ -23,6 +23,12 @@ class movie extends CActiveRecord
     return 'movie';
   }
 
+  public function behaviors()
+  {
+    return array(
+        'statusText' => 'ARStatusTextBehavior',
+    );
+  }
   /**
    * @return array validation rules for model attributes.
    */
