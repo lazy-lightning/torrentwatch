@@ -25,7 +25,6 @@ class updateFavoriteAction extends CAction
       $transaction->rollback();
       throw $e;
     }
-    $class = get_class($model);
   }
 
   public function run()
@@ -36,22 +35,20 @@ class updateFavoriteAction extends CAction
     if($this->create === FALSE)
     {
       // Update command
-      $this->response->dialog['header'] = 'Update Favorite';
       $model = $this->asa('loadModel')->loadModel();
+      $class = get_class($model);
     }
     else
     {
-      $this->response->dialog['header'] = 'Create Favorite';
       $class = $this->asa('loadModel')->getControllerARClass();
       $model = new $class;
     }
 
-    if(isset($_GET[$class]))
-      $this->updateModel($model, $_GET[$class]);
+    if(isset($_POST[$class]))
+      $this->updateModel($model, $_POST[$class]);
 
-    $this->response->showDialog = '#favorites';
-    $this->response->showTab = "#".$class."s";
-    $this->response->showFavorite = "#".$class.'s-'.$model->id;
+    if($this->success)
+      $this->response->resetFeedItems = true;
     Yii::app()->getController()->render('show', array(
         'response'=>$this->response->getContent(),
         'model'=>$model,

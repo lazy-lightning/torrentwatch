@@ -24,18 +24,21 @@
         });
       }, 0);
     };
+    $.resetFeedItems = function () {
+      // Reset the feed items container and click the selected link to trigger reload
+      $("#feedItems_container").children('div')
+        .each(function() {
+          $(this).empty();
+        }).end()
+        .find('.tabs-selected')
+        .removeClass('tabs-selected')
+        .children("a")
+        .click();
+    };
+        
     // Remove old dynamic content, replace it with passed html(ajax success function)
     $.loadDynamicData = function(html) {
-      // Reset the feed items container and click the selected link to trigger reload
-        $("#feedItems_container").children('div')
-          .each(function() {
-            $(this).empty();
-          }).end()
-          .find('.tabs-selected')
-          .removeClass('tabs-selected')
-          .children("a")
-          .click();
-        
+        $.resetFeedItems();
         $("#dynamicdata").remove();
         setTimeout(function() {
             // Close any open dialog
@@ -85,7 +88,9 @@
       $(id).replaceWith(data.filter('form'));
       setTimeout(function() {
           $(id).initForm().show();
-//        $('body').append(data.filter('script')); 
+          data.filter('script').each(function() {
+            $.globalEval( this.text || this.textContent || this.innerHTML || "" );
+          });
           $.showDialog('#favorites');
       }, 50);
     };
@@ -360,7 +365,7 @@ $(function() {
     
     window.showWelcomeScreen = true;
     // Perform the first load of the dynamic information
-    $.get($('#fullResponseLink')[0].href, '', $.loadDynamicData, 'html');
+    // $.get($('#fullResponseLink')[0].href, '', $.loadDynamicData, 'html');
 
     // Initialize the tabs which will also load dynamic information
     $("#feedItems_container").tabs({ 
@@ -372,6 +377,8 @@ $(function() {
           .initDuplicates();
         },
     });
+
+    $.resetFeedItems();
 
     $("#favorites").initFavorites();
 });

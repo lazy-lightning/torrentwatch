@@ -22,11 +22,8 @@ abstract class feedItemAction extends CAction
     if(!($model instanceof feedItem))
       throw new CHttpException(500, 'The requested feedItem could not be found:'.get_class($model));
 
-    $this->response = array();
+    $this->response = new actionResponseWidget
     $this->runAction($model);
-    $app = Yii::app();
-    $app->getUser()->setFlash('response', $this->response);
-    $app->getController()->redirect(array('ajax/fullResponse', 'response'=>'1'));
   }
 }
 

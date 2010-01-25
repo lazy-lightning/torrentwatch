@@ -10,11 +10,14 @@ class actionResponseWidget extends CWidget{
 
   public $dialog = false;
 
+  public $resetFeedItems = false;
+
   protected $jScript = array();
 
   public function getContent()
   {
-    Yii::log(print_r($this,true));
+    if($this->resetFeedItems)
+      $this->jScript[] = "$.resetFeedItems()";
     if($this->showTab)
       $this->jScript[] = "$.showTab('{$this->showTab}')";
     if($this->showDialog)
