@@ -2,64 +2,62 @@
 
 class updateFavoriteAction extends CAction
 {
+  // The response data
   protected $response;
+
+  // If the save was successfull or not
+  protected $success = False;
 
   // When set to true will create a favorite rather than update
   public $create = False;
 
   // Updates the model from POST data
-  protected function updateModel($model, $class = null)
+  protected function updateModel($model, $attributes)
   {
-    if($class === null)
-      $class = get_class($model);
     if(isset($_POST['quality_id']))
       $model->qualityIds = $_POST['quality_id'];
-    $model->attributes = $_POST[$class];
+    $model->attributes = $attributes;
     try {
       $transaction = $model->dbConnection->beginTransaction();
-      $model->save();
+      $this->success = $model->save();
       $transaction->commit();
     } catch (Exception $e) {
       $transaction->rollback();
       throw $e;
     }
-    $this->response[$class] = $model;
-    $this->response['showFavorite'] = "#".$class.'s-'.$model->id;
-    $this->response['showTab'] = "#".$class."s";
+    $class = get_class($model);
   }
 
-  // To be called at the end of implementing classes run() function
   public function run()
   {
+    $this->response = new actionResponseWidget;
     $this->attachBehavior('loadModel', 'loadControllerARModelBehavior');
     $class = null;
     if($this->create === FALSE)
     {
       // Update command
-      $this->response['dialog']['header'] = 'Update Favorite';
+      $this->response->dialog['header'] = 'Update Favorite';
       $model = $this->asa('loadModel')->loadModel();
     }
     else
     {
-      $this->response['dialog']['header'] = 'Create Favorite';
+      $this->response->dialog['header'] = 'Create Favorite';
       $class = $this->asa('loadModel')->getControllerARClass();
       $model = new $class;
-      if(!isset($_POST[$class]))
-      {
-        // No item data, show creation form
-        Yii::app()->getController()->render('show', array(
-            'model'=>$model,
-            'feedsListData'=>feed::getCHtmlListData(),
-            'genresListData'=>genre::getCHtmlListData(),
-            'qualitysListData'=>quality::getCHtmlListData(),
-        ));
-        return;
-      }
     }
 
-    $this->updateModel($model, $class);
-    $app = Yii::app();
-    $app->getUser()->setFlash('response', $this->response);
-    $app->getController()->redirect(array('/ajax/fullResponse', 'response'=>1));
+    if(isset($_GET[$class]))
+      $this->updateModel($model, $_GET[$class]);
+
+    $this->response->showDialog = '#favorites';
+    $this->response->showTab = "#".$class."s";
+    $this->response->showFavorite = "#".$class.'s-'.$model->id;
+    Yii::app()->getController()->render('show', array(
+        'response'=>$this->response->getContent(),
+        'model'=>$model,
+        'feedsListData'=>feed::getCHtmlListData(),
+        'genresListData'=>genre::getCHtmlListData(),
+        'qualitysListData'=>quality::getCHtmlListData(),
+    ));
   }
 }

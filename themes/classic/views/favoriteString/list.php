@@ -1,9 +1,17 @@
 <div id="favoriteString_container">
   <ul class="favorite loadContent">
     <?php 
-    echo "<li>".CHtml::link('New Favorite', array('show'), array('rel'=>'#favoriteString'))."</li>";
+    echo "<li>".CHtml::link(
+        'New Favorite', 
+        array('create', '#'=>'favoriteStrings-'), 
+        array('rel'=>'#favoriteString')
+    )."</li>";
     foreach($favoriteList as $model) {
-      echo "<li>".CHtml::link($model->name, array('show', 'id'=>$model->id), array('rel'=>'#favoriteString'))."</li>";
+      echo "<li>".CHtml::link(
+          $model->name, 
+          array('show', 'id'=>$model->id, '#'=>'favoriteStrings-'.$model->id), 
+          array('rel'=>'#favoriteString')
+      )."</li>";
     } ?>
   </ul>
   <?php 
