@@ -14,6 +14,7 @@
         'feeds'=>$feeds,
         'response'=>$response,
   ));
+/*
   Yii::log('start favorites_dialog: '.$logger->getExecutionTime(), CLogger::LEVEL_PROFILE);
   $this->renderPartial('favorites_dialog', array(
         'favoriteMovies'=>$favoriteMovies,
@@ -21,7 +22,7 @@
         'favoriteTvShows'=>$favoriteTvShows,
         'response'=>$response,
   ));
-
+*/
   if(isset($response['dialog']))
   {
     $opts = $response['dialog'];

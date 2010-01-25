@@ -1,6 +1,6 @@
 
 (function($) {
-    var current_favorite, current_dialog, inspect_status;
+    var current_favorite, inspect_status;
     $.toggleInspector = function() {
         inspect_status = !inspect_status;
         $("div#feedItems_container,div#feedItems_container > div,ul#filterbar_container,div#inspector_container").stop(true,true).animate(
@@ -26,6 +26,7 @@
     };
     // Remove old dynamic content, replace it with passed html(ajax success function)
     $.loadDynamicData = function(html) {
+      // Reset the feed items container and click the selected link to trigger reload
         $("#feedItems_container").children('div')
           .each(function() {
             $(this).empty();
@@ -37,21 +38,21 @@
         
         $("#dynamicdata").remove();
         setTimeout(function() {
-            $(current_dialog).toggleDialog();
-            current_dialog = '';
+            // Close any open dialog
+            $(window.current_dialog).toggleDialog();
+            window.current_dialog = '';
             var dynamic = $("<div id='dynamicdata'/>");
             // Use innerHTML because some browsers choke with $(html) when html is many KB
             dynamic[0].innerHTML = html;
-            dynamic.find("div#favorites").initFavorites().end()
-                    .find("form").initForm().end()
+            dynamic .find("form").initForm().end()
                     .find("div#configuration").initConfigDialog().end()
                     .appendTo("body");
             setTimeout(function() {
                 var container = $("#feedItems_container > div:first");
                 if(container.children('ul').children().length == 1 && $(".login_form").length == 0 &&
                    window.showWelcomeScreen) {
-                    current_dialog = '#welcome1';
-                    $(current_dialog).show();
+                    window.current_dialog = '#welcome1';
+                    $(window.current_dialog).show();
                     window.showWelcomeScreen = false;
                 } else {
                     container.slideDown(400, function() {
@@ -73,29 +74,42 @@
         } else
             form = $(button).closest("form");
         // close any open dialog
-        if(current_dialog)
-          $(current_dialog).toggleDialog();
+        if(window.current_dialog)
+          $(window.current_dialog).toggleDialog();
 
-        $.post(form.get(0).action, form.buildDataString(button), $.loadDynamicData, 'html');
+        $.post(form.get(0).action, form.buildDataString(button), $.loadFormUpdate, 'html');
     }; 
+    $.loadFormUpdate = function(html) {
+      var data = $(html);
+      var id = '#'+data.filter('form')[0].id;
+      $(id).replaceWith(data.filter('form'));
+      setTimeout(function() {
+          $(id).initForm().show();
+//        $('body').append(data.filter('script')); 
+          $.showDialog('#favorites');
+      }, 50);
+    };
     $.fn.toggleDialog = function() {
         this.each(function() {
-            var last = current_dialog === '#' ? '' : current_dialog;
+            var last = window.current_dialog === '#' ? '' : window.current_dialog;
             var target = this.hash === '#' ? '#'+$(this).closest('.dialog_window').id : this.hash;
             var hide = false, show = false;
 
-            current_dialog = last === target ? '' : this.hash;
+            window.current_dialog = last === target ? '' : this.hash;
             if (last) {
                 $(last).fadeOut();
                 hide = true;
             }
-            if (current_dialog && this.hash != '#') {
+            if (window.current_dialog && this.hash != '#') {
                 show = true;
-                var dialog = $(current_dialog);
+                var dialog = $(window.current_dialog);
                 var callback = function() { 
                   dialog.fadeIn();
                   if(!dialog.find('div.close').length)
                     dialog.prepend('<div class="close"></div>');
+                  var tabs = dialog.find('.tabs-container');
+                  if(tabs.length != 0 && tabs.filter('.tabs-hide').children().length == 0)
+                    dialog.find('.tabs-nav .tabs-selected').removeClass('tabs-selected').find('a').click();
                 };
                 if(!dialog.length) {
                   $.get(this.href, '', function(html) {
@@ -124,18 +138,14 @@
     };
 
     $.fn.initFavorites = function() {
-      this.find("ul.favorite > li").not(":first").tsort("a");
-      this.live('click', function(e) {
-          var target = $(e.target);
-          if(target.is('ul.favorite > li'))
-            target = target.find("a");
-          if(target.is('ul.favorite > li a')) {
-            target.toggleFavorite();
-            return false;
-          }
-        });
-
-      return this.children('.content').tabs({ fxAutoHeight: true }).find("input#favoriteMovies_rating").spin({ interval: 0.1, min: 0, max: 10 }).end().end();
+      return this.children('.content').tabs({ 
+          fxAutoHeight: true , 
+          remote: true, 
+          onShow: function(clicked, toShow, toHide) {
+            $(toShow).find('form').initForm().end()
+                     .addClass('clearfix').find("ul.favorite > li").not(":first").tsort("a");
+          },
+      }).end();
     };
 
     $.fn.initForm = function() {
@@ -189,7 +199,7 @@
         this.find('.client_config select').change(function() {
             $(this).closest('.client_config').find('.config').hide().end()
               .find('#'+$(this).val()).show();
-        }).change();
+        });
         // First trigger of change() will hide the unselected client forms
         setTimeout(function() {
             $('select#client').change();
@@ -218,7 +228,9 @@
 
 $(function() { 
     // Handle button click events
-    $("#feedItems_container, #mainoptions, #dynamicdata").live('click', function(e) {
+    $("body").live('click', function(e) {
+      if(e.button != 0)
+        return;
       var target = $(e.target);
       // Menu Bar, and other buttons which show/hide a dialog
       if(target.is('a.toggleDialog')) {
@@ -246,6 +258,13 @@ $(function() {
           // $(html).html() is used to strip the outer tag(<div#history></div>) and get the children
           $("div#history").html($(html).html());
         }, 'html');
+        return false;
+      }
+      // toggle visible favorite
+      if(target.is('ul.favorite > li'))
+        target = target.find("a");
+      if(target.is('ul.favorite > li a')) {
+        target.toggleFavorite();
         return false;
       }
       // Standard ajax submit with reload
@@ -354,4 +373,5 @@ $(function() {
         },
     });
 
+    $("#favorites").initFavorites();
 });

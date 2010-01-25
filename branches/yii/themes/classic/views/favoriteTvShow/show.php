@@ -4,7 +4,7 @@
   $qualitysListData = isset($qualitysListData) ? $qualitysListData : quality::getCHtmlListData();
   
   $htmlId = 'favoriteTvShows-'.$model->id;
-  
+
   echo CHtml::beginForm(
       array('/favoriteTvShow/'.($model->isNewRecord ? 'create' : 'update'), 'id'=>$model->id),
       'post', 
@@ -63,4 +63,4 @@
           echo CHtml::link('Delete', array('/favoriteTvShow/delete', 'id'=>$model->id), array('class'=>'button ajaxSubmit')); ?>
   <a class="toggleDialog button" href="#">Close</a>
 </div>
-<?php echo CHtml::endForm(); ?>
+<?php echo CHtml::endForm(); echo isset($response) ? $response : ''; ?>

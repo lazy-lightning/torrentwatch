@@ -2,7 +2,7 @@
   echo CHtml::beginForm(
       array('/favoriteString/'.$model->isNewRecord ? 'create' : 'update', 'id'=>$model->id), 
       'post', 
-      array('class'=>'favinfo', 'id'=>'favoriteString')
+      array('class'=>'favinfo', 'id'=>'favoriteStrings-'.$model->id)
   );
   echo CHtml::errorSummary($model);
 ?>

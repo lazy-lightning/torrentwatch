@@ -721,15 +721,15 @@ div.favorite_quality select {
   }
 
 /* long selector to override form.favinfo input[type=text] */
-div#favoriteMovies div.favorite_years input {
-  width: 3em;
-  margin-left: .2em
+div.favorite_years input {
+  width: 3em !important;
+  margin-left: .2em !important;
 }
 
 /* long selector to override form.favinfo input[type=text] */
-div#favoriteTvShows div.favorite_episodes input {
-  width: 2em;
-  margin-left: .2em;
+div.favorite_episodes input {
+  width: 2em !important;
+  margin-left: .2em !important;
   }
 
 div.favorite_years span {
