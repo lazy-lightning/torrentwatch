@@ -23,8 +23,9 @@ class deleteFavoriteAction extends CAction
 
   public function run()
   {
-    $this->response = array('dialog'=>array('header'=>'Delete Favorite'));
-    $app = Yii::app();
+    $this->response = new actionResponseWidget;
+    $this->response->dialog = array('header'=>'Delete Favorite'));
+    $this->response->resetFeedItems = true;
 
     if(isset($_GET['id']) && is_numeric($_GET['id']))
     {
@@ -42,12 +43,13 @@ class deleteFavoriteAction extends CAction
           // Reset feedItem status on anything this was matching, then rerun matching routine incase something else matches the reset items
           feedItem::model()->updateByPk($ids, array('status'=>feedItem::STATUS_NEW));
           Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NEW);
-          $this->response['dialog']['content'] = 'Your favorite has been successfully deleted';
+          $this->response->dialog['content'] = 'Your favorite has been successfully deleted';
+          $this->response->resetFeedItems = true;
         }
         else
         {
-          $this->response['dialog']['content'] = 'Unable to delete favorite';
-          $this->response['dialog']['error'] = True;
+          $this->response->dialog['content'] = 'Unable to delete favorite';
+          $this->response->dialog['error'] = True;
         }
         $transaction->commit();
       } catch (Exception $e) {
@@ -56,7 +58,6 @@ class deleteFavoriteAction extends CAction
       }
     }
 
-    $app->getUser()->setFlash('response', $this->response);
-    $app->getController()->redirect(array('/ajax/fullResponse', 'response'=>1));
+    echo $this->response->getContent();
   }
 }
