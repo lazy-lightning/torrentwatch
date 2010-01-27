@@ -120,7 +120,12 @@ abstract class BaseDvrConfig extends CModel {
     {
       $data = apc_fetch(empty($key) ? $this->_apcKey : $key, $success);
       if($success)
+      {
+        // allow sub-categories to add themselves
+        $this->allowNewEntries = true;
         $this->_ar = unserialize($data);
+        $this->allowNewEntries = false;
+      }
     }
     return $success;
   }
@@ -158,7 +163,6 @@ abstract class BaseDvrConfig extends CModel {
    * for all attributes not prefixed with _ contained in the category
    */
   public function setAttributes($values, $scenario='') {
-    Yii::log(__FUNCTION__.': '.print_r($values, true));
     foreach($values as $name=>$value)
     {
       if($name[0] !== '_')
@@ -185,20 +189,15 @@ abstract class BaseDvrConfig extends CModel {
   {
     if($this->beforeSave())
     {
-      $toSave = array();
       $transaction = Yii::app()->db->beginTransaction();
       try {
-        Yii::log('saving '.print_r($this, TRUE));
-
+        Yii::log('Attributes to save: '.print_r($attributes, true));
         if($attributes===null)
           $attributes = $this->attributeNames();
         foreach($attributes as $key) 
         {
           $value = $this->$key;
-          if(is_object($value))
-            $toSave[] = $value; // cant save now due to nested transactions
-          else 
-            $this->updateByKey($key, $value);
+          is_object($value) ? $value->save() : $this->updateByKey($key, $value);
         }
   
         $transaction->commit();
@@ -208,8 +207,6 @@ abstract class BaseDvrConfig extends CModel {
         $transaction->rollback();
         throw $e;
       }
-      foreach($toSave as $item)
-        $item->save();
       $this->afterSave();
       return true;
     }
@@ -232,7 +229,7 @@ abstract class BaseDvrConfig extends CModel {
 
 }
 
-class dvrConfigCategory extends BaseDvrConfig {
+class dvrConfigCategory extends BaseDvrConfig implements Serializable {
   // @var dvrConfig the object that created this category object instance
   private $_parent;
   // @var string the title of this category
@@ -281,9 +278,29 @@ class dvrConfigCategory extends BaseDvrConfig {
     return $this->_title;
   }
 
+  public function serialize()
+  {
+    $ar = array('_title'=>$this->_title);
+    foreach($this->attributeNames() as $key)
+      $ar[$key] = $this->$key;
+    return serialize($ar);
+  }
+
+  public function unserialize($serialized)
+  {
+    $this->_parent = dvrConfig::instance();
+    $ar = unserialize($serialized);
+    $this->_title = $ar['_title'];
+    unset($ar['_title']);
+    foreach($ar as $key => $value)
+      $this->add($key, $value);
+    parent::init();
+  }
 }
 
 class dvrConfig extends BaseDvrConfig {
+
+  private static $instance = null;
 
   public function afterSave()
   {
@@ -301,11 +318,18 @@ class dvrConfig extends BaseDvrConfig {
     );
   }
 
+  public static function instance()
+  {
+    return self::$instance;
+  }
+
   /**
    * Initializes all configuration values from the database(or APC if available)
    */
   public function init() 
   {
+    if(self::$instance === null)
+      self::$instance = $this;
     if($this->loadAPC() === False)
     {
       $db = Yii::app()->db;
