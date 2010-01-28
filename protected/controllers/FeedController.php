@@ -67,22 +67,15 @@ class FeedController extends BaseController
       try {
         $response = array('dialog'=>array('header'=>'Create Feed'));
         $feed->attributes=$_POST['feed'];
-        if($feed->save())
-          $response['dialog']['content'] = 'Feed Added.  Status: '.$feed->getStatusText();
-        else
-        {
-          $response['activeFeed-'] = $feed;
-          $response['showTab'] = '#feeds';
-        }
+        $success = $feed->save())
         $transaction->commit();
       } catch (Exception $e) {
         $transaction->rollback();
         throw $e;
       }
-      Yii::app()->user->setFlash('response', $response);
-      $this->redirect(array('/ajax/fullResponse', 'response'=>1));
+      if($success)
+        $this->redirect(array('list'));
     }
-
     $this->render('create',array('feed'=>$feed));
   }
 
@@ -93,17 +86,18 @@ class FeedController extends BaseController
   public function actionUpdate()
   {
     $feed=$this->loadfeed();
+    $success = false;
     if(isset($_POST['feed']))
     {
       $transaction = $feed->getDbConnection()->beginTransaction();
       try {
         $feed->attributes=$_POST['feed'];
-        $return = $feed->save());
+        $success = $feed->save();
       } catch (Exception $e) {
         $transaction->rollback();
         throw $e;
       }
-      if($return)
+      if($success)
        $this->redirect(array('show','id'=>$feed->id));
     }
     $this->render('update',array('feed'=>$feed));

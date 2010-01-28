@@ -207,6 +207,11 @@ $.fn.tabs = function(initial, settings) {
 
     // initialize tabs
     return this.each(function() {
+        ///////
+        // MOD FOR NMTDVR
+        /////
+        $(this).data('onShow', settings.onShow);
+        // END MOD
 
         // remember wrapper for later
         var container = this;

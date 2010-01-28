@@ -2,7 +2,7 @@
   echo CHtml::beginForm(
       array('/favoriteMovie/'.$model->isNewRecord ? 'create' : 'update', 'id'=>$model->id), 
       'post', 
-      array('class'=>'favinfo', 'id'=>'favoriteMovies-'.$model->id)
+      array('class'=>'favinfo', 'id'=>'favoriteMovie-'.$model->id)
   );
   echo CHtml::errorSummary($model);
 ?>
@@ -50,8 +50,14 @@
  <div class="buttonContainer">
    <a class="submitForm button" id="Update" href="#"><?php echo $model->isNewRecord ? 'Create' : 'Update'; ?></a>
    <?php if(!$model->isNewRecord)
-           echo CHtml::link('Delete', array('deleteFavorite', 'type'=>get_class($model), 'id'=>$model->id), array('class'=>'button ajaxSubmit')); ?>
+           echo CHtml::link('Delete', array('delete', 'id'=>$model->id), array('class'=>'button ajaxSubmit')); ?>
    <a class="toggleDialog button" href="#">Close</a>
  </div>
-<?php echo CHtml::endForm(); ?>
+<?php if(isset($addLi) && $addLi)
+        echo "<li id='favoriteMovie-li-{$model->id}'>".CHtml::link(
+          $model->name,
+          array('show', 'id'=>$model->id),
+          array('rel'=>'#favoriteMovie-'.$model->id)
+        )."</li>";
+echo CHtml::endForm().(isset($response) ? $response : ''); ?>
 

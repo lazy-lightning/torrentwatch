@@ -18,10 +18,9 @@ class makeFavoriteAction extends feedItemAction
       throw $e;
     }
     // After save to get the correct id
-    $htmlId = $type.'s-'.$fav->id;
+    $htmlId = $type.'-'.$fav->id;
     $this->response->showDialog = '#favorites';
-    $this->response->showFavorite = '#'.$type.'s-'.$fav->id;
-    $this->response->showTab = "#".$type.'s';
+    $this->response->showTab = "#".$type;
     $this->response->resetFeedItems = true;
     $this->render("/$type/show", array(
           'response' => $this->response->getContent(),

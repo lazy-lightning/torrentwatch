@@ -39,17 +39,11 @@ class feedAdapter extends SimplePie {
 
     foreach($this->get_items() as $item) {
       $title = $item->get_title();
-      echo "Considering $title: ";
       $hash = md5($item->get_id());
-      if(feedItem::model()->exists('hash=:hash', array(':hash'=>$hash))) 
-      {
-        echo " already exists";
-      } 
-      else 
+      if(false === feedItem::model()->exists('hash=:hash', array(':hash'=>$hash))) 
       {
         $transaction = Yii::app()->db->beginTransaction();
         try {
-          echo " creating record";
           $description = $item->get_description();
 
           // Prefer a link from enclosure over link from item
@@ -70,16 +64,12 @@ class feedAdapter extends SimplePie {
                 'description' => $item->get_description(),
                 'pubDate'     => $item->get_date('U'),
           ));
-          echo " as ".$record->id;
-          echo " Commiting transaction . . . ";
           $transaction->commit();
-          echo "Done\n";
         } catch (Exception $e) {
           $transaction->rollback();
           Yii::log('feedItem failed to save: '.$title.' : '.$e->getMessage(), CLogger::LEVEL_ERROR);
         }
       }
-      echo "\n";
     }
   }
 }

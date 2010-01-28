@@ -20,14 +20,14 @@
   <script type="text/javascript" src="javascript/torrentwatch.js"></script>
 </head>
 <body>
-<a id="fullResponseLink" href="nmtdvr-test.php?r=ajax/fullResponse"></a>
+<a id="wizardLink" class="hidden" href="nmtdvr-test.php?r=dvrConfig/welcome"></a>
 <ul class="mainoptions" id="mainoptions">
   <li id="refresh"><a href="">Refresh</a></li>
   <li class="divider">&nbsp;</li>
   <li id="favoritesMenu"><a class="toggleDialog" href="#favorites">Favorites</a></li>
   <li id="config"><a class="toggleDialog" href="#configuration">Configure</a></li>
   <li class="divider">&nbsp;</li>
-  <li id="view"><a class="toggleDialog" href="nmtdvr.php?r=history/list#history">View History</a></li>
+  <li id="view"><a class="toggleDialog" href="nmtdvr-test.php?r=history/list#history">View History</a></li>
   <li id="empty"><a class="toggleDialog" href="#reset_data">Reset Data</a></li>
   <li id="inspector"><a href="#inspector_container">Inspector</a></li>
   <li id='webui'><a href='#'>Client UI</a></li>
@@ -63,5 +63,25 @@
     <li><a href="nmtdvr-test.php?r=movie/list"><span>Movies</span></a></li>
     <li><a href="nmtdvr-test.php?r=other/list"><span>Others</span></a></li>
     <li><a href="nmtdvr-test.php?r=ajax/loadFeedItems&type=queued"><span>Queued</span></a></li>
+  </ul>
+</div>
+<div id="favorites" class="dialog_window">
+  <div class="content">
+    <ul class="favTypes">
+      <li><a href="nmtdvr-test.php?r=favoriteTvShow/list"><span>TV Shows</span></a></li>
+      <li><a href="nmtdvr-test.php?r=favoriteMovie/list"><span>Movies</span></a></li>
+      <li><a href="nmtdvr-test.php?r=favoriteString/list"><span>Strings</span></a></li>
+    </ul>
+  </div>
+</div>
+<div id="configuration" class="dialog_window">
+  <div class="content">
+    <ul>
+     <li><a href="nmtdvr-test.php?r=dvrConfig/globals"><span>Main</span></a></li>
+     <li><a href="nmtdvr-test.php?r=dvrConfig/torClient"><span>Torrent Client</span></a></li>
+     <li><a href="nmtdvr-test.php?r=dvrConfig/nzbClient"><span>NZB Client</span></a></li>
+     <li><a href="nmtdvr-test.php?r=feed/list"><span>Feeds</span></a></li>
+    </ul>
+  </div>
 </div>
 </body></html>

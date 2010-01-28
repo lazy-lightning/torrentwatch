@@ -1,7 +1,7 @@
 <ul id="tv_container" class='loadContent'>
 <?php
 foreach($otherList as $n => $model) {
-  echo "<li id='tvEpisode-".$model->id."' class='torrent hasDuplicates match_".strtok($model->getStatusText(), ' ').($n%2?' alt':' notalt')."' >".
+  echo "<li id='other-".$model->id."' class='torrent hasDuplicates match_".strtok($model->getStatusText(), ' ').($n%2?' alt':' notalt')."' >".
        "<div class='itemButtons'>".
          CHtml::link(CHtml::image('images/tor_start.png', 'Start', array('height'=>10)),
              array('startDownload', 'id'=>$model->id), array('class'=>'startDownload ajaxSubmit')).

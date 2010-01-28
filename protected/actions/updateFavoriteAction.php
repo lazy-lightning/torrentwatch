@@ -45,13 +45,24 @@ class updateFavoriteAction extends CAction
     }
 
     if(isset($_POST[$class]))
+    {
       $this->updateModel($model, $_POST[$class]);
+      if($this->create && $this->success)
+      {
+        $this->response->append = array(
+            'parent'=>"#{$class}List",
+            'selector'=>"#{$class}-li-".$model->id,
+        );
+      }
+    }
 
-    if($this->success)
+    if($this->success) 
       $this->response->resetFeedItems = true;
+
     Yii::app()->getController()->render('show', array(
         'response'=>$this->response->getContent(),
         'model'=>$model,
+        'addLi'=>($this->create && $this->success),
         'feedsListData'=>feed::getCHtmlListData(),
         'genresListData'=>genre::getCHtmlListData(),
         'qualitysListData'=>quality::getCHtmlListData(),

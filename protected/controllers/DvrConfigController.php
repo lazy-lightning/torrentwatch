@@ -9,7 +9,7 @@ class DvrConfigController extends BaseController
   public $defaultAction='update';
 
   /**
-   * @var array response data to be passed to the view
+   * @var array response data to be passed to the view to construct an actionResponseWidget
    */
   protected $response = array();
 
@@ -32,7 +32,8 @@ class DvrConfigController extends BaseController
   {
     return array(
       array('allow', // allow authenticated user
-        'actions'=>array('update', 'wizard'),
+        'actions'=>array('update', 'welcome', 'wizardClient', 'wizardFeed',
+                         'globals', 'nzbClient', 'torClient', 'feeds'),
         'users'=>array('@'),
       ),
       array('deny',  // deny all users
@@ -41,91 +42,108 @@ class DvrConfigController extends BaseController
     );
   }
 
-  public function actionUpdate()
+  public function actionGlobals()
   {
-    $this->response = array('dialog'=>array('header'=>'Save Configuration'));
-
     $config = Yii::app()->dvrConfig;
-    Yii::log(print_r($_POST, TRUE));
-    if(isset($_POST['category']) && $config->contains($_POST['category']))
-    {
-      // empty dvrConfig allows still setting config client
-      if(isset($_POST['dvrConfigCategory']))
-        $config->$_POST['category']->attributes = $_POST['dvrConfigCategory'];
-
-      // if this is a client category, also set the main config to use this client
-      if(isset($_POST['type']) && in_array($_POST['type'], array('nzbClient', 'torClient')) &&
-         substr($_POST['category'], 0, 6) === 'client')
-        // $_POST['type'] is now guaranteed to be one of two values
-        $config->$_POST['type'] = $_POST['category'];
-    }
-    elseif(isset($_POST['dvrConfig']))
+    $success = false;
+    if(isset($_POST['dvrConfig']))
     {
       $config->attributes = $_POST['dvrConfig'];
+      try {
+        $transaction = Yii::app()->db->beginTransaction();
+        $success = $config->save();
+        $transaction->commit();
+      } catch (Exception $e) {
+        $transaction->rollback();
+        throw $e;
+      }
     }
-    try {
+    $this->render('global', array('config'=>$config, 'successfullSave' => $success));
+  }
+
+  public function actionNzbClient()
+  {
+    $config = Yii::app()->dvrConfig;
+    if(isset($_GET['id']) && Yii::app()->request->isPostRequest &&
+       $config->contains($_GET['id']))
+    {
+      $config->nzbClient = $_GET['id'];
+      if(isset($_POST['dvrConfigCategory']))
+        $config->{$_GET['id']}->attributes = $_POST['dvrConfigCategory'];
       $transaction = Yii::app()->db->beginTransaction();
-      if($config->save()) 
-      {
-        $this->response['dialog']['content'] = 'Configuration successfully saved';
+      try {
+        $config->save();
+        $transaction->commit();
+      } catch (Exception $e) {
+        $transaction->rollback();
+        throw $e;
       }
-      else
-      {
-        $this->response['dialog']['error'] = True;
-        $this->response['dialog']['content'] = 'There was an error saving the configuration';
-        $this->response['dvrConfig'] = $config;
-        $this->response['showDialog'] = '#configuration';
-      }
-      $transaction->commit();
-    } catch (Exception $e) {
-      $transaction->rollback();
-      throw $e;
     }
-    $this->redirectFullResponse();
+    $this->render('nzbClient', array(
+          'availClients'=>Yii::app()->dlManager->availClients[feedItem::TYPE_NZB],
+          'config'=>$config
+    ));
   }
 
-  public function actionWizard()
+  public function actionTorClient()
   {
-    $this->response = array('dialog'=>array('header'=>'Initial Configuration', 'content'=>''));
-
-    try {
-      $transaction = $feed->dbConnection->beginTransaction();
-      if(isset($_POST['dvrConfig']))
-      {
-        $config = Yii::app()->dvrConfig;
-        $config->attributes = $_POST['dvrConfig'];
-        $this->response['dialog']['content'] .= ($config->save() ? 'Saved configuration' : 'Failed saving configuration').'<br>';
+    $config = Yii::app()->dvrConfig;
+    if(isset($_GET['id']) && Yii::app()->request->isPostRequest &&
+       $config->contains($_GET['id']))
+    {
+      $config->torClient = $_GET['id'];
+      if(isset($_POST['dvrConfigCategory']))
+        $config->{$_GET['id']}->attributes = $_POST['dvrConfigCategory'];
+      $transaction = Yii::app()->db->beginTransaction();
+      try {
+        $config->save();
+        $transaction->commit();
+      } catch (Exception $e) {
+        $transaction->rollback();
+        throw $e;
       }
+    }
+    $this->render('torClient', array(
+          'availClients'=>Yii::app()->dlManager->availClients[feedItem::TYPE_TORRENT],
+          'config'=>$config
+    ));
+  }
 
-      if(isset($_POST['feed']))
-      {
-        $feeds = array();
-        foreach(array('torUrl'=>feedItem::TYPE_TORRENT, 'nzbUrl'=>feedItem::TYPE_NZB) as $key => $type)
-        {
-          if(isset($_POST['feed'][$key]))
-          {
-            $feed = new feed;
-            $feed->url = $_POST['feed'][$key];
-            $feed->downloadType = $type;
-            // FIXME: this will block the database while the update is being requested over the net
-            $this->response['dialog']['content'] .= ($feed->save() ? "Saved feed {$feed->title}" : "Failed saving feed {$feed->url}").'<br>';
-          }
-        }
+  public function actionWelcome()
+  {
+    $this->render('welcome');
+  }
+
+  public function actionWizardClient()
+  {
+    $app = Yii::app();
+    $config = $app->dvrConfig;
+    if($app->request->isPostRequest)
+    {
+      if(isset($_POST['dvrConfig']['torClient']))
+        $config->torClient = $_POST['dvrConfig']['torClient'];
+      if(isset($_POST['dvrConfig']['nzbClient']))
+        $config->nzbClient = $_POST['dvrConfig']['nzbClient'];
+      $transaction = Yii::app()->db->beginTransaction();
+      try {
+        $success = $config->save();
+        $transaction->commit();
+      } catch (Exception $e) {
+        $transaction->rollback();
+        throw $e;
       }
-      $transaction->commit();
-    } catch (Exception $e) {
-      $transaction->rollback();
-      throw $e;
+      if($success)
+        return $this->redirect('wizardFeed');
     }
 
-    if(empty($this->response['dialog']['content']))
-      $this->response['dialog']['content'] = 'No valid attributes passed to wizard';
-    $this->redirectFullResponse();
+    $this->render('wizardClient', array(
+          'availClients'=>$app->dlManager->getAvailClients(),
+          'config'=>$config, 
+    ));
   }
 
-  protected function redirectFullResponse()
+  public function actionWizardFeed()
   {
-    Yii::app()->getUser()->setFlash('response', $this->response);
-    $this->redirect(array('/ajax/fullResponse', 'response'=>1));
   }
+
 }
