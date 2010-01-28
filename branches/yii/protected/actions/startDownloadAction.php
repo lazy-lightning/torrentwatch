@@ -15,5 +15,7 @@ class startDownloadAction extends feedItemAction
       $this->response->dialog['error'] = true;
       $this->response->dialog['content'] = CHtml::errorSummary(Yii::app()->dlManager);
     }
+
+    echo $this->response->getContent();
   }
 }

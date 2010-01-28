@@ -618,12 +618,16 @@ div.client_config select {
   }
 
 /* Feeds */
-div.activeFeed {
+.activeFeed {
   height: 35px;
   border-top: 1px solid #bbb;
   }
 
-div.activeFeed label.item {
+.activeFeed span {
+  margin: 0 1em;
+  }
+
+.activeFeed label.item {
   white-space: nowrap;
   min-width: 95px;
   max-width: 350px;
@@ -633,17 +637,21 @@ div.activeFeed label.item {
   margin: 5px 0 0 0;
   }
 
-div#configuration.dialog_window .feedForm select {
+#newFeed {
+  height: 52px;
+  }
+
+#newFeed select {
   display: inline;
   margin-left: 80px;
   margin-top: 4px;
   position: relative;
-  width: 8em;
+  width: 8em !important;
   }
 
-div#configuration.dialog_window div.activeFeed #feed_url[type=text] {
-  width: 490px;
-  border: 1px solid black;
+#newFeed #feed_url[type=text] {
+  width: 490px !important;
+  border: 1px solid black !important;
   }
 
 

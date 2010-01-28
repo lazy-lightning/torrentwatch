@@ -20,7 +20,7 @@
   <script type="text/javascript" src="javascript/torrentwatch.js"></script>
 </head>
 <body>
-<a id="fullResponseLink" href="nmtdvr.php?r=ajax/fullResponse"></a>
+<a id="wizardLink" class="hidden" href="nmtdvr.php?r=dvrConfig/welcome"></a>
 <ul class="mainoptions" id="mainoptions">
   <li id="refresh"><a href="">Refresh</a></li>
   <li class="divider">&nbsp;</li>
@@ -71,6 +71,16 @@
       <li><a href="nmtdvr.php?r=favoriteTvShow/list"><span>TV Shows</span></a></li>
       <li><a href="nmtdvr.php?r=favoriteMovie/list"><span>Movies</span></a></li>
       <li><a href="nmtdvr.php?r=favoriteString/list"><span>Strings</span></a></li>
+    </ul>
+  </div>
+</div>
+<div id="configuration" class="dialog_window">
+  <div class="content">
+    <ul>
+     <li><a href="nmtdvr.php?r=dvrConfig/globals"><span>Main</span></a></li>
+     <li><a href="nmtdvr.php?r=dvrConfig/torClient"><span>Torrent Client</span></a></li>
+     <li><a href="nmtdvr.php?r=dvrConfig/nzbClient"><span>NZB Client</span></a></li>
+     <li><a href="nmtdvr.php?r=feed/list"><span>Feeds</span></a></li>
     </ul>
   </div>
 </div>

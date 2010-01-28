@@ -1,6 +1,5 @@
-
 (function($) {
-    var current_favorite, inspect_status;
+    var inspect_status;
     $.toggleInspector = function() {
         inspect_status = !inspect_status;
         $("div#feedItems_container,div#feedItems_container > div,ul#filterbar_container,div#inspector_container").stop(true,true).animate(
@@ -24,9 +23,9 @@
         });
       }, 0);
     };
-    $.resetFeedItems = function () {
+    $.fn.tabsResetAjax = function () {
       // Reset the feed items container and click the selected link to trigger reload
-      $("#feedItems_container").children('div')
+      this.children('div')
         .each(function() {
           $(this).empty();
         }).end()
@@ -36,36 +35,6 @@
         .click();
     };
         
-    // Remove old dynamic content, replace it with passed html(ajax success function)
-    $.loadDynamicData = function(html) {
-        $.resetFeedItems();
-        $("#dynamicdata").remove();
-        setTimeout(function() {
-            // Close any open dialog
-            $(window.current_dialog).toggleDialog();
-            window.current_dialog = '';
-            var dynamic = $("<div id='dynamicdata'/>");
-            // Use innerHTML because some browsers choke with $(html) when html is many KB
-            dynamic[0].innerHTML = html;
-            dynamic .find("form").initForm().end()
-                    .find("div#configuration").initConfigDialog().end()
-                    .appendTo("body");
-            setTimeout(function() {
-                var container = $("#feedItems_container > div:first");
-                if(container.children('ul').children().length == 1 && $(".login_form").length == 0 &&
-                   window.showWelcomeScreen) {
-                    window.current_dialog = '#welcome1';
-                    $(window.current_dialog).show();
-                    window.showWelcomeScreen = false;
-                } else {
-                    container.slideDown(400, function() {
-                        if(inspect_status)
-                            container.css('right', 350);
-                    });
-                }
-            }, 50);
-        }, 100);
-    };
     $.submitForm = function(button) {
         var form;
         if($(button).is('form')) { // User pressed enter
@@ -76,58 +45,93 @@
             button = button[0];
         } else
             form = $(button).closest("form");
-        // close any open dialog
-        if(window.current_dialog)
-          $(window.current_dialog).toggleDialog();
 
         $.post(form.get(0).action, form.buildDataString(button), $.loadFormUpdate, 'html');
     }; 
     $.loadFormUpdate = function(html) {
       var data = $(html);
-      var id = '#'+data.filter('form')[0].id;
-      $(id).replaceWith(data.filter('form'));
-      setTimeout(function() {
+      var form = data.filter('form');
+      if(form.length) {
+        var id = '#'+form.attr('id');
+        // special handling for receiving a brand new item
+        // origional form had id like: favoriteTvShow-
+        // new form has: favoriteTvShow-23
+        var oldForm = $(id);
+        if(oldForm.length == 0) {
+          oldForm = $(id.replace(/\d+$/,'')).hide();
+          oldForm[0].reset()
+          oldForm.parent().append(form);
+        } else
+          oldForm.replaceWith(form);
+        setTimeout(function() {
           $(id).initForm().show();
           data.filter('script').each(function() {
             $.globalEval( this.text || this.textContent || this.innerHTML || "" );
           });
-          $.showDialog('#favorites');
-      }, 50);
+        }, 50);
+      } else
+        $.loadAjaxUpdate(data);
     };
+    $.loadAjaxUpdate = function(html) {
+      var data = $(html);
+      data.each(function() { 
+        if(!this.id) return;
+        var target = $('#'+this.id);
+        if(target.length) {
+          target.after(this).remove();
+          data = data.not(this);
+          // trigger any onshow events
+          // FIXME: feels like a bad hack
+          var onShow = $('#'+this.id).closest('.tabs-container').parent().data('onShow')
+          if(typeof onShow == 'function')
+            onShow(null, this.parentNode, null);
+        }
+      });
+      data.not('script').addClass('dynamic-load').appendTo('body');
+      setTimeout(function() {
+        data.filter('script').each(function() {
+          $.globalEval( this.text || this.textContent || this.innerHTML || "" );
+        });
+      },0);
+    };
+    // toggleDialog is a click handler for anchors 
+    window.current_dialog = '';
     $.fn.toggleDialog = function() {
         this.each(function() {
-            var last = window.current_dialog === '#' ? '' : window.current_dialog;
-            var target = this.hash === '#' ? '#'+$(this).closest('.dialog_window').id : this.hash;
-            var hide = false, show = false;
+            var $this = $(this), dialog;
+            if($this.is('a') && this.hash)
+                dialog = $(this.hash);
+            else if($this.is('.dialog_window'))
+                dialog = $this
+            else
+                dialog = $this.closest('.dialog_window');
 
-            window.current_dialog = last === target ? '' : this.hash;
-            if (last) {
-                $(last).fadeOut();
-                hide = true;
-            }
-            if (window.current_dialog && this.hash != '#') {
-                show = true;
-                var dialog = $(window.current_dialog);
-                var callback = function() { 
-                  dialog.fadeIn();
-                  if(!dialog.find('div.close').length)
+            var toHide = $('.dialog_window:visible');
+            var visible = dialog.is(':visible');
+
+            var callback = function() { 
+                $('div.expose').show();
+                dialog = $($this[0].hash);
+                dialog.fadeIn();
+                if(dialog.find('div.close').length == 0)
                     dialog.prepend('<div class="close"></div>');
-                  var tabs = dialog.find('.tabs-container');
-                  if(tabs.length != 0 && tabs.filter('.tabs-hide').children().length == 0)
+                // if tabs are initialized but the active one is empty trigger the ajax load
+                var tabs = dialog.find('.tabs-container');
+                if(tabs.length != 0 && tabs.filter('.tabs-hide').children().length == 0)
                     dialog.find('.tabs-nav .tabs-selected').removeClass('tabs-selected').find('a').click();
-                };
-                if(!dialog.length) {
-                  $.get(this.href, '', function(html) {
-                    $('#dynamicdata').append(html);
-                    setTimeout(callback, 0);
-                  }, 'html');
+            };
+         
+            if(dialog && !visible) {
+                if(dialog.length == 0) {
+                    $.get(this.href, '', function(html) {
+                        $.loadAjaxUpdate(html);
+                        setTimeout(callback, 100);
+                    }, 'html');
                 } else 
-                  callback();
-            }
-            if(hide && !show)
-              $('div.expose').hide();
-            if(!hide && show)
-              $('div.expose').show();
+                    callback();
+            } else if(visible)
+                $('div.expose').hide();
+            toHide.fadeOut();
         });
         return this;
     };
@@ -141,18 +145,6 @@
       });
       return this;
     };
-
-    $.fn.initFavorites = function() {
-      return this.children('.content').tabs({ 
-          fxAutoHeight: true , 
-          remote: true, 
-          onShow: function(clicked, toShow, toHide) {
-            $(toShow).find('form').initForm().end()
-                     .addClass('clearfix').find("ul.favorite > li").not(":first").tsort("a");
-          },
-      }).end();
-    };
-
     $.fn.initForm = function() {
         this.submit(function(e) {
             $.submitForm(this);
@@ -163,29 +155,25 @@
             this.find("#config_webui").val(f).change();
         return this;
     };
+    // click handler for anchors
+    // will make the element found by rel visible
+    // or if non-existant the page referenced by the anchor will
+    // be loaded and appended to the closest tabs container
     $.fn.toggleFavorite = function() {
-        this.each(function() {
-            var last = current_favorite;
-            current_favorite = this.hash;
-            var onDone = function() {
-              $(current_favorite).show();
-            };
-            if(last)
-              $(last).hide();
-            if($(current_favorite).length == 0) {
-              var tabs = $(this).closest('.tabs-container');
-              $.get(this.href, null, function(html) {
-                  tabs.append(html);
-                  onDone();
-                  }, 'html');
-            } else 
+        var current_favorite = $(this).attr('rel'),
+            onDone = function() {
+          $(current_favorite).show();
+        };
+        $(this).closest('.tabs-container').children('.favinfo:visible').hide();
+        if($(current_favorite).length == 0) {
+          var tabs = $(this).closest('.tabs-container');
+          $.get(this[0].href, null, function(html) {
+              tabs.append(html);
               onDone();
-        });
+              }, 'html');
+        } else 
+          onDone();
         return this;
-    };
-
-    $.showFavorite = function(hash) {
-      $('<a href="'+hash+'"/>').toggleFavorite();
     };
 
     $.showTab = function(hash) {
@@ -197,20 +185,7 @@
     $.showDialog = function(hash) {
       $('<a href="'+hash+'"/>').toggleDialog();
     };
-    $.fn.initConfigDialog = function() {
-        // initialize the tabs
-        this.children('.content').tabs({fxAutoHeight: true });
-        // setup the auto switch of form information for client tabs
-        this.find('.client_config select').change(function() {
-            $(this).closest('.client_config').find('.config').hide().end()
-              .find('#'+$(this).val()).show();
-        });
-        // First trigger of change() will hide the unselected client forms
-        setTimeout(function() {
-            $('select#client').change();
-        }, 500);
-        return this;
-    };
+
     $.fn.buildDataString = function(buttonElement) {
         var dataString = $(this).filter('form').serialize();
         if(buttonElement) {
@@ -276,7 +251,7 @@ $(function() {
       if(target.is("img") && target.parent().is("a.ajaxSubmit"))
         target = target.parent();
       if(target.is("a.ajaxSubmit")) {
-        $.get(target[0].href, '', $.loadDynamicData, 'html');
+        $.get(target[0].href, '', $.loadAjaxUpdate, 'html');
         return false;
       }
       // Inspector
@@ -342,14 +317,20 @@ $(function() {
     });
 
     // Ajax progress bar
+    window.ajaxCount = 0;
     $("#progressbar").ajaxStart(function() {
-      $('.dialog_window:visible:not(#favorites,#history)').toggleDialog();
+      window.ajaxCount++;
       $(this).show();
       $('div.expose').show();
     }).ajaxStop(function() {
-      $(this).hide();
-      if($('.dialog_window:visible:not(#progressbar)').length == 0) 
-        $('div.expose').hide();
+      window.ajaxCount--;
+      var progress = $(this);
+      setTimeout(function() {
+        if(window.ajaxCount > 0) return;
+        progress.hide();
+        if($('.dialog_window:visible').not(progress[0]).length == 0) 
+          $('div.expose').hide();
+      },100);
     }).ajaxError(function(event, XMLHttpRequest, ajaxOptions, thrownError){
       var content;
       if(XMLHttpRequest.responseText === '')
@@ -359,26 +340,49 @@ $(function() {
 
       $(this).unbind('ajaxStop')
              .find('.content')
-             .empty()
-             .append(content);
+             .replaceWith(content);
     });
     
     window.showWelcomeScreen = true;
-    // Perform the first load of the dynamic information
-    // $.get($('#fullResponseLink')[0].href, '', $.loadDynamicData, 'html');
-
-    // Initialize the tabs which will also load dynamic information
+    // Initialize the feed items and open wizard if empty on first load
     $("#feedItems_container").tabs({ 
         remote: true,
         onShow: function(clicked, toShow, toHide) {
-          $("li.torrent:not(.initialized)", toShow)
+          $("li.torrent:not(.initialized)")
           .addClass('initialized')
           .filter(".hasDuplicates")
           .initDuplicates();
+          if(window.showWelcomeScreen && clicked && !clicked.jquery) {
+            if($(toShow).children('ul').children().length <= 1 && $(".login_form").length == 0) {
+              $.get($('#wizardLink')[0].href, '', $.loadAjaxUpdate, 'html');
+            }
+            window.showWelcomeScreen = false;
+          }
         },
+    }).tabsResetAjax();
+
+    $("#configuration .content").tabs({
+      remote: true,
+      onShow: function(clicked, toShow, toHide) {
+        var show = $(toShow);
+        show.find('form').initForm();
+        if(show.children('.client_config').length) {
+          // setup the auto switch of form information for client tabs
+          show.find('.client_config select').change(function() {
+            $(this).closest('.client_config').find('form').hide().end()
+                .find('#'+$(this).val()).show();
+          });
+          // First trigger of change() will hide the unselected client forms
+          setTimeout(function() { show.find('.client_config select').change(); }, 0);
+        }
+      },
     });
-
-    $.resetFeedItems();
-
-    $("#favorites").initFavorites();
+    // Initialize the 
+    $("#favorites > .content").tabs({ 
+      fxAutoHeight: true , 
+      remote: true, 
+      onShow: function(clicked, toShow, toHide) {
+        $(toShow).addClass('clearfix');
+      },
+    });
 });

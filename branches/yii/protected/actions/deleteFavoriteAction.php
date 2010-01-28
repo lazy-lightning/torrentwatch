@@ -24,8 +24,7 @@ class deleteFavoriteAction extends CAction
   public function run()
   {
     $this->response = new actionResponseWidget;
-    $this->response->dialog = array('header'=>'Delete Favorite'));
-    $this->response->resetFeedItems = true;
+    $this->response->dialog = array('header'=>'Delete Favorite');
 
     if(isset($_GET['id']) && is_numeric($_GET['id']))
     {
@@ -45,6 +44,8 @@ class deleteFavoriteAction extends CAction
           Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NEW);
           $this->response->dialog['content'] = 'Your favorite has been successfully deleted';
           $this->response->resetFeedItems = true;
+          $this->response->delete = '#'.get_class($model).'-li-'.$_GET['id'];
+          $this->response->alsoDelete = '#'.get_class($model).'-'.$_GET['id'];
         }
         else
         {

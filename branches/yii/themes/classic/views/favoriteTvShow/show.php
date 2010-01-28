@@ -1,14 +1,8 @@
 <?php 
-  $feedsListData = isset($feedsListData) ? $feedsListData : feed::getCHtmlListData();
-  $genresListData = isset($genresListData) ? $genresListData : genre::getCHtmlListData();
-  $qualitysListData = isset($qualitysListData) ? $qualitysListData : quality::getCHtmlListData();
-  
-  $htmlId = 'favoriteTvShows-'.$model->id;
-
   echo CHtml::beginForm(
       array('/favoriteTvShow/'.($model->isNewRecord ? 'create' : 'update'), 'id'=>$model->id),
       'post', 
-      array('class'=>'favinfo', 'id'=>$htmlId)
+      array('class'=>'favinfo', 'id'=>'favoriteTvShow-'.$model->id)
   );
   echo CHtml::errorSummary($model);
 ?>
@@ -63,4 +57,10 @@
           echo CHtml::link('Delete', array('/favoriteTvShow/delete', 'id'=>$model->id), array('class'=>'button ajaxSubmit')); ?>
   <a class="toggleDialog button" href="#">Close</a>
 </div>
-<?php echo CHtml::endForm(); echo isset($response) ? $response : ''; ?>
+<?php if(isset($addLi) && $addLi)
+        echo "<li id='favoriteTvShow-li-{$model->id}'>".CHtml::link(
+          $model->name,
+          array('show', 'id'=>$model->id),
+          array('rel'=>'#favoriteTvShow-'.$model->id)
+      )."</li>"; ?>
+<?php echo CHtml::endForm().(isset($response) ? $response : ''); ?>

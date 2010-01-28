@@ -22,7 +22,7 @@ abstract class feedItemAction extends CAction
     if(!($model instanceof feedItem))
       throw new CHttpException(500, 'The requested feedItem could not be found:'.get_class($model));
 
-    $this->response = new actionResponseWidget
+    $this->response = new actionResponseWidget;
     $this->runAction($model);
   }
 }

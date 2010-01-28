@@ -58,7 +58,7 @@ class FavoriteTvShowController extends BaseController
   /**
    * Lists all favorites.
    */
-  public function actionList()
+  public function actionList($options = array())
   {
     $criteria=new CDbCriteria(array('order'=>'title ASC'));
     $pages=null;
@@ -71,10 +71,10 @@ class FavoriteTvShowController extends BaseController
 
     $favoriteList=favoriteTvShow::model()->with(array('tvShow'=>array('select'=>'id,title')))->findAll($criteria);
 
-    $this->render('list',array(
+    $this->render('list',array_merge($options, array(
       'favoriteList'=>$favoriteList,
       'pages'=>$pages,
-    ));
+    )));
   }
 
   /**
