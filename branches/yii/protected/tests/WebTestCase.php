@@ -13,6 +13,8 @@ define('TEST_BASE_URL','http://xbmclive/nmtdvr/nmtdvr-test.php/');
  */
 class WebTestCase extends CWebTestCase
 {
+  public $autostop = false;
+
   /**
    * Sets up the class before a test is run
    * primarily used to login before testing
@@ -21,6 +23,11 @@ class WebTestCase extends CWebTestCase
   {
     $this->start();
     $this->login();
+  }
+
+  protected function assertPostConditions()
+  {
+    $this->stop();
   }
 
   protected function tearDown()

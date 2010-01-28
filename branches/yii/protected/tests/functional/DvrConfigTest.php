@@ -20,13 +20,6 @@ class DvrConfigTest extends WebTestCase
     $this->assertVisible('id=global_config');
   }
 
-  protected function assertPostConditions()
-  {
-    if($this->isVisible('css=div.close'))
-      $this->click('css=div.close');
-    parent::assertPostConditions();
-  }
-
   function testDefaultSave()
   {
     $this->assertElementPresent('link=Save');
@@ -121,10 +114,24 @@ class DvrConfigTest extends WebTestCase
     $this->waitForElementNotPresent('css=.errorSummary');
     // verify our sample feeds title is displayed
     $this->assertText("xpath=id('feeds')/div[1]/span", "Sample Feed");
+    // verify feed items have not yet been loaded
+    $this->assertElementNotPresent('css=.torrent');
+    // close the dialog
+    $this->click("css=#configuration > div.close");
+    // wait for feed items to load
+    $this->waitForElementPresent('css=.torrent');
+    usleep(500000);
+    // reopen the configuration dialog
+    $this->clickAndWaitFor('link=Configure', 'id=configuration', false);
     // click the delete button
     $this->click("xpath=id('feeds')/div[1]/a");
     // wait till the feeds list is one element shorter
     $this->waitForElementNotPresent("xpath=id('feeds')/div[4]");
+    usleep(500000);
+    // close the dialog
+    $this->click("css=#configuration > div.close");
+    // verify the feed items have disapeared
+    $this->waitForElementNotPresent('css=.torrent');
   }
 
   public function clickAndWaitFor($locator, $waitFor = 'id=configuration', $mid='id=progressbar')

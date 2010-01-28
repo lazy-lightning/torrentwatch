@@ -109,7 +109,7 @@
          
             if(dialog && !visible) {
                 if(dialog.length == 0) {
-                    $.get(this.href, '', function(html) {
+                    $.post(this.href, '', function(html) {
                         $.loadAjaxUpdate(html);
                         setTimeout(callback, 100);
                     }, 'html');
@@ -237,7 +237,7 @@ $(function() {
       if(target.is("img") && target.parent().is("a.ajaxSubmit"))
         target = target.parent();
       if(target.is("a.ajaxSubmit")) {
-        $.get(target[0].href, '', $.loadAjaxUpdate, 'html');
+        $.post(target[0].href, '', $.loadAjaxUpdate, 'html');
         return false;
       }
       // Inspector

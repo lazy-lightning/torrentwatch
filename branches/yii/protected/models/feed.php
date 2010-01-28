@@ -90,6 +90,18 @@ class feed extends CActiveRecord
         favoriteTvShow::model()->updateAll(array('feed_id'=>0), 'feed_id = :feed_id', array('feed_id'=>$item));
         favoriteMovie::model()->updateAll(array('feed_id'=>0), 'feed_id = :feed_id', array('feed_id'=>$item));
         favoriteString::model()->updateAll(array('feed_id'=>0), 'feed_id = :feed_id', array('feed_id'=>$item));
+        tvEpisode::model()->deleteAll(
+            'id NOT IN (SELECT tvEpisode_id id FROM feedItem WHERE id NOT NULL) AND status = :status', 
+            array(':status'=>tvEpisode::STATUS_NEW)
+        );
+        movie::model()->deleteAll(
+            'id NOT IN (SELECT movie_id id FROM feedItem WHERE id NOT NULL) AND status = :status', 
+            array(':status'=>movie::STATUS_NEW)
+        );
+        other::model()->deleteAll(
+          'id NOT IN (SELECT other_id id FROM feedItem WHERE id NOT NULL) AND status = :status', 
+          array(':status'=>other::STATUS_NEW)
+        );
       }
       return True;
     }
