@@ -1,8 +1,8 @@
 <?php 
   echo CHtml::beginForm(
-      array('/favoriteString/'.$model->isNewRecord ? 'create' : 'update', 'id'=>$model->id), 
+      array('/favoriteString/'.($model->isNewRecord ? 'create' : 'update'), 'id'=>$model->id), 
       'post', 
-      array('class'=>'favinfo', 'id'=>'favoriteStrings-'.$model->id)
+      array('class'=>'favinfo', 'id'=>'favoriteString-'.$model->id)
   );
   echo CHtml::errorSummary($model);
 ?>
@@ -49,4 +49,10 @@
            echo CHtml::link('Delete', array('delete', 'id'=>$model->id), array('class'=>'button ajaxSubmit')); ?>
    <a class="toggleDialog button" href="#">Close</a>
  </div>
-<?php echo CHtml::endForm(); ?>
+<?php if(isset($addLi) && $addLi)
+        echo "<li id='favoriteString-li-{$model->id}'>".CHtml::link(
+          $model->name,
+          array('show', 'id'=>$model->id),
+          array('rel'=>'#favoriteString-'.$model->id)
+        )."</li>";
+echo CHtml::endForm().(isset($response) ? $response : ''); ?>

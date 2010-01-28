@@ -14,7 +14,7 @@
             }
           ?>
           <div class="buttonContainer">
-            <a class="submitForm button" id="Save" href="#">Save</a>
+            <a class="submitForm button" class="Save" href="#">Save</a>
             <a class='toggleDialog button' href='#'>Close</a>
           </div>
         <?php echo CHtml::endForm(); ?>

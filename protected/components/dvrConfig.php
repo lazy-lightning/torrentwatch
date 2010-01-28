@@ -115,6 +115,9 @@ abstract class BaseDvrConfig extends CModel {
    */
   protected function loadAPC($key = '')
   {
+    if(UNIT_TEST)
+      return false;
+
     $success = false;
     if(function_exists('apc_fetch'))
     {
@@ -139,7 +142,7 @@ abstract class BaseDvrConfig extends CModel {
 
   public function saveAPC($key = '')
   {
-    if(function_exists('apc_store'))
+    if(!UNIT_TEST && function_exists('apc_store'))
     {
       apc_store(empty($key) ? $this->_apcKey : $key, serialize($this->_ar), 3600);
     }

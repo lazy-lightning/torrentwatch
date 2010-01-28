@@ -32,11 +32,12 @@ class actionResponseWidget extends CWidget{
     if($this->alsoDelete)
       $this->jScript[] = "$('{$this->alsoDelete}').remove()";
     if($this->append)
-      $this->jScript[] = "$('{$this->append['selector']}').remove().appendTo('{$this->append['parent']}');";
+      $this->jScript[] = "$('{$this->append['selector']}').remove().appendTo('{$this->append['parent']}')";
     if($this->resetFeedItems)
-      $this->jScript[] = "$('#feedItems_container').tabsResetAjax()";
+      $this->jScript[] = "$('#feedItems_container').addClass('needsReset')";
     if($this->showTab)
       $this->jScript[] = "$.showTab('{$this->showTab}')";
+
     if($this->showDialog)
       $this->jScript[] = "$.showDialog('{$this->showDialog}')";
     elseif(!empty($this->dialog))
@@ -44,6 +45,7 @@ class actionResponseWidget extends CWidget{
 
     if($this->showFavorite)
       $this->jScript[] = "$.showFavorite('{$this->showFavorite}')";
+
     return $this->render('response', array(
         'jScript' => implode(";\n  ", $this->jScript),
         'dialog' => $this->dialog,

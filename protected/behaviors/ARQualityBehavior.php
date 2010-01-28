@@ -40,7 +40,6 @@ class ARQualityBehavior extends CActiveRecordBehavior
 
   public function setQualityIds($in) 
   {
-    Yii::log(__FUNCTION__);
     $this->_qualityIds = array();
     foreach($in as $val) 
     {
@@ -51,7 +50,6 @@ class ARQualityBehavior extends CActiveRecordBehavior
 
   public function afterSave($event) 
   {
-    Yii::log(print_r($this->getQualityIds(),true));
     // update scenario
     // Clean out any quality relations if this isn't new
     $table = $this->Owner->tableName();

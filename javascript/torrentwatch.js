@@ -7,22 +7,6 @@
                 { duration: 600 }
         );
     };
-    $.loadMoreFeedItems = function(html) {
-      var container = $("<div />");
-      container[0].innerHTML = html;
-      setTimeout(function() {
-        container.find('div#feedItems_container').children().each(function() {
-          var dest = $('#'+this.id);
-          if(!dest.is('ul'))
-            dest = dest.children('ul');
-
-          $(this).find("li.torrent.hasDuplicates").initDuplicates();
-          
-          dest.find('li.loadMore').remove().end()
-          .append($(this).children('ul').children('li'));
-        });
-      }, 0);
-    };
     $.fn.tabsResetAjax = function () {
       // Reset the feed items container and click the selected link to trigger reload
       this.children('div')
@@ -34,7 +18,6 @@
         .children("a")
         .click();
     };
-        
     $.submitForm = function(button) {
         var form;
         if($(button).is('form')) { // User pressed enter
@@ -45,7 +28,6 @@
             button = button[0];
         } else
             form = $(button).closest("form");
-
         $.post(form.get(0).action, form.buildDataString(button), $.loadFormUpdate, 'html');
     }; 
     $.loadFormUpdate = function(html) {
@@ -58,9 +40,7 @@
         // new form has: favoriteTvShow-23
         var oldForm = $(id);
         if(oldForm.length == 0) {
-          oldForm = $(id.replace(/\d+$/,'')).hide();
-          oldForm[0].reset()
-          oldForm.parent().append(form);
+          oldForm = $(id.replace(/\d+$/,'')).hide().parent().append(form).end()[0].reset();
         } else
           oldForm.replaceWith(form);
         setTimeout(function() {
@@ -93,6 +73,12 @@
           $.globalEval( this.text || this.textContent || this.innerHTML || "" );
         });
       },0);
+    };
+    $.fn.hideExpose = function() {
+      $(this).hide();
+      var feedItems = $("#feedItems_container");
+      if(feedItems.hasClass('needsReset'))
+        feedItems.removeClass('needsReset').tabsResetAjax();
     };
     // toggleDialog is a click handler for anchors 
     window.current_dialog = '';
@@ -130,7 +116,7 @@
                 } else 
                     callback();
             } else if(visible)
-                $('div.expose').hide();
+                $('div.expose').hideExpose();
             toHide.fadeOut();
         });
         return this;
@@ -259,11 +245,6 @@ $(function() {
         $.toggleInspector();
         return false;
       }
-      // Feed Item Load More
-      if(target.is("li.loadMore a")) {
-        $.get(target[0].href, '', $.loadMoreFeedItems, 'html');
-        return false;
-      }
     });
 
     // Vary the font-size
@@ -329,8 +310,8 @@ $(function() {
         if(window.ajaxCount > 0) return;
         progress.hide();
         if($('.dialog_window:visible').not(progress[0]).length == 0) 
-          $('div.expose').hide();
-      },100);
+          $('div.expose').hideExpose();
+      },300);
     }).ajaxError(function(event, XMLHttpRequest, ajaxOptions, thrownError){
       var content;
       if(XMLHttpRequest.responseText === '')
@@ -358,7 +339,7 @@ $(function() {
             }
             window.showWelcomeScreen = false;
           }
-        },
+        }
     }).tabsResetAjax();
 
     $("#configuration .content").tabs({
@@ -375,7 +356,7 @@ $(function() {
           // First trigger of change() will hide the unselected client forms
           setTimeout(function() { show.find('.client_config select').change(); }, 0);
         }
-      },
+      }
     });
     // Initialize the 
     $("#favorites > .content").tabs({ 
@@ -383,6 +364,6 @@ $(function() {
       remote: true, 
       onShow: function(clicked, toShow, toHide) {
         $(toShow).addClass('clearfix');
-      },
+      }
     });
 });

@@ -8,6 +8,7 @@ $config=dirname(__FILE__).'/protected/config/main.php';
 
 // remove the following line when in production mode
 defined('YII_DEBUG') or define('YII_DEBUG',true);
+defined('UNIT_TEST') or define('UNIT_TEST',false);
 set_time_limit(0);
 
 // Enable the display of errors during the include process

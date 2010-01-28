@@ -1,24 +1,22 @@
 <div id="favoriteString_container">
-  <ul class="favorite loadContent">
+  <ul id="favoriteStringList" class="favorite loadContent">
     <?php 
-    echo "<li>".CHtml::link(
+    echo "<li id='favoriteString-li-'>".CHtml::link(
         'New Favorite', 
-        array('create', '#'=>'favoriteStrings-'), 
-        array('rel'=>'#favoriteString')
+        array('create'),
+        array('rel'=>'#favoriteString-')
     )."</li>";
     foreach($favoriteList as $model) {
-      echo "<li>".CHtml::link(
+      echo "<li id='favoriteString-li-{$model->id}'>".CHtml::link(
           $model->name, 
-          array('show', 'id'=>$model->id, '#'=>'favoriteStrings-'.$model->id), 
-          array('rel'=>'#favoriteString')
+          array('show', 'id'=>$model->id),
+          array('rel'=>'#favoriteString-'.$model->id)
       )."</li>";
     } ?>
   </ul>
   <?php 
-  if($pages===null) 
-    $this->renderPartial('show', array('model'=>new favoriteString()));
-  else
+  if($pages!==null) 
     $this->widget('CLinkPager',array('pages'=>$pages)); 
   ?> 
 </div>
-
+<?php if(isset($response)) echo $response; ?>
