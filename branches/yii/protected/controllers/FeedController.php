@@ -51,7 +51,10 @@ class FeedController extends BaseController
    */
   public function actionShow()
   {
-    $this->render('show',array('feed'=>$this->loadfeed()));
+    $this->render('show',array(
+        'model'=>$this->loadfeed(),
+        'response'=>Yii::app()->getUser()->getFlash('response'),
+    ));
   }
 
   /**
@@ -67,16 +70,18 @@ class FeedController extends BaseController
       try {
         $response = array('dialog'=>array('header'=>'Create Feed'));
         $feed->attributes=$_POST['feed'];
-        $success = $feed->save())
+        $success = $feed->save();
         $transaction->commit();
       } catch (Exception $e) {
         $transaction->rollback();
         throw $e;
       }
-      if($success)
+      if($success) {
+        Yii::app()->getUser()->setFlash('response', array('resetFeedItems'=>true));
         $this->redirect(array('list'));
+      }
     }
-    $this->render('create',array('feed'=>$feed));
+    $this->render('update',array('model'=>$feed));
   }
 
   /**
@@ -97,10 +102,12 @@ class FeedController extends BaseController
         $transaction->rollback();
         throw $e;
       }
-      if($success)
-       $this->redirect(array('show','id'=>$feed->id));
+      if($success) {
+        Yii::app()->getUser()->setFlash('response', array('resetFeedItems'=>true));
+        $this->redirect(array('list'));
+      }
     }
-    $this->render('update',array('feed'=>$feed));
+    $this->render('update',array('model'=>$feed));
   }
 
   /**
@@ -109,25 +116,17 @@ class FeedController extends BaseController
    */
   public function actionDelete()
   {
-    if(Yii::app()->request->isPostRequest)
-    {
-      // we only allow deletion via POST request
-      $response = array('dialog'=>array('header'=> 'Delete Feed'));
-      $feed = $this->loadfeed();
-      $transaction = $feed->getDbConnection()->beginTransaction();
-      try {
-        $feed->delete();
-        $transaction->commit();
-      } catch (Exception $e) {
-        $transaction->rollback();
-        throw $e;
-      }
-      $response['dialog']['content'] = 'Your feed has been successfully deleted.';
-      Yii::app()->getUser()->setFlash('response', $response);
-      $this->redirect(array('/ajax/fullResponse', 'response'=>1));
+    $feed = $this->loadfeed();
+    $transaction = $feed->getDbConnection()->beginTransaction();
+    try {
+      $feed->delete();
+      $transaction->commit();
+    } catch (Exception $e) {
+      $transaction->rollback();
+      throw $e;
     }
-    else
-      throw new CHttpException(500,'Invalid request. Please do not repeat this request again.');
+    Yii::app()->getUser()->setFlash('response', array('resetFeedItems'=>true));
+    $this->redirect(array('list'));
   }
 
   /**
@@ -142,10 +141,10 @@ class FeedController extends BaseController
     $pages->applyLimit($criteria);
 
     $feedList=feed::model()->findAll($criteria);
-
     $this->render('list',array(
       'feedList'=>$feedList,
       'pages'=>$pages,
+      'response'=>Yii::app()->getUser()->getFlash('response'),
     ));
   }
 
@@ -168,9 +167,9 @@ class FeedController extends BaseController
     $feedList=feed::model()->findAll($criteria);
 
     $this->render('admin',array(
-      'feedList'=>$feedList,
-      'pages'=>$pages,
-      'sort'=>$sort,
+        'feedList'=>$feedList,
+        'pages'=>$pages,
+        'sort'=>$sort,
     ));
   }
 

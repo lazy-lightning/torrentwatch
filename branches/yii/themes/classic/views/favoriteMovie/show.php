@@ -1,6 +1,6 @@
 <?php 
   echo CHtml::beginForm(
-      array('/favoriteMovie/'.$model->isNewRecord ? 'create' : 'update', 'id'=>$model->id), 
+      array('/favoriteMovie/'.($model->isNewRecord ? 'create' : 'update'), 'id'=>$model->id), 
       'post', 
       array('class'=>'favinfo', 'id'=>'favoriteMovie-'.$model->id)
   );
@@ -48,7 +48,7 @@
               CHtml::activeCheckBox($model, 'queue'); ?>
  </div>
  <div class="buttonContainer">
-   <a class="submitForm button" id="Update" href="#"><?php echo $model->isNewRecord ? 'Create' : 'Update'; ?></a>
+   <a class="submitForm button" class="update" href="#"><?php echo ($model->isNewRecord ? 'Create' : 'Update'); ?></a>
    <?php if(!$model->isNewRecord)
            echo CHtml::link('Delete', array('delete', 'id'=>$model->id), array('class'=>'button ajaxSubmit')); ?>
    <a class="toggleDialog button" href="#">Close</a>

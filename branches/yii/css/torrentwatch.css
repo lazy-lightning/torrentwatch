@@ -638,7 +638,7 @@ div.client_config select {
   }
 
 #newFeed {
-  height: 52px;
+  height: auto;
   }
 
 #newFeed select {

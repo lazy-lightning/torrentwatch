@@ -9,6 +9,8 @@ class feedAdapter extends SimplePie {
 
   function __construct($feed, $cache_location = null, $cache_duration = null) {
     parent::SimplePie(null, $cache_location, $cache_duration);
+    if(UNIT_TEST)
+      $this->cache = false;
     $this->_feedAR = $feed;
     $this->set_feed_url($feed->url);
     // feedAdapter_File implements the :COOKIE: portion of url's
@@ -34,6 +36,7 @@ class feedAdapter extends SimplePie {
     }
 
     $this->_feedAR->status = feed::STATUS_OK;
+    Yii::log($this->get_title());
     $this->_feedAR->title = $this->get_title();
     $this->_feedAR->description = $this->get_description();
 

@@ -1,6 +1,6 @@
 <div class="activeFeed" id="newFeed">
   <?php echo CHtml::beginForm(array('create'), 'post', array('class'=>'feedform')); ?>
-  <a class="submitForm button" id="Add" href="#">Add</a>
+  <a class="submitForm button" class="add" href="#">Add</a>
   <?php if($model->hasErrors()) echo CHtml::errorSummary($model); ?>
   <div>
     <label class="item">New Feed</label>
