@@ -99,6 +99,7 @@
                 $('div.expose').show();
                 dialog = $($this[0].hash);
                 dialog.fadeIn();
+                // all dialogs must have a close button
                 if(dialog.find('div.close').length == 0)
                     dialog.prepend('<div class="close"></div>');
                 // if tabs are initialized but the active one is empty trigger the ajax load
@@ -115,8 +116,10 @@
                     }, 'html');
                 } else 
                     callback();
-            } else if(visible)
+            } else if(visible) {
+                // dialog was just hidden
                 $('div.expose').hideExpose();
+            }
             toHide.fadeOut();
         });
         return this;
@@ -214,8 +217,10 @@ $(function() {
         return false;
       }
       // History details hide/reveal
-      if(target.is("div#history li")) {
-        target.find(".hItemDetails").slideToggle(600);
+      if(target.closest("#history li").length)
+        target = target.closest("#history li");
+      if(target.is("#history li")) {
+        target.children(".hItemDetails").slideToggle(300);
         return false;
       }
       // Clear History ajax submit
