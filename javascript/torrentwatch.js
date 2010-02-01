@@ -128,7 +128,7 @@
       this.click(function() {
         var li = $(this);
         $.get('nmtdvr.php', 'r=feedItem/list&filter='+encodeURIComponent(li[0].id), function(html) {
-          li.replaceWith(html);
+          li.replaceWith($(html).children('li'));
           $('li.torrent').markAlt();
         }, 'html');
       });
