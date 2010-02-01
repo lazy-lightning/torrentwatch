@@ -13,27 +13,62 @@ class DvrConfigTest extends WebTestCase
       'tvEpisode'=>'tvEpisode',
   );
 
+  // These are element locators  used throughout the test
+  // they offer a single place to change a locator and 
+  // more obvious names
+  protected $locators = array(
+      'closeConfigDialogButton'    => "css=#configuration > div.close",
+      'configDialog'               => 'id=configuration',
+      'deleteFirstFeedButton'      => "xpath=id('feeds')/div[1]/a",
+      'errorSummary'               => 'css=.errorSummary',
+      'feedSaveButton'             => "xpath=id('newFeed')/form/a",
+      'feedsTab'                   => 'id=feeds',
+      'feedUrlInput'               => 'id=feed_url',
+      'firstFeedTitle'             => "xpath=id('feeds')/div[1]/span",
+      'globalConfigTab'            => 'id=global_config',
+      'itemsPerLoadInput'          => 'id=dvrConfig_webItemsPerLoad',
+      'nzbClientSelect'            => 'id=dvrConfig_nzbClient',
+      'nzbTab'                     => 'id=nzbClient',
+      'responseDialog'             => 'id=actionResponse',
+      'toggleConfigDialog'         => 'link=Configure',
+      'toggleFeedTab'              => "xpath=id('configuration')/div[2]/ul/li[4]/a",
+      'toggleNzbTab'               => "xpath=id('configuration')/div[2]/ul/li[3]/a",
+      'toggleTorrentTab'           => "xpath=id('configuration')/div[2]/ul/li[2]/a",
+      'torClientSelect'            => 'id=dvrConfig_torClient',
+      'torrentTab'                 => 'id=torClient',
+      'transRpcUsernameInput'      => "xpath=id('clientTransRPC')/div[3]/input",
+      'transRpcPasswordInput'      => "xpath=id('clientTransRPC')/div[4]/input",
+      'transRpcSaveButton'         => "xpath=id('clientTransRPC')/div/a[1]",
+      'sabnzbdCategoryInput'       => "xpath=id('clientSABnzbd')/div[1]/input",
+      'sabnzbdConfig'              => 'id=clientSABnzbd',
+      'sabnzbdSaveButton'          => "xpath=id('clientSABnzbd')/div/a[1]",
+
+  );
+
   protected function assertPreConditions()
   {
+    $l = $this->locators; // shorthand access
     parent::assertPreConditions();
-    $this->clickAndWaitFor('link=Configure', 'id=configuration', false);
-    $this->assertVisible('id=global_config');
+    $this->clickAndWaitFor($l['toggleConfigDialog'], $l['configDialog'], false);
+    $this->assertVisible($l['globalConfigTab']);
   }
 
   function testDefaultSave()
   {
+    $l = $this->locators; // shorthand access
     $this->assertElementPresent('link=Save');
-    $this->clickAndWaitFor('link=Save', 'id=actionResponse', false);
-    $this->assertText('id=actionResponse', 'Configuration saved.');
+    $this->clickAndWaitFor('link=Save', $l['responseDialog'], false);
+    $this->assertText($l['responseDialog'], 'Configuration saved.');
   }
 
   function testUpdateGlobalConfig()
   {
-    $this->type('id=dvrConfig_webItemsPerLoad', 'qwerty');
-    $this->clickAndWaitFor('link=Save', 'css=.errorSummary', false);
-    $this->type('id=dvrConfig_webItemsPerLoad', 200);
-    $this->clickAndWaitFor('link=Save', 'id=actionResponse', false);
-    $this->assertText('id=actionResponse', 'Configuration saved.');
+    $l = $this->locators; // shorthand access
+    $this->type($l['itemsPerLoadInput'], 'qwerty');
+    $this->clickAndWaitFor('link=Save', $l['errorSummary'], false);
+    $this->type($l['itemsPerLoadInput'], 200);
+    $this->clickAndWaitFor('link=Save', $l['responseDialog'], false);
+    $this->assertText($l['responseDialog'], 'Configuration saved.');
     $config = new dvrConfig;
     $config->init();
     $this->assertEquals($config->webItemsPerLoad, 200);
@@ -41,24 +76,26 @@ class DvrConfigTest extends WebTestCase
 
   function testTorClient()
   {
+    $l = $this->locators; // shorthand access
     // click button to load torrent client configuration
-    $this->click("xpath=id('configuration')/div[2]/ul/li[2]/a");
-    $this->waitForElementPresentAndVisible('id=torClient');
+    $this->click($l['toggleTorrentTab']);
+    $this->waitForElementPresentAndVisible($l['torrentTab']);
     // Verify save to folder was default client
-    $this->assertSelectedLabel('id=dvrConfig_torClient', 'Save to Folder');
+    $this->assertSelectedLabel($l['torClientSelect'], 'Save to Folder');
     // change to clientTransRPC
-    $this->select('id=dvrConfig_torClient', 'value=clientTransRPC');
+    $this->select($l['torClientSelect'], 'value=clientTransRPC');
     $this->waitForElementVisible('id=clientTransRPC');
     // and set a few variables
-    $this->type("xpath=id('clientTransRPC')/div[3]/input", "spaztastic");
-    $this->type("xpath=id('clientTransRPC')/div[4]/input", "pAsswOrd");
+    $this->type($l['transRpcUsernameInput'], "spaztastic");
+    $this->type($l['transRpcPasswordInput'], "pAsswOrd");
     // click save button
-    $this->click("xpath=id('clientTransRPC')/div/a[1]");
+    $this->click($l['transRpcSaveButton']);
     // not sure how to tell this is actually done
     usleep(500000);
-    // Check that our selected client is visible
+    // Check that saved client choice is selected
+    $this->assertSelectedLabel($l['torClientSelect'], 'Transmission >= 1.3');
+    // Check that our selected client options are visible
     $this->assertElementVisible('id=clientTransRPC');
-    $this->assertSelectedLabel('id=dvrConfig_torClient', 'Transmission >= 1.3');
     // Check that our selected client was saved in the configuration
     $config = new dvrConfig;
     $config->init();
@@ -70,23 +107,24 @@ class DvrConfigTest extends WebTestCase
 
   function testNzbClient()
   {
+    $l = $this->locators; // shorthand access
     // click button to load torrent client configuration
-    $this->click("xpath=id('configuration')/div[2]/ul/li[3]/a");
-    $this->waitForElementPresentAndVisible('id=nzbClient');
+    $this->click($l['toggleNzbTab']);
+    $this->waitForElementPresentAndVisible($l['nzbTab']);
     // Verify save to folder was default client
-    $this->assertSelectedLabel('id=dvrConfig_nzbClient', 'Save to Folder');
+    $this->assertSelectedLabel($l['nzbClientSelect'], 'Save to Folder');
     // change to clientSABnzbd
-    $this->select('id=dvrConfig_nzbClient', 'value=clientSABnzbd');
-    $this->waitForElementVisible('id=clientSABnzbd');
+    $this->select($l['nzbClientSelect'], 'value=clientSABnzbd');
+    $this->waitForElementVisible($l['sabnzbdConfig']);
     // and set a few variables
-    $this->type("xpath=id('clientSABnzbd')/div[1]/input", "spaztastic");
+    $this->type($l['sabnzbdCategoryInput'], "spaztastic");
     // click save button
-    $this->click("xpath=id('clientSABnzbd')/div/a[1]");
+    $this->click($l['sabnzbdSaveButton']);
     // not sure how to tell this is actually done
     usleep(500000);
     // Check that our selected client is visible
-    $this->assertElementVisible('id=clientSABnzbd');
-    $this->assertSelectedLabel('id=dvrConfig_nzbClient', 'SABnzbd+');
+    $this->assertElementVisible($l['sabnzbdConfig']);
+    $this->assertSelectedLabel($l['nzbClientSelect'], 'SABnzbd+');
     // Check that our selected client was saved in the configuration
     $config = new dvrConfig;
     $config->init();
@@ -97,39 +135,40 @@ class DvrConfigTest extends WebTestCase
 
   function testFeeds()
   {
+    $l = $this->locators; // shorthand access
     // click button to load feeds configuration
-    $this->click("xpath=id('configuration')/div[2]/ul/li[4]/a");
-    $this->waitForElementPresentAndVisible('id=feeds');
+    $this->click($l['toggleFeedTab']);
+    $this->waitForElementPresentAndVisible($l['feedsTab']);
     // Try entering a non-url and saving
-    $this->type('id=feed_url', 'Ipsum');
-    $this->click("xpath=id('newFeed')/form/a");
+    $this->type($l['feedUrlInput'], 'Ipsum');
+    $this->click($l['feedSaveButton']);
     // wait for error message
-    $this->waitForElementPresentAndVisible('css=.errorSummary');
+    $this->waitForElementPresentAndVisible($l['errorSummary']);
     // Try a valid sample feed
     // NOTE: bad reference to static data
     //       also requires a localhost.com to be defined in /etc/hosts
-    $this->type('id=feed_url', 'http://localhost.com/nmtdvr/testing/index.html');
-    $this->click("xpath=id('newFeed')/form/a");
+    $this->type($l['feedUrlInput'], 'http://localhost.com/nmtdvr/testing/index.html');
+    $this->click($l['feedSaveButton']);
     // wait for error message to disapear
-    $this->waitForElementNotPresent('css=.errorSummary');
+    $this->waitForElementNotPresent($l['errorSummary']);
     // verify our sample feeds title is displayed
-    $this->assertText("xpath=id('feeds')/div[1]/span", "Sample Feed");
+    $this->assertText($l['firstFeedTitle'], "Sample Feed");
     // verify feed items have not yet been loaded
     $this->assertElementNotPresent('css=.torrent');
     // close the dialog
-    $this->click("css=#configuration > div.close");
+    $this->click($l['closeConfigDialogButton']);
     // wait for feed items to load
     $this->waitForElementPresent('css=.torrent');
     usleep(500000);
     // reopen the configuration dialog
-    $this->clickAndWaitFor('link=Configure', 'id=configuration', false);
+    $this->clickAndWaitFor($l['toggleConfigDialog'], $l['configDialog'], false);
     // click the delete button
-    $this->click("xpath=id('feeds')/div[1]/a");
+    $this->click($l['deleteFirstFeedButton']);
     // wait till the feeds list is one element shorter
     $this->waitForElementNotPresent("xpath=id('feeds')/div[4]");
     usleep(500000);
     // close the dialog
-    $this->click("css=#configuration > div.close");
+    $this->click($l['closeConfigDialogButton']);
     // verify the feed items have disapeared
     $this->waitForElementNotPresent('css=.torrent');
   }
