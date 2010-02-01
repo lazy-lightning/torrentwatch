@@ -22,7 +22,8 @@ class makeFavoriteAction extends feedItemAction
     $this->response->showDialog = '#favorites';
     $this->response->showTab = "#".$type;
     $this->response->resetFeedItems = true;
-    $this->render("/$type/show", array(
+    Yii::app()->getController->render("/$type/show", array(
+          'model' => $fav,
           'response' => $this->response->getContent(),
           'feedsListData' => feed::getCHtmlListData(),
           'genresListData' => genre::getCHtmlListData(),
