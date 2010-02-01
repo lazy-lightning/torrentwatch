@@ -1,17 +1,18 @@
 <html>
 <head>
   <title>Torrentwatch</title>
-  <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" ></link>
-  <link rel="Stylesheet" type="text/css" href="css/reset.css"></link>
-  <link rel="Stylesheet" type="text/css" href="css/torrentwatch.css"></link>
-  <link rel="Stylesheet" type="text/css" href="css/jquery.tabs.css"></link>
+  <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
+  <link rel="Stylesheet" type="text/css" href="css/reset.css" />
+  <link rel="Stylesheet" type="text/css" href="css/torrentwatch.css" />
+  <link rel="Stylesheet" type="text/css" href="css/jquery.tabs.css" />
   <!--[if IE]>
     <link rel="Stylesheet" type="text/css" href="css/ie.css"></link>
   <![endif]-->
   <!--
+  <script type="text/javascript" src="javascript/joined.js"></script>
   <script type="text/javascript" src="javascript/min.js"></script>
   -->
-  <script type="text/javascript" src="javascript/jquery-1.3.1.js"></script>
+  <script type="text/javascript" src="javascript/jquery-1.4.1.js"></script>
   <script type="text/javascript" src="javascript/jquery.cookie.js"></script>
   <script type="text/javascript" src="javascript/jquery.tinysort.js"></script>
   <script type="text/javascript" src="javascript/jquery.tabs.js"></script>
@@ -38,17 +39,11 @@
 </ul>
 <div class="progressbar dialog_window" id="progressbar">
   <div class="content">
-    <img src="images/ajaxload.gif">
+<!--<img src="images/ajaxload.gif"> -->
+    <img src="data:image/gif;base64,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">
   </div>
 </div>
 <div class="expose">&nbsp;</div>
-<div class="context_menu" id="CM1">
-  <ul>
-    <li id="addToFavorites">Add to Favorites</li>
-    <li id="startDownloading">Start Downloading</li>
-    <li id="inspect">Inspect</li>
-  </ul>
-</div>
 <div id="inspector_container">
   <div id="inspector_loading">
     <h2>Right click any feed item and select Inspect</h2>
@@ -60,7 +55,6 @@
     <li><a href="nmtdvr.php?r=tvEpisode/list"><span>TV Episodes</span></a></li>
     <li><a href="nmtdvr.php?r=movie/list"><span>Movies</span></a></li>
     <li><a href="nmtdvr.php?r=other/list"><span>Others</span></a></li>
-    <li><a href="nmtdvr.php?r=ajax/loadFeedItems&type=queued"><span>Queued</span></a></li>
   </ul>
 </div>
 <div id="favorites" class="dialog_window">
