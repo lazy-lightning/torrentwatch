@@ -1,6 +1,6 @@
 <?php
 
-class ARStatusTextBehavior extends CActiveRecordBehavior
+class ARStatusTextBehavior extends CBehavior
 {
   public function getStatusOptions() {
     $class = get_class($this->getOwner());
