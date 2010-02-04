@@ -92,6 +92,39 @@ abstract class favoriteManager extends CModel {
     }
   }
 
+  protected function markOldEpisodes($itemStatus)
+  {
+    // Start by limiting to the favorites with only newer flagged
+    $tvShowIdsSql =
+        "SELECT tvShow_id FROM favoriteTvShows WHERE onlyNewer = 1";
+
+    // Get the id of the newest tv episode of each tvShow in our set
+    $newEpisodeIdsSql =
+        "SELECT id FROM ".
+        "( SELECT id,tvShow_id FROM tvEpisode ".
+        "  WHERE tvShow_id IN ( $tvShowIdsSql )".
+        "  ORDER BY season,episode".
+        ")".
+        "GROUP BY tvShow_id";
+
+    // Get the id of every episode that is not the newest of each tvShow in our set
+    // sqlite is smart enough to only make the $tvShowIdsSql query once even
+    // if we use it twice
+    $notNewEpisodeIdsSql =
+        "SELECT id FROM tvEpisode".
+        " WHERE tvShow_id IN ( $tvShowIdsSql )".
+        "   AND id NOT IN ( $newEpisodeIdsSql )";
+
+    // update all feed items of proper status that are in the notNew tvEpisode query
+    Yii::app()->db->createCommand(
+        "UPDATE feedItem".
+        "   SET status = ".feedItem::STATUS_OLD.
+        " WHERE tvEpisode_id NOT NULL".
+        "   AND status = ".$itemStatus.
+        "   AND tvEpisode_id IN ( $notNewEpisodeIdsSql )"
+    )->execute();
+  }
+
   /**
    * looks for feedItems that matching a favoriteTvShow in the database
    * @param integer a feeditem status to limit the search to
@@ -114,16 +147,7 @@ abstract class favoriteManager extends CModel {
             ' );'
             )->execute();
 
-        // Mark any old episodes with favorite set to only newer
-        // episodes(handled inside the view)
-        $db->createCommand(
-            'UPDATE feedItem'.
-            '   SET status='.feedItem::STATUS_OLD.
-            ' WHERE feedItem.status = '.$itemStatus.
-            '   AND feedItem.id IN ( SELECT feedItem_id'.
-            '    FROM onlyNewerFeedItemFilter'.
-            ')'
-            )->execute();
+        $this->markOldEpisodes($itemStatus);
         $trans->commit();
     } catch (Exception $e) {
         $trans->rollback();
