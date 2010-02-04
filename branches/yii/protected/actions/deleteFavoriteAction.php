@@ -44,8 +44,10 @@ class deleteFavoriteAction extends CAction
           Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NEW);
           $this->response->dialog['content'] = 'Your favorite has been successfully deleted';
           $this->response->resetFeedItems = true;
-          $this->response->delete = '#'.get_class($model).'-li-'.$_GET['id'];
-          $this->response->alsoDelete = '#'.get_class($model).'-'.$_GET['id'];
+          $this->response->delete = array(
+              '#'.get_class($model).'-li-'.$_GET['id'],
+              '#'.get_class($model).'-'.$_GET['id'],
+          );
         }
         else
         {
