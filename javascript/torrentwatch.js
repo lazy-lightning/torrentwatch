@@ -1,5 +1,18 @@
 (function($) {
     var inspect_status;
+    $.ajaxAppend = function(child, parent) {
+      var wait = function() {
+        if($(parent).length == 0)
+          setTimeout(wait, 100);
+        else {
+          var old = $(parent).find(child);
+          if(old.length)
+            old.remove();
+          $(child).remove().appendTo(parent);
+        }
+      }
+      wait();
+    }
     $.toggleInspector = function() {
         inspect_status = !inspect_status;
         $("div#feedItems_container,div#feedItems_container > div,ul#filterbar_container,div#inspector_container").stop(true,true).animate(
@@ -8,7 +21,7 @@
         );
     };
     $.fn.tabsResetAjax = function () {
-      // Reset the feed items container and click the selected link to trigger reload
+      // Reset the container and click the selected link to trigger reload
       this.children('div')
         .each(function() {
           $(this).empty();
@@ -67,61 +80,64 @@
             onShow(null, this.parentNode, null);
         }
       });
-      data.not('script').addClass('dynamic-load').appendTo('body');
-      setTimeout(function() {
+      data.not('script').addClass('dynamic-load').end().appendTo('body');
+/*      setTimeout(function() {
         data.filter('script').each(function() {
           $.globalEval( this.text || this.textContent || this.innerHTML || "" );
         });
-      },0);
+      },0); */
     };
     $.fn.hideExpose = function() {
-      $(this).hide();
-      var feedItems = $("#feedItems_container");
-      if(feedItems.hasClass('needsReset'))
-        feedItems.removeClass('needsReset').tabsResetAjax();
+      var $this = $(this);
+      var wait = function() {
+        if($this.is(':visible') && $('.dialog_window:visible').length == 0) {
+          var feedItems = $("#feedItems_container");
+          if(feedItems.hasClass('needsReset'))
+            feedItems.removeClass('needsReset').tabsResetAjax();
+          else
+            $this.hide();
+        }
+        setTimeout(wait, 300);
+      }
+      wait();
     };
     // toggleDialog is a click handler for anchors 
-    window.current_dialog = '';
     $.fn.toggleDialog = function() {
-        this.each(function() {
-            var $this = $(this), dialog;
-            if($this.is('a') && this.hash)
-                dialog = $(this.hash);
-            else if($this.is('.dialog_window'))
-                dialog = $this
-            else
-                dialog = $this.closest('.dialog_window');
+        var dialog;
+        if(this.is('a') && this[0].hash)
+            dialog = $(this[0].hash);
+        else if(this.is('.dialog_window'))
+            dialog = this
+        else
+            dialog = this.closest('.dialog_window');
+        var dialogSelector = '#'+dialog[0].id;
 
-            var toHide = $('.dialog_window:visible');
-            var visible = dialog.is(':visible');
+        var toHide = $('.dialog_window:visible').not('.progressbar');
+        var visible = dialog.is(':visible');
 
-            var callback = function() { 
-                $('div.expose').show();
-                dialog = $($this[0].hash);
-                dialog.fadeIn();
-                // all dialogs must have a close button
-                if(dialog.find('div.close').length == 0)
-                    dialog.prepend('<div class="close"></div>');
-                // if tabs are initialized but the active one is empty trigger the ajax load
-                var tabs = dialog.find('.tabs-container');
-                if(tabs.length != 0 && tabs.filter('.tabs-hide').children().length == 0)
-                    dialog.find('.tabs-nav .tabs-selected').removeClass('tabs-selected').find('a').click();
-            };
-         
-            if(dialog && !visible) {
-                if(dialog.length == 0) {
-                    $.post(this.href, '', function(html) {
-                        $.loadAjaxUpdate(html);
-                        setTimeout(callback, 100);
-                    }, 'html');
-                } else 
-                    callback();
-            } else if(visible) {
-                // dialog was just hidden
-                $('div.expose').hideExpose();
-            }
-            toHide.fadeOut();
-        });
+        var callback = function() { 
+            $('div.expose').show();
+            dialog = $(dialogSelector);
+            dialog.fadeIn();
+            // all dialogs must have a close button
+            if(dialog.find('div.close').length == 0)
+                dialog.prepend('<div class="close"></div>');
+            // if tabs are initialized but the active one is empty trigger the ajax load
+            var tabs = dialog.find('.tabs-container');
+            if(tabs.length != 0 && tabs.filter('.tabs-hide').children().length == 0)
+                dialog.find('.tabs-nav .tabs-selected').removeClass('tabs-selected').find('a').click();
+        };
+     
+        if(dialog && !visible) {
+            if(dialog.length == 0) {
+                $.post(this.href, '', function(html) {
+                    $.loadAjaxUpdate(html);
+                    setTimeout(callback, 100);
+                }, 'html');
+            } else 
+                callback();
+        }
+        toHide.fadeOut();
         return this;
     };
     $.fn.initDuplicates = function() {
@@ -165,16 +181,37 @@
         return this;
     };
 
-    $.showTab = function(hash) {
-      var dialog = $(hash).closest('.dialog_window');
-      $.showDialog('#'+dialog.get(0).id)
-      dialog.find('ul.tabs-nav').find("a[href="+hash+"]").click();
+    // Utility function called from ajax response javascript
+    $.showTab = function(linkSelector) {
+      var link = $(linkSelector);
+      var dialog = link.closest('.dialog_window')[0];
+      // click before show to prevent loading current tab
+      // and newly selected tab via ajax
+      link.click();
+      $.showDialog('#'+dialog.id)
     }
-
+    // Utility function called from ajax response javascript
     $.showDialog = function(hash) {
+//      $('#mainoptions a[rel='+hash+']').toggleDialog();
       $('<a href="'+hash+'"/>').toggleDialog();
     };
+    $.showFavorite = function(hash) {
+      var selector = "a[rel='"+hash+"']";
+      var wait = function() {
+        var link = $(selector);
+        var $hash = $(hash);
+        // wait for link, and hash to exist.  Also wait for hash to be in a dialog_window
+        if(link.length == 0 || $hash.length == 0 || $hash.parents('.dialog_window').length == 0)
+          setTimeout(wait, 300);
+        else {
+          link.toggleFavorite();
+        }
+      }
+      wait();
+    };
 
+    // Used to build the string to submit a form
+    // Will add buttonElement as a form option
     $.fn.buildDataString = function(buttonElement) {
         var dataString = $(this).filter('form').serialize();
         if(buttonElement) {
@@ -182,6 +219,7 @@
         }
         return dataString;
     };
+    // marks the group of elements as alt/notalt
     $.fn.markAlt = function() {
       return this.removeClass('alt').removeClass('notalt').filter(":visible")
         .filter(":even").addClass('alt').end()
@@ -196,6 +234,8 @@
 //
 
 $(function() { 
+    // auto-hiding expose
+    $('div.expose').hideExpose();
     // Handle button click events
     $("body").live('click', function(e) {
       if(e.button != 0)
@@ -229,6 +269,7 @@ $(function() {
           // $(html).html() is used to strip the outer tag(<div#history></div>) and get the children
           $("div#history").html($(html).html());
         }, 'html');
+        e.returnValue = false;
         return false;
       }
       // toggle visible favorite
@@ -271,22 +312,32 @@ $(function() {
 
     // Filter Bar - Buttons
     $("ul#filterbar_container li:not(#filter_bytext)").click(function() {
+        // If filter already selected do nothing
         if($(this).is('.selected'))
             return;
+        // mark this filter selected, siblings as not seleceted
         $(this).addClass('selected').siblings().removeClass("selected");
+        // Find out the type of filter
         var filter = this.id;
+        // Find the active feed item container
         var container = $("div#feedItems_container > div:visible");
+        // Hide the container while filtering
         container.slideUp(400, function() {
+          // Get all the currently known about feed items
             var tor = $("li.torrent:not(.duplicate)").removeClass('hidden');
             switch (filter) {
             case 'filter_matching':
+                // Hide
                 tor.filter(".match_New, .match_Unmatched, .match_Auto").addClass('hidden');
                 break;
             case 'filter_downloaded':
+                // Hide all except the following classes
                 tor.not('.match_Automatic, .match_Manual, .match_Failed').addClass('hidden');
                 break;
             }
+            // re-mark the torrents as alt/notalt
             tor.markAlt();
+            // Display the container again
             container.slideDown(400);
         });
     });
@@ -314,8 +365,6 @@ $(function() {
       setTimeout(function() {
         if(window.ajaxCount > 0) return;
         progress.hide();
-        if($('.dialog_window:visible').not(progress[0]).length == 0) 
-          $('div.expose').hideExpose();
       },300);
     }).ajaxError(function(event, XMLHttpRequest, ajaxOptions, thrownError){
       var content;
