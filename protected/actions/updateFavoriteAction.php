@@ -40,6 +40,7 @@ class updateFavoriteAction extends CAction
     }
     else
     {
+      // Create command
       $class = $this->asa('loadModel')->getControllerARClass();
       $model = new $class;
     }

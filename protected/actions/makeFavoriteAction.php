@@ -11,19 +11,31 @@ class makeFavoriteAction extends feedItemAction
     $type=get_class($fav);
     $transaction = Yii::app()->db->beginTransaction();
     try {
-      $fav->save();
+      $success = $fav->save();
       $transaction->commit();
     } catch (Exception $e) {
       $transaction->rollback();
       throw $e;
     }
     // After save to get the correct id
-    $htmlId = $type.'-'.$fav->id;
-    $this->response->showDialog = '#favorites';
-    $this->response->showTab = "#".$type;
+    $this->response->showTab = "#{$type}_tab a";
+    $this->response->showFavorite = "#{$type}-{$fav->id}";
     $this->response->resetFeedItems = true;
-    Yii::app()->getController->render("/$type/show", array(
+    $this->response->append = array(
+        array(
+          'selector'=>"#{$type}-{$fav->id}",
+          'parent'=>"#{$type}_container",
+    ));
+    if($success)
+    {
+      $this->response->append[] = array(
+          'selector' =>"#${type}-li-{$fav->id}",
+          'parent'=>"#{$type}List",
+      );
+    }
+    Yii::app()->getController()->render("/$type/show", array(
           'model' => $fav,
+          'addLi' => $success,
           'response' => $this->response->getContent(),
           'feedsListData' => feed::getCHtmlListData(),
           'genresListData' => genre::getCHtmlListData(),
