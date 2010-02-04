@@ -86,8 +86,9 @@ class FavoritesTest extends WebTestCase
     if($this->isElementPresent($l['favoriteFilterInput']))
       $this->type($l['favoriteFilterInput'], 'bazzab');
     $this->clickAndWaitFor($l['createFavoriteButton'], $l['updateFavoriteButton'],false);
-    // Make sure our name got to this page
+    // Make sure item created successfully
     $this->assertElementNotPresent($l['errorSummary']);
+    // Make sure our name got to this page
     $this->assertTextPresent('foobar');
     // try a directory that cant be saved to
     $this->type($l['favoriteSaveInInput'], '/etc');

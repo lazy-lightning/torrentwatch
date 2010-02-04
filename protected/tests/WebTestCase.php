@@ -50,6 +50,14 @@ class WebTestCase extends CWebTestCase
     $this->clickAndWait("//input[@value='Login']");
     // Open page, wait for progress bar to finish
     $this->open('../index-test.html');
+    $this->closeWelcome();
+  }
+
+  /**
+   * Close the initial welcome screen
+   */
+  protected function closeWelcome()
+  {
     $this->waitForElementPresent('link=Close');
     // Click the close wizard button
     $this->click('link=Close');
