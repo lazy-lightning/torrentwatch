@@ -4,9 +4,16 @@
 // with the quality table.  This standardizes their setting
 // and getting
 
-class ARQualityBehavior extends CActiveRecordBehavior 
+class ARQualityBehavior extends CBehavior 
 {
   private $_qualityIds;
+
+  public function events()
+  {
+    return array(
+        'onAfterSave' => 'afterSave',
+    );
+  }
 
   public function getQualityIds() 
   {
