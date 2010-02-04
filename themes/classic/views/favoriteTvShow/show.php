@@ -60,7 +60,7 @@
 <?php if(isset($addLi) && $addLi)
         echo "<li id='favoriteTvShow-li-{$model->id}'>".CHtml::link(
           $model->name,
-          array('show', 'id'=>$model->id),
+          array('/favoriteTvShow/show', 'id'=>$model->id),
           array('rel'=>'#favoriteTvShow-'.$model->id)
       )."</li>"; ?>
 <?php echo CHtml::endForm().(isset($response) ? $response : ''); ?>
