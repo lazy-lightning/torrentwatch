@@ -7,11 +7,10 @@ class DbFixtureManager extends CDbFixtureManager {
   public function setSubFixture($dir)
   {
     $this->resetSubFixture();
-    if(!is_dir($this->basepath.DIRECTORY_SEPARATOR.$dir))
-      throw new CException('Fixture sub directory does not exist: '.$dir);
-    $this->basePath = $this->basepath.DIRECTORY_SEPARATOR.$dir;
+    if(!is_dir($this->basePath.DIRECTORY_SEPARATOR.$dir) || strpos($dir, DIRECTORY_SEPARATOR) !== false)
+      throw new CException('Fixture sub directory is invalid: '.$dir);
+    $this->basePath = $this->basePath.DIRECTORY_SEPARATOR.$dir;
     $this->isSubFixture = true;
-    return this;
   }
 
   public function resetSubFixture()
@@ -21,5 +20,17 @@ class DbFixtureManager extends CDbFixtureManager {
       $this->basePath = dirname($this->basePath);
       $this->isSubFixture = false;
     }
+  }
+
+  protected function assertPostConditions()
+  {
+    $this->resetSubFixture();
+    parent::assertPostConditions();
+  }
+
+  public function tearDown()
+  {
+    $this->resetSubFixture();
+    parent::tearDown();
   }
 }
