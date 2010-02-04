@@ -23,7 +23,7 @@
 <ul class="mainoptions" id="mainoptions">
   <li id="refresh"><a href="">Refresh</a></li>
   <li class="divider">&nbsp;</li>
-  <li id="favoritesMenu"><a class="toggleDialog" href="#favorites">Favorites</a></li>
+  <li id="favoritesMenu"><a class="toggleDialog" rel="#favorites" href="#favorites">Favorites</a></li>
   <li id="config"><a class="toggleDialog" href="#configuration">Configure</a></li>
   <li class="divider">&nbsp;</li>
   <li id="view"><a class="toggleDialog" href="nmtdvr.php?r=history/list#history">View History</a></li>
@@ -60,9 +60,9 @@
 <div id="favorites" class="dialog_window">
   <div class="content">
     <ul class="favTypes">
-      <li><a href="nmtdvr.php?r=favoriteTvShow/list"><span>TV Shows</span></a></li>
-      <li><a href="nmtdvr.php?r=favoriteMovie/list"><span>Movies</span></a></li>
-      <li><a href="nmtdvr.php?r=favoriteString/list"><span>Strings</span></a></li>
+      <li id="favoriteTvShow_tab"><a href="nmtdvr.php?r=favoriteTvShow/list"><span>TV Shows</span></a></li>
+      <li id="favoriteMovie_tab"><a href="nmtdvr.php?r=favoriteMovie/list"><span>Movies</span></a></li>
+      <li id="favoriteString_tab"><a href="nmtdvr.php?r=favoriteString/list"><span>Strings</span></a></li>
     </ul>
   </div>
 </div>

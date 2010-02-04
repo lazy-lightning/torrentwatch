@@ -123,6 +123,9 @@ class TvEpisodeController extends BaseController
     $criteria=new CDbCriteria(array(
           'select'=>'id, status, title, season, episode', 
           'order'=>'t.lastUpdated DESC',
+          // only display episodes that have a related feeditem
+          // how much slower does this make it, should there be an extra column to flag this
+          'condition'=>'t.id in (select tvEpisode_id from feedItem where tvEpisode_id not null)'
     )) ;
 
     if(isset($_GET['tvShow']))
