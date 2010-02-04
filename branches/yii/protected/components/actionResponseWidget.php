@@ -27,18 +27,25 @@ class actionResponseWidget extends CWidget{
   public function getContent()
   {
     if($this->delete)
-      $this->jScript[] = "$('{$this->delete}').remove()";
-    // FIXME: stupidly ugly
-    if($this->alsoDelete)
-      $this->jScript[] = "$('{$this->alsoDelete}').remove()";
+    {
+      if(!is_array($this->delete))
+        $this->delete = array($this->delete);
+      foreach($this->delete as $delete)
+        $this->jScript[] = "$('{$delete}').remove()";
+    }
     if($this->append)
-      $this->jScript[] = "$('{$this->append['selector']}').remove().appendTo('{$this->append['parent']}')";
+    {
+      if(isset($this->append['selector']))
+        $this->append = array($this->append);
+      foreach($this->append as $row)
+        $this->jScript[] = "$.ajaxAppend('{$row['selector']}', '{$row['parent']}')";
+    }
     if($this->resetFeedItems)
       $this->jScript[] = "$('#feedItems_container').addClass('needsReset')";
+
     if($this->showTab)
       $this->jScript[] = "$.showTab('{$this->showTab}')";
-
-    if($this->showDialog)
+    elseif($this->showDialog)
       $this->jScript[] = "$.showDialog('{$this->showDialog}')";
     elseif(!empty($this->dialog))
       $this->jScript[] = "$.showDialog('#actionResponse')";
