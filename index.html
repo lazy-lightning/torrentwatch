@@ -21,7 +21,6 @@
 <body>
 <a id="wizardLink" class="hidden" href="nmtdvr.php?r=dvrConfig/welcome"></a>
 <ul class="mainoptions" id="mainoptions">
-  <li id="refresh"><a href="">Refresh</a></li>
   <li class="divider">&nbsp;</li>
   <li id="favoritesMenu"><a class="toggleDialog" rel="#favorites" href="#favorites">Favorites</a></li>
   <li id="config"><a class="toggleDialog" href="#configuration">Configure</a></li>
@@ -29,7 +28,7 @@
   <li id="view"><a class="toggleDialog" href="nmtdvr.php?r=history/list#history">View History</a></li>
   <li id="empty"><a class="toggleDialog" href="#reset_data">Reset Data</a></li>
   <li id="inspector"><a href="#inspector_container">Inspector</a></li>
-  <li id='webui'><a href='#'>Client UI</a></li>
+  <li id="toggleLegend"><a class="toggleDialog" href="#legend">Legend</a></li>
 </ul>
 <ul id="filterbar_container">
   <li id="filter_all" class="selected"><a href="#">All</a></li>
@@ -38,7 +37,7 @@
   <li id="filter_bytext"><input type="text" id="filter_text_input"></li>
 </ul>
 <div class="progressbar dialog_window" id="progressbar">
-  <div class="content">
+  <div class="content clearfix">
 <!--<img src="images/ajaxload.gif"> -->
     <img src="data:image/gif;base64,R0lGODlhYQAsAPcfAC1YlGePxlF+voam0////6vB3xMkPDZqtbm5uZSw2LzN5l6IxKG53PL1+kN0ujZqs+Tr9cnX63mczmySya/D4Q4bLiZLfxkxVJ+424Ki0EFytx8+aCNFdSRHeENzuP///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQFCgAfACwAAAAAYQAsAAAI/wAJCBxIsKDBgwgTKlzIsKHDhxAjSpxIsaLFixgzatzIsaPHjwQVKIBwMEKCBAxIFowgskFIkSILQoAZkwBMlwRmRiDYgMHJlB8PHEhQsMEEoUiJEnQglAFBpEgl4EwA9YDApAKpLhhItaoEj0KVDhwgdEECpgcoDIyAdMLTAw4WoBXgUkFXs1eRktSaFemABEe3dgxLEEJZgQ2EOhgLFScBwgQkQH48dCBUt3wTC1WZU+zGyQQYNB0o+YBKpqWd5hWr2HLlvKXtHtgq+oBqkKsJdlXAVShvtmkFHHCbW+ACoa5ZH1Bw3AHf3QQGLJg+AOzrvst7ZydrtTbOycetFv+nLFLxbALQw58ffJ0AhdECjx5wiRaqasiaBVNWzrv0+fe2EcCScPp91p5mDrgE3FbACTCdUMQRBoFwAY7nW05IbaXZATsRcFyBGlV1Xm2zIbUTdzihSJlXAjEQXlx58YbeYaFFddZ6HIkoGIlwyciUAAMB6FRVC9zWFVIxIsaUfhTUB9dtuBUkUodRLjSTAo5VqeWWXHbp5ZdghinmmGSWaeaZaKap5ppstilmAQVgICcGA2jgJm4ZSBDAngF4wAFDCAQqqEOCDtpQoYESiuhCAQjwwKMPAHABoIseWimlhSqaqUKNQhrppAshioCmhmJaaqiXItQppJKamqilm7pBOiqspx606qOtohqrrrUmJCqprybkAAAWFGvBBgbICuysytIaLEIdGFDBtNTeae212Gar7bbcduvtt+CGKy64AQEAIfkEBQoAHwAsBQAbABwACAAACFcACQgcSLBgwQIFMCjEMEADgocQDUokkEFCgIsBPHCAGHFiwQACHoh8AOACx4ceP4YcWfIkgpQEQY4kafIkzIEyWdbkeFOgAwAWglrYYKCnxA4GKihdGhAAIfkEBQoAHwAsGQAbABwACAAACFcACQgcSLBgwQIFMCjEMEADgocQDUokkEFCgIsBPHCAGHFiwQACHoh8AOACx4ceP4YcWfIkgpQEQY4kafIkzIEyWdbkeFOgAwAWglrYYKCnxA4GKihdGhAAIfkEBQoAHwAsLQAbABwACAAACFcACQgcSLBgwQIFMCjEMEADgocQDUokkEFCgIsBPHCAGHFiwQACHoh8AOACx4ceP4YcWfIkgpQEQY4kafIkzIEyWdbkeFOgAwAWglrYYKCnxA4GKihdGhAAIfkEBQoAHwAsQQAbABwACAAACFcACQgcSLBgwQIFMCjEMEADgocQDUokkEFCgIsBPHCAGHFiwQACHoh8AOACx4ceP4YcWfIkgpQEQY4kafIkzIEyWdbkeFOgAwAWglrYYKCnxA4GKihdGhAAIfkEBWQAHwAsVQAbAAgACAAACBsACQgcKBCBwYMFDxpMqJAhQgIKF0KMSLAigYAAOw==">
   </div>
@@ -58,7 +57,7 @@
   </ul>
 </div>
 <div id="favorites" class="dialog_window">
-  <div class="content">
+  <div class="content clearfix">
     <ul class="favTypes">
       <li id="favoriteTvShow_tab"><a href="nmtdvr.php?r=favoriteTvShow/list"><span>TV Shows</span></a></li>
       <li id="favoriteMovie_tab"><a href="nmtdvr.php?r=favoriteMovie/list"><span>Movies</span></a></li>
@@ -67,7 +66,7 @@
   </div>
 </div>
 <div id="configuration" class="dialog_window">
-  <div class="content">
+  <div class="content clearfix">
     <ul>
      <li><a href="nmtdvr.php?r=dvrConfig/globals"><span>Main</span></a></li>
      <li><a href="nmtdvr.php?r=dvrConfig/torClient"><span>Torrent Client</span></a></li>
@@ -75,5 +74,46 @@
      <li><a href="nmtdvr.php?r=feed/list"><span>Feeds</span></a></li>
     </ul>
   </div>
+</div>
+<div id="legend" class="dialog_window">
+  <div class="content clearfix"><ul>
+    <li class="torrent match_Unmatched">
+      <div class="itemButtons">
+        <h3>No Match</h3>
+        <div>Will not be downloaded</div>
+      </div>
+    </li>
+    <li class="torrent match_Failed alt">
+      <div class="itemButtons">
+        <h3>Failed</h3>
+        <div>Item failed to download</div>
+      </div>
+    </li>
+    <li class="torrent match_Downloaded alt">
+      <div class="itemButtons">
+      <h3>Started</h3>
+      <div>Feed item was sent to the download client</div>
+      </div>
+    </li>
+    <li class="torrent match_Old alt">
+      <div class="itemButtons">
+      <h3>Old or Duplicate episode</h3>
+      <div>
+        Episode is downloaded previously or older than the most recently downloaded episode
+      </div>
+    </li>
+    <li class="torrent match_Queued">
+      <div class="itemButtons">
+      <h3>Queued</h3>
+      <div>Feed Item is queued for user to act on</div>
+      </div>
+    </li>
+    <li class="torrent match_New alt">
+      <div class="itemButtons">
+      <h3>New</h3>
+      <div>Feed Item is new and has not yet been processed for favorites.  Suggest refreshing page</div>
+      </div>
+    </li>
+  </ul></div>
 </div>
 </body></html>
