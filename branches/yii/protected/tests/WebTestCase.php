@@ -30,6 +30,13 @@ class WebTestCase extends CWebTestCase
     $this->stop();
   }
 
+  // Ensure visibility of items before clicking them
+  protected function click($locator)
+  {
+    $this->assertElementVisible($locator);
+    parent::__call('click', array($locator));
+  }
+
   protected function tearDown()
   {
     $app=Yii::app();
@@ -74,14 +81,14 @@ class WebTestCase extends CWebTestCase
 		$this->setBrowserUrl(TEST_BASE_URL);
 	}
 
-  public function assertElementVisible($locator)
+  public function assertElementVisible($locator, $message = '')
   {
-    $this->assertEquals(true, $this->getEval("selenium.isVisible('$locator');"));
+    $this->assertEquals(true, $this->isVisible($locator), $message);
   }
 
-  public function assertElementNotVisible($locator)
+  public function assertElementNotVisible($locator, $message = '')
   {
-    $this->assertEquals('false', $this->getEval("selenium.isVisible('$locator');"));
+    $this->assertEquals(false, $this->isVisible($locator), $message);
   }
 
   public function clickAndWaitFor($locator, $waitFor, $mid='id=progressbar')
@@ -96,7 +103,8 @@ class WebTestCase extends CWebTestCase
    */
   public function waitForElementVisible($locator)
   {
-    $this->waitForCondition("selenium.isVisible('$locator');");
+    $locator = escapeshellarg($locator); // only escapes single quotes
+    $this->waitForCondition("selenium.isVisible($locator);");
   }
 
   /**
@@ -104,7 +112,8 @@ class WebTestCase extends CWebTestCase
    */
   public function waitForElementNotVisible($locator)
   {
-    $this->waitForCondition("!selenium.isVisible('$locator');");
+    $locator = escapeshellarg($locator); // only escapes single quotes
+    $this->waitForCondition("!selenium.isVisible($locator);");
   }
 
   public function waitForElementPresentAndVisible($locator)
