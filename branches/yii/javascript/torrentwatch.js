@@ -1,17 +1,20 @@
 (function($) {
     var inspect_status;
-    $.ajaxAppend = function(child, parent) {
+    $.waitFor = function(selector, callback) {
       var wait = function() {
-        if($(parent).length == 0)
-          setTimeout(wait, 100);
-        else {
-          var old = $(parent).find(child);
-          if(old.length)
-            old.remove();
-          $(child).remove().appendTo(parent);
-        }
+        if($(selector).length == 0)
+          setTimeout(wait, 200);
+        else 
+          callback();
       }
       wait();
+    };
+    $.ajaxAppend = function(child, parent, deleteSelector) {
+      $.waitFor(parent, function() {
+        if(deleteSelector)
+          $(deleteSelector).remove();
+        $(child).remove().appendTo(parent);
+      });
     }
     $.toggleInspector = function() {
         inspect_status = !inspect_status;
@@ -20,16 +23,21 @@
                 { duration: 600 }
         );
     };
+    // reset all forms
+    $.fn.reset = function() {
+      this.each(function() {
+        $(this).is('form') && $(this).find('.errorSummary').remove().end().get(0).reset();
+      });
+      return this;
+    };
     $.fn.tabsResetAjax = function () {
       // Reset the container and click the selected link to trigger reload
       this.children('div')
         .each(function() {
           $(this).empty();
         }).end()
-        .find('.tabs-selected')
-        .removeClass('tabs-selected')
-        .children("a")
-        .click();
+        .find('.tabs-selected').removeClass('tabs-selected')
+        .children("a").click();
     };
     $.submitForm = function(button) {
         var form;
@@ -41,37 +49,23 @@
             button = button[0];
         } else
             form = $(button).closest("form");
-        $.post(form.get(0).action, form.buildDataString(button), $.loadFormUpdate, 'html');
+        $.post(form.get(0).action, form.buildDataString(button), $.loadAjaxUpdate, 'html');
     }; 
-    $.loadFormUpdate = function(html) {
-      var data = $(html);
-      var form = data.filter('form');
-      if(form.length) {
-        var id = '#'+form.attr('id');
-        // special handling for receiving a brand new item
-        // origional form had id like: favoriteTvShow-
-        // new form has: favoriteTvShow-23
-        var oldForm = $(id);
-        if(oldForm.length == 0) {
-          oldForm = $(id.replace(/\d+$/,'')).hide().parent().append(form).end()[0].reset();
-        } else
-          oldForm.replaceWith(form);
-        setTimeout(function() {
-          $(id).initForm().show();
-          data.filter('script').each(function() {
-            $.globalEval( this.text || this.textContent || this.innerHTML || "" );
-          });
-        }, 50);
-      } else
-        $.loadAjaxUpdate(data);
-    };
     $.loadAjaxUpdate = function(html) {
       var data = $(html);
       data.each(function() { 
         if(!this.id) return;
-        var target = $('#'+this.id);
+        var id = this.id, target = $('#'+id);
+        if($(this).is('form'))
+          setTimeout(function() { $('#'+id).initForm().show(); }, 100);
+        if(target.length == 0 && $(this).is('form')) {
+          var oldForm = $('#'+id.replace(/\d+$/,''));
+          if(oldForm.length) {
+            oldForm.reset().hide();
+          }
+        }
         if(target.length) {
-          target.after(this).remove();
+          target.replaceWith(this);
           data = data.not(this);
           // trigger any onshow events
           // FIXME: feels like a bad hack
@@ -81,25 +75,18 @@
         }
       });
       data.not('script').addClass('dynamic-load').end().appendTo('body');
-/*      setTimeout(function() {
-        data.filter('script').each(function() {
-          $.globalEval( this.text || this.textContent || this.innerHTML || "" );
-        });
-      },0); */
     };
-    $.fn.hideExpose = function() {
-      var $this = $(this);
-      var wait = function() {
+    $.fn.autoHideExpose = function() {
+      var $this = $(this), wait = function() {
         if($this.is(':visible') && $('.dialog_window:visible').length == 0) {
           var feedItems = $("#feedItems_container");
           if(feedItems.hasClass('needsReset'))
             feedItems.removeClass('needsReset').tabsResetAjax();
           else
-            $this.hide();
+            $this.fadeOut();
         }
-        setTimeout(wait, 300);
       }
-      wait();
+      setInterval(wait, 300);
     };
     // toggleDialog is a click handler for anchors 
     $.fn.toggleDialog = function() {
@@ -110,15 +97,11 @@
             dialog = this
         else
             dialog = this.closest('.dialog_window');
-        var dialogSelector = '#'+dialog[0].id;
-
-        var toHide = $('.dialog_window:visible').not('.progressbar');
-        var visible = dialog.is(':visible');
-
-        var callback = function() { 
-            $('div.expose').show();
-            dialog = $(dialogSelector);
-            dialog.fadeIn();
+        var dialogSelector = this[0].hash || '#'+dialog[0].id,
+            toHide = $('.dialog_window:visible').not('.progressbar'),
+            visible = dialog.is(':visible'),
+        callback = function() { 
+            dialog = $(dialogSelector).fadeIn();
             // all dialogs must have a close button
             if(dialog.find('div.close').length == 0)
                 dialog.prepend('<div class="close"></div>');
@@ -129,10 +112,11 @@
         };
      
         if(dialog && !visible) {
+            $('div.expose').not(':animated').fadeIn();
             if(dialog.length == 0) {
-                $.post(this.href, '', function(html) {
+                $.post(this.attr('href'), '', function(html) {
                     $.loadAjaxUpdate(html);
-                    setTimeout(callback, 100);
+                    callback();
                 }, 'html');
             } else 
                 callback();
@@ -169,9 +153,9 @@
             onDone = function() {
           $(current_favorite).show();
         };
-        $(this).closest('.tabs-container').children('.favinfo:visible').hide();
+        $(this).closest('.tabs-container div').children('.favinfo:visible').hide();
         if($(current_favorite).length == 0) {
-          var tabs = $(this).closest('.tabs-container');
+          var tabs = $(this).closest('.tabs-container div');
           $.get(this[0].href, null, function(html) {
               tabs.append(html);
               onDone();
@@ -183,8 +167,7 @@
 
     // Utility function called from ajax response javascript
     $.showTab = function(linkSelector) {
-      var link = $(linkSelector);
-      var dialog = link.closest('.dialog_window')[0];
+      var link = $(linkSelector), dialog = link.closest('.dialog_window')[0];
       // click before show to prevent loading current tab
       // and newly selected tab via ajax
       link.click();
@@ -192,14 +175,11 @@
     }
     // Utility function called from ajax response javascript
     $.showDialog = function(hash) {
-//      $('#mainoptions a[rel='+hash+']').toggleDialog();
       $('<a href="'+hash+'"/>').toggleDialog();
     };
     $.showFavorite = function(hash) {
-      var selector = "a[rel='"+hash+"']";
-      var wait = function() {
-        var link = $(selector);
-        var $hash = $(hash);
+      var selector = "a[rel='"+hash+"']", wait = function() {
+        var link = $(selector), $hash = $(hash);
         // wait for link, and hash to exist.  Also wait for hash to be in a dialog_window
         if(link.length == 0 || $hash.length == 0 || $hash.parents('.dialog_window').length == 0)
           setTimeout(wait, 300);
@@ -235,7 +215,7 @@
 
 $(function() { 
     // auto-hiding expose
-    $('div.expose').hideExpose();
+    $('div.expose').autoHideExpose();
     // Handle button click events
     $("body").live('click', function(e) {
       if(e.button != 0)
@@ -358,13 +338,13 @@ $(function() {
     $("#progressbar").ajaxStart(function() {
       window.ajaxCount++;
       $(this).show();
-      $('div.expose').show();
+      $('div.expose').not(':animated').fadeIn();
     }).ajaxStop(function() {
       window.ajaxCount--;
       var progress = $(this);
       setTimeout(function() {
-        if(window.ajaxCount > 0) return;
-        progress.hide();
+        if(window.ajaxCount == 0) 
+          progress.hide();
       },300);
     }).ajaxError(function(event, XMLHttpRequest, ajaxOptions, thrownError){
       var content;

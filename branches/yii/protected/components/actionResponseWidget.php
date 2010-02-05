@@ -38,7 +38,12 @@ class actionResponseWidget extends CWidget{
       if(isset($this->append['selector']))
         $this->append = array($this->append);
       foreach($this->append as $row)
-        $this->jScript[] = "$.ajaxAppend('{$row['selector']}', '{$row['parent']}')";
+      {
+        if(isset($row['delete']))
+          $this->jScript[] = "$.ajaxAppend('{$row['selector']}', '{$row['parent']}', '{$row['delete']}')";
+        else
+          $this->jScript[] = "$.ajaxAppend('{$row['selector']}', '{$row['parent']}')";
+      }
     }
     if($this->resetFeedItems)
       $this->jScript[] = "$('#feedItems_container').addClass('needsReset')";

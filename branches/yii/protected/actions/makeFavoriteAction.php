@@ -29,8 +29,9 @@ class makeFavoriteAction extends feedItemAction
     if($success)
     {
       $this->response->append[] = array(
-          'selector' =>"#${type}-li-{$fav->id}",
+          'selector'=>"#{$type}-{$fav->id} li",
           'parent'=>"#{$type}List",
+          'delete'=>"#{$type}List #{$type}-li-{$fav->id}"
       );
     }
     Yii::app()->getController()->render("/$type/show", array(
