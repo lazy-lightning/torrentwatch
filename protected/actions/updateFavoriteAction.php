@@ -51,8 +51,14 @@ class updateFavoriteAction extends CAction
       if($this->create && $this->success)
       {
         $this->response->append = array(
-            'parent'=>"#{$class}List",
-            'selector'=>"#{$class}-li-".$model->id,
+            array(
+              'parent'=>"#{$class}List",
+              'selector'=>"#{$class}-{$model->id} li",
+            ),
+            array(
+              'parent'=>"#{$class}_container",
+              'selector'=>"#{$class}-{$model->id}",
+            ),
         );
       }
     }
