@@ -11,6 +11,7 @@ class TvEpisodeTest extends WebTestCase
   );
 
   public $locators = array(
+      'actionResponse'        => "id=actionResponse",
       'closeDialog'           => "css=div.close",
       'createdFavoriteButton' => "xpath=id('favoriteTvShow-li-1')/a",
       'createdFavoriteButton2'=> "xpath=id('favoriteTvShow-li-2')/a",
@@ -73,4 +74,19 @@ class TvEpisodeTest extends WebTestCase
     // Make sure there is a button to select this favorite
     $this->assertElementVisible($l['createdFavoriteButton2']);
   }
+
+  public function testStartDownload()
+  {
+    $l = $this->locators; // shorthand access
+    $this->waitForElementPresent($l['tvEpisode']);
+    // click the start download button
+    $this->click($l['startDownloadButton']);
+    // wait for response dialog
+    $this->waitForElementPresentAndVisible($l['actionResponse']);
+    // verify no errors
+    $this->assertElementNotPresent($l['errorSummary']);
+    // check for success string
+    $this->assertText($l['actionResponse'], 'Started');
+  }
+
 }
