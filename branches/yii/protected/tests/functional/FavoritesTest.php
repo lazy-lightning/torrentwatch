@@ -88,6 +88,10 @@ class FavoritesTest extends WebTestCase
     $this->clickAndWaitFor($l['createFavoriteButton'], $l['updateFavoriteButton'],false);
     // Make sure item created successfully
     $this->assertElementNotPresent($l['errorSummary']);
+    // Make sure the creation form was hidden
+    $this->assertElementNotVisible($l['createFavoriteButton']);
+    // Make sure the creation form was reset
+    $this->assertValue($l['favoriteNameInput'], '');
     // Make sure our name got to this page
     $this->assertTextPresent('foobar');
     // try a directory that cant be saved to

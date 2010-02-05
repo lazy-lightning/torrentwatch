@@ -76,7 +76,12 @@ class WebTestCase extends CWebTestCase
 
   public function assertElementVisible($locator)
   {
-    $this->assertEquals($this->getEval("selenium.isVisible('$locator');"), TRUE);
+    $this->assertEquals(true, $this->getEval("selenium.isVisible('$locator');"));
+  }
+
+  public function assertElementNotVisible($locator)
+  {
+    $this->assertEquals('false', $this->getEval("selenium.isVisible('$locator');"));
   }
 
   public function clickAndWaitFor($locator, $waitFor, $mid='id=progressbar')
