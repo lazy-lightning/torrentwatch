@@ -26,11 +26,11 @@ class HistoryTest extends WebTestCase
   {
     $l = $this->locators;
     // Check that our fixture history item exists
-    $this->assertElementPresent($l['historyItem']");
+    $this->assertElementPresent($l['historyItem']);
     // Check that the title is being displayed
     $this->assertText($l['historyItemTitle'], $this->history[0]['feedItem_title']);
     // Click the first item to show some details
-    $this->click($l['historyItem'];);
+    $this->click($l['historyItem']);
     // Check if our details are being displayed
     $this->assertText($l['historyItem'], $this->history[0]['feed_title']);
     $this->assertText($l['historyItem'], $this->history[0]['favorite_name']);
