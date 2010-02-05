@@ -7,6 +7,45 @@ class downloadManager extends favoriteManager {
   private $opts; // the current item being started in the form of either
                  // a feedItem or a row from a matchingFavorite* view
 
+  private $getters = array(
+      'downloadType' => array('obj'=>'downloadType',       'arr'=>'feedItem_downloadType'),
+      'feedId'       => array('obj'=>'feed_id',            'arr'=>'feed_id'),
+      'feedItemId'   => array('obj'=>'id',                 'arr'=>'feedItem_id'),
+      'feedTitle'    => array('obj'=>array('feed','title'),'arr'=>'feed_title'),
+      'movieId'      => array('obj'=>'movie_id',           'arr'=>'movie_id'),
+      'otherId'      => array('obj'=>'other_id',           'arr'=>'other_id'),
+      'title'        => array('obj'=>'title',              'arr'=>'feedItem_title'),
+      'tvEpisodeId'  => array('obj'=>'tvEpisode_id',       'arr'=>'tvEpisode_id'),
+  );
+
+  public function __get($name)
+  {
+    if(isset($this->getters[$name]))
+    {
+      if(is_array($this->opts))
+        return isset($this->opts[$this->getters[$name]['arr']]) ? 
+            $this->opts[$this->getters[$name]['arr']] : false;
+      else 
+      {
+        $attr = $this->getters[$name]['obj'];
+        if(!is_array($attr))
+          return $this->opts->$attr;
+        else
+        {
+          // FIXME: uninspired . .
+          // allows selecting more than one level deep
+          // shifting wont effect the origional array, php makes
+          // copies of arrays by default
+          $foo = $this->opts->{array_shift($attr)};
+          foreach($attr as $i)
+            $foo = $foo->$i;
+          return $foo;
+        }
+      }
+    }
+    return parent::__get($name);
+  }
+
   /**
    * @return array valid attribute names for error reporting purposes only
    */
@@ -25,37 +64,6 @@ class downloadManager extends favoriteManager {
     return $this->opts;
   }
 
-  /**
-   * @return number feeditem id of the current item being started
-   * @param none
-   */
-  public function getFeedItemId() {
-    return is_a($this->opts, 'feedItem') ? $this->opts->id : $this->opts['feedItem_id'];
-  }
-
-  /**
-   * @return number other id of the current item being started
-   * @param none
-   */
-  public function getOtherId() {
-    return is_a($this->opts, 'feedItem') ? $this->opts->other_id : isset($this->opts['other_id']) ? $this->opts['other_id'] : False;
-  }
-
-  /**
-   * @return number movie id of the current item being started
-   * @param none
-   */
-  public function getMovieId() {
-    return is_a($this->opts, 'feedItem') ? $this->opts->movie_id : isset($this->opts['movie_id']) ? $this->opts['movie_id'] : False;
-  }
-
-  /**
-   * @return number tvEpisode id of the current item being started
-   * @param none
-   */
-  public function getTvEpisodeId() {
-    return is_a($this->opts, 'feedItem') ? $this->opts->tvEpisode_id : isset($this->opts['tvEpisode_id']) ? $this->opts['tvEpisode_id'] : False;
-  }
 
   /**
    * @return string url of the current item being started
@@ -70,39 +78,6 @@ class downloadManager extends favoriteManager {
       $url .= $cookies;
     }
     return $url;
-  }
-
-  /**
-   * @return string title of the current item being started
-   * @param none
-   */
-  public function getTitle() {
-    return is_array($this->opts) ? $this->opts['feedItem_title'] : $this->opts->title;
-  }
-
-  /**
-   * @return string download type of the current item being started
-   * @param none
-   */
-  public function getDownloadType() {
-    // is this all repetative, can i just use array access on the object?
-    return is_array($this->opts) ? $this->opts['feedItem_downloadType'] : $this->opts->downloadType;
-  }
-
-  /**
-   * @return number id of the feed related to the item being started
-   * @param none
-   */
-  public function getFeedId() {
-    return is_array($this->opts) ? $this->opts['feed_id'] : $this->opts->feed_id;
-  }
-
-  /**
-   * @return string title of the feed related to the item being started
-   * @param none
-   */
-  public function getFeedTitle() {
-    return is_array($this->opts) ? $this->opts['feed_title'] : $this->opts->feed->title;
   }
 
   /**
@@ -255,6 +230,8 @@ class downloadManager extends favoriteManager {
    * @param mixed $opts either a feedItem object or a row returned from the various matching views in the db
    * @param integer $status the status to set related {@link feedItem} to on successfull start,.
    */
+  // TODO: Perhaps should be reworked to allow for downloading from the net
+  //       outside of a locking transaction
   public function startDownload($opts, $status) 
   {
     // $opts is used in the various get functions to make the following code cleaner
