@@ -96,9 +96,9 @@ ul.mainoptions li {
   vertical-align: middle;
   }
 
-ul.mainoptions li#inspector,
-ul.mainoptions li#webui {
-  float: right;
+#inspector,
+#toggleLegend {
+  float: right !important;
   }
 
 ul.mainoptions li a {
@@ -128,7 +128,7 @@ ul.mainoptions li#empty a {
   background: url('../images/menusprites.png') no-repeat center -335px;
   }
 
-ul.mainoptions li#webui a {
+ul.mainoptions li#toggleLegend a {
   background: url('../images/menusprites.png') no-repeat center -555px;
   }
 
@@ -382,10 +382,7 @@ ul li.torrent.match_Automatic .itemButtons {
   background-color: #00C12B;
 }
 
-ul li.torrent.match_Duplicate .itemButtons {
-  background-color: #FFFFCC;
-  }
-
+ul li.torrent.match_Duplicate .itemButtons,
 ul li.torrent.match_Old .itemButtons {
   background-color: #CCCCFF;
   }
@@ -395,7 +392,7 @@ ul li.torrent.match_Queued .itemButtons {
   }
 
 ul li.torrent.match_New .itemButtons {
-  background-color: #E0428F;
+  background-color: #E3F12D;
   }
 
 ul li.torrent.hasDuplicates {
@@ -426,6 +423,38 @@ a.context_link {
   display: none;
   }
 
+/*--------------------------
+ *
+ * L E G E N D  
+ *
+ * ---------------------*/
+#legend .content {
+  padding-top: 30px;
+}
+#legend h3 {
+  font-size: 1.1em;
+  font-weight: bold;
+  padding-top: .3em;
+}
+
+#legend .itemButtons {
+  float: none !important;
+  padding: 0 0 0 2%;
+  width: 98%;
+  height: 100%;
+}
+#legend ul {
+width: 97%;
+margin-left: 1%;
+}
+
+#legend li {
+  height: 3.5em;
+  overflow: none;
+}
+#legend .itemButtons div {
+  font-style: italic;
+}
 /*--------------------------
  *
  * D I A L O G S
