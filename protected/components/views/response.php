@@ -8,7 +8,9 @@
 <?php endif; ?>
 <?php if($jScript): ?>
   <script language="javascript" type="text/javascript">
+    /*<![CDATA[*/
     <?php echo $jScript; ?>;
+    /*]]>*/
   </script>
 <?php endif; ?>
 
