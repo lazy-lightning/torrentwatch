@@ -24,6 +24,7 @@ class DvrConfigTest extends WebTestCase
       'feedSaveButton'             => "xpath=id('newFeed')/form/a",
       'feedsTab'                   => 'id=feeds',
       'feedUrlInput'               => 'id=feed_url',
+      'feedItem'                   => 'css=#feedItems_container .torrent',
       'firstFeedTitle'             => "xpath=id('feeds')/div[1]/span",
       'globalConfigTab'            => 'id=global_config',
       'itemsPerLoadInput'          => 'id=dvrConfig_webItemsPerLoad',
@@ -154,11 +155,11 @@ class DvrConfigTest extends WebTestCase
     // verify our sample feeds title is displayed
     $this->assertText($l['firstFeedTitle'], "Sample Feed");
     // verify feed items have not yet been loaded
-    $this->assertElementNotPresent('css=.torrent');
+    $this->assertElementNotPresent($l['feedItem']);
     // close the dialog
     $this->click($l['closeConfigDialogButton']);
     // wait for feed items to load
-    $this->waitForElementPresent('css=.torrent');
+    $this->waitForElementPresent($l['feedItem']);
     usleep(500000);
     // reopen the configuration dialog
     $this->clickAndWaitFor($l['toggleConfigDialog'], $l['configDialog'], false);
@@ -170,7 +171,7 @@ class DvrConfigTest extends WebTestCase
     // close the dialog
     $this->click($l['closeConfigDialogButton']);
     // verify the feed items have disapeared
-    $this->waitForElementNotPresent('css=.torrent');
+    $this->waitForElementNotPresent($l['feedItem']);
   }
 
   public function clickAndWaitFor($locator, $waitFor = 'id=configuration', $mid='id=progressbar')
