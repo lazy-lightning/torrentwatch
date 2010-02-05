@@ -1,5 +1,4 @@
-    <div id="global_config">
-      <?php echo CHtml::beginForm(array('/dvrConfig/globals'), 'post', array('id'=>'config_form'));
+      <?php echo CHtml::beginForm(array('/dvrConfig/globals'), 'post', array('id'=>'global_config'));
       echo CHtml::errorSummary($config); 
       ?>
         <h2 class="dialog_heading">Web UI Settings</h2>
@@ -39,5 +38,4 @@
           <a class='toggleDialog button' href='#welcome1'>Wizard</a>
         </div>
       <?php echo CHtml::endForm(); ?>
-    </div>
 <?php if($successfullSave) $this->widget('actionResponseWidget', array('dialog'=>array('header'=>'Configuration saved.')));
