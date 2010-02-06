@@ -56,9 +56,8 @@ class updateTVDBCommand extends BaseConsoleCommand {
       $tvEpisode->title = $ep->name;
       $toSave[] = $tvEpisode;
     }
-
+    $transaction = Yii::app()->db->beginTransaction();
     try {
-      $transaction = Yii::app()->db->beginTransaction();
       echo count($toSave)." tv Episodes to save\n";
       foreach($toSave as $record)
         $record->save();

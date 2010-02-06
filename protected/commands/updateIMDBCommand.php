@@ -3,8 +3,8 @@
 class updateIMDbCommand extends BaseConsoleCommand {
 
   public function run($args) {
+    $transaction = Yii::app()->db->beginTransaction();
     try {
-      $transaction = Yii::app()->db->beginTransaction();
       $this->updateMovies();
       // EXPERIMENTAL
       $this->updateOthers();

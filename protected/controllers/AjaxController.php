@@ -123,8 +123,8 @@ class AjaxController extends BaseController
       else
       {
         $show = $feedItem->tvShow;
+        $transaction = $feedItem->dbConnection->beginTransaction();
         try {
-          $transaction = $feedItem->dbConnection->beginTransaction();
           $show->hide = true;
           $show->save();
           $transaction->commit();
@@ -164,9 +164,9 @@ class AjaxController extends BaseController
     if(isset($_GET['type']) && in_array($_GET['type'], $whiteList))
     {
       $type = $_GET['type'];
+      $transaction = Yii::app()->db->beginTransaction();
       try
       {
-        $transaction = Yii::app()->db->beginTransaction();
         switch($type)
         {
         case 'all':
@@ -211,8 +211,8 @@ class AjaxController extends BaseController
   {
     if(isset($_GET['tvShow_id']) && is_array($_GET['tvShow_id']))
     {
+      Yii::app()->db->beginTransaction();
       try {
-        Yii::app()->db->beginTransaction();
         $shows = tvShow::model()->findAllByPk($_GET['tvShow_id']);
         foreach($shows as $s)
         {

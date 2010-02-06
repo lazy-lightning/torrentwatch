@@ -71,9 +71,8 @@ class dbMaintinanceCommand extends BaseConsoleCommand {
     // and its not run interactively so the little bit of extra speed is negligable
     foreach($pruneFk as $item)
       $querys[] = "DELETE FROM {$item['table']} WHERE {$item['fktable']}_id NOT IN (SELECT id FROM {$item['fktable']});";
-
+    $transaction = $db->beginTransaction();
     try {
-      $transaction = $db->beginTransaction();
       // delete more than maxItemsPerFeed
       $reader = $db->createCommand('SELECT id FROM feed')->queryAll();
       foreach($reader as $row)

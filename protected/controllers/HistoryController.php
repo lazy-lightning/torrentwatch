@@ -50,9 +50,9 @@ class HistoryController extends BaseController
   {
     if(Yii::app()->request->isPostRequest)
     {
+      $transaction = $model->dbConnection->beginTransaction();
       try {
         $model = history::model();
-        $transaction = $model->dbConnection->beginTransaction();
         $model->deleteAll();
         $transaction->commit();
       } catch (Exception $e) {
@@ -73,9 +73,9 @@ class HistoryController extends BaseController
 		if(Yii::app()->request->isPostRequest)
 		{
 			// we only allow deletion via POST request
+      $transaction = $model->dbConnection->beginTransaction();
       try {
         $model = history::model();
-        $transaction = $model->dbConnection->beginTransaction();
   			$this->loadhistory()->delete();
         $transaction->commit();
       } catch (Exception $e) {

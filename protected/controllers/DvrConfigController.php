@@ -49,8 +49,8 @@ class DvrConfigController extends BaseController
     if(isset($_POST['dvrConfig']))
     {
       $config->attributes = $_POST['dvrConfig'];
+      $transaction = Yii::app()->db->beginTransaction();
       try {
-        $transaction = Yii::app()->db->beginTransaction();
         $success = $config->save();
         $transaction->commit();
       } catch (Exception $e) {

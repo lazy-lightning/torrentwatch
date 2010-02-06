@@ -166,8 +166,8 @@ class feed extends CActiveRecord
     // update the db with new title/description/update time and status
     // Is this save necessary always?  on a run with no downloading and no
     // updates this used 25% of the execution time.
+    $trans = Yii::app()->db->beginTransaction();
     try {
-        $trans = Yii::app()->db->beginTransaction();
         $this->save();
         $trans->commit();
     } catch (Exception $e) {

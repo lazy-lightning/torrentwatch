@@ -17,8 +17,8 @@ class updateFavoriteAction extends CAction
     if(isset($_POST['quality_id']))
       $model->qualityIds = $_POST['quality_id'];
     $model->attributes = $attributes;
+    $transaction = $model->dbConnection->beginTransaction();
     try {
-      $transaction = $model->dbConnection->beginTransaction();
       $this->success = $model->save();
       $transaction->commit();
     } catch (Exception $e) {
@@ -52,12 +52,12 @@ class updateFavoriteAction extends CAction
       {
         $this->response->append = array(
             array(
-              'parent'=>"#{$class}List",
-              'selector'=>"#{$class}-{$model->id} li",
+                'parent'=>"#{$class}List",
+                'selector'=>"#{$class}-{$model->id} li",
             ),
             array(
-              'parent'=>"#{$class}_container",
-              'selector'=>"#{$class}-{$model->id}",
+                'parent'=>"#{$class}_container",
+                'selector'=>"#{$class}-{$model->id}",
             ),
         );
       }
