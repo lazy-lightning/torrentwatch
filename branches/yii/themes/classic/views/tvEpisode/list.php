@@ -6,6 +6,7 @@ $url = Yii::app()->getUrlManager();
 foreach($tvepisodeList as $n => $model) {
   echo "<li id='tvEpisode-".$model->id."' class='torrent hasDuplicates match_".strtok($model->asa('statusText')->getStatusText(), ' ').($n%2?' alt':' notalt')."' >".
          "<div class='itemButtons'>".
+           "<a href='".$url->createUrl('feedItem/list', array('related'=>'tvEpisode', 'id'=>$model->id))."' class='loadDuplicates'>Load Duplicates</a>".
            "<a href='".$url->createUrl('tvEpisode/startDownload', array('id'=>$model->id))."' class='startDownload ajaxSubmit'>".
            "<img src='images/tor_start.png' alt='Start' height='10'></a>".
            "<a href='".$url->createUrl('tvEpisode/makeFavorite', array('id'=>$model->id))."' class='makeFavorite ajaxSubmit'>".

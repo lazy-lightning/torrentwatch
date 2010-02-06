@@ -311,6 +311,10 @@ div.yiiForm {
   padding: 0 !important;
   }
 
+.loadDuplicates {
+  display: none;
+  }
+
 div#feedItems_container {
   }
 

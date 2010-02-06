@@ -1,5 +1,6 @@
 (function($) {
-    var inspect_status;
+    // Wait for a selector to be present before triggering
+    // given callback
     $.waitFor = function(selector, callback) {
       var wait = function() {
         if($(selector).length == 0)
@@ -9,6 +10,8 @@
       }
       wait();
     };
+    // append child to parent once parent exists in the dom
+    // optionally delete an item from the dom first
     $.ajaxAppend = function(child, parent, deleteSelector) {
       $.waitFor(parent, function() {
         if(deleteSelector)
@@ -16,6 +19,8 @@
         $(child).remove().appendTo(parent);
       });
     }
+    // open/close the inspector pane
+    var inspect_status = false;
     $.toggleInspector = function() {
         inspect_status = !inspect_status;
         $("div#feedItems_container,div#feedItems_container > div,ul#filterbar_container,div#inspector_container").stop(true,true).animate(
@@ -25,31 +30,20 @@
     };
     // reset all forms
     $.fn.reset = function() {
-      this.each(function() {
-        $(this).is('form') && $(this).find('.errorSummary').remove().end().get(0).reset();
+      this.find('errorSummary').remove().end().each(function() {
+        $(this).is('form') && this.reset();
       });
       return this;
     };
     $.fn.tabsResetAjax = function () {
       // Reset the container and click the selected link to trigger reload
-      this.children('div')
-        .each(function() {
-          $(this).empty();
-        }).end()
+      return this.children('div').empty().end()
         .find('.tabs-selected').removeClass('tabs-selected')
-        .children("a").click();
+        .children("a").click().end().end();
     };
     $.submitForm = function(button) {
-        var form;
-        if($(button).is('form')) { // User pressed enter
-            form = $(button);
-            button = form.find('a');
-            if(button.length == 0)
-              button = form.find('input[type=submit]');
-            button = button[0];
-        } else
-            form = $(button).closest("form");
-        $.post(form.get(0).action, form.buildDataString(button), $.loadAjaxUpdate, 'html');
+        var form = $(button).closest('form');
+        $.post(form.get(0).action, form.serialize(), $.loadAjaxUpdate, 'html');
     }; 
     $.loadAjaxUpdate = function(html) {
       var data = $(html);
@@ -125,12 +119,7 @@
         return this;
     };
     $.fn.initDuplicates = function() {
-      this.click(function() {
-        var li = $(this);
-        $.get('nmtdvr.php', 'r=feedItem/list&filter='+encodeURIComponent(li[0].id), function(html) {
-          li.replaceWith($(html).children('li'));
-          $('li.torrent').markAlt();
-        }, 'html');
+      this.click(function(e) {
       });
       return this;
     };
@@ -139,9 +128,6 @@
             $.submitForm(this);
             return false;
         });
-        var f = $.cookie('twFontSize');
-        if(f)
-            this.find("#config_webui").val(f).change();
         return this;
     };
     // click handler for anchors
@@ -149,34 +135,34 @@
     // or if non-existant the page referenced by the anchor will
     // be loaded and appended to the closest tabs container
     $.fn.toggleFavorite = function() {
-        var current_favorite = $(this).attr('rel'),
+        var $this = $(this), toShow = $this.attr('rel'),
             onDone = function() {
-          $(current_favorite).show();
+          $(toShow).show();
         };
-        $(this).closest('.tabs-container div').children('.favinfo:visible').hide();
-        if($(current_favorite).length == 0) {
-          var tabs = $(this).closest('.tabs-container div');
+        $this.closest('.tabs-container div').children('.favinfo:visible').hide();
+        if($(toShow).length > 0)
+          onDone()
+        else {
+          var tabs = $this.closest('.tabs-container div');
           $.get(this[0].href, null, function(html) {
               tabs.append(html);
               onDone();
               }, 'html');
-        } else 
-          onDone();
+        }
         return this;
     };
 
     // Utility function called from ajax response javascript
     $.showTab = function(linkSelector) {
       var link = $(linkSelector), dialog = link.closest('.dialog_window')[0];
-      // click before show to prevent loading current tab
-      // and newly selected tab via ajax
-      link.click();
-      $.showDialog('#'+dialog.id)
+      // click to trigger tab switch, and show the parent dialog
+      $.showDialog('#'+link.click().closest('.dialog_window').attr('id'))
     }
     // Utility function called from ajax response javascript
     $.showDialog = function(hash) {
       $('<a href="'+hash+'"/>').toggleDialog();
     };
+    // Utility function called from ajax response javascript
     $.showFavorite = function(hash) {
       var selector = "a[rel='"+hash+"']", wait = function() {
         var link = $(selector), $hash = $(hash);
@@ -188,16 +174,6 @@
         }
       }
       wait();
-    };
-
-    // Used to build the string to submit a form
-    // Will add buttonElement as a form option
-    $.fn.buildDataString = function(buttonElement) {
-        var dataString = $(this).filter('form').serialize();
-        if(buttonElement) {
-            dataString += (dataString.length == 0 ? '' : '&' ) + 'button=' + buttonElement.id;
-        }
-        return dataString;
     };
     // marks the group of elements as alt/notalt
     $.fn.markAlt = function() {
@@ -224,16 +200,19 @@ $(function() {
       // Menu Bar, and other buttons which show/hide a dialog
       if(target.is('a.toggleDialog')) {
         target.toggleDialog();
+        e.returnValue = false;
         return false;
       }
       // X button on all dialogs
       if(target.is('div.close')) {
         target.closest('.dialog_window').toggleDialog();
+        e.returnValue = false;
         return false;
       }
       // Configuration, wizard, and update/delete favorite ajax submit
       if(target.is('a.submitForm,input.submitForm')) {
         $.submitForm(target[0]);
+        e.returnValue = false;
         return false;
       }
       // History details hide/reveal
@@ -241,6 +220,7 @@ $(function() {
         target = target.closest("#history li");
       if(target.is("#history li")) {
         target.children(".hItemDetails").slideToggle(300);
+        e.returnValue = false;
         return false;
       }
       // Clear History ajax submit
@@ -257,6 +237,7 @@ $(function() {
         target = target.find("a");
       if(target.is('ul.favorite > li a')) {
         target.toggleFavorite();
+        e.returnValue = false;
         return false;
       }
       // Standard ajax submit with reload
@@ -264,30 +245,27 @@ $(function() {
         target = target.parent();
       if(target.is("a.ajaxSubmit")) {
         $.post(target[0].href, '', $.loadAjaxUpdate, 'html');
+        e.returnValue = false;
+        return false;
+      }
+      // Loading related feedItems from owner types (tvepisode/movie/other)
+      // needs to be near end to not override clickable items in the li
+      if(target.closest('li.torrent.hasDuplicates').length)
+        target = target.closest('li.torrent.hasDuplicates');
+      if(target.is('li.torrent.hasDuplicates')) {
+        var li = $(this);
+        $.get(li.find('a.loadDuplicates').attr('href'), '', function(html) {
+          li.replaceWith($(html).children('li'));
+          $('li.torrent').markAlt();
+        }, 'html');
         return false;
       }
       // Inspector
       if(target.is("li#inspector a")) {
         $.toggleInspector();
+        e.returnValue = false;
         return false;
       }
-    });
-
-    // Vary the font-size
-    $("#config_webui select").live('change', function() {
-        var f = $(this).val();
-        $.cookie('twFontSize', f);
-        switch (f) {
-        case 'Small':
-            $("body").css('font-size', '75%');
-            break;
-        case 'Medium':
-            $("body").css('font-size', '85%');
-            break;
-        case 'Large':
-            $("body").css('font-size', '100%');
-            break;
-        }
     });
 
     // Filter Bar - Buttons
@@ -303,17 +281,14 @@ $(function() {
         var container = $("div#feedItems_container > div:visible");
         // Hide the container while filtering
         container.slideUp(400, function() {
-          // Get all the currently known about feed items
+            // Get all the currently known about feed items
             var tor = $("li.torrent:not(.duplicate)").removeClass('hidden');
-            switch (filter) {
-            case 'filter_matching':
-                // Hide
+            if(filter == 'filter_matching') {
+                // Hide the following classes
                 tor.filter(".match_New, .match_Unmatched, .match_Auto").addClass('hidden');
-                break;
-            case 'filter_downloaded':
+            } else if(filter == 'filter_downloaded') { 
                 // Hide all except the following classes
                 tor.not('.match_Automatic, .match_Manual, .match_Failed').addClass('hidden');
-                break;
             }
             // re-mark the torrents as alt/notalt
             tor.markAlt();
@@ -326,10 +301,8 @@ $(function() {
     $("input#filter_text_input").keyup(function() {
         var filter = $(this).val().toLowerCase();
         $("li.torrent").addClass('hidden_bytext').each(function() {
-            var item = $(this).find("span:first");
-            if (item.text().toLowerCase().match(filter)) {
+            if ($(this).find("span:first").text().toLowerCase().match(filter))
                 $(this).removeClass('hidden_bytext');
-            }
         }).markAlt(); 
     });
 
@@ -381,18 +354,18 @@ $(function() {
       onShow: function(clicked, toShow, toHide) {
         var show = $(toShow);
         show.find('form').initForm();
+        // Special handling for client configuration tabs
+        // Could be handled from the view instead?
         if(show.children('.client_config').length) {
           // setup the auto switch of form information for client tabs
           show.find('.client_config select').change(function() {
             $(this).closest('.client_config').find('form').hide().end()
                 .find('#'+$(this).val()).show();
-          });
-          // First trigger of change() will hide the unselected client forms
-          setTimeout(function() { show.find('.client_config select').change(); }, 0);
+          }).change();
         }
       }
     });
-    // Initialize the 
+    // Initialize the favorites tab, perhaps clearfix should be done directly in the view?
     $("#favorites > .content").tabs({ 
       fxAutoHeight: true , 
       remote: true, 
