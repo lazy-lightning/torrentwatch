@@ -1,6 +1,7 @@
 (function ($) {
     // Wait for a selector to be present before triggering
-    // given callback
+    // given callback.  selector can also be a function whih
+    // must return not false when the callback is ready to run
     $.waitFor = function (selector, callback) {
         var test = selector, wait = function () {
             if (!test()) {
@@ -37,7 +38,8 @@
                 { duration: 600 }
         );
     };
-    // reset all forms
+    // reset all forms in the container
+    // 
     $.fn.reset = function () {
         this.find('errorSummary').remove().end().each(function () {
             if ($(this).is('form')) { 
@@ -46,16 +48,23 @@
         });
         return this;
     };
+    // Reset the container and click the selected link to trigger reload
+    // Used to reset a tabs container that has dynamic content
     $.fn.tabsResetAjax = function () {
-        // Reset the container and click the selected link to trigger reload
         return this.children('div').empty().end()
           .find('.tabs-selected').removeClass('tabs-selected')
           .children("a").click().end().end();
     };
+    // generic submit form handler
     $.submitForm = function (button) {
         var form = $(button).closest('form');
         $.post(form.get(0).action, form.serialize(), $.loadAjaxUpdate, 'html');
     }; 
+    // handles almost all ajax responses.
+    // If an element of same id as that in response exists it will be replaced
+    // remaining elements will be attached to the document body.
+    // Special handling occurs for handling forms to initialize them and reset
+    // possible parent forms 
     $.loadAjaxUpdate = function (html) {
         var data = $(html);
         data.each(function () { 
@@ -88,6 +97,9 @@
         });
         data.not('script').addClass('dynamic-load').end().appendTo('body');
     };
+    // Auto-hiding expose.  Elements acted upon will be hidden when
+    // no dialog windows are visible.  Upon hide the feed items container
+    // is checked to see if a reset is required.
     $.fn.autoHideExpose = function () {
         var $this = $(this), wait = function () {
             if ($this.is(':visible') && $('.dialog_window:visible').length === 0) {
@@ -101,9 +113,14 @@
         };
         setInterval(wait, 300);
     };
-    // toggleDialog is a click handler for anchors 
+    // toggleDialog is a click handler for anchors.  Can also be called
+    // on any element in a dialog window to toggle the container.
+    // when called on an anchor if the given dialog is non-existant
+    // the contents of the result page will be appended to the body element
+    // This function also ensures all dialogs have a close button, and that the
+    // tabs onShow event is run to when a dialog with tabs is displayed
     $.fn.toggleDialog = function () {
-        var dialog, tabs, dialogSelector, toHide, visible, callback;
+        var dialog, dialogSelector, toHide, callback;
         if (this.is('a') && this[0].hash) {
             dialog = $(this[0].hash);
         } else if (this.is('.dialog_window')) {
@@ -113,7 +130,6 @@
         }
         dialogSelector = this[0].hash || ('#' + dialog[0].id);
         toHide = $('.dialog_window:visible').not('.progressbar');
-        visible = dialog.is(':visible');
         callback = function () {
             dialog = $(dialogSelector).fadeIn();
             // all dialogs must have a close button
@@ -121,13 +137,13 @@
                 dialog.prepend('<div class="close"></div>');
             }
             // if tabs are initialized but the active one is empty trigger the ajax load
-            tabs = dialog.find('.tabs-container');
+            var tabs = dialog.find('.tabs-container');
             if (tabs.length !== 0 && tabs.filter('.tabs-hide').children().length === 0) {
                 dialog.find('.tabs-nav .tabs-selected').removeClass('tabs-selected').find('a').click();
             }
         };
 
-        if (dialog && !visible) {
+        if (!dialog.is(':visible')) {
             $('div.expose').not(':animated').fadeIn();
             if (dialog.length === 0) {
                 $.post(this.attr('href'), '', function (html) {
@@ -141,6 +157,7 @@
         toHide.fadeOut();
         return this;
     };
+    // Sets up forms to submit via $.submitForm instead of standard browser method
     $.fn.initForm = function () {
         return this.submit(function (e) {
             $.submitForm(this);
@@ -150,7 +167,7 @@
     // click handler for anchors
     // will make the element found by rel visible
     // or if non-existant the page referenced by the anchor will
-    // be loaded and appended to the closest tabs container
+    // be loaded and appended to the closest tabs container child div
     $.fn.toggleFavorite = function () {
         var $this = $(this), toShow = $this.attr('rel'), tabs,
             onDone = function () {
@@ -170,16 +187,19 @@
     };
 
     // Utility function called from ajax response javascript
+    // to make a tab and its parent dialog visible
     $.showTab = function (linkSelector) {
         var link = $(linkSelector);
         // click to trigger tab switch, and show the parent dialog
         $.showDialog('#' + link.click().closest('.dialog_window').attr('id'));
     };
     // Utility function called from ajax response javascript
+    // to make a dialog visible.
     $.showDialog = function (hash) {
         $('<a href="' + hash + '"/>').toggleDialog();
     };
     // Utility function called from ajax response javascript
+    // to change the currently displayed favorite
     $.showFavorite = function (hash) {
         var selector = "a[rel='" + hash + "']";
         $.waitfor(function() {
