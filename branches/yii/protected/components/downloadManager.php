@@ -74,7 +74,7 @@ class downloadManager extends favoriteManager {
     $url = $is_a ? $this->opts->url : $this->opts['feedItem_url'];
     $feed_url = $is_a ? $this->opts->feed->url : $this->opts['feed_url'];
     
-    if($cookies = stristr($feed_url, ':COOKIE:')) {
+    if(($cookies = stristr($feed_url, ':COOKIE:'))) {
       $url .= $cookies;
     }
     return $url;
@@ -241,8 +241,8 @@ class downloadManager extends favoriteManager {
 
     if($this->beforeDownload())
     {
+      $transaction = Yii::app()->db->beginTransaction();
       try {
-        $transaction = Yii::app()->db->beginTransaction();
         $client = $this->getClient();
         if(is_object($client) ? $client->addByUrl($this->url) : False)
           $this->afterDownload();

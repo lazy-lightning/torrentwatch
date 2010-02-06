@@ -31,7 +31,8 @@ class deleteFavoriteAction extends CAction
       $this->attachBehavior('loadModel', array('class'=>'loadControllerARModelBehavior'));
 
       // Have to get the matching information before deleting the row
-      // TODO: with the model information already loaded, does this really have to be done ahead of time?
+      // TODO: with the model information already loaded, does this really have
+      //       to be done ahead of time?
       $model = $this->asa('loadModel')->loadModel($_GET['id']);
       $ids = $this->getMatchingIds($model);
 
@@ -39,7 +40,8 @@ class deleteFavoriteAction extends CAction
       try {
         if($model->deleteByPk($_GET['id']))
         {
-          // Reset feedItem status on anything this was matching, then rerun matching routine incase something else matches the reset items
+          // Reset feedItem status on anything this was matching, then rerun
+          // matching routine incase something else matches the reset items
           feedItem::model()->updateByPk($ids, array('status'=>feedItem::STATUS_NEW));
           Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NEW);
           $this->response->dialog['content'] = 'Your favorite has been successfully deleted';

@@ -34,8 +34,8 @@ abstract class favoriteManager extends CModel {
     Yii::log('Looking for movie favorites');
     $db = Yii::app()->db;
 
+    $trans = $db->beginTransaction();
     try {
-        $trans = $db->beginTransaction();
         // Mark any previously downloaded movies that are now matching
         $db->createCommand(
             'UPDATE feedItem'.
@@ -134,8 +134,8 @@ abstract class favoriteManager extends CModel {
     Yii::log('Looking for TvShow favorites');
     $db = Yii::app()->db;
 
+    $trans = $db->beginTransaction();
     try {
-        $trans = $db->beginTransaction();
         // Mark any duplicate episodes
         $db->createCommand(
             'UPDATE feedItem'.
@@ -201,9 +201,9 @@ abstract class favoriteManager extends CModel {
    */
   private function updateItemStatus($updateType)
   {
+    $trans = Yii::app()->db->beginTransaction();
     try {
       $model = feedItem::model();
-      $trans = Yii::app()->db->beginTransaction();
       // After matching has occured, updated item statuses
       // The status of downloaded items have already been set.
       if(count($this->toQueue) !== 0)
@@ -239,8 +239,8 @@ abstract class favoriteManager extends CModel {
     if(is_subclass_of($favorite, 'BaseFavorite'))
     {
       $db = $favorite->dbConnection;
+      $transaction=$db->beginTransaction();
       try {
-        $transaction=$db->beginTransaction();
         $table = $favorite->tableName();
         $favorite->dbConnection->createCommand(
             'UPDATE feedItem SET status='.feedItem::STATUS_NOMATCH.
