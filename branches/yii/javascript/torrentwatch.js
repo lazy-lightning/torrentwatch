@@ -2,17 +2,24 @@
     // Wait for a selector to be present before triggering
     // given callback
     $.waitFor = function (selector, callback) {
-        var wait = function () {
-            if (!$(selector).length) {
+        var test = selector, wait = function () {
+            if (!test()) {
                 setTimeout(wait, 200);
             } else  {
                 callback();
             }
         };
+        if(typeof test !== 'function') {
+            test = function() {
+                return $(selector).length;
+            };
+        }
         wait();
     };
     // append child to parent once parent exists in the dom
     // optionally delete an item from the dom first
+    // needs wait for because sometimes the dialog that contains
+    // the parent needs to be loaded first
     $.ajaxAppend = function (child, parent, deleteSelector) {
         $.waitFor(parent, function () {
             if (deleteSelector) {
@@ -63,12 +70,12 @@
             }
             if (target.length === 0 && $(this).is('form')) {
                 // could this be done in the view instead?
-                oldForm = $('#' + id.replace(/\d+$/, ''));
-                if (oldForm.length) {
-                    oldForm.reset().hide();
-                }
+                oldForm = $('#' + id.replace(/\d+$/, '')).reset().hide();
             }
             if (target.length) {
+                // if replacing visible dialog, make the replacement visible
+                if(target.is(".dialog_window:visible"))
+                  $(this).show();
                 target.replaceWith(this);
                 data = data.not(this);
                 // trigger any onshow events
@@ -107,7 +114,7 @@
         dialogSelector = this[0].hash || ('#' + dialog[0].id);
         toHide = $('.dialog_window:visible').not('.progressbar');
         visible = dialog.is(':visible');
-        callback = function () { 
+        callback = function () {
             dialog = $(dialogSelector).fadeIn();
             // all dialogs must have a close button
             if (dialog.find('div.close').length === 0) {
@@ -119,7 +126,7 @@
                 dialog.find('.tabs-nav .tabs-selected').removeClass('tabs-selected').find('a').click();
             }
         };
-     
+
         if (dialog && !visible) {
             $('div.expose').not(':animated').fadeIn();
             if (dialog.length === 0) {
@@ -135,16 +142,10 @@
         return this;
     };
     $.fn.initForm = function () {
-        this.submit(function (e) {
+        return this.submit(function (e) {
             $.submitForm(this);
             return false;
         });
-        this.find('input[title]').simpletip({
-            fixed: true,
-            position: 'top'
-
-        });
-        return this;
     };
     // click handler for anchors
     // will make the element found by rel visible
@@ -180,17 +181,13 @@
     };
     // Utility function called from ajax response javascript
     $.showFavorite = function (hash) {
-        var selector = "a[rel='" + hash + "']", wait = function () {
+        var selector = "a[rel='" + hash + "']";
+        $.waitfor(function() {
             var link = $(selector), $hash = $(hash);
             // wait for link, and hash to exist.  Also wait for hash to be in a dialog_window
-            if (link.length === 0 || $hash.length === 0 || $hash.parents('.dialog_window').length === 0) {
-                setTimeout(wait, 300);
-            } else {
-                link.toggleFavorite();
-            }
-        };
-        wait();
-    };
+            return !(link.length === 0 || $hash.length === 0 || $hash.parents('.dialog_window').length === 0);
+        }, link.toggleFavorite);
+    }
     // marks the group of elements as alt/notalt
     $.fn.markAlt = function () {
         return this.removeClass('alt').removeClass('notalt').filter(":visible")
@@ -234,19 +231,13 @@
             }
             // History details hide/reveal
             if (target.closest("#history li").length) {
-                target = target.closest("#history li");
-            }
-            if (target.is("#history li")) {
-                target.children(".hItemDetails").slideToggle(300);
+                target.closest("#history li").children(".hItemDetails").slideToggle(300);
                 e.returnValue = false;
                 return false;
             }
             // Clear History ajax submit
             if (target.is("a.historySubmit")) {
-                $.get(this.href, '', function (html) {
-                    // $(html).html() is used to strip the outer tag(<div#history></div>) and get the children
-                    $("div#history").html($(html).html());
-                }, 'html');
+                $.get(this.href, '', $.loadAjaxUpdate, 'html');
                 e.returnValue = false;
                 return false;
             }
@@ -299,7 +290,7 @@
             // Find out the type of filter
             var filter = this.id,
             // Find the active feed item container
-                container = $("div#feedItems_container > div:visible");
+                container = $("#feedItems_container > div:visible");
             // Hide the container while filtering
             container.slideUp(400, function () {
                 // Get all the currently known about feed items
