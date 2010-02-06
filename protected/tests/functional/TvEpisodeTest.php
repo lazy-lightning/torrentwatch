@@ -20,10 +20,10 @@ class TvEpisodeTest extends WebTestCase
       'favoriteForm'          => "id=favoriteTvShow-1",
       'favoriteForm2'         => "id=favoriteTvShow-2",
       'favoriteTvShowList'    => "id=favoriteTvShowList",
-      'makeFavoriteButton'    => "xpath=id('tvEpisode-1')/div[1]/a[2]",
-      'makeFavoriteButton2'   => "xpath=id('tvEpisode-2')/div[1]/a[2]",
+      'makeFavoriteButton'    => "xpath=id('tvEpisode-1')/div[1]/a[3]",
+      'makeFavoriteButton2'   => "xpath=id('tvEpisode-2')/div[1]/a[3]",
       'newFavoriteButton'     => "xpath=id('favoriteTvShow-li-')/a",
-      'startDownloadButton'   => "xpath=id('tvEpisode-1')/div[1]/a[1]",
+      'startDownloadButton'   => "xpath=id('tvEpisode-1')/div[1]/a[2]",
       'tvEpisode'             => 'id=tvEpisode-1',
   );
 

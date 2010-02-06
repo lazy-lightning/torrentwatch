@@ -6,14 +6,6 @@
           <?php echo CHtml::activeLabel($config, 'timezone', array('class'=>'item')).': '.
                      CHtml::activeTextField($config, 'timezone'); ?>
         </div>
-        <div id="config_webui"> <!-- Only used by the javascript, selected via cookie -->
-          <label class="item select">Font Size</label>:
-          <select name="webui">
-            <option value="Small">Small</option>
-            <option value="Medium" selected>Medium</option>
-            <option value="Large">Large</option>
-          </select>
-        </div>
         <div id="config_webItemsPerLoad">
           <?php echo CHtml::activeLabel($config, 'webItemsPerLoad', array('class'=>'item')).': '.
                      CHtml::activeTextField($config, 'webItemsPerLoad'); ?>
