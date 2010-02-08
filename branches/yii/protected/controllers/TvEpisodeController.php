@@ -42,14 +42,10 @@ class TvEpisodeController extends BaseController
     return array(
       array('allow', // allow authenticated user to perform actions
         'actions'=>array(
-          'create', 'list', 'show', 'update', 
+          'list', 'show',
           'makeFavorite', 'startDownload',
         ),
         'users'=>array('@'),
-      ),
-      array('allow', // allow admin user to perform 'admin' and 'delete' actions
-        'actions'=>array('admin','delete'),
-        'users'=>array('admin'),
       ),
       array('deny',  // deny all users
         'users'=>array('*'),
@@ -63,54 +59,6 @@ class TvEpisodeController extends BaseController
   public function actionShow()
   {
     $this->render('show',array('tvepisode'=>$this->loadtvEpisode()));
-  }
-
-  /**
-   * Creates a new tvepisode.
-   * If creation is successful, the browser will be redirected to the 'show' page.
-   */
-  public function actionCreate()
-  {
-    $tvepisode=new tvEpisode;
-    if(isset($_POST['tvEpisode']))
-    {
-      $tvepisode->attributes=$_POST['tvEpisode'];
-      if($tvepisode->save())
-        $this->redirect(array('show','id'=>$tvepisode->id));
-    }
-    $this->render('create',array('tvepisode'=>$tvepisode));
-  }
-
-  /**
-   * Updates a particular tvepisode.
-   * If update is successful, the browser will be redirected to the 'show' page.
-   */
-  public function actionUpdate()
-  {
-    $tvepisode=$this->loadtvEpisode();
-    if(isset($_POST['tvEpisode']))
-    {
-      $tvepisode->attributes=$_POST['tvEpisode'];
-      if($tvepisode->save())
-        $this->redirect(array('show','id'=>$tvepisode->id));
-    }
-    $this->render('update',array('tvepisode'=>$tvepisode));
-  }
-
-  /**
-   * Deletes a particular tvepisode.
-   * If deletion is successful, the browser will be redirected to the 'list' page.
-   */
-  public function actionDelete()
-  {
-    if(Yii::app()->request->isPostRequest)
-    {
-      // we only allow deletion via POST request
-      $this->loadtvEpisode()->delete();
-      $this->redirect(array('list'));
-    }
-    else
-      throw new CHttpException(500,'Invalid request. Please do not repeat this request again.');
   }
 
   /**
@@ -154,31 +102,6 @@ class TvEpisodeController extends BaseController
   }
 
   /**
-   * Manages all tvepisodes.
-   */
-  public function actionAdmin()
-  {
-    $this->processAdminCommand();
-
-    $criteria=new CDbCriteria;
-
-    $pages=new CPagination(tvEpisode::model()->count($criteria));
-    $pages->pageSize=self::PAGE_SIZE;
-    $pages->applyLimit($criteria);
-
-    $sort=new CSort('tvEpisode');
-    $sort->applyOrder($criteria);
-
-    $tvepisodeList=tvEpisode::model()->findAll($criteria);
-
-    $this->render('admin',array(
-      'tvepisodeList'=>$tvepisodeList,
-      'pages'=>$pages,
-      'sort'=>$sort,
-    ));
-  }
-
-  /**
    * Returns the data model based on the primary key given in the GET variable.
    * If the data model is not found, an HTTP exception will be raised.
    * @param integer the primary key value. Defaults to null, meaning using the 'id' GET variable
@@ -193,18 +116,5 @@ class TvEpisodeController extends BaseController
         throw new CHttpException(500,'The requested tvepisode does not exist.');
     }
     return $this->_tvepisode;
-  }
-
-  /**
-   * Executes any command triggered on the admin page.
-   */
-  protected function processAdminCommand()
-  {
-    if(isset($_POST['command'], $_POST['id']) && $_POST['command']==='delete')
-    {
-      $this->loadtvEpisode($_POST['id'])->delete();
-      // reload the current page to avoid duplicated delete actions
-      $this->refresh();
-    }
   }
 }

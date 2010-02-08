@@ -19,7 +19,6 @@ class OtherController extends BaseController
     return array(
         'startDownload' => 'startDownloadAction',
         'makeFavorite' => 'makeFavoriteAction',
-        'hide' => 'hideRelatedAction',
     );
   }
 
@@ -41,17 +40,9 @@ class OtherController extends BaseController
 	public function accessRules()
 	{
 		return array(
-			array('allow',  // allow all users to perform 'list' and 'show' actions
-				'actions'=>array('list','show'),
-				'users'=>array('*'),
-			),
-			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update'),
+			array('allow', // allow authenticated user to perform actions
+				'actions'=>array('list', 'show', 'startDownload', 'makeFavorite'),
 				'users'=>array('@'),
-			),
-			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('admin','delete'),
-				'users'=>array('admin'),
 			),
 			array('deny',  // deny all users
 				'users'=>array('*'),
@@ -65,54 +56,6 @@ class OtherController extends BaseController
 	public function actionShow()
 	{
 		$this->render('show',array('other'=>$this->loadother()));
-	}
-
-	/**
-	 * Creates a new other.
-	 * If creation is successful, the browser will be redirected to the 'show' page.
-	 */
-	public function actionCreate()
-	{
-		$other=new other;
-		if(isset($_POST['other']))
-		{
-			$other->attributes=$_POST['other'];
-			if($other->save())
-				$this->redirect(array('show','id'=>$other->id));
-		}
-		$this->render('create',array('other'=>$other));
-	}
-
-	/**
-	 * Updates a particular other.
-	 * If update is successful, the browser will be redirected to the 'show' page.
-	 */
-	public function actionUpdate()
-	{
-		$other=$this->loadother();
-		if(isset($_POST['other']))
-		{
-			$other->attributes=$_POST['other'];
-			if($other->save())
-				$this->redirect(array('show','id'=>$other->id));
-		}
-		$this->render('update',array('other'=>$other));
-	}
-
-	/**
-	 * Deletes a particular other.
-	 * If deletion is successful, the browser will be redirected to the 'list' page.
-	 */
-	public function actionDelete()
-	{
-		if(Yii::app()->request->isPostRequest)
-		{
-			// we only allow deletion via POST request
-			$this->loadother()->delete();
-			$this->redirect(array('list'));
-		}
-		else
-			throw new CHttpException(500,'Invalid request. Please do not repeat this request again.');
 	}
 
 	/**
@@ -136,31 +79,6 @@ class OtherController extends BaseController
 	}
 
 	/**
-	 * Manages all others.
-	 */
-	public function actionAdmin()
-	{
-		$this->processAdminCommand();
-
-		$criteria=new CDbCriteria;
-
-		$pages=new CPagination(other::model()->count($criteria));
-		$pages->pageSize=self::PAGE_SIZE;
-		$pages->applyLimit($criteria);
-
-		$sort=new CSort('other');
-		$sort->applyOrder($criteria);
-
-		$otherList=other::model()->findAll($criteria);
-
-		$this->render('admin',array(
-			'otherList'=>$otherList,
-			'pages'=>$pages,
-			'sort'=>$sort,
-		));
-	}
-
-	/**
 	 * Returns the data model based on the primary key given in the GET variable.
 	 * If the data model is not found, an HTTP exception will be raised.
 	 * @param integer the primary key value. Defaults to null, meaning using the 'id' GET variable
@@ -175,18 +93,5 @@ class OtherController extends BaseController
 				throw new CHttpException(500,'The requested other does not exist.');
 		}
 		return $this->_other;
-	}
-
-	/**
-	 * Executes any command triggered on the admin page.
-	 */
-	protected function processAdminCommand()
-	{
-		if(isset($_POST['command'], $_POST['id']) && $_POST['command']==='delete')
-		{
-			$this->loadother($_POST['id'])->delete();
-			// reload the current page to avoid duplicated delete actions
-			$this->refresh();
-		}
 	}
 }

@@ -14,6 +14,13 @@ class TvShowController extends BaseController
    */
   private $_tvshow;
 
+  public function actions()
+  {
+    return array(
+      'makeFavorite'=>'makeFavoriteAction',
+    );
+  }
+
   /**
    * @return array action filters
    */
@@ -33,15 +40,8 @@ class TvShowController extends BaseController
   {
     return array(
       array('allow', // allow authenticated user to perform actions
-        'actions'=>array(
-            'create', 'list', 'show', 'update', 
-            'hide', 'unHide'
-        ),
+        'actions'=>array('list', 'show', 'hide', 'makeFavorite'),
         'users'=>array('@'),
-      ),
-      array('allow', // allow admin user to perform 'admin' and 'delete' actions
-        'actions'=>array('admin','delete'),
-        'users'=>array('admin'),
       ),
       array('deny',  // deny all users
         'users'=>array('*'),
@@ -55,54 +55,6 @@ class TvShowController extends BaseController
   public function actionShow()
   {
     $this->render('show',array('tvshow'=>$this->loadtvShow()));
-  }
-
-  /**
-   * Creates a new tvshow.
-   * If creation is successful, the browser will be redirected to the 'show' page.
-   */
-  public function actionCreate()
-  {
-    $tvshow=new tvShow;
-    if(isset($_POST['tvShow']))
-    {
-      $tvshow->attributes=$_POST['tvShow'];
-      if($tvshow->save())
-        $this->redirect(array('show','id'=>$tvshow->id));
-    }
-    $this->render('create',array('tvshow'=>$tvshow));
-  }
-
-  /**
-   * Updates a particular tvshow.
-   * If update is successful, the browser will be redirected to the 'show' page.
-   */
-  public function actionUpdate()
-  {
-    $tvshow=$this->loadtvShow();
-    if(isset($_POST['tvShow']))
-    {
-      $tvshow->attributes=$_POST['tvShow'];
-      if($tvshow->save())
-        $this->redirect(array('show','id'=>$tvshow->id));
-    }
-    $this->render('update',array('tvshow'=>$tvshow));
-  }
-
-  /**
-   * Deletes a particular tvshow.
-   * If deletion is successful, the browser will be redirected to the 'list' page.
-   */
-  public function actionDelete()
-  {
-    if(Yii::app()->request->isPostRequest)
-    {
-      // we only allow deletion via POST request
-      $this->loadtvShow()->delete();
-      $this->redirect(array('list'));
-    }
-    else
-      throw new CHttpException(500,'Invalid request. Please do not repeat this request again.');
   }
 
   /**
@@ -126,46 +78,34 @@ class TvShowController extends BaseController
     ));
   }
 
-  /**
-   * Manages all tvshows.
-   */
-  public function actionAdmin()
-  {
-    $this->processAdminCommand();
-
-    $criteria=new CDbCriteria;
-
-    $pages=new CPagination(tvShow::model()->count($criteria));
-    $pages->pageSize=self::PAGE_SIZE;
-    $pages->applyLimit($criteria);
-
-    $sort=new CSort('tvShow');
-    $sort->applyOrder($criteria);
-
-    $tvshowList=tvShow::model()->findAll($criteria);
-
-    $this->render('admin',array(
-      'tvshowList'=>$tvshowList,
-      'pages'=>$pages,
-      'sort'=>$sort,
-    ));
-  }
-
   public function actionHide()
   {
-    $model = $this->loadtvShow();
-    $transaction = $model->getDbConnection()->beginTransaction();
-    try {
-      $model->hide = true;
-      $model->save();
-      $transaction->commit();
-    } catch (Exception $e) {
-      $transaction->rollback();
-      throw $e;
+    $id = $_GET['id'];
+    if(favoriteTvShow::model()->exists('tvShow_id = :id', array(':id'=>$id)))
+    {
+      $this->widget('actionResponseWidget', array(
+            'dialog'=>array(
+                'heading'=>'Hide Tv Show',
+                'content'=>'This tv show will not be hidden as it is currently favorited.',
+            ),
+      ));
     }
-    // Somehow the choice between tvEpisode and tvShow controllers
-    // should be programatic.
-    $this->redirect(array('/tvEpisode/list'));
+    else
+    {
+      $model = $this->loadtvShow($id);
+      $transaction = $model->getDbConnection()->beginTransaction();
+      try {
+        $model->hide = true;
+        $model->save();
+        $transaction->commit();
+      } catch (Exception $e) {
+        $transaction->rollback();
+        throw $e;
+      }
+      // Somehow the choice between tvEpisode and tvShow controllers
+      // should be programatic.
+      $this->redirect(array('/tvEpisode/list'));
+    }
   }
 
   /**
@@ -183,18 +123,5 @@ class TvShowController extends BaseController
         throw new CHttpException(500,'The requested tvshow does not exist.');
     }
     return $this->_tvshow;
-  }
-
-  /**
-   * Executes any command triggered on the admin page.
-   */
-  protected function processAdminCommand()
-  {
-    if(isset($_POST['command'], $_POST['id']) && $_POST['command']==='delete')
-    {
-      $this->loadtvShow($_POST['id'])->delete();
-      // reload the current page to avoid duplicated delete actions
-      $this->refresh();
-    }
   }
 }

@@ -15,7 +15,7 @@
     <?php endif; ?>
     </ul>
     <div class="buttonContainer clearFix">
-       <?php echo CHtml::link('Clear', array('deleteAll'), array('class'=>'ajaxSubmit button', 'id'=>'clearHistory')); ?>
+       <?php echo CHtml::link('Clear', array('delete', 'all'=>1), array('class'=>'ajaxSubmit button', 'id'=>'clearHistory')); ?>
        <a class="toggleDialog button" href="#">Close</a>
     </div>
   </div>
