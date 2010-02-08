@@ -82,7 +82,7 @@ class feedAdapter_Item extends SimplePie_Item {
   function get_imdbId() {
     $desc = $this->get_description();
     if(preg_match('/imdb.com\/title\/tt(\d+)/i', $desc, $regs))
-      return $regs[1];
+      return (int) $regs[1];
     else
       return 0;
   }

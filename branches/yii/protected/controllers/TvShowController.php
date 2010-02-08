@@ -32,12 +32,11 @@ class TvShowController extends BaseController
   public function accessRules()
   {
     return array(
-      array('allow',  // allow all users to perform 'list' and 'show' actions
-        'actions'=>array('list','show'),
-        'users'=>array('*'),
-      ),
-      array('allow', // allow authenticated user to perform 'create' and 'update' actions
-        'actions'=>array('create','update'),
+      array('allow', // allow authenticated user to perform actions
+        'actions'=>array(
+            'create', 'list', 'show', 'update', 
+            'hide', 'unHide'
+        ),
         'users'=>array('@'),
       ),
       array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -150,6 +149,23 @@ class TvShowController extends BaseController
       'pages'=>$pages,
       'sort'=>$sort,
     ));
+  }
+
+  public function actionHide()
+  {
+    $model = $this->loadtvShow();
+    $transaction = $model->getDbConnection()->beginTransaction();
+    try {
+      $model->hide = true;
+      $model->save();
+      $transaction->commit();
+    } catch (Exception $e) {
+      $transaction->rollback();
+      throw $e;
+    }
+    // Somehow the choice between tvEpisode and tvShow controllers
+    // should be programatic.
+    $this->redirect(array('/tvEpisode/list'));
   }
 
   /**

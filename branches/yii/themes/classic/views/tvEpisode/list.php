@@ -12,7 +12,7 @@ foreach($tvepisodeList as $n => $model) {
            "<a href='".$url->createUrl('tvEpisode/makeFavorite', array('id'=>$model->id))."' class='makeFavorite ajaxSubmit'>".
            "<img src='images/tor_fav.png' alt='Favorite' height='10'></a>".
          "</div><div class='hideButton'>".
-           "<a href='".$url->createUrl('tvEpisode/hide', array('id'=>$model->id))."' class='hideTvShow ajaxSubmit'>".
+           "<a href='".$url->createUrl('tvShow/hide', array('id'=>$model->tvShow_id))."' class='hideTvShow ajaxSubmit'>".
            "<img src='images/hide.png' alt='Hide'></a>".
          "</div><div class='itemDetails'>".
          "  <span class='name'>".(empty($model->tvShow) ? $model->tvShow_id : CHtml::encode($model->tvShow->title))."</span>".

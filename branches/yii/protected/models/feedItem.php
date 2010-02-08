@@ -64,6 +64,7 @@ class feedItem extends CActiveRecord
       array('downloadType', 'in', 'allowEmpty'=>false, 'range'=>array_keys(feedItem::getStatusOptions())),
       array('title,description', 'notMultibyte'),
       array('url', 'url', 'allowEmpty'=>false),
+      array('imdbId', 'numerical', 'allowEmpty'=>false, 'integerOnly'=>true, 'min'=>0),
     );
   }
 
