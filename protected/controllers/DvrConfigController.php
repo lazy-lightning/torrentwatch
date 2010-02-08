@@ -4,9 +4,9 @@ class DvrConfigController extends BaseController
 {
 
   /**
-   * @var string specifies the default action to be 'update'.
+   * @var string specifies the default action to be 'globals'.
    */
-  public $defaultAction='update';
+  public $defaultAction='globals';
 
   /**
    * @var array response data to be passed to the view to construct an actionResponseWidget
@@ -91,6 +91,8 @@ class DvrConfigController extends BaseController
     if(isset($_GET['id']) && Yii::app()->request->isPostRequest &&
        $config->contains($_GET['id']))
     {
+      // $_GET['id'] is considered safe as it is verified to be a member of
+      // $config 
       $config->torClient = $_GET['id'];
       if(isset($_POST['dvrConfigCategory']))
         $config->{$_GET['id']}->attributes = $_POST['dvrConfigCategory'];

@@ -2,7 +2,8 @@
 
 class FeedController extends BaseController
 {
-  const PAGE_SIZE=10;
+  // TODO: some thought should be given to this
+  const PAGE_SIZE=100;
 
   /**
    * @var string specifies the default action to be 'list'.
@@ -66,9 +67,9 @@ class FeedController extends BaseController
     $feed=new feed;
     if(isset($_POST['feed']))
     {
+      $response = array('dialog'=>array('header'=>'Create Feed'));
       $transaction = $feed->getDbConnection()->beginTransaction();
       try {
-        $response = array('dialog'=>array('header'=>'Create Feed'));
         $feed->attributes=$_POST['feed'];
         $success = $feed->save();
         $transaction->commit();
@@ -86,7 +87,7 @@ class FeedController extends BaseController
 
   /**
    * Updates a particular feed.
-   * If update is successful, the browser will be redirected to the 'show' page.
+   * If update is successful, the browser will be redirected to the 'list' page.
    */
   public function actionUpdate()
   {
@@ -98,6 +99,7 @@ class FeedController extends BaseController
       try {
         $feed->attributes=$_POST['feed'];
         $success = $feed->save();
+        $transaction->commit();
       } catch (Exception $e) {
         $transaction->rollback();
         throw $e;
@@ -197,16 +199,26 @@ class FeedController extends BaseController
   {
     if(isset($_POST['command'], $_POST['id']) && $_POST['command']==='delete')
     {
-      $this->loadfeed($_POST['id'])->delete();
+      $transaction = Yii::app()->db->beginTransaction();
+      try {
+        $this->loadfeed($_POST['id'])->delete();
+        $transaction->commit();
+      } 
+      catch (Exception $e) {
+        $transaction->rollback();
+        throw $e;
+      }
       // reload the current page to avoid duplicated delete actions
       $this->refresh();
     }
 
     if (isset($_GET['command']) && $_GET['command']==='updateFeedItems')
     {
+      // NOTE: transaction is handled inside updateFeedItems due to network
+      //       access and lock length
       if(isset($_GET['id'])) {
         Yii::log('performing single update');
-        $this->loadfeed()->updateFeedItems();
+        $this->loadfeed($_GET['id'])->updateFeedItems();
         Yii::log('update complete');
       } else {
         foreach(feed::model()->findAll() as $feed)
