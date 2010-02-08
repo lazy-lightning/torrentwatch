@@ -91,6 +91,7 @@ class SqlitePdo extends PDO
     }
 
     $this->transLevel++;
+    return $this;
   }
 
   /**
