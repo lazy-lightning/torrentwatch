@@ -36,7 +36,7 @@ class movie extends CActiveRecord
   {
     return array(
       array('status', 'default', 'value'=>self::STATUS_NEW),
-      array('imdbId', 'numerical', 'integerOnly'=>true),
+      array('imdbId', 'numerical', 'integerOnly'=>true, 'min'=>0),
       array('lastUpdated', 'default', 'setOnEmpty'=>false, 'value'=>time()),
     );
   }

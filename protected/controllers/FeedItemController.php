@@ -118,9 +118,10 @@ class FeedItemController extends BaseController
 		$criteria=new CDbCriteria(array('select'=>'id,title,status,pubDate', 'order'=>'pubDate DESC'));
     $pages = null;
 
-    if(isset($_GET['filter']))
+    if(isset($_GET['related']) && isset($_GET['id']))
     {
-      list($type, $id) = explode('-', $_GET['filter']);
+      $type = $_GET['related'];
+      $id = (int) $_GET['id'];
       $whitelist = array('tvEpisode', 'movie', 'other');
       if(in_array($type, $whitelist))
       {

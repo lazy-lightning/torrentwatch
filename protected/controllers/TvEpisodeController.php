@@ -40,12 +40,11 @@ class TvEpisodeController extends BaseController
   public function accessRules()
   {
     return array(
-      array('allow',  // allow all users to perform 'list' and 'show' actions
-        'actions'=>array('list','show'),
-        'users'=>array('*'),
-      ),
-      array('allow', // allow authenticated user to perform 'create' and 'update' actions
-        'actions'=>array('create','update', 'startDownload', 'makeFavorite'),
+      array('allow', // allow authenticated user to perform actions
+        'actions'=>array(
+          'create', 'list', 'show', 'update', 
+          'makeFavorite', 'startDownload',
+        ),
         'users'=>array('@'),
       ),
       array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -121,18 +120,22 @@ class TvEpisodeController extends BaseController
   {
     $pages = null;
     $criteria=new CDbCriteria(array(
-          'select'=>'id, status, title, season, episode', 
+          'select'=>'id, status, title, season, episode, tvShow_id', 
           'order'=>'t.lastUpdated DESC',
           // only display episodes that have a related feeditem
           // how much slower does this make it, should there be an extra column to flag this
-          'condition'=>'t.id in (select tvEpisode_id from feedItem where tvEpisode_id not null)'
-    )) ;
+          'condition'=>'t.id in (select tvEpisode_id from feedItem where '.
+                       'tvEpisode_id not null)'
+    ));
 
     if(isset($_GET['tvShow']))
     {
-      $criteria->condition = 't.tvShow_id = :tvShow_id';
+      $criteria->condition .= ' AND t.tvShow_id = :tvShow_id';
       $criteria->params = array(':tvShow_id'=>$_GET['tvShow']);
     }
+    else
+      $criteria->condition .= ' AND t.tvShow_id NOT IN '.
+        '(SELECT id FROM tvShow WHERE hide = 1)';
 
     $pages=new CPagination(tvEpisode::model()->count($criteria));
     $pages->pageSize=Yii::app()->dvrConfig->webItemsPerLoad;
