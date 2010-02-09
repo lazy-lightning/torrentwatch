@@ -284,7 +284,7 @@ class dvrConfigCategory extends BaseDvrConfig implements Serializable {
 
   public function serialize()
   {
-    $ar = array('_title'=>$this->_title);
+    $ar = array('_title'=>$this->_title, '_id'=>$this->_id);
     foreach($this->attributeNames() as $key)
       $ar[$key] = $this->$key;
     return serialize($ar);
@@ -296,6 +296,8 @@ class dvrConfigCategory extends BaseDvrConfig implements Serializable {
     $ar = unserialize($serialized);
     $this->_title = $ar['_title'];
     unset($ar['_title']);
+    $this->_id = $ar['_id'];
+    unset($ar['_id']);
     foreach($ar as $key => $value)
       $this->add($key, $value);
     parent::init();
