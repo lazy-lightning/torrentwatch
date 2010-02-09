@@ -1,7 +1,7 @@
 <?php
 
 abstract class BaseDvrConfig extends CModel {
-  protected $_apcKey = 'NMTDVR_Config';
+  public $_apcKey = 'NMTDVR_Config';
   private $_updateCommand; // CDbCommand that can update a value from this category
   private $_changed=array(); // changed items since load
   private $_ar = array(); // loaded values
@@ -115,13 +115,12 @@ abstract class BaseDvrConfig extends CModel {
    */
   protected function loadAPC($key = '')
   {
-    if(UNIT_TEST)
-      return false;
-
     $success = false;
-    if(function_exists('apc_fetch'))
+    if($key === '')
+      $key = $this->_apcKey;
+    if(function_exists('apc_fetch') && !empty($key) )
     {
-      $data = apc_fetch(empty($key) ? $this->_apcKey : $key, $success);
+      $data = apc_fetch($key, $success);
       if($success)
       {
         // allow sub-categories to add themselves
@@ -142,9 +141,11 @@ abstract class BaseDvrConfig extends CModel {
 
   public function saveAPC($key = '')
   {
-    if(!UNIT_TEST && function_exists('apc_store'))
+    if($key === '')
+      $key = $this->_apcKey;
+    if(!empty($key) && function_exists('apc_store'))
     {
-      apc_store(empty($key) ? $this->_apcKey : $key, serialize($this->_ar), 3600);
+      apc_store($key, serialize($this->_ar), 3600);
     }
   }
   /**
