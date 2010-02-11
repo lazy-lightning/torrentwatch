@@ -16,6 +16,8 @@ class feedAdapter extends SimplePie {
     // feedAdapter_File implements the :COOKIE: portion of url's
     $this->set_item_class('feedAdapter_Item');
     $this->set_file_class('feedAdapter_File');
+    // Allows for broken feeds that dont encode & as &amp;
+    $this->set_parser_class('feedAdapter_Parser');
   }
 
   function init() {
@@ -96,3 +98,12 @@ class feedAdapter_Item extends SimplePie_Item {
   }
 }
 
+// Allows for broken feeds that dont encode & as &amp;
+class feedAdapter_Parser extends SimplePie_Parser
+{
+  function parse(&$data, $encoding)
+  {
+    $data = str_replace(' & ', '&#38;', $data);
+    return parent::parse($data, $encoding);
+  }
+}
