@@ -49,8 +49,6 @@ class feedAdapter extends SimplePie {
       {
         $transaction = Yii::app()->db->beginTransaction();
         try {
-          $description = $item->get_description();
-
           // Prefer a link from enclosure over link from item
           $link = '';
           $enclosure = $item->get_enclosure();
@@ -59,7 +57,7 @@ class feedAdapter extends SimplePie {
           if(empty($link))
             $link = $item->get_link();
   
-          $record = factory::feedItemByAttributes(array(
+          factory::feedItemByAttributes(array(
                 'hash'        => $hash,
                 'feed_id'     => $this->_feedAR->id,
                 'downloadType'=> $this->_feedAR->downloadType,
