@@ -1,13 +1,25 @@
 <?php
 
-// many of the ar classes have a many_many relationship
-// with the quality table.  This standardizes their setting
-// and getting
-
+/**
+ * many of the ar classes have a many_many relationship
+ * with the quality table.  This standardizes their setting
+ * and getting
+ * 
+ * @uses CBehavior
+ * @package nmtdvr
+ * @version $id$
+ * @copyright Copyright &copy; 2009-2010 Erik Bernhardson
+ * @author Erik Bernhardson <journey4712@yahoo.com> 
+ * @license GNU General Public License v2 http://www.gnu.org/licenses/gpl-2.0.txt
+ */
 class ARQualityBehavior extends CBehavior 
 {
   private $_qualityIds;
 
+  /**
+   * Declares events and the corresponding event handler methods.
+   * @return array events (array keys) and the corresponding event handler methods (array values).
+   */
   public function events()
   {
     return array(
@@ -15,6 +27,11 @@ class ARQualityBehavior extends CBehavior
     );
   }
 
+  /**
+   * getQualityIds 
+   * 
+   * @return array 0 indexed array of quality ids related to this record
+   */
   public function getQualityIds() 
   {
     if($this->_qualityIds === null) 
@@ -35,6 +52,11 @@ class ARQualityBehavior extends CBehavior
     return $this->_qualityIds;
   }
 
+  /**
+   * getQualityString 
+   * 
+   * @return string ' / ' seperated list of related qualitys
+   */
   public function getQualityString() 
   {
     $string = array();
@@ -45,6 +67,12 @@ class ARQualityBehavior extends CBehavior
     return implode(' / ', $string);
   }
 
+  /**
+   * Set the records quality to be all positive numbers in the given set
+   * 
+   * @param array $in the quality ids to be set
+   * @return void
+   */
   public function setQualityIds($in) 
   {
     $this->_qualityIds = array();
@@ -55,6 +83,12 @@ class ARQualityBehavior extends CBehavior
     }
   }
 
+  /**
+   * Save quality relations to the database after successfull save.
+   * 
+   * @param CEvent $event the event that triggered this method
+   * @return void
+   */
   public function afterSave($event) 
   {
     // update scenario

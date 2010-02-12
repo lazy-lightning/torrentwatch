@@ -10,6 +10,14 @@ define('TEST_BASE_URL','http://xbmclive/nmtdvr/nmtdvr-test.php/');
  * The base class for functional test cases.
  * In this class, we set the base URL for the test application.
  * We also provide some common methods to be used by concrete test classes.
+ * And ensures sub fixtures are reset
+ * 
+ * @uses CWebTestCase
+ * @package nmtdvr
+ * @version $id$
+ * @copyright Copyright &copy; 2009-2010 Erik Bernhardson
+ * @author Erik Bernhardson <journey4712@yahoo.com> 
+ * @license GNU General Public License v2 http://www.gnu.org/licenses/gpl-2.0.txt
  */
 class WebTestCase extends CWebTestCase
 {
@@ -18,6 +26,8 @@ class WebTestCase extends CWebTestCase
   /**
    * Sets up the class before a test is run
    * primarily used to login before testing
+   *
+   * @return void
    */
   protected function assertPreConditions()
   {
@@ -25,18 +35,33 @@ class WebTestCase extends CWebTestCase
     $this->login();
   }
 
+  /**
+   * Stop the browser session after each test
+   * 
+   * @return void
+   */
   protected function assertPostConditions()
   {
     $this->stop();
   }
 
-  // Ensure visibility of items before clicking them
+  /**
+   * Ensure visibility of items before clicking them
+   * 
+   * @param string $locator 
+   * @return void
+   */
   protected function click($locator)
   {
     $this->assertElementVisible($locator);
     parent::__call('click', array($locator));
   }
 
+  /**
+   * tearDown 
+   * 
+   * @return void
+   */
   protected function tearDown()
   {
     $app=Yii::app();
@@ -47,6 +72,8 @@ class WebTestCase extends CWebTestCase
 
   /**
    * Access the login form and receive authorization
+   *
+   * @return void
    */
   protected function login()
   {
@@ -62,6 +89,8 @@ class WebTestCase extends CWebTestCase
 
   /**
    * Close the initial welcome screen
+   *
+   * @return void
    */
   protected function closeWelcome()
   {
@@ -74,6 +103,8 @@ class WebTestCase extends CWebTestCase
 	/**
 	 * Sets up before each test method runs.
 	 * This mainly sets the base URL for the test application.
+   *
+   * @return void
 	 */
 	protected function setUp()
 	{
@@ -81,16 +112,38 @@ class WebTestCase extends CWebTestCase
 		$this->setBrowserUrl(TEST_BASE_URL);
 	}
 
+  /**
+   * assertElementVisible 
+   * 
+   * @param string $locator 
+   * @param string $message 
+   * @return void
+   */
   public function assertElementVisible($locator, $message = '')
   {
     $this->assertEquals(true, $this->isVisible($locator), $message);
   }
 
+  /**
+   * assertElementNotVisible 
+   * 
+   * @param string $locator 
+   * @param string $message 
+   * @return void
+   */
   public function assertElementNotVisible($locator, $message = '')
   {
     $this->assertEquals(false, $this->isVisible($locator), $message);
   }
 
+  /**
+   * Click element and wait for another element, optionally with a mid point
+   *
+   * @param string $locator
+   * @param string $waitFor
+   * @param string $mid
+   * @return void
+   */
   public function clickAndWaitFor($locator, $waitFor, $mid='id=progressbar')
   {
     $this->click($locator);
@@ -100,6 +153,9 @@ class WebTestCase extends CWebTestCase
 
   /**
    * Pause execution until element is visible
+   *
+   * @param string $locator
+   * @return void
    */
   public function waitForElementVisible($locator)
   {
@@ -109,6 +165,9 @@ class WebTestCase extends CWebTestCase
 
   /**
    * Pause execution until element is not visible
+   *
+   * @param string $locator
+   * @return void
    */
   public function waitForElementNotVisible($locator)
   {
@@ -116,6 +175,12 @@ class WebTestCase extends CWebTestCase
     $this->waitForCondition("!selenium.isVisible($locator);");
   }
 
+  /**
+   * Pause execution until element is present and visible
+   *
+   * @param string $locator
+   * @return void
+   */
   public function waitForElementPresentAndVisible($locator)
   {
     $this->waitForElementPresent($locator);

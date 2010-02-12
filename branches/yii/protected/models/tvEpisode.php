@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * tvEpisode implements validation and relationships for the tvEpisode table
+ * 
+ * @uses CActiveRecord
+ * @package nmtdvr
+ * @version $id$
+ * @copyright Copyright &copy; 2009-2010 Erik Bernhardson
+ * @author Erik Bernhardson <journey4712@yahoo.com> 
+ * @license GNU General Public License v2 http://www.gnu.org/licenses/gpl-2.0.txt
+ */
 class tvEpisode extends CActiveRecord
 {
 
@@ -23,6 +33,10 @@ class tvEpisode extends CActiveRecord
     return 'tvEpisode';
   }
 
+  /**
+   * Returns a list of behaviors that this model should behave as.
+   * @return array the behavior configurations (behavior name=>behavior configuration)
+   */
   public function behaviors()
   {
     return array(

@@ -1,9 +1,30 @@
 <?php
 
 Yii::import('system.test.CDbFixtureManager');
+/**
+ * DbFixtureManager 
+ * 
+ * @uses CDbFixtureManager
+ * @package nmtdvr
+ * @version $id$
+ * @copyright Copyright &copy; 2009-2010 Erik Bernhardson
+ * @author Erik Bernhardson <journey4712@yahoo.com> 
+ * @license GNU General Public License v2 http://www.gnu.org/licenses/gpl-2.0.txt
+ */
 class DbFixtureManager extends CDbFixtureManager {
+  /**
+   * isSubFixture 
+   * 
+   * @var mixed
+   */
   private $isSubFixture = false;
 
+  /**
+   * setSubFixture 
+   * 
+   * @param mixed $dir 
+   * @return void
+   */
   public function setSubFixture($dir)
   {
     $this->resetSubFixture();
@@ -13,6 +34,11 @@ class DbFixtureManager extends CDbFixtureManager {
     $this->isSubFixture = true;
   }
 
+  /**
+   * resetSubFixture 
+   * 
+   * @return void
+   */
   public function resetSubFixture()
   {
     if($this->isSubFixture)
@@ -22,12 +48,22 @@ class DbFixtureManager extends CDbFixtureManager {
     }
   }
 
+  /**
+   * assertPostConditions 
+   * 
+   * @return void
+   */
   protected function assertPostConditions()
   {
     $this->resetSubFixture();
     parent::assertPostConditions();
   }
 
+  /**
+   * reset sub fixture on tearDown
+   * 
+   * @return void
+   */
   public function tearDown()
   {
     $this->resetSubFixture();
