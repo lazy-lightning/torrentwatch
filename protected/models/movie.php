@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * movie implements validation and relationships for the movie table
+ * 
+ * @uses CActiveRecord
+ * @package nmtdvr
+ * @version $id$
+ * @copyright Copyright &copy; 2009-2010 Erik Bernhardson
+ * @author Erik Bernhardson <journey4712@yahoo.com> 
+ * @license GNU General Public License v2 http://www.gnu.org/licenses/gpl-2.0.txt
+ */
 class movie extends CActiveRecord
 {
 
@@ -23,12 +33,17 @@ class movie extends CActiveRecord
     return 'movie';
   }
 
+  /**
+   * Returns a list of behaviors that this model should behave as.
+   * @return array the behavior configurations (behavior name=>behavior configuration)
+   */
   public function behaviors()
   {
     return array(
         'statusText' => 'ARStatusTextBehavior',
     );
   }
+
   /**
    * @return array validation rules for model attributes.
    */
@@ -108,6 +123,9 @@ class movie extends CActiveRecord
     return empty($this->name) ? $this->title : $this->name;
   }
 
+  /**
+   * @return array the status options (status code=>status name)
+   */
   public function getStatusOptions()
   {
     return array(
@@ -116,6 +134,9 @@ class movie extends CActiveRecord
     );
   }
 
+  /**
+   * @return string this items status as a string
+   */
   public function getStatusText()
   {
     $options=$this->getStatusOptions();

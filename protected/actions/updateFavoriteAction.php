@@ -1,17 +1,41 @@
 <?php
 
+/**
+ * updateFavoriteAction 
+ * 
+ * @uses CAction
+ * @package nmtdvr
+ * @version $id$
+ * @copyright Copyright &copy; 2009-2010 Erik Bernhardson
+ * @author Erik Bernhardson <journey4712@yahoo.com> 
+ * @license GNU General Public License v2 http://www.gnu.org/licenses/gpl-2.0.txt
+ */
 class updateFavoriteAction extends CAction
 {
-  // The response data
+  /**
+   * The response data
+   * 
+   * @var actionResponseWidget
+   */
   protected $response;
 
-  // If the save was successfull or not
+  /**
+   * @var boolean true when save is successfull
+   */
   protected $success = False;
 
-  // When set to true will create a favorite rather than update
+  /**
+   * @var boolean When true will create a favorite rather than update
+   */
   public $create = False;
 
-  // Updates the model from POST data
+  /**
+   * Updates the model from POST data
+   * 
+   * @param mixed $model 
+   * @param mixed $attributes 
+   * @return void
+   */
   protected function updateModel($model, $attributes)
   {
     if(isset($_POST['quality_id']))
@@ -27,6 +51,11 @@ class updateFavoriteAction extends CAction
     }
   }
 
+  /**
+   * run 
+   * 
+   * @return void
+   */
   public function run()
   {
     $this->response = new actionResponseWidget;

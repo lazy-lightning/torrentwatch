@@ -1,11 +1,28 @@
 <?php
-// This action can be attached to any AR Controller controlling a
-// model decended from BaseFavorite
-
+/**
+ * deleteFavoriteAction can be attached to any AR controller controlling a model
+ * decended from BaseFavorite
+ * 
+ * @uses CAction
+ * @package nmtdvr
+ * @version $id$
+ * @copyright Copyright &copy; 2009-2010 Erik Bernhardson
+ * @author Erik Bernhardson <journey4712@yahoo.com> 
+ * @license GNU General Public License v2 http://www.gnu.org/licenses/gpl-2.0.txt
+ */
 class deleteFavoriteAction extends CAction
 {
+  /**
+   * response 
+   * 
+   * @var actionResponseWidget
+   */
   protected $response;
 
+  /**
+   * @param BaseFavorite $model the model act upon
+   * @return array 0 indexed array of feedItem id's that match current favorite
+   */
   protected function getMatchingIds($model)
   {
     $class = get_class($model);
@@ -21,6 +38,11 @@ class deleteFavoriteAction extends CAction
     return $ids;
   }
 
+  /**
+   * run 
+   * 
+   * @return void
+   */
   public function run()
   {
     $this->response = new actionResponseWidget;

@@ -1,7 +1,23 @@
 <?php
 
+/**
+ * startDownloadAction 
+ * 
+ * @uses feedItemAction
+ * @package nmtdvr
+ * @version $id$
+ * @copyright Copyright &copy; 2009-2010 Erik Bernhardson
+ * @author Erik Bernhardson <journey4712@yahoo.com> 
+ * @license GNU General Public License v2 http://www.gnu.org/licenses/gpl-2.0.txt
+ */
 class startDownloadAction extends feedItemAction 
 {
+  /**
+   * runAction 
+   * 
+   * @param mixed $model 
+   * @return void
+   */
   protected function runAction($model)
   {
     $this->response->dialog['header'] = 'Download Feed Item';

@@ -1,8 +1,24 @@
 <?php
 
+/**
+ * BaseFavorite is the base class providing most features needed by favorite objects
+ * 
+ * BaseFavorite provides validation of common data and triggering of downloads
+ *
+ * @uses CActiveRecord
+ * @package nmtdvr
+ * @version $id$
+ * @copyright Copyright &copy; 2009-2010 Erik Bernhardson
+ * @author Erik Bernhardson <journey4712@yahoo.com> 
+ * @license GNU General Public License v2 http://www.gnu.org/licenses/gpl-2.0.txt
+ */
 abstract class BaseFavorite extends CActiveRecord
 {
 
+  /**
+   * returns array to instantiate class behaviors
+   * @return array the behavior configurations (behavior name=>behavior configuration)
+   */
   public function behaviors()
   {
     return array(
@@ -10,6 +26,10 @@ abstract class BaseFavorite extends CActiveRecord
     );
   }
 
+  /**
+   * Returns the validation rules for attributes
+   * @return array validation rules to be applied when {@link CModel::validate()} is called.
+   */
   public function rules()
   {
     return array(
@@ -22,7 +42,8 @@ abstract class BaseFavorite extends CActiveRecord
   }
 
   /**
-   * Check for any newly matching favorites
+   * Check for any newly matching favorites on successfull save
+   * @return void
    */
   public function afterSave()
   {
@@ -32,6 +53,7 @@ abstract class BaseFavorite extends CActiveRecord
 
   /**
    * Reset any currently matching feed Items that arn't downloaded to nomatch
+   * @return boolean if save should proceede
    */
   public function beforeSave()
   {
@@ -43,6 +65,7 @@ abstract class BaseFavorite extends CActiveRecord
 
   /**
    * Clean out many_many relationship tables on delete
+   * @return boolean true on successfull delete
    */
   public function deleteByPk($pk,$condition='',$params=array())
   {
@@ -59,6 +82,7 @@ abstract class BaseFavorite extends CActiveRecord
 
   /**
    * Validation function
+   * @return void
    */
   public function writableDirectory($attribute, $params) {
     if(!empty($this->$attribute) &&

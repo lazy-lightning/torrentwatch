@@ -1,6 +1,19 @@
 <?php
+/**
+ * Functional testing of the favorites dialog
+ * 
+ * @uses WebTestCase
+ * @package nmtdvr
+ * @version $id$
+ * @copyright Copyright &copy; 2009-2010 Erik Bernhardson
+ * @author Erik Bernhardson <journey4712@yahoo.com> 
+ * @license GNU General Public License v2 http://www.gnu.org/licenses/gpl-2.0.txt
+ */
 class FavoritesTest extends WebTestCase
 {
+  /**
+   * @var array fixtures to be used for this test case (name=>ar class OR :table)
+   */
   protected $fixtures = array(
       'favoriteTvShow'=>'favoriteTvShow',
       'favoriteMovie'=>'favoriteMovie',
@@ -8,28 +21,36 @@ class FavoritesTest extends WebTestCase
       'tvEpisode'=>'tvEpisode',
   );
 
+  /**
+   * @var array locators used in the test (name=>locator)
+   */
   protected $locators = array(
-      'actionResponseDialog' => 'id=actionResponse',
-      'actionResponseHeading' => 'css=#actionResponse .dialog_heading',
-      'createFavoriteButton' => 'link=Create',
-      'deleteFavoriteButton' => 'link=Delete',
-      'errorSummary' => 'css=.errorSummary',
-      'favoriteFilterInput' => 'name={type}[filter]',
-      'favoriteMovieContainer' => 'id=favoriteMovie_container',
-      'favoriteNameInput' => "name={type}[{id}]",
-      'favoriteSaveInInput' => "css=#{type}-1 .favorite_savein input",
+      'actionResponseDialog'    => 'id=actionResponse',
+      'actionResponseHeading'   => 'css=#actionResponse .dialog_heading',
+      'createFavoriteButton'    => 'link=Create',
+      'deleteFavoriteButton'    => 'link=Delete',
+      'errorSummary'            => 'css=.errorSummary',
+      'favoriteFilterInput'     => 'name={type}[filter]',
+      'favoriteMovieContainer'  => 'id=favoriteMovie_container',
+      'favoriteNameInput'       => "name={type}[{id}]",
+      'favoriteSaveInInput'     => "css=#{type}-1 .favorite_savein input",
       'favoriteStringContainer' => 'id=favoriteString_container',
-      'favoriteQualitySelect' => "{}div[@class='favorite_quality']/select",
-      'favoritesDialog' => 'id=favorites',
-      'favoriteForm' => '{}div',
-      'newFavoriteLink' => "xpath=id('{type}-li-')/a",
-      'saveFavoriteButton' => '{}div/a[1]',
-      'toggleFavoriteMovieTab' => "xpath=id('favorites')/div[2]/ul/li[2]/a",
+      'favoriteQualitySelect'   => "{}div[@class='favorite_quality']/select",
+      'favoritesDialog'         => 'id=favorites',
+      'favoriteForm'            => '{}div',
+      'newFavoriteLink'         => "xpath=id('{type}-li-')/a",
+      'saveFavoriteButton'      => '{}div/a[1]',
+      'toggleFavoriteMovieTab'  => "xpath=id('favorites')/div[2]/ul/li[2]/a",
       'toggleFavoriteStringTab' => "xpath=id('favorites')/div[2]/ul/li[3]/a",
-      'toggleFavoritesButton' => 'link=Favorites',
-      'updateFavoriteButton' => 'link=Update',
+      'toggleFavoritesButton'   => 'link=Favorites',
+      'updateFavoriteButton'    => 'link=Update',
   );
 
+  /**
+   * open the favorites dialog before performing each test
+   * 
+   * @return void
+   */
   public function assertPreConditions()
   {
     $l = $this->locators;
@@ -38,7 +59,14 @@ class FavoritesTest extends WebTestCase
     $this->waitForElementVisible($l['favoritesDialog']);
   }
 
-  // used for accessing different favorites without confusing the similar forms
+  /**
+   * getLocators returns a set of locators targeted for the current test
+   * 
+   * @param string $type the type of favorite to locate
+   * @param int $id the name of the related foreign key in favorite class being
+   *                tested as it appears in the form
+   * @return array locators used in the test (name=>locator)
+   */
   protected function getLocators($type,$id) {
     $xpath = "xpath=id('$type-1')/";
     $out = array();
@@ -47,12 +75,22 @@ class FavoritesTest extends WebTestCase
     return $out;
   }
 
+  /**
+   * Performs a test of the favorites TV Show tab
+   * 
+   * @return void
+   */
   public function testTvShowFavorite()
   {
     // tvShow will be open be default
     $this->realTest($this->getLocators('favoriteTvShow', 'tvShow_id'));
   }
 
+  /**
+   * Performs a test of the favorites TV Show tab
+   * 
+   * @return void
+   */
   public function testMovieFavorite()
   {
     $l = $this->getLocators('favoriteMovie', 'name');
@@ -63,6 +101,12 @@ class FavoritesTest extends WebTestCase
     $this->realTest($l);
   }
 
+  /**
+   * Performs a test of the favorites Strings tab
+   * 
+   * @access public
+   * @return void
+   */
   function testStringFavorite()
   {
     $l = $this->getLocators('favoriteString', 'name');
@@ -73,6 +117,20 @@ class FavoritesTest extends WebTestCase
     $this->realTest($l);
   }
 
+  /**
+   * Performs a basic test of a favorites tab using the provided locators.
+   * tests of: 
+   * favorite creation
+   * ensure an errorSummary is present if bad data is supplied to Save In 
+   * - TODO: this assumes it will appear for others.  should test
+   * ensure supplied data is returned after create/update
+   * ensure various links automatically appear/disapear when creating/deleting favorites
+   * verifys can set and unset multiple qualitys 
+   * favorite deletion
+   *
+   * @param array $locators locators used in the test (name=>locator)
+   * @return void
+   */
 	public function realTest($locators)
 	{
     $l = $locators;
@@ -132,6 +190,14 @@ class FavoritesTest extends WebTestCase
     $this->assertElementNotPresent($l['favoriteForm']);
 	}
 
+  /**
+   * Overload to provide sensible defaults to second and third parameter
+   * 
+   * @param string $locator element to be clicked
+   * @param string $waitFor element to wait for
+   * @param string $mid optional element to wait for before second argument
+   * @return void
+   */
   public function clickAndWaitFor($locator, $waitFor = 'id=favorites', $mid='id=progressbar')
   {
     parent::clickAndWaitFor($locator, $waitFor, $mid);

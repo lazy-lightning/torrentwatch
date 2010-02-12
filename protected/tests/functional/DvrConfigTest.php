@@ -1,4 +1,14 @@
 <?php
+/**
+ * Functional testing for the configuration dialog
+ * 
+ * @uses WebTestCase
+ * @package nmtdvr
+ * @version $id$
+ * @copyright Copyright &copy; 2009-2010 Erik Bernhardson
+ * @author Erik Bernhardson <journey4712@yahoo.com> 
+ * @license GNU General Public License v2 http://www.gnu.org/licenses/gpl-2.0.txt
+ */
 class DvrConfigTest extends WebTestCase
 {
   public $autoStop = false;
@@ -46,6 +56,11 @@ class DvrConfigTest extends WebTestCase
 
   );
 
+  /**
+   * Open the configuration dialog before each test procedes
+   * 
+   * @return void
+   */
   protected function assertPreConditions()
   {
     $l = $this->locators; // shorthand access
@@ -54,7 +69,12 @@ class DvrConfigTest extends WebTestCase
     $this->assertVisible($l['globalConfigTab']);
   }
 
-  function testDefaultSave()
+  /**
+   * Test a save of the data pre-populated in the form
+   * 
+   * @return void
+   */
+  public function testDefaultSave()
   {
     $l = $this->locators; // shorthand access
     $this->assertElementPresent('link=Save');
@@ -62,7 +82,12 @@ class DvrConfigTest extends WebTestCase
     $this->assertText($l['responseDialog'], 'Configuration saved.');
   }
 
-  function testUpdateGlobalConfig()
+  /**
+   * Test the main tab of the configuration dialog
+   * 
+   * @return void
+   */
+  public function testUpdateGlobalConfig()
   {
     $l = $this->locators; // shorthand access
     $this->type($l['itemsPerLoadInput'], 'qwerty');
@@ -75,7 +100,12 @@ class DvrConfigTest extends WebTestCase
     $this->assertEquals($config->webItemsPerLoad, 200);
   }
 
-  function testTorClient()
+  /**
+   * Test the torrent client tab of the configuration dialog
+   * 
+   * @return void
+   */
+  public function testTorClient()
   {
     $l = $this->locators; // shorthand access
     // click button to load torrent client configuration
@@ -106,6 +136,11 @@ class DvrConfigTest extends WebTestCase
     $this->assertEquals($config->clientTransRPC->password, 'pAsswOrd');
   }
 
+  /**
+   * Test the nzb client tab of the configuration dialog
+   * 
+   * @return void
+   */
   function testNzbClient()
   {
     $l = $this->locators; // shorthand access
@@ -134,6 +169,11 @@ class DvrConfigTest extends WebTestCase
     $this->assertEquals($config->clientSABnzbd->category, 'spaztastic');
   }
 
+  /**
+   * Test the feeds tab of the configuration dialog
+   * 
+   * @return void
+   */
   function testFeeds()
   {
     $l = $this->locators; // shorthand access
@@ -174,6 +214,14 @@ class DvrConfigTest extends WebTestCase
     $this->waitForElementNotPresent($l['feedItem']);
   }
 
+  /**
+   * Overloaded to set sensible defaults for second and third parameter
+   * 
+   * @param string $locator 
+   * @param string $waitFor 
+   * @param string $mid 
+   * @return void
+   */
   public function clickAndWaitFor($locator, $waitFor = 'id=configuration', $mid='id=progressbar')
   {
     parent::clickAndWaitFor($locator, $waitFor, $mid);
