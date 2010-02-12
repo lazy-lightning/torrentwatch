@@ -5,19 +5,28 @@
 // new feedItems and their related models
 
 // The factory will throw CException if something fails to save to the database
-
+// Failure to save is usually a problem with item validation
 class factory {
-  // @param array must contain at least 'hash' key for feedItem
+  /*
+   * feedItemByAttributes
+   *
+   * @param array must contain at least 'hash' and 'title' keys 
+   * @throws CException on incorrect attributes array
+   * @throws CException on failure to save(validation usually)
+   */
   public static function feedItemByAttributes($attributes)
   {
-    if(!isset($attributes['hash']))
+    if(empty($attributes['hash']))
       throw new CException("No hash provided for ".__FUNCTION__);
+    if(empty($attributes['title']))
+      throw new CException("No title provided for ".__FUNCTION__);
     $item = feedItem::model()->find('hash = :hash', array('hash'=>$attributes['hash']));
     if($item === null)
     {
       $item = new feedItem;
-      // Should the attributes also be applied and saved when it already exists in the db?
       $item->attributes = $attributes;
+      $details = new mediaTitleParser($item->title);
+      $details->applyTo($item);
       if(!$item->save())
         throw new CException("New feed item failed to save");
     }

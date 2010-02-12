@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * feedItem Class File
+ * 
+ * @uses CActiveRecord
+ * @version $id$
+ * @copyright 1997-2005 The PHP Group
+ * @author Tobias Schlitt <toby@php.net> 
+ * @license PHP Version 3.0 {@link http://www.php.net/license/3_0.txt}
+ */
 class feedItem extends CActiveRecord
 {
 
@@ -104,6 +113,9 @@ class feedItem extends CActiveRecord
   }
 
   /**
+   * getDownloadTypeText 
+   * 
+   * @param mixed $downloadType 
    * @return string String representation of download type
    */
   public static function getDownloadTypeText($downloadType=null) {
@@ -133,6 +145,12 @@ class feedItem extends CActiveRecord
     );
   }
 
+  /**
+   * getStatusText 
+   * 
+   * @param integer $status 
+   * @return string the given status as a string
+   */
   // static to allow translation directly from query row in a view without AR model
   public static function getStatusText($status = null) {
     static $options = null;
@@ -144,53 +162,9 @@ class feedItem extends CActiveRecord
         : "unknown ({$status})";
   }
       
-  public function beforeValidate() {
-    if($this->isNewRecord) {
-      list($shortTitle, $episodeTitle, $season, $episode, $network, $quality) = mediaTitleParser::detect($this->title);
- 
-      if(!empty($network))
-        $this->network_id = factory::networkByTitle($network)->id;
-
-      $this->qualityIds = factory::qualityIdsByTitleArray($quality);
-     
-      // TODO: perhaps mediaTitleParser should return the tvEpisode/movie/other object
-      //       or something that interfaces with mediaTitleParser
-      if(($season >= 0 && $episode > 0) ||
-         ($season > 0 && $episode == 0)) 
-      {
-        // Found a season and episode for this item
-        $model = factory::tvEpisodeByEpisode($shortTitle, $season, $episode);
-        $this->tvEpisode_id = $model->id;
-        // mark the tvEpisode as having a new feeditem
-        // set the title if given
-        if(!empty($episodeTitle)) 
-          $model->title = $episodeTitle;
-      }
-      elseif($this->imdbId > 1000) 
-      {
-        // IMdB id is not best differentiator, but will work for now
-        $model = factory::movieByImdbId($this->imdbId, $shortTitle);
-        $this->movie_id = $model->id;
-      }
-      elseif(null !== ($model = movie::model()->find('title LIKE :title', array(':title'=>$shortTitle))))
-      {
-        // movie of like name exists
-        $this->movie_id = $model->id;
-      }
-      else 
-      {
-        $model = factory::otherByTitle($shortTitle);
-        $this->other_id = $model->id;
-      }
-      // trigger lastUpdated update
-      $model->save();
-    }
-    return parent::beforeValidate();
-  }
-
   /**
    * Create a favorite that would match this feed item
-   * @return object an unsaved favorite
+   * @return BaseFavorite an unsaved favorite
    */
   public function generateFavorite() {
     $fav = null;
@@ -215,14 +189,29 @@ class feedItem extends CActiveRecord
     return $fav;
   }
 
-  public function getItemTypeRecord()
+  /**
+   * Provides information about what this item relates to
+   * @return string the records item type.  Null if no relations.
+   */
+  public function getItemType()
   {
     if(!empty($this->tvEpisode_id))
-      return $this->tvEpisode;
+      return 'tvEpisode';
     elseif(!empty($this->movie_id))
-      return $this->movie;
+      return 'movie';
     elseif(!empty($this->other_id))
-      return $this->other;
+      return 'other';
+    return null;
+  }
+
+  /**
+   * Retreives the AR class of the related item type
+   * @return CActiveRecord the related record. Null if no relations.
+   */
+  public function getItemTypeRecord()
+  {
+    if(null !== ($type = $this->getItemType()))
+      return $this->$type;
     return null;
   }
 
@@ -231,8 +220,11 @@ class feedItem extends CActiveRecord
    * Function from http://us2.php.net/manual/en/function.mb-detect-encoding.php
    * by chris AT w3style.co DOT uk based on code by php-note-2005 at ryandesign dot com
    * @param string the attribute to check
+   * 
+   * @param string $attr the string to check for multibyte characters
+   * @return boolean true when the string contains no multibyte characters
    */
-  function notMultibyte($attr)
+  public function notMultibyte($attr)
   {
     if(preg_match('%(?:
         [\xC2-\xDF][\x80-\xBF]             # non-overlong 2-byte
