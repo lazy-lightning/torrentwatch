@@ -364,6 +364,14 @@ div.hideButton img {
   margin: 0 .5em 0 .3em;
   }
 
+.loadInspector {
+  float: right;
+  height: 10px;
+  width: 10px;
+  margin: 5px;
+  background-color: #BDD3FE;
+}
+
 div.itemDetails {
   padding-top: .4em;
   height: 28px;

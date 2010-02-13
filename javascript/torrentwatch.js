@@ -31,6 +31,9 @@
     };
     // open/close the inspector pane
     var inspect_status = false;
+    $.showInspector = function() {
+      if(!inspect_status) $.toggleInspector();
+    };
     $.toggleInspector = function () {
         inspect_status = !inspect_status;
         $("div#feedItems_container,div#feedItems_container > div,ul#filterbar_container,div#inspector_container").stop(true, true).animate(
