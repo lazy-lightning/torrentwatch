@@ -18,11 +18,12 @@ class FavoriteTvShowController extends BaseController
   {
     return array(
         'delete'=>'deleteFavoriteAction',
-        'show'=>'showFavoriteAction',
         'update'=>'updateFavoriteAction',
+        'show'=>'showFavoriteAction',
         'create'=>array(
           'class'=>'updateFavoriteAction',
-          'create'=>true
+          'create'=>true,
+          'extraVars'=>'createViewVariables',
         ),
     );
   }
@@ -77,6 +78,23 @@ class FavoriteTvShowController extends BaseController
     )));
   }
 
+  /**
+   * createViewVariables 
+   * 
+   * @param favoriteTvShow $model 
+   * @access public
+   * @return void
+   */
+  function createViewVariables($model)
+  {
+    $validShows = array();
+    if($model->isNewRecord)
+    {
+      foreach(tvShow::model()->findAll(array('select'=>'title', 'order'=>'title')) as $model)
+        $out['validShows'][] = $model->title;
+    }
+    return $out;
+  }
   /**
    * Returns the data model based on the primary key given in the GET variable.
    * If the data model is not found, an HTTP exception will be raised.

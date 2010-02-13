@@ -20,7 +20,7 @@ class actionResponseWidget extends CWidget{
 
   public $delete = false;
 
-  public $alsoDelete = false;
+  public $showInspector = false;
 
   protected $jScript = array();
 
@@ -57,6 +57,9 @@ class actionResponseWidget extends CWidget{
 
     if($this->showFavorite)
       $this->jScript[] = "$.showFavorite('{$this->showFavorite}')";
+
+    if($this->showInspector)
+      $this->jScript[] = "$.showInspector()";
 
     return $this->render('response', array(
         'jScript' => implode(";\n  ", $this->jScript),
