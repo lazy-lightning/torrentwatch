@@ -30,6 +30,13 @@ class updateFavoriteAction extends CAction
   public $create = False;
 
   /**
+   * extraVars 
+   * 
+   * @var string a function in the controller to call to get extra variables for the view
+   */
+  public $extraVars = '';
+
+  /**
    * Updates the model from POST data
    * 
    * @param mixed $model 
@@ -95,13 +102,18 @@ class updateFavoriteAction extends CAction
     if($this->success) 
       $this->response->resetFeedItems = true;
 
-    Yii::app()->getController()->render('show', array(
+    $vars = array(
         'response'=>$this->response->getContent(),
         'model'=>$model,
         'addLi'=>($this->create && $this->success),
         'feedsListData'=>feed::getCHtmlListData(),
         'genresListData'=>genre::getCHtmlListData(),
         'qualitysListData'=>quality::getCHtmlListData(),
-    ));
+    );
+    $extraVarsFunc = array($this->getController(), $this->extraVars);
+    if(!empty($this->extraVars) && method_exists($extraVarsFunc[0], $extraVarsFunc[1]))
+        $vars = array_merge($vars, call_user_func($extraVarsFunc, $model));
+
+    Yii::app()->getController()->render('show', $vars);
   }
 }

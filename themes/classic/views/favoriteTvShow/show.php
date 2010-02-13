@@ -64,3 +64,8 @@
           array('rel'=>'#favoriteTvShow-'.$model->id)
       )."</li>"; ?>
 <?php echo CHtml::endForm().(isset($response) ? $response : ''); ?>
+<?php if($model->isNewRecord && !empty($validShows)): ?>
+  <script type='text/javascript'>
+    $('#favoriteTvShow_tvShow_id').autocomplete(<?php echo json_encode($validShows);?>);
+  </script>
+<?php endif; ?>
