@@ -735,7 +735,7 @@ ul.favorite li a {
   }
 
 ul.favorite li:hover {
-  background-color: #3879D7;
+  background-color: #00BFFF;
   }
 
 form.favinfo {
@@ -799,6 +799,16 @@ div.favorite_episodes input.min {
   text-align: right;
   }
 
+/* tv show autocomplete */
+.ac_results {
+  background: white;
+  border: 1px solid black;
+  z-index: 99999;
+  }
+
+.ac_over {
+background: #00BFFF;
+}
 /******************************
  *
  * H I S T O R Y   D I A L O G
@@ -868,44 +878,6 @@ div#history a.toggleDialog {
 div#reset_data li {
   padding-left: 10px;
   min-height: 40px;
-  }
-
-/**************************
- *
- * C O N T E X T   M E N U
- *
- *************************/
-div.context_menu {
-  display: none;
-  position: absolute;
-  margin: 0;
-  padding: 0;
-  border: 1px solid rgb(119, 119, 119);
-  background-color: white;
-  z-index: 9999;
-  width: 190px;
-  }
-
-div.context_menu ul {
-  border: medium none;
-  margin: 0;
-  padding: 5px 0pt;
-  list-style-type: none;
-  list-style-image: none;
-  list-style-position: outside;
-  font-size: 14px;
-}
-
-div.context_menu ul li a {
-  display: block;
-  padding: 0 10px 2px 20px;
-  color: #000000;
-  text-decoration: none;
-  }
-
-div.context_menu ul li a:hover {
-  background-color: #3879D7;
-  color: #FFFFFF;
   }
 
 /*-----------------
