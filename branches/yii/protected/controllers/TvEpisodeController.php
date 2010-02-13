@@ -19,6 +19,7 @@ class TvEpisodeController extends BaseController
     return array(
       'startDownload'=>'startDownloadAction',
       'makeFavorite'=>'makeFavoriteAction',
+      'inspect'=>'inspectMediaAction',
     );
   }
 
@@ -42,7 +43,7 @@ class TvEpisodeController extends BaseController
     return array(
       array('allow', // allow authenticated user to perform actions
         'actions'=>array(
-          'list', 'show',
+          'list', 'show', 'inspect',
           'makeFavorite', 'startDownload',
         ),
         'users'=>array('@'),
@@ -105,6 +106,7 @@ class TvEpisodeController extends BaseController
    * Returns the data model based on the primary key given in the GET variable.
    * If the data model is not found, an HTTP exception will be raised.
    * @param integer the primary key value. Defaults to null, meaning using the 'id' GET variable
+   * @throws CHttpException 500 on tv episode not found
    */
   public function loadtvEpisode($id=null)
   {
