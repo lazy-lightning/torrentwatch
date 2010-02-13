@@ -2,7 +2,8 @@
 Yii::import('application.components.mediaTitleParser.*');
 
 /**
- * mediaTitleParser 
+ * mediaTitleParser is called from the factory to help initialize the related
+ * models of a feedItem based on the given title title.
  * 
  * @package nmtdvr
  * @version $id$
@@ -28,7 +29,7 @@ class mediaTitleParser {
    * 
    * @var string
    */
-  public $title = '';
+  public $shortTitle = '';
 
   /**
    * epTitle 
@@ -66,14 +67,29 @@ class mediaTitleParser {
   public $quality = array();
 
   /**
-   * tvEpisode,$movie,$other
+   * tvEpisode
    * 
-   * @var int id of the related model for a given type
+   * @var tvEpisode model of the related tvEpisode, or null
    */
-  public $tvEpisode, $movie, $other;
+  public $tvEpisode;
+    
+  /**
+   * movie 
+   * 
+   * @var movie model of the related movie, or null
+   */
+  public $movie;
+  
+  /**
+   * other 
+   * 
+   * @var other model of the related other, or null
+   */
+  public $other;
 
   /**
-   * __construct 
+   * __construct will take in a title and initialize its properties based
+   * on the given title
    * 
    * @param string $title  The title to be parsed for media information
    * @return void
@@ -81,26 +97,23 @@ class mediaTitleParser {
   public function __construct($title)
   {
     // Start by splitting the quality and the title into seperate strings
-    list($shortTitle, $this->quality) = qualityMatch::run($title);
+    list($this->shortTitle, $this->quality) = qualityMatch::run($title);
     // Get ID's for all the qualitys
     $this->quality = factory::qualityIdsByTitleArray($this->quality);
 
     // Loop through our title matching objects untill we find some information
     foreach(self::getMatchers() as $matcher)
     {
-      $result = $matcher->run($shortTitle);
+      $result = $matcher->run($this->shortTitle);
       if($result)
       {
-        list($this->title, $this->epTitle, $this->season, $this->episode, $this->network) = $result;
+        list($this->shortTitle, $this->epTitle, $this->season, $this->episode, $this->network) = $result;
         if(!empty($this->network))
           $this->network = factory::networkByTitle($this->network);
         $this->initRelated();
         return;
       }
     }
-
-    // default detect if no match found
-    $this->title = $shortTitle;
   }
 
   protected function initRelated()
@@ -108,17 +121,17 @@ class mediaTitleParser {
     if(($this->season >= 0 && $this->episode >0) ||
        ($season > 0 && $this->episode === 0))
     {
-      $model = $this->tvEpisode = factory::tvEpisodeByEpisode($this->title, $this->season, $this->episode); 
+      $model = $this->tvEpisode = factory::tvEpisodeByEpisode($this->shortTitle, $this->season, $this->episode); 
       if(!empty($this->epTitle))
         $this->tvEpisode->title = $this->epTitle;
     }
-    elseif(null!==($model = movie::model()->find('title LIKE :title', array(':title'=>$this->title))))
+    elseif(null!==($model = movie::model()->find('title LIKE :title', array(':title'=>$this->shortTitle))))
     {
       $this->movie = $model;
     }
     else
     {
-      $model = $this->other = factory::otherByTitle($this->title);
+      $model = $this->other = factory::otherByTitle($this->shortTitle);
     }
     // Trigger lastUpdated to update itself
     $model->save();
@@ -132,14 +145,13 @@ class mediaTitleParser {
    */
   public function applyTo(feedItem $model)
   {
+    $model->qualityIds = $this->quality;
     $model->setAttributes(array(
-        'title'=>$this->title,
         'network_id'   => empty($this->network)   ? null : $this->network->id,
         'tvEpisode_id' => empty($this->tvEpisode) ? null : $this->tvEpisode->id,
         'movie_id'     => empty($this->movie)     ? null : $this->movie->id,
         'other_id'     => empty($this->other)     ? null : $this->other->id,
     ));
-    $model->qualityIds = $this->quality;
   }
 
   static public function getMatchers()
