@@ -2,7 +2,10 @@
 
 class updateIMDbCommand extends BaseConsoleCommand {
 
+  protected $factory;
+
   public function run($args) {
+    $this->factory = Yii::app()->modelFactory;
     $transaction = Yii::app()->db->beginTransaction();
     try {
       $this->updateMovies();
@@ -49,7 +52,7 @@ class updateIMDbCommand extends BaseConsoleCommand {
       foreach($toSave as $arr) {
         list($id, $title, $scraper) = $arr;
 
-        $movie = factory::movieByImdbId($scraper->imdbId, $title);
+        $movie = $this->factory->movieByImdbId($scraper->imdbId, $title);
 
         feedItem::model()->updateAll(
             array('other_id'=>NULL,
@@ -125,7 +128,7 @@ class updateIMDbCommand extends BaseConsoleCommand {
         foreach($scraper->genres as $genre) {
           $record = new movie_genre;
           $record->movie_id = $movie->id;
-          $record->genre_id = factory::genreByTitle($genre)->id;
+          $record->genre_id = $this->factory->genreByTitle($genre)->id;
           $record->save();
         }
       }

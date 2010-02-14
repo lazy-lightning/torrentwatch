@@ -8,6 +8,7 @@ class TvEpisodeTest extends WebTestCase
       'feeds'           => 'feed',
       'feedItems'       => 'feedItem',
       'favoriteTvShows' => 'favoriteTvShow',
+      'dvrConfig'       => ':dvrConfig',
   );
 
   public $locators = array(

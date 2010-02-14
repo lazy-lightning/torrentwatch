@@ -87,7 +87,7 @@ class FavoriteTvShowController extends BaseController
    */
   function createViewVariables($model)
   {
-    $validShows = array();
+    $out = array();
     if($model->isNewRecord)
     {
       foreach(tvShow::model()->findAll(array('select'=>'title', 'order'=>'title')) as $model)
