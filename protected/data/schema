@@ -175,6 +175,7 @@ CREATE TABLE users (
     username TEXT NOT NULL,
     password TEXT NOT NULL
 );
+
 CREATE VIEW tvFeedItem AS
 SELECT feedItem.id feedItem_id,
        feedItem.title feedItem_title,
@@ -198,12 +199,14 @@ SELECT feedItem.id feedItem_id,
    AND tvEpisode.tvShow_id = tvShow.id
    AND feed.id = feedItem.feed_id
  ORDER BY feedItem.pubDate DESC;
+
 CREATE VIEW matchingFavoriteMovies AS
 SELECT i.id feedItem_id,
        i.title feedItem_title,
        i.status feedItem_status,
        i.downloadType as feedItem_downloadType,
        i.url feedItem_url,
+       i.pubDate feedItem_pubDate,
        feed.id feed_id,
        feed.url feed_url,
        feed.title feed_title,
@@ -231,12 +234,14 @@ SELECT i.id feedItem_id,
             AND iq.quality_id = fq.quality_id
             AND fq.favoriteMovies_id = f.id
        );
+
 CREATE VIEW matchingFavoriteStrings AS
 SELECT i.id feedItem_id,
        i.title feedItem_title,
        i.status feedItem_status,
        i.downloadType as feedItem_downloadType,
        i.url feedItem_url,
+       i.pubDate feedItem_pubDate,
        feed.id feed_id,
        feed.url feed_url,
        feed.title feed_title,
@@ -263,12 +268,14 @@ SELECT i.id feedItem_id,
          OR
          i.title NOT LIKE f.notFilter
        );
+
 CREATE VIEW matchingFavoriteTvShows AS
 SELECT i.feedItem_id feedItem_id,
        i.feedItem_title feedItem_title,
        i.feedItem_status feedItem_status,
        i.feedItem_downloadType as feedItem_downloadType,
        i.feedItem_url feedItem_url,
+       i.feedItem_pubDate feedItem_pubDate,
        i.feed_id feed_id,
        i.feed_url feed_url,
        i.feed_title feed_title,
@@ -304,6 +311,7 @@ SELECT i.feedItem_id feedItem_id,
            AND i.tvEpisode_episode BETWEEN f.minEpisode AND f.maxEpisode
          )
        );
+
 CREATE VIEW movieFeedItem AS
 SELECT feedItem.id feedItem_id,
        feedItem.title feedItem_title,
@@ -321,12 +329,14 @@ SELECT feedItem.id feedItem_id,
  WHERE feedItem.movie_id = movie.id
    AND feedItem.feed_id = feed.id
  ORDER BY feedItem.pubDate DESC;
+
 CREATE VIEW newestTvEpisode AS
 SELECT * 
   FROM ( SELECT *  
            FROM tvEpisode 
           ORDER BY season, episode
        ) GROUP BY tvShow_id;
+
 CREATE VIEW onlyNewerFeedItemFilter AS
 SELECT feedItem_id, feedItem_status, tvEpisode_status
   FROM matchingFavoriteTvShows m
@@ -342,6 +352,7 @@ SELECT feedItem_id, feedItem_status, tvEpisode_status
                         )
                       )
              );
+
 CREATE VIEW otherFeedItem AS
 SELECT feedItem.id feedItem_id,
        feedItem.title feedItem_title,
@@ -358,6 +369,7 @@ SELECT feedItem.id feedItem_id,
  WHERE feedItem.other_id = other.id
    AND feedItem.feed_id = feed.id
  ORDER BY feedItem.pubDate DESC;
+
 CREATE VIEW queuedFeedItem AS
 SELECT f.title feed_title,
        i.status feedItem_status,
@@ -369,6 +381,7 @@ SELECT f.title feed_title,
   LEFT OUTER JOIN feed f
     ON i.feed_id = f.id
  WHERE i.status = 15;
+
 CREATE VIEW recentTvShows AS 
 SELECT DISTINCT tvShow.* 
   FROM ( SELECT tvEpisode.tvShow_id as tvShow_id,
@@ -379,6 +392,7 @@ SELECT DISTINCT tvShow.*
        ), tvShow 
  WHERE tvShow.id = tvShow_id 
  ORDER BY pubDate DESC;
+
 CREATE INDEX favoriteMovies_quality_index ON favoriteMovies_quality (favoriteMovies_id DESC, quality_id ASC);
 CREATE INDEX favoriteStrings_quality_index ON favoriteStrings_quality (favoriteStrings_id ASC, quality_id ASC);
 CREATE INDEX favoriteTvShows_quality_index ON favoriteTvShows_quality (favoriteTvShows_id ASC, quality_id ASC);
