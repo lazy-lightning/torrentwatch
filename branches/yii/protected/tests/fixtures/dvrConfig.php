@@ -19,6 +19,7 @@ array('key'=>'maxItemsPerFeed','value'=> 100,'dvrConfigCategory_id'=> NULL),
 array('key'=>'timezone','value'=> 'America/Los_Angeles','dvrConfigCategory_id'=> NULL),
 array('key'=>'webuiTheme','value'=> 'classic','dvrConfigCategory_id'=> NULL),
 array('key'=>'gayauiTheme','value'=> 'gaya','dvrConfigCategory_id'=> NULL),
+array('key'=>'matchingTimeLimit','value'=>24,'dvrConfigCategory_id'=> NULL),
 // BTPD
 array('key'=>'executable','value'=>'/mnt/syb8634/bin/btcli','dvrConfigCategory_id'=>2),
 array('key'=>'directory','value'=>'/share/.btpd','dvrConfigCategory_id'=>2),

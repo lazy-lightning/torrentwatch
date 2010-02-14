@@ -1,0 +1,65 @@
+<?php
+
+class favoriteManagerTvShowTest extends CDbTestCase
+{
+  public $fixtures = array(
+      'favoriteTvShow'=>'favoriteTvShow',
+      'favoriteTvShows_quality'=>':favoriteTvShows_quality',
+      'tvShow'=>':tvShow',
+      'tvEpisode'=>':tvEpisode',
+      'feedItem'=>':feedItem',
+      'feedItem_quality'=>':feedItem_quality',
+      'feed'=>':feed',
+      'dvrConfig'=>':dvrConfig',
+  );
+
+  public function setUp()
+  {
+    $this->getFixtureManager()->setSubFixture('favoriteManager');
+    parent::setUp();
+  }
+
+  public function tearDown()
+  {
+    $this->getFixtureManager()->resetSubFixture();
+    parent::tearDown();
+  }
+
+  public function testTvShowTimeLimitDisabled()
+  {
+    // should match both items with no limit
+    Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NOMATCH, false);
+
+    $this->assertEquals(0, feedItem::model()->count('status = '.feedItem::STATUS_NOMATCH));
+    $this->assertEquals(2, feedItem::model()->count('status = '.feedItem::STATUS_QUEUED));
+  }
+
+  public function testTvShowTimeLimitLong()
+  {
+    // should match both items with 24 hours limit
+    Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NOMATCH, 24*60*60);
+
+    $this->assertEquals(0, feedItem::model()->count('status = '.feedItem::STATUS_NOMATCH));
+    $this->assertEquals(2, feedItem::model()->count('status = '.feedItem::STATUS_QUEUED));
+  }
+
+  public function testTvShowTimeLimitShort()
+  {
+    // should match one item with 1 hour limit
+    Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NOMATCH, 60*60);
+
+    $this->assertEquals(1, feedItem::model()->count('status = '.feedItem::STATUS_NOMATCH));
+    $this->assertEquals(1, feedItem::model()->count('status = '.feedItem::STATUS_QUEUED));
+  }
+
+  public function testTvShowTimeLimitDefault()
+  {
+    // should match one item with 1 hour limit set in dvrConfig
+    Yii::app()->dvrConfig->matchingTimeLimit = 1;
+    Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NOMATCH);
+
+    $this->assertEquals(1, feedItem::model()->count('status = '.feedItem::STATUS_NOMATCH));
+    $this->assertEquals(1, feedItem::model()->count('status = '.feedItem::STATUS_QUEUED));
+  }
+}
+

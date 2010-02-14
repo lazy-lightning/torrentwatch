@@ -14,7 +14,8 @@ class mediaTitleParserTest extends CTestCase
 {
   public function testConstruct()
   {
-    $parser = new mediaTitleParser('BBC.The.Frankincense.Trail.1of4.Omen.Yemen.Saudi.Arabia.XviD.AC3.MVGroup.org.avi');
+    $factory = Yii::app()->modelFactory;
+    $parser = new mediaTitleParser('BBC.The.Frankincense.Trail.1of4.Omen.Yemen.Saudi.Arabia.XviD.AC3.MVGroup.org.avi', $factory);
     $this->assertEquals('BBC The Frankincense Trail', $parser->shortTitle);
     $this->assertEquals(1, $parser->season);
     $this->assertEquals(4, $parser->episode);
