@@ -6,7 +6,8 @@
 
 // The factory will throw CException if something fails to save to the database
 // Failure to save is usually a problem with item validation
-class factory {
+class modelFactory extends CApplicationComponent {
+
   /*
    * feedItemByAttributes
    *
@@ -14,7 +15,7 @@ class factory {
    * @throws CException on incorrect attributes array
    * @throws CException on failure to save(validation usually)
    */
-  public static function feedItemByAttributes($attributes)
+  public function feedItemByAttributes($attributes)
   {
     if(empty($attributes['hash']))
       throw new CException("No hash provided for ".__FUNCTION__);
@@ -25,7 +26,7 @@ class factory {
     {
       $item = new feedItem;
       $item->attributes = $attributes;
-      $details = new mediaTitleParser($item->title);
+      $details = new mediaTitleParser($item->title, $this);
       $details->applyTo($item);
       if(!$item->save())
         throw new CException("New feed item failed to save");
@@ -34,7 +35,7 @@ class factory {
     return $item;
   }
 
-  public static function genreByTitle($title) {
+  public function genreByTitle($title) {
     $genre = genre::model()->find('title LIKE :title', array(':title'=>$title));
     if($genre === null) {
       $genre = new genre;
@@ -45,7 +46,7 @@ class factory {
     return $genre;
   }
 
-  public static function networkByTitle($title) {
+  public function networkByTitle($title) {
     // Remove the preface
     if(strtolower(substr($title, 0, 4)) === 'the ')
       $title = substr($title, 4);
@@ -70,9 +71,9 @@ class factory {
     return $network;
   }
 
-  public static function tvEpisodeByEpisode($tvShow, $season, $episode) {
+  public function tvEpisodeByEpisode($tvShow, $season, $episode) {
     if(is_string($tvShow)) {
-      $tvShow = self::tvShowByTitle($tvShow);
+      $tvShow = $this->tvShowByTitle($tvShow);
     }
     $tvEpisode = tvEpisode::model()->find(array(
           'condition' => 'tvShow_id=:id AND season=:season AND episode=:episode',
@@ -90,7 +91,7 @@ class factory {
     return $tvEpisode;
   }
 
-  public static function tvShowByTitle($title) {
+  public function tvShowByTitle($title) {
     if(empty($title)) {
       Yii::log('trying to init tvShow without title'."\n".print_r(debug_backtrace()), CLogger::LEVEL_ERROR);
       throw new CException('Attempt to initialize tvShow with no title');
@@ -110,7 +111,7 @@ class factory {
     return $tvShow;
   }
 
-  public static function qualityByTitle($title) {
+  public function qualityByTitle($title) {
     $record = quality::model()->find(array(
           'condition' => 'title LIKE :quality',
           'params' => array(':quality'=>$title)
@@ -125,16 +126,16 @@ class factory {
     return $record;
   }
 
-  public static function qualityIdsByTitleArray($titles) {
+  public function qualityIdsByTitleArray($titles) {
     $ids = array();
     foreach($titles as $title)
     {
-      $ids[] = self::qualityByTitle($title)->id;
+      $ids[] = $this->qualityByTitle($title)->id;
     }
     return $ids;
   }
 
-  public static function movieByImdbId($imdbId, $title) {
+  public function movieByImdbId($imdbId, $title) {
     $record = movie::model()->find(array(
           'condition' => 'imdbId = :imdbId',
           'params' => array(':imdbId'=>$imdbId)
@@ -150,7 +151,7 @@ class factory {
     return $record;
   }
 
-  public static function otherByTitle($title) {
+  public function otherByTitle($title) {
     $record = other::model()->find(array(
           'condition' => 'title LIKE :title',
           'params' => array(':title'=>$title)

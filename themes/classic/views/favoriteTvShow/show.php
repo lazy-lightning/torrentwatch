@@ -6,6 +6,9 @@
   );
   echo CHtml::errorSummary($model);
 ?>
+<?php if(isset($success) && $success): ?>
+<div class='saved'>Saved</div>
+<?php endif; ?>
 <div class="favorite_name">
  <?php 
    echo CHtml::activeLabelEx($model, 'tvShow_id').': ';
@@ -57,7 +60,7 @@
           echo CHtml::link('Delete', array('/favoriteTvShow/delete', 'id'=>$model->id), array('class'=>'button ajaxSubmit')); ?>
   <a class="toggleDialog button" href="#">Close</a>
 </div>
-<?php if(isset($addLi) && $addLi)
+<?php if(isset($success,$create) && $success && $create)
         echo "<li id='favoriteTvShow-li-{$model->id}'>".CHtml::link(
           $model->name,
           array('/favoriteTvShow/show', 'id'=>$model->id),

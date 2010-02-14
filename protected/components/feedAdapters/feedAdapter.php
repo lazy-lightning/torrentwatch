@@ -41,37 +41,34 @@ class feedAdapter extends SimplePie {
     Yii::log($this->get_title());
     $this->_feedAR->title = $this->get_title();
     $this->_feedAR->description = $this->get_description();
+    return true;
+  }
 
-    foreach($this->get_items() as $item) {
+  public function checkFeedItems()
+  {
+    foreach($this->get_items() as $item) 
+    {
       $title = $item->get_title();
+      echo "considering $title\n";
       $hash = md5($item->get_id());
-      if(false === feedItem::model()->exists('hash=:hash', array(':hash'=>$hash))) 
-      {
-        $transaction = Yii::app()->db->beginTransaction();
-        try {
-          // Prefer a link from enclosure over link from item
-          $link = '';
-          $enclosure = $item->get_enclosure();
-          if($enclosure)
-            $link = $enclosure->get_link();
-          if(empty($link))
-            $link = $item->get_link();
-  
-          factory::feedItemByAttributes(array(
-                'hash'        => $hash,
-                'feed_id'     => $this->_feedAR->id,
-                'downloadType'=> $this->_feedAR->downloadType,
-                'imdbId'      => $item->get_imdbId(),
-                'title'       => $item->get_title(),
-                'url'         => $link,
-                'description' => $item->get_description(),
-                'pubDate'     => $item->get_date('U'),
-          ));
-          $transaction->commit();
-        } catch (Exception $e) {
-          $transaction->rollback();
-          Yii::log('feedItem failed to save: '.$title.' : '.$e->getMessage(), CLogger::LEVEL_ERROR);
-        }
+      if(false !== feedItem::model()->exists('hash=:hash', array(':hash'=>$hash))) 
+        continue;
+      $transaction = Yii::app()->db->beginTransaction();
+      try {
+        Yii::app()->modelFactory->feedItemByAttributes(array(
+              'hash'        => $hash,
+              'feed_id'     => $this->_feedAR->id,
+              'downloadType'=> $this->_feedAR->downloadType,
+              'imdbId'      => $item->get_imdbId(),
+              'title'       => $title,
+              'url'         => $link,
+              'description' => $item->get_description(),
+              'pubDate'     => $item->get_date('U'),
+        ));
+        $transaction->commit();
+      } catch (Exception $e) {
+        $transaction->rollback();
+        Yii::log('feedItem failed to save: '.$title.' : '.$e->getMessage(), CLogger::LEVEL_ERROR);
       }
     }
   }
@@ -85,6 +82,19 @@ class feedAdapter_Item extends SimplePie_Item {
       return (int) $regs[1];
     else
       return 0;
+  }
+
+  function get_link() {
+    // Prefer a link from enclosure over link from item
+    // TDOO: only if application/x-bittorrent 
+    //            or application/whatever nzb is  ?
+    $link = '';
+    $enclosure = $this->get_enclosure();
+    if($enclosure)
+      $link = $enclosure->get_link();
+    if(empty($link))
+      $link = parent::get_link();
+    return $link;
   }
 
   function get_title() {

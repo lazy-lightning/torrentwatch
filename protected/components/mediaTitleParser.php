@@ -88,18 +88,26 @@ class mediaTitleParser {
   public $other;
 
   /**
+   * factory 
+   * 
+   * @var mixed
+   */
+  protected $factory;
+  /**
    * __construct will take in a title and initialize its properties based
    * on the given title
    * 
    * @param string $title  The title to be parsed for media information
+   * @param modelFactory an object to create 
    * @return void
    */
-  public function __construct($title)
+  public function __construct($title,$factory)
   {
+    $this->factory = $factory;
     // Start by splitting the quality and the title into seperate strings
     list($this->shortTitle, $this->quality) = qualityMatch::run($title);
     // Get ID's for all the qualitys
-    $this->quality = factory::qualityIdsByTitleArray($this->quality);
+    $this->quality = $this->factory->qualityIdsByTitleArray($this->quality);
 
     // Loop through our title matching objects untill we find some information
     foreach(self::getMatchers() as $matcher)
@@ -109,7 +117,7 @@ class mediaTitleParser {
       {
         list($this->shortTitle, $this->epTitle, $this->season, $this->episode, $this->network) = $result;
         if(!empty($this->network))
-          $this->network = factory::networkByTitle($this->network);
+          $this->network = $this->factory->networkByTitle($this->network);
         $this->initRelated();
         return;
       }
@@ -121,7 +129,7 @@ class mediaTitleParser {
     if(($this->season >= 0 && $this->episode >0) ||
        ($season > 0 && $this->episode === 0))
     {
-      $model = $this->tvEpisode = factory::tvEpisodeByEpisode($this->shortTitle, $this->season, $this->episode); 
+      $model = $this->tvEpisode = $this->factory->tvEpisodeByEpisode($this->shortTitle, $this->season, $this->episode); 
       if(!empty($this->epTitle))
         $this->tvEpisode->title = $this->epTitle;
     }
@@ -131,7 +139,8 @@ class mediaTitleParser {
     }
     else
     {
-      $model = $this->other = factory::otherByTitle($this->shortTitle);
+      // later these get scanned in imdb to be re-checked for movies
+      $model = $this->other = $this->factory->otherByTitle($this->shortTitle);
     }
     // Trigger lastUpdated to update itself
     $model->save();

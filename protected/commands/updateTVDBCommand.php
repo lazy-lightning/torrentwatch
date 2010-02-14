@@ -4,9 +4,11 @@ class updateTVDBCommand extends BaseConsoleCommand {
 
   // array of loaded tvShows indexed by tvdbid
   private $tvShows = array();
+  protected $factory;
 
   public function run($args) {
     require_once('TVDB.php');
+    $this->factory = Yii::app()->modelFactory;
     $this->updateTvShows();
     $this->updateTvEpisodes();
   }
@@ -99,12 +101,12 @@ class updateTVDBCommand extends BaseConsoleCommand {
       foreach($toSave as $id => $data)
       {
         $tvShow = tvShow::model()->findByPk($id);
-        // Dont change the title will mess up factory::tvShowByTitle()
+        // Dont change the title will mess up $this->factory->tvShowByTitle()
         // perhaps create new column for tvdb Name ?
         //$tvShow->title = $data->seriesName;
 
         if(!empty($data->network))
-          $tvShow->network_id = factory::networkByTitle($data->network)->id;
+          $tvShow->network_id = $this->factory->networkByTitle($data->network)->id;
         $tvShow->rating = (integer) $data->rating;
         $tvShow->description = $data->overview;
         $tvShow->tvdbId = $data->id;
@@ -128,7 +130,7 @@ class updateTVDBCommand extends BaseConsoleCommand {
             // Loopthrough the genres linking them all to the tvShow
             foreach($data->genres as $genre) 
             {
-              $genre_id = factory::genreByTitle($genre)->id;
+              $genre_id = $this->factory->genreByTitle($genre)->id;
               $addGenre->execute();
             }
           }

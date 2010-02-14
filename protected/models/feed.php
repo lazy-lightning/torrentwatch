@@ -67,7 +67,8 @@ class feed extends CActiveRecord
     );
   }
 
-  public function afterSave() {
+  public function afterSave() 
+  {
     parent::afterSave();
     if($this->isNewRecord)
     {
@@ -143,7 +144,8 @@ class feed extends CActiveRecord
   /**
    * @return string the title of this feed, prefering a user provided title
    */
-  public function getTitle() {
+  public function getTitle() 
+  {
     return empty($this->userTitle) ? $this->title : $this->userTitle;
   }
 
@@ -152,9 +154,11 @@ class feed extends CActiveRecord
    * some inspiration from http://simplepie.org/wiki/tutorial/how_to_display_previous_feed_items_like_google_reader
    * @return none
    */
-  public function updateFeedItems($checkFavorites = True) {
+  public function updateFeedItems($checkFavorites = True) 
+  {
     // id 0 is generic 'All Feeds' placeholder
-    if($this->id == 0) {
+    if($this->id == 0) 
+    {
       return;
     }
 
@@ -162,20 +166,22 @@ class feed extends CActiveRecord
     $adapter = feedAdapterRouter::getAdapter($this);
     Yii::log("Initialized ".get_class($adapter)." for: {$this->url}");
 
-    // Checks for and inserts new feed items, updates feed status, etc.
-    $adapter->init();
+    // Populates the feed into the object, updates feed status
+    if($adapter->init())
+    {
+      // Checks for and inserts new feed items
+      $adapter->checkFeedItems();
+
+      // Check for new matching favorites
+      if($checkFavorites)
+        Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NEW);
+    }
 
     // Solves a memory leak in php
     $adapter->__destruct();
     unset($adapter);
 
-    // Check for new matching favorites
-    if($checkFavorites)
-      Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NEW);
-
     // update the db with new title/description/update time and status
-    // Is this save necessary always?  on a run with no downloading and no
-    // updates this used 25% of the execution time.
     $trans = Yii::app()->db->beginTransaction();
     try {
         $this->save();

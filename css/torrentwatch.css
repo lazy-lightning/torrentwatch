@@ -391,7 +391,7 @@ ul li.torrent.match_Manual .itemButtons {
 
 ul li.torrent.match_Downloaded .itemButtons,
 ul li.torrent.match_Automatic .itemButtons {
-  background-color: #00C12B;
+  background-color: #98FB98;
 }
 
 ul li.torrent.match_Duplicate .itemButtons,
@@ -798,6 +798,15 @@ div.favorite_episodes span {
 div.favorite_episodes input.min {
   text-align: right;
   }
+/* successfull save response */
+.saved {
+  background-color: #98FB98;
+  min-height: 21px !important;
+  font-size: 1.3em;
+  text-align: center;
+  margin: 0 0 10px;
+  border: 1px solid gray;
+}
 
 /* tv show autocomplete */
 .ac_results {

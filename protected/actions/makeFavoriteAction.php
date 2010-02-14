@@ -54,7 +54,8 @@ class makeFavoriteAction extends feedItemAction
     }
     Yii::app()->getController()->render("/$type/show", array(
           'model' => $fav,
-          'addLi' => $success,
+          'success' => $success,
+          'create' => true,
           'response' => $this->response->getContent(),
           'feedsListData' => feed::getCHtmlListData(),
           'genresListData' => genre::getCHtmlListData(),

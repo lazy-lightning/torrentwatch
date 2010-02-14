@@ -87,8 +87,10 @@ class favoriteTvShow extends BaseFavorite
       } 
       else try 
       {
-        $this->tvShow_id = factory::tvShowByTitle($this->tvShow_id)->id;
-      } catch ( Exception $e) {
+        $this->tvShow_id = Yii::app()->modelFactory->tvShowByTitle($this->tvShow_id)->id;
+      } 
+      catch ( Exception $e) 
+      {
         $this->addError("tvShow_id", "There was a problem initilizing a tvshow of title: ".$this->tvShow_id);
       }
     }

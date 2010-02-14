@@ -105,7 +105,8 @@ class updateFavoriteAction extends CAction
     $vars = array(
         'response'=>$this->response->getContent(),
         'model'=>$model,
-        'addLi'=>($this->create && $this->success),
+        'create'=>$this->create,
+        'success'=>$this->success,
         'feedsListData'=>feed::getCHtmlListData(),
         'genresListData'=>genre::getCHtmlListData(),
         'qualitysListData'=>quality::getCHtmlListData(),
