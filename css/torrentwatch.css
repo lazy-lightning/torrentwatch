@@ -15,7 +15,7 @@
 /*---------------------
  * Some debugging info
  * --------------------*/
-div.rss_debug {
+.rss_debug {
   display: none;
 }
 
@@ -81,7 +81,7 @@ input:hover, input:focus {
  * T O P   M E N U
  *
  * ----------------*/
-ul.mainoptions {
+.mainoptions {
   /*background: transparent url('../images/menu_bg.gif') repeat-x;*/
   background: transparent url('data:image/gif;base64,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') repeat-x;
   border-bottom: 1px solid #979797;
@@ -90,7 +90,7 @@ ul.mainoptions {
   z-index: 20;
   }
 
-ul.mainoptions li {
+.mainoptions li {
   float: left;
   margin: 12px 0 0 0;
   vertical-align: middle;
@@ -101,7 +101,7 @@ ul.mainoptions li {
   float: right !important;
   }
 
-ul.mainoptions li a {
+.mainoptions a {
   color: #030303;
   font-size: 0.9em;
   text-decoration: none;
@@ -109,34 +109,34 @@ ul.mainoptions li a {
   display: block;
   }
 
-ul.mainoptions li#refresh a {
+#refresh a {
   background: url('../images/menusprites.png') no-repeat center -23px;
   }
 
-ul.mainoptions li#favoritesMenu a {
+#favoritesMenu a {
   background: url('../images/menusprites.png') no-repeat center -101px;
   }
-ul.mainoptions li#config a {
+#config a {
   background: url('../images/menusprites.png') no-repeat center -179px;
   }
 
-ul.mainoptions li#view a {
+#view a {
   background: url('../images/menusprites.png') no-repeat center -257px;
   }
 
-ul.mainoptions li#empty a {
+#empty a {
   background: url('../images/menusprites.png') no-repeat center -335px;
   }
 
-ul.mainoptions li#toggleLegend a {
+#toggleLegend a {
   background: url('../images/menusprites.png') no-repeat center -555px;
   }
 
-ul.mainoptions li#inspector a {
+#inspector a {
   background: url('../images/menusprites.png'') no-repeat center -413px;
   }
 
-ul.mainoptions li.divider {
+li.divider {
   background: transparent url('../images/menusprites.png') center -633px;
   height: 2.3em;
   margin: 1.3em 0 0 0;
@@ -148,7 +148,7 @@ ul.mainoptions li.divider {
  *
  * ---------------*/
 
-ul#filterbar_container {
+#filterbar_container {
   position: fixed;
 /*  background: #C0C8D6 url('../images/filter_bar_bg.png') repeat-x; */
   background: transparent url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAYCAIAAAC9RaD3AAAABGdBTUEAANbY1E9YMgAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAACYSURBVHjaRFBbDsMwCMMRf5Mm7f7H2e8O0NPgmVfbShBjx0Dw/V2mj/oNMP+8XwBIKqp+VBUQGZHppDT1LJrOgqXK5OyM0slvaE48JLl3dPD71CH9mu8pTjO3xBezezTG9oCvMosQr7FrUmPMPEMrouZdAKv+7YxZM/3Xnb0fONvkCwlHTTo7nrla5gy2n+0jzX5Py78AAwDGiX6O/XStSQAAAABJRU5ErkJggg==') repeat-x;
@@ -160,7 +160,7 @@ ul#filterbar_container {
   z-index: 20;
   }
 
-ul#filterbar_container li {
+#filterbar_container li {
   float: left;
   margin: 0.3em 0.5em;
   padding-left: 0.5em;
@@ -170,40 +170,40 @@ ul#filterbar_container li {
   color: #4E4E4F;
   }
 
-ul#filterbar_container li a {
+#filterbar_container a {
   padding-right: 0.5em;
   text-decoration: none;
   color: #333;
   }
 
-ul#filterbar_container li:not(#filter_bytext):hover {
+#filterbar_container li:not(#filter_bytext):hover {
   /*background: transparent url('../images/filter_hover_left.png') no-repeat top left;*/
   background: transparent url('data:image/png;base64,'iVBORw0KGgoAAAANSUhEUgAAAMgAAAAQCAIAAADcV6eLAAAABGdBTUEAANbY1E9YMgAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAIUSURBVHja7FpNb9wgEGWA3baJmiaVWvX//6Tccs056jbeXYy/mILHxthyNts6F6R5h5U9+xiG0RNgBnh8ehYoBAj/a2xVlpWt6rrpOtcFG/1FQAHxmQy9ZWhNz6MlIfeu1x+IDygw8lNvKXmMcXrvCUOMIomEWmFwkWfkYxci5+Rr8tI03evJFCfjrVICKLXTejYCsRgVQmpc42zhL1vNUyxghTo5jIRMI59Zck2+Fxa2bfdyKIxtpFSRiYizlmsdL72/F+g/8ZetUjquU1cImUaef/KDsH6/ns5l5VWF6LxInbuqVwbjAvTZ2KIopVb9LOWnNETWFWO7sE6m9ELysxQtqLQZY20xtgrLlA1pyTkXNvQA167ADMYFYdV1C1KB9HKKMxa8sUNjMK4Wlp+qgpIcTNMVi4qxXVhaq7ajswdcnjIwGP8trP1e26MFJYFXQMYHCuv25uZPYSXCcDIXtlrAeWFsF9b+293nQ2FkKOUAaYvzwti+eRcPd1/rpj2erVJK8HTF+CBhodby5/d7JY+Ho+m/DSV9IVLBXIznD9PruGj2Rkgrk0PVcqTFJnM7Xpbvsmg6fqlCLAuE1TpQqPoUyYsIM448DTvPIQxXGHY79evH/e2XT8W5LG1V1R26Lr0ssew+yYB442bG+DtdvRjiQNrJTbFg4urC0HGtu9gLreAgZge8mUb+zmWCHIbwV4ABALQGIR4yaHhWAAAAAElFTkSuQmCC') no-repeat top left;
   }
 
-ul#filterbar_container li:hover a {
+#filterbar_container li:hover a {
   /* background: transparent url('../images/filter_hover_right.png') no-repeat top right; */
   background: transparent url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAQCAIAAABV4/KnAAAABGdBTUEAANbY1E9YMgAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAADSSURBVHjaVE9BcsIwDJSdBcdxCOTA///AuT/oTzp0CgMkkMRS5dpTQCPL2rW8kszh47N2q24TGu9IKBvIVuMUh+O5bVzftUClrJX0boyxl9vj6/s0z4uIWCKNrG4MDffp53xVjBhFKzUjQ9bidBl87UB/xVSulFyHEcxMb2bGccILKfnDfV4gxP9j5gaqg9RfCtYxFK1QIXJplQKzevAenHE5SVd3hzxVKcbYdyE0TmcorK7XuLWymiTdbLtNve+3QNoLEpfgXb9t2+CzrtqvAAMAHn2QA1fr0HgAAAAASUVORK5CYII=') no-repeat top right;
   }
 
 
-ul#filterbar_container li.selected {
+#filterbar_container li.selected {
   /*background: transparent url('../images/filter_selected_left.png') no-repeat top left;*/
   background: transparent url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAAARCAIAAAAXC3QuAAAABGdBTUEAANbY1E9YMgAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAIWSURBVHja7FprT8IwFL23bTYmIg8VE43R+P9/jd+MMT6CkaHClA0RWGu38kqMUtkANfd8gD0O99DmpLu9d3h+cYcASoFGs+n7rdZzO+iG4SiWCCmS2zCDuaqvII5/ZstJj22YGxH9AfPX61qSVznPQp/q4yiKrq5v7puPjuM6hWK9VEXO9A1E1PcRxp/wBRZyVPoPbKJp5kZELZl/QteGbBlz6fFqYyntqovLq/ZLVKvVXc8TQgCBkA2Jh25uG0HYr+7u6cUKGTOWJxAyGetB51VPnXJl13U8RKZS0LwQshqrE7y6haIQjnaTkpJmhJCPsbphz3G3dOoljatotSLkYqy3QVxyhTSWUuOdI4GQ1Vic8fQhqKb7ScqxCDkYa7voDaWcViAUAJCxCNmNVSp6raDPkSslbUpqBIKVsSrlHb/di2MGplif1E8JhMzGqlZKhwe9RuuVMS71ckW2IuRirPfh8GC/OhhKvxMiLVeEvIylM3XO+cnRvuOIhv+iAGf5e5JtoZp2y82XaWLDrL+d2HERxz4amHbm2kU3NdhV6M629t8GtKQtN4qkVxjHkjE8ParXytvPnW4Q9ntvg1Esk3xLjWvxc73ruSKqTDlyMUefo4RpXf975kRzraKWzD+kaxlwReMVhhSPVDR69wru2fEWF1xMWtHGlJ/f41GTt3TQjgNzFl/I3Ijof9IFu4CwyvF+CDAAR9KK7k0CIJkAAAAASUVORK5CYII=') no-repeat top left;
   }
 
-ul#filterbar_container li.selected a {
+#filterbar_container .selected a {
   /*background: transparent url('../images/filter_selected_right.png') no-repeat top right;*/
   background: transparent url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAARCAIAAACevyECAAAABGdBTUEAANbY1E9YMgAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAEPSURBVHjaPFBhT4MwEG2hwGDQUpDB1Gjmj/Wrv8CfNBONITF+0JiYGDOdMSMMS3tegdA26fXdu3vvSq9vbrNUXG0uq3VJgIzLyYqy02T7UG/v7g9Ngzgeh4tM5qu8qPa/7WP9ZBMADmZcxqJlLLL8cFSvL2+IMgIUL0od31/wRH7svrLPHTPGALGbEuoFQRjG3/sfi466MDjwAr9pWjZjuCjyHdZ0auLi03KH0EX1uYOlUwJA4mjBtAEkjn0pUN33mYwYGIwnLeyLpUIkqGbm8bXWZ6WQKWcGDBm5ACcirFbyT1kPgyeAdcEvTnMcUxvDPJekSXReSs6X7VFNRuvn917rtlOq18R+CJaRfwEGAEEfkaQ+fph+AAAAAElFTkSuQmCC') no-repeat top right;
   }
 
-ul#filterbar_container li#filter_bytext {
+#filterbar_container li#filter_bytext {
   float: right;
   margin: 0;
   border: 0;
   }
 
-input#filter_text_input {
+#filter_text_input {
   height: 1.5em; 
   width: 8em; 
   border: 1px solid #5D80A1; 
@@ -219,7 +219,7 @@ input#filter_text_input {
   outline-style: none;
   }
 
-input#filter_text_input.blur {
+#filter_text_input.blur {
   border-color: #CCC;
   }
 
@@ -229,7 +229,7 @@ input#filter_text_input.blur {
  *
  * ------------------------*/
 
-div#inspector_container {
+#inspector_container {
   background-color: #FEFEFE;
   position: fixed;
   overflow: auto;
@@ -242,20 +242,20 @@ div#inspector_container {
   text-align: center;
   }
 
-div#inspector_container h2 {
+#inspector_container h2 {
   font-size: 2em;
   }
 
-div#inspector_container > div {
+#inspector_container > div {
   background-color: #EDF3FE;
   padding-left: 5px;
   }
 
-div#inspector_container span {
+#inspector_container span {
   display: block;
   }
 
-div#inspector_container .content {
+#inspector_container .content {
   background-color: #FEFEFE;
   }
 
@@ -265,19 +265,19 @@ div#inspector_container .content {
  *
  * -----------------------------------*/
 
-div.errorSummary {
+.errorSummary {
   border: 1px solid black;
   padding: 0.2em 1em;
   background-color: #FCFFF0;
   margin-bottom: 1em;
   }
 
-div.errorSummary ul {
+.errorSummary ul {
   list-style-type: disc;
   padding-left: 2em;
   }
 
-div.errorSummary ul li {
+.errorSummary li {
   }
 
 label.error {
@@ -289,7 +289,7 @@ label.error {
  * L O G I N   F O R M
  *
  * ------------------------*/
-div.login_form {
+.login_form {
   background: #DBDBDB;
   padding: 5px;
   position: fixed;
@@ -299,7 +299,7 @@ div.login_form {
   margin-left: -205px;
 }
 
-div.yiiForm {
+.yiiForm {
 }
 /*------------------------------
  *
@@ -315,14 +315,14 @@ div.yiiForm {
   display: none;
   }
 
-div#feedItems_container {
+#feedItems_container {
   }
 
-div#feedItems_container > ul {
+#feedItems_container > ul {
   background: #e9e9e9;
   }
 
-div#feedItems_container > div {
+#feedItems_container > div {
   position: fixed;
   overflow: auto;
   top: 117px;
@@ -331,35 +331,35 @@ div#feedItems_container > div {
   right: 0;
   }
 
-ul.duplicates {
+.duplicates {
   display: none;
   }
 
-ul li.torrent {
+.torrent {
   border-bottom: 1px solid #ccc;
   min-height: 2.3em;
   background: #FFF;
   }
 
-li.torrent.hidden_bytext {
+.torrent.hidden_bytext {
   display: none;
   }
 
-div.itemButtons, div.hideButton {
+.itemButtons, .hideButton {
   float: left;
   height: 25px;
   padding-top: 8px;
   }
 
-div.itemButtons {
+.itemButtons {
   width: 3.6em;
   }
 
-div.itemButtons a {
+.itemButtons a {
   padding-left: .6em;
 }
 
-div.hideButton img {
+.hideButton img {
   border: 1px solid #b0b0b0;
   margin: 0 .5em 0 .3em;
   }
@@ -372,66 +372,66 @@ div.hideButton img {
   background-color: #BDD3FE;
 }
 
-div.itemDetails {
+.itemDetails {
   padding-top: .4em;
   height: 28px;
   }
 
-ul li.torrent.match_Unmatched .itemButtons {
+.torrent.match_Unmatched .itemButtons {
   background-color: #FBBFBF;
   }
 
-ul li.torrent.match_Failed .itemButtons {
+.torrent.match_Failed .itemButtons {
   background-color: #FFA900;
   }
 
-ul li.torrent.match_Manual .itemButtons {
+.torrent.match_Manual .itemButtons {
   background-color: #84E900;
   }
 
-ul li.torrent.match_Downloaded .itemButtons,
-ul li.torrent.match_Automatic .itemButtons {
+.torrent.match_Downloaded .itemButtons,
+.torrent.match_Automatic .itemButtons {
   background-color: #98FB98;
 }
 
-ul li.torrent.match_Duplicate .itemButtons,
-ul li.torrent.match_Old .itemButtons {
+.torrent.match_Duplicate .itemButtons,
+.torrent.match_Old .itemButtons {
   background-color: #CCCCFF;
   }
 
-ul li.torrent.match_Queued .itemButtons {
+.torrent.match_Queued .itemButtons {
   background-color: #38ADB8;
   }
 
-ul li.torrent.match_New .itemButtons {
+.torrent.match_New .itemButtons {
   background-color: #E3F12D;
   }
 
-ul li.torrent.hasDuplicates {
+.torrent.hasDuplicates {
   cursor: pointer;
   }
 
-ul li.torrent.hasDuplicates.open {
+.torrent.hasDuplicates.open {
   background-image: none !important;
   }
 
-ul li.torrent.alt {
+.torrent.alt {
   background-color: #EDF3FE;
   }
 
-ul li.torrent.notalt {
+.torrent.notalt {
   background-color: #FFFFFF;
   }
 
-span.torrent_name {
+.torrent_name {
   margin-right: 10px;
   }
 
-span.torrent_pubDate {
+.torrent_pubDate {
   float: right;
   }  
 
-a.context_link {
+.context_link {
   display: none;
   }
 
@@ -473,7 +473,7 @@ margin-left: 1%;
  *
  * ---------------------*/
 
-div.dialog_window {
+.dialog_window {
   display: none;
   position: absolute;
   margin-left: auto;
@@ -491,7 +491,7 @@ div.dialog_window {
   }
 
 /* default close button positioned on upper right corner */
-div.dialog_window div.close {
+.dialog_window > .close {
   background-image:url('../images/overlay/close.png');
   position:absolute;
   right:5px;
@@ -502,7 +502,7 @@ div.dialog_window div.close {
   z-index: 10;
   }
 
-div.expose {
+.expose {
   background-color: #CCC;
   display: block;
   top: 0;
@@ -514,12 +514,12 @@ div.expose {
   z-index: 9000;
   }
 
-div.dialog_window .content {
+.content {
   background-image: url('../images/overlay/white.png');
   padding: 26px 23px 0 23px;
   }
 
-div.dialog_window:after {
+.dialog_window:after {
   content: " ";
   display: block;
   background: url('../images/overlay/white.png') 0 -493px;
@@ -527,18 +527,18 @@ div.dialog_window:after {
   clear: both;
   }
 
-h2.dialog_heading {
+.dialog_heading {
   font-size: 1.3em;
   text-align: center;
   }
 
-div.buttonContainer {
+.buttonContainer {
   width: 100%;
   border-top: 1px solid gray;
   margin-top: 2px;
   }
 
-div.clearFix:after {
+.clearFix:after {
   content: " ";
   display: block;
   height: 0;
@@ -546,7 +546,7 @@ div.clearFix:after {
   visibility: hidden;
   }
 
-a.button,
+.button,
 input[type=submit] {
   float: right;
   margin: .5em 1em 0 0;
@@ -559,7 +559,7 @@ input[type=submit] {
   cursor: pointer;
   }
 
-a.button {
+.button {
   width: 50px;
   text-align: center;
   text-decoration: none;
@@ -576,40 +576,40 @@ input[type=submit] {
  *
  *******************************/
 
-div.welcome .content {
+.welcome .content {
   padding: 30px 30px 0 30px;
 }
-div.welcome input {
+.welcome input {
   clear: left;
   }
 
-div.welcome label {
+.welcome label {
   float: none;
   width: auto;
   }
 
-div#welcome5 div.content div {
+#welcome5 > .content div {
   margin-bottom: 1em;
   }
 
-div#welcome5 div.content div.buttonContainer {
+#welcome5 div.buttonContainer {
   margin-bottom: 0;
   }
 
-div.welcome .torrent_client,
-div.welcome .nzb_client {
+.welcome .torrent_client,
+.welcome .nzb_client {
   width: 285px;
   padding: 5px;
   float: left;
   }
 
-div#welcome1 label,
-div#welcome7 label {
+#welcome1 label,
+#welcome7 label {
   margin-top: 0.2em;
   display: block;
   }
 
-div.form_radio {
+.form_radio {
   padding-left: 10px;
   }
 
@@ -639,17 +639,17 @@ div.form_radio {
   margin: 0 10px 0 100px;
   }
 
-div.dialog_window#configuration select,
-div.dialog_window#configuration input[type=text] {
+#configuration select,
+#configuration input[type=text] {
   width: 285px;
   }
 
-div.dialog_window#configuration div {
+#configuration div {
   min-height: 30px;
   }
 
 /* Client Config */
-div.client_config select {
+.client_config select {
   display: block;
   margin: 0 auto 15px;
   }
@@ -659,7 +659,7 @@ div.client_config select {
   margin: 0 auto 15px;
   }
 
-#configuration #feeds h2 {
+#feeds h2 {
   border: 0;
   margin: 0;
   }
@@ -696,7 +696,7 @@ div.client_config select {
   width: 8em !important;
   }
 
-#newFeed #feed_url[type=text] {
+#feed_url {
   width: 490px !important;
   border: 1px solid black !important;
   }
@@ -709,7 +709,7 @@ div.client_config select {
  *`
  **********************************/
 
-ul.favorite {
+.favorite {
   height: 230px;
   float: left;
   clear: left;
@@ -721,12 +721,12 @@ ul.favorite {
   overflow: auto;
   }
 
-ul.favorite li {
+.favorite li {
   overflow: hidden;
   cursor: pointer;
   }
 
-ul.favorite li a {
+.favorite a {
   vertical-align: top;
   font-size: 0.8em;
   text-decoration: none;
@@ -734,11 +734,11 @@ ul.favorite li a {
   overflow: none;
   }
 
-ul.favorite li:hover {
+.favorite li:hover {
   background-color: #00BFFF;
   }
 
-form.favinfo {
+.favinfo {
   display: none;
   padding: 5px 0;
   margin: .5em 1.5em .5em 0;
@@ -746,56 +746,53 @@ form.favinfo {
   float: right;
   }
 
-form.favinfo div {
+.favinfo div {
   min-height: 24px;
   }
 
-form.favinfo label {
+.favinfo label {
   float: left;
   width: 8em;
   }
 
-form.favinfo input#mode,
-form.favinfo input#idx {
+#mode, #idx {
   display: none;
   }
 
-form.favinfo select,
-form.favinfo input[type=text] {
+.favinfo select,
+.favinfo input[type=text] {
   width: 16em;
   }
 
 
-div.favorite_name span {
+.favorite_name span {
   margin-left: 1em;
   }
 
-div.favorite_quality select {
+.favorite_quality select {
   right: auto;
   width: 4.7em;
   }
 
-/* long selector to override form.favinfo input[type=text] */
-div.favorite_years input {
+.favorite_years input {
   width: 3em !important;
   margin-left: .2em !important;
 }
 
-/* long selector to override form.favinfo input[type=text] */
-div.favorite_episodes input {
+.favorite_episodes input {
   width: 2em !important;
   margin-left: .2em !important;
   }
 
-div.favorite_years span {
+.favorite_years span {
   margin-left: .8em;
   }
 
-div.favorite_episodes span {
+.favorite_episodes span {
   margin-left: 1em;
   }
 
-div.favorite_episodes input.min {
+.favorite_episodes input.min {
   text-align: right;
   }
 /* successfull save response */
@@ -823,11 +820,11 @@ background: #00BFFF;
  * H I S T O R Y   D I A L O G
  *
  *****************************/
-div#history {
+#history {
   height: 250px;
   }
 
-div#history ul {
+#history ul {
   position: relative;
   background-color: #FFF;
   border-width: 1px 1px 0;
@@ -840,7 +837,7 @@ div#history ul {
   padding: 2px 0 0 3px;
   }
 
-div#history ul li {
+#history li {
   white-space: nowrap;
   overflow: hidden;
   font-size: 0.9em;
@@ -848,29 +845,29 @@ div#history ul li {
   cursor: pointer
   }
 
-div#history ul li.alt {
+#history .alt {
   background-color: #EDF3FE;
   }
 
 
-div#history .date {
+#history .date {
   float: right;
   }
 
-div.hItemDetails {
+.hItemDetails {
   display: none;
   }
 
-div#history a {
+#history a {
   position: inherit;
   bottom: 0.2em;
   }
 
-div#history a#clearhistory {
+#clearhistory {
   right: 0;
   }
 
-div#history a.toggleDialog {
+#history .toggleDialog {
   right: 6.5em;
   }
 
@@ -884,7 +881,7 @@ div#history a.toggleDialog {
  * R E S E T   D A T A   D I A L O G
  *
  ************************************/
-div#reset_data li {
+#reset_data li {
   padding-left: 10px;
   min-height: 40px;
   }
@@ -898,7 +895,7 @@ div#reset_data li {
 
 .clear { clear: both; }
 
-div.timer {
+.timer {
   font-size: 8pt;
   text-align: right;
   margin-right: 5px;
