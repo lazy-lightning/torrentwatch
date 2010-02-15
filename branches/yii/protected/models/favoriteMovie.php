@@ -70,4 +70,5 @@ class favoriteMovie extends BaseFavorite
       'rating'=>'Rating >=',
     );
   }
+
 }
