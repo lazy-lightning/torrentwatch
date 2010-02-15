@@ -1,5 +1,5 @@
 <?php $tvShow = $model->getRelated('tvShow'); ?>
-<div id='tvShowDetails-<?php echo $model->id; ?>' class='mediaDetails'>
+<div id='tvEpisodeDetails-<?php echo $model->id; ?>' class='mediaDetails'>
 <div>
   <h2 class='content'><?php 
     if(empty($tvShow->tvdbId))
@@ -42,7 +42,7 @@
 <?php $this->widget('actionResponseWidget', array(
             'append'=>array(
                 'parent'=>'#inspector_container',
-                'selector'=>'#tvShowDetails-'.$model->id,
+                'selector'=>'#tvEpisodeDetails-'.$model->id,
                 'delete'=>'#inspector_container > .mediaDetails',
             ),
             'showInspector'=>true,

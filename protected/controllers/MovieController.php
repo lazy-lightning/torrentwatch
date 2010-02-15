@@ -73,7 +73,7 @@ class MovieController extends BaseController
                     'SELECT id FROM'.
                     '  (SELECT status,id,movie_id FROM feedItem'.
                     '   WHERE movie_id NOT NULL'.
-                    '   ORDER by status DESC'.
+                    '   ORDER by status ASC'.
                     '  )'.
                     'GROUP BY movie_id)'
               ),

@@ -19,6 +19,7 @@ class OtherController extends BaseController
     return array(
         'startDownload' => 'startDownloadAction',
         'makeFavorite' => 'makeFavoriteAction',
+        'inspect' => 'inspectMediaAction',
     );
   }
 
@@ -41,7 +42,7 @@ class OtherController extends BaseController
 	{
 		return array(
 			array('allow', // allow authenticated user to perform actions
-				'actions'=>array('list', 'show', 'startDownload', 'makeFavorite'),
+				'actions'=>array('inspect', 'list', 'show', 'startDownload', 'makeFavorite'),
 				'users'=>array('@'),
 			),
 			array('deny',  // deny all users
@@ -72,7 +73,7 @@ class OtherController extends BaseController
                     'SELECT id FROM'.
                     '  (SELECT status,id,other_id FROM feedItem'.
                     '   WHERE other_id NOT NULL'.
-                    '   ORDER by status DESC'.
+                    '   ORDER by status ASC'.
                     '  )'.
                     'GROUP BY other_id)'
               ),

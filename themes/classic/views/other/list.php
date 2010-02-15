@@ -2,7 +2,6 @@
 <?php
 foreach($otherList as $n => $model) {
   echo "<li id='other-".$model->id."' class='torrent hasDuplicates match_".strtok($model->feedItem[0]->getStatusText(), ' ').($n%2?' alt':' notalt')."' >".
-       CHtml::link('', array('inspect', 'id'=>$model->id), array('class'=>'loadInspector ajaxSubmit', 'title'=>'Get More Information')).
        "<div class='itemButtons'>".
          CHtml::link('Related FeedItems', array('/feedItem/list', 'related'=>'other', 'id'=>$model->id),
              array('class'=>'loadDuplicates')).

@@ -81,7 +81,7 @@ class TvEpisodeController extends BaseController
                     'SELECT id FROM'.
                     '  (SELECT status,id,tvEpisode_id FROM feedItem'.
                     '   WHERE tvEpisode_id NOT NULL'.
-                    '   ORDER by status DESC'.
+                    '   ORDER by status ASC'.
                     '  )'.
                     'GROUP BY tvEpisode_id)'
               ),
