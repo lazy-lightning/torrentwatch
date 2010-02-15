@@ -27,7 +27,7 @@
         <div class="buttonContainer">
           <a class="submitForm button" id="Save" href="#">Save</a>
           <a class='toggleDialog button' href='#'>Close</a>
-          <a class='toggleDialog button' href='#welcome1'>Wizard</a>
+          <?php echo CHtml::link('Wizard', array('welcome', '#'=>'welcome'), array('class'=>'toggleDialog button')); ?>
         </div>
       <?php echo CHtml::endForm(); ?>
 <?php if($successfullSave) $this->widget('actionResponseWidget', array('dialog'=>array('header'=>'Configuration saved.')));
