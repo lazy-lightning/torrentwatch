@@ -71,6 +71,21 @@ class TvEpisodeController extends BaseController
     $criteria=new CDbCriteria(array(
           'select'=>'id, status, title, season, episode, tvShow_id', 
           'order'=>'t.lastUpdated DESC',
+          'with'=>array(
+              'tvShow'=>array(
+                  'select'=>'id,title',
+              ),
+              'feedItem'=>array(
+                  'select'=>'id,status',
+                  'condition'=>'feedItem.id IN ('.
+                    'SELECT id FROM'.
+                    '  (SELECT status,id,tvEpisode_id FROM feedItem'.
+                    '   WHERE tvEpisode_id NOT NULL'.
+                    '   ORDER by status DESC'.
+                    '  )'.
+                    'GROUP BY tvEpisode_id)'
+              ),
+          ),
           // only display episodes that have a related feeditem
           // how much slower does this make it, should there be an extra column to flag this
           'condition'=>'t.id in (select tvEpisode_id from feedItem where '.
@@ -90,11 +105,7 @@ class TvEpisodeController extends BaseController
     $pages->pageSize=Yii::app()->dvrConfig->webItemsPerLoad;
     $pages->applyLimit($criteria);
 
-    $tvepisodeList=tvEpisode::model()->with(array(
-          'tvShow'=>array(
-            'select'=>'id,title',
-          ),
-    ))->findAll($criteria);
+    $tvepisodeList=tvEpisode::model()->findAll($criteria);
 
     $this->render('list',array(
       'tvepisodeList'=>$tvepisodeList,
