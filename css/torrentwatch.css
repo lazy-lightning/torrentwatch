@@ -1,23 +1,6 @@
-/*
-  Name: PCH Torrent RSS Config
-  Description: Stylistic update of the TorrentWatch (http://code.google.com/p/torrentwatch/) config interface.
-  Version: 1.0
-  Author: Keith Solomon
-  Author URI: http://reciprocity.be/
-  
-  License: GNU General Public License v2
-*/
-
-/* Modifications by Erik Bernhardson
+/* by Erik Bernhardson
  * inspired by Clutch
  */
-
-/*---------------------
- * Some debugging info
- * --------------------*/
-.rss_debug {
-  display: none;
-}
 
 /*-----------------
  *
@@ -107,10 +90,6 @@ input:hover, input:focus {
   text-decoration: none;
   padding: 33px 0.7em 0 0.7em;
   display: block;
-  }
-
-#refresh a {
-  background: url('../images/menusprites.png') no-repeat center -23px;
   }
 
 #favoritesMenu a {
@@ -219,7 +198,7 @@ li.divider {
   outline-style: none;
   }
 
-#filter_text_input.blur {
+#filter_text_input:blur {
   border-color: #CCC;
   }
 
@@ -257,6 +236,8 @@ li.divider {
 
 #inspector_container .content {
   background-color: #FEFEFE;
+  background-image: none !important;
+  padding: 5px;
   }
 
 /*-----------------------------------
@@ -299,8 +280,6 @@ label.error {
   margin-left: -205px;
 }
 
-.yiiForm {
-}
 /*------------------------------
  *
  * F E E D   I T E M   L I S T
@@ -329,10 +308,6 @@ label.error {
   bottom: 0;
   left: 0;
   right: 0;
-  }
-
-.duplicates {
-  display: none;
   }
 
 .torrent {
@@ -411,28 +386,12 @@ label.error {
   cursor: pointer;
   }
 
-.torrent.hasDuplicates.open {
-  background-image: none !important;
-  }
-
 .torrent.alt {
   background-color: #EDF3FE;
   }
 
 .torrent.notalt {
   background-color: #FFFFFF;
-  }
-
-.torrent_name {
-  margin-right: 10px;
-  }
-
-.torrent_pubDate {
-  float: right;
-  }  
-
-.context_link {
-  display: none;
   }
 
 /*--------------------------
@@ -546,8 +505,7 @@ margin-left: 1%;
   visibility: hidden;
   }
 
-.button,
-input[type=submit] {
+.button {
   float: right;
   margin: .5em 1em 0 0;
   padding: .5em;
@@ -563,11 +521,6 @@ input[type=submit] {
   width: 50px;
   text-align: center;
   text-decoration: none;
-  }
-
-input[type=submit] {
-  width: 62px;
-  height: 28px;
   }
 
 /********************************
@@ -894,14 +847,6 @@ background: #00BFFF;
 
 
 .clear { clear: both; }
-
-.timer {
-  font-size: 8pt;
-  text-align: right;
-  margin-right: 5px;
-  bottom: 0;
-  right: 0;
-}
 
 
 .favorite li {
