@@ -65,7 +65,21 @@ class MovieController extends BaseController
 	{
 		$criteria=new CDbCriteria(array(
           'select'=>'id,status,title,name,year,rating',
-          'order'=>'lastUpdated DESC'
+          'order'=>'lastUpdated DESC',
+          'with'=>array(
+              'feedItem'=>array(
+                  'select'=>'id,status',
+                  'condition'=>'feedItem.id IN ('.
+                    'SELECT id FROM'.
+                    '  (SELECT status,id,movie_id FROM feedItem'.
+                    '   WHERE movie_id NOT NULL'.
+                    '   ORDER by status DESC'.
+                    '  )'.
+                    'GROUP BY movie_id)'
+              ),
+          ),
+          'condition'=>'t.id in (select movie_id from feedItem where '.
+                       'movie_id not null)'
     ));
 
 		$pages=new CPagination(movie::model()->count($criteria));
