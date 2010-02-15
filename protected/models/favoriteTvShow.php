@@ -41,6 +41,7 @@ class favoriteTvShow extends BaseFavorite
           array('onlyNewer', 'default', 'value'=>0),
           array('onlyNewer', 'in', 'allowEmpty'=>False, 'range'=>array(0, 1)),
           array('tvShow_id', 'exist', 'allowEmpty'=>False, 'attributeName'=>'id', 'className'=>'tvShow'),
+          array('tvShow_id', 'unique', 'message'=>'A Favorite already exists for this Tv Show'),
           array('minEpisode, maxEpisode, minSeason, maxSeason', 'default', 'value'=>0),
           array('minEpisode, maxEpisode, minSeason, maxSeason', 'numerical', 'allowEmpty'=>false, 'integerOnly'=>true, 'min'=> 0),
     ));
