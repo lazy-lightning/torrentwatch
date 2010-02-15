@@ -151,8 +151,7 @@ class feedItem extends CActiveRecord
    * @param integer $status 
    * @return string the given status as a string
    */
-  // static to allow translation directly from query row in a view without AR model
-  public static function getStatusText($status = null) {
+  public  function getStatusText($status = null) {
     static $options = null;
     if($status === null)
       $status = $this->status;
