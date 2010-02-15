@@ -253,6 +253,8 @@ class IMDbScraper extends Scraper {
 
     // Decode HTML entities found on page
     $html = html_entity_decode($html, ENT_QUOTES);
+    // replace characters like &#x27; with '
+    $html = preg_replace('~&#x([0-9a-f]+);~ei', 'chr(hexdec("\\1"))', $html)
 
     // If the title contains a year then adjust the returned page to include year in search
     if(isset($title_year))
