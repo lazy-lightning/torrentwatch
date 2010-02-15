@@ -4,7 +4,7 @@ class DbTestCase extends CDbTestCase
 {
   protected function setUp()
   {
-    $this->getFixtureManager()->setSubFixture(explode('::', $this->toString()));
+    $this->getFixtureManager()->setSubFixture($this->toString());
     parent::setUp();
   }
 

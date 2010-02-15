@@ -109,7 +109,7 @@ class WebTestCase extends CWebTestCase
 	 */
 	protected function setUp()
 	{
-    $this->getFixtureManager()->setSubFixture(explode('::', $this->toString()));
+    $this->getFixtureManager()->setSubFixture($this->toString());
   	parent::setUp();
 		$this->setBrowserUrl(TEST_BASE_URL);
 	}
