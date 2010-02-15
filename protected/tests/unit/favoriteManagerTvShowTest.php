@@ -1,6 +1,6 @@
 <?php
 
-class favoriteManagerTvShowTest extends CDbTestCase
+class favoriteManagerTvShowTest extends DbTestCase
 {
   public $fixtures = array(
       'favoriteTvShow'=>'favoriteTvShow',
@@ -12,18 +12,6 @@ class favoriteManagerTvShowTest extends CDbTestCase
       'feed'=>':feed',
       'dvrConfig'=>':dvrConfig',
   );
-
-  public function setUp()
-  {
-    $this->getFixtureManager()->setSubFixture('favoriteManager');
-    parent::setUp();
-  }
-
-  public function tearDown()
-  {
-    $this->getFixtureManager()->resetSubFixture();
-    parent::tearDown();
-  }
 
   public function testTvShowTimeLimitDisabled()
   {

@@ -1,5 +1,5 @@
 <?php
-class dvrConfigTest extends CDbTestCase
+class dvrConfigTest extends DbTestCase
 {
 
   public $fixtures = array(

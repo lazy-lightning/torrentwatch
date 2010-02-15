@@ -33,12 +33,6 @@ class TvEpisodeTest extends WebTestCase
   protected function closeWelcome() {
   }
 
-  public function setUp()
-  {
-    $this->getFixtureManager()->setSubFixture('ItemTests');
-    parent::setUp();
-  }
-
   public function testMakeFavorite()
   {
     $l = $this->locators; // shorthand access
