@@ -15,19 +15,20 @@ class DbFixtureManager extends NDbFixtureManager {
   /**
    * subFixture 
    * 
-   * @var mixed
+   * @var mixed either boolean false or two item array indicating sub-dirs to check
    */
   private $subFixture = false;
 
   /**
    * setSubFixture 
    * 
-   * @param mixed $dir 
+   * @param string $testString format of className::funcName
    * @return void
    */
-  public function setSubFixture($breadcrumbs)
+  public function setSubFixture($testString)
   {
-    if(is_array($breadcrumbs) && count($breadcrumbs)===2)
+    $breadcrumbs = explode('::', $testString);
+    if(count($breadcrumbs)===2)
       $this->subFixture = $breadcrumbs;
   }
 
