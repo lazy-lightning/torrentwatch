@@ -149,7 +149,7 @@
         if (!dialog.is(':visible')) {
             $('div.expose').not(':animated').fadeIn();
             if (dialog.length === 0) {
-                $.post(this.attr('href'), '', function (html) {
+                $.get(this.attr('href'), '', function (html) {
                     $.loadAjaxUpdate(html);
                     callback();
                 }, 'html');
@@ -199,7 +199,10 @@
     // Utility function called from ajax response javascript
     // to make a dialog visible.
     $.showDialog = function (hash) {
-        $('<a href="' + hash + '"/>').toggleDialog();
+      setTimeout(function() {
+        if($(hash).is(':not(:visible)'))
+          $('<a href="' + hash + '"/>').toggleDialog();
+      }, 100);
     };
     // Utility function called from ajax response javascript
     // to change the currently displayed favorite

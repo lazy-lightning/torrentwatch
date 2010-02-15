@@ -8,9 +8,6 @@
                  array('startDownload', 'id'=>$model->id), array('class'=>'startDownload ajaxSubmit')).
              CHtml::link(CHtml::image('images/tor_fav.png', 'Favorite', array('height'=>10)), 
                  array('makeFavorite', 'id'=>$model->id), array('class'=>'makeFavorite ajaxSubmit')).
-           "</div><div class='hideButton'>".
-             CHtml::link(CHtml::image('images/hide.png', 'Hide'), 
-               array('hideTvShow', 'id'=>$model->id), array('class'=>'hideTvShow ajaxSubmit')).
            "</div><div class='itemDetails'>".
            "  <span class='torrent_name'>".CHtml::encode($model->title)."</span>".
            "  <span class='torrent_feed'>".CHtml::encode($model->feed->title)."</span>".
