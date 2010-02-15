@@ -204,6 +204,23 @@ class feedItem extends CActiveRecord
     return null;
   }
 
+  public function getFavorite()
+  {
+    if(null!==($related=$this->getItemTypeRecord()))
+    {
+      return $related->getFavorite();
+    }
+
+    $favoriteId = $this->dbConnection->createCommand(array(
+          'SELECT favoriteStrings_id FROM matchingFavoriteStrings'.
+          ' WHERE feedItem_id = :id', array(':id'=>$this->id)
+    ))->queryScalar();
+    if($favoriteId)
+      return favoriteString::model()->findByPk($favoriteId);
+
+    return false;
+  }
+
   /**
    * Retreives the AR class of the related item type
    * @return CActiveRecord the related record. Null if no relations.

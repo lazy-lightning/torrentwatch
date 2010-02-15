@@ -78,6 +78,17 @@ class movie extends CActiveRecord
     );
   }
 
+  public function getFavorite()
+  {
+    $favoriteId = $this->dbConnection->createCommand(
+          'SELECT favoriteMovies_id FROM matchingFavoriteMovies'.
+          ' WHERE movie_id = :id'
+    )->bindParam(':id', $this->id)->queryScalar();
+    if($favoriteId)
+      return favoriteMovie::model()->findByPk($favoriteId);
+    return false;
+  }
+
   /**
    * @return favoriteMovie a favoriteMovie object to match this movie
    */

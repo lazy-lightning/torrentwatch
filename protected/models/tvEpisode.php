@@ -101,6 +101,17 @@ class tvEpisode extends CActiveRecord
     return $fav;
   }
 
+  public function getFavorite()
+  {
+    $favoriteId = $this->dbConnection->createCommand(
+          'SELECT favoriteTvShows_id FROM matchingFavoriteTvShows'.
+          ' WHERE tvEpisode_id = :id'
+    )->bindParam(':id',$this->id)->queryScalar();
+    if($favoriteId)
+      return favoriteTvShow::model()->findByPk($favoriteId);
+    return false;
+  }
+
   /**
    * @return string a string representation of this records episode
    */

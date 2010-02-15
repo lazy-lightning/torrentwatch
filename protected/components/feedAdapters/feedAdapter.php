@@ -49,7 +49,6 @@ class feedAdapter extends SimplePie {
     foreach($this->get_items() as $item) 
     {
       $title = $item->get_title();
-      echo "considering $title\n";
       $hash = md5($item->get_id());
       if(false !== feedItem::model()->exists('hash=:hash', array(':hash'=>$hash))) 
         continue;
@@ -61,7 +60,7 @@ class feedAdapter extends SimplePie {
               'downloadType'=> $this->_feedAR->downloadType,
               'imdbId'      => $item->get_imdbId(),
               'title'       => $title,
-              'url'         => $link,
+              'url'         => $item->get_link(),
               'description' => $item->get_description(),
               'pubDate'     => $item->get_date('U'),
         ));

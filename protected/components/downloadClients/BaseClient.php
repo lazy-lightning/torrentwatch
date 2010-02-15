@@ -60,10 +60,16 @@ abstract class baseClient {
     }
   }
 
-  protected function getSaveInDirectory() {
+  protected function getSaveInDirectory()
+  {
     $opts = $this->manager->opts;
-    if(is_array($opts)) {
+    if(is_array($opts))
+    {
       $saveIn = $opts['favorite_saveIn'];
+    }
+    elseif(false!==($fav=$opts->getFavorite()))
+    {
+      $saveIn = $fav->saveIn;
     }
 
     if(empty($saveIn))

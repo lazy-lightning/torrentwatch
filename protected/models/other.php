@@ -75,4 +75,9 @@ class other extends CActiveRecord
       'title'=>'Title',
     );
   }
+
+  public function getFavorite()
+  {
+    return false;
+  }
 }
