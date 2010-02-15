@@ -62,6 +62,7 @@ class other extends CActiveRecord
   public function relations()
   {
     return array(
+        'feedItem'=>array(self::HAS_MANY, 'feedItem', 'other_id'),
     );
   }
 

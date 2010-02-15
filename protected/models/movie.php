@@ -63,6 +63,7 @@ class movie extends CActiveRecord
   {
     return array(
       'genres'=>array(self::MANY_MANY, 'genre', 'movie_genre(movie_id, genre_id)'),
+      'feedItem'=>array(self::HAS_MANY, 'feedItem', 'movie_id'),
     );
   }
 

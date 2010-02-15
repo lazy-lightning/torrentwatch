@@ -1,9 +1,11 @@
 <ul id="other_container">
 <?php
 foreach($otherList as $n => $model) {
-  echo "<li id='other-".$model->id."' class='torrent hasDuplicates match_".strtok($model->getStatusText(), ' ').($n%2?' alt':' notalt')."' >".
+  echo "<li id='other-".$model->id."' class='torrent hasDuplicates match_".strtok($model->feedItem[0]->getStatusText(), ' ').($n%2?' alt':' notalt')."' >".
        CHtml::link('', array('inspect', 'id'=>$model->id), array('class'=>'loadInspector ajaxSubmit', 'title'=>'Get More Information')).
        "<div class='itemButtons'>".
+         CHtml::link('Related FeedItems', array('/feedItem/list', 'related'=>'other', 'id'=>$model->id),
+             array('class'=>'loadDuplicates')).
          CHtml::link(CHtml::image('images/tor_start.png', 'Start', array('height'=>10)),
              array('startDownload', 'id'=>$model->id), array('class'=>'startDownload ajaxSubmit', 'title'=>'Start Download')).
          CHtml::link(CHtml::image('images/tor_fav.png', 'Favorite', array('height'=>10)),

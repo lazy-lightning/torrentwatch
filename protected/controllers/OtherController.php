@@ -63,7 +63,24 @@ class OtherController extends BaseController
 	 */
 	public function actionList()
 	{
-		$criteria=new CDbCriteria(array('order'=>'lastUpdated DESC'));
+		$criteria=new CDbCriteria(array(
+          'order'=>'lastUpdated DESC',
+          'with'=>array(
+              'feedItem'=>array(
+                  'select'=>'id,status',
+                  'condition'=>'feedItem.id IN ('.
+                    'SELECT id FROM'.
+                    '  (SELECT status,id,other_id FROM feedItem'.
+                    '   WHERE other_id NOT NULL'.
+                    '   ORDER by status DESC'.
+                    '  )'.
+                    'GROUP BY other_id)'
+              ),
+          ),
+          'condition'=>'t.id in (select other_id from feedItem where '.
+                       'other_id not null)'
+
+    ));
     $pages = null;
 
 		$pages=new CPagination(other::model()->count($criteria));
