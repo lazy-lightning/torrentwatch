@@ -33,7 +33,8 @@ class DvrConfigController extends BaseController
     return array(
       array('allow', // allow authenticated user
         'actions'=>array('update', 'welcome', 'wizardClient', 'wizardFeed',
-                         'globals', 'nzbClient', 'torClient', 'feeds'),
+                         'globals', 'nzbClient', 'torClient', 'feeds',
+                         'wizardSettings'),
         'users'=>array('@'),
       ),
       array('deny',  // deny all users
@@ -120,7 +121,8 @@ class DvrConfigController extends BaseController
   {
     $app = Yii::app();
     $config = $app->dvrConfig;
-    if($app->request->isPostRequest)
+    $success = false;
+    if($app->request->isPostRequest && isset($_POST['dvrConfig']))
     {
       if(isset($_POST['dvrConfig']['torClient']))
         $config->torClient = $_POST['dvrConfig']['torClient'];
@@ -134,18 +136,79 @@ class DvrConfigController extends BaseController
         $transaction->rollback();
         throw $e;
       }
-      if($success)
-        return $this->redirect('wizardFeed');
     }
-
-    $this->render('wizardClient', array(
-          'availClients'=>$app->dlManager->getAvailClients(),
-          'config'=>$config, 
-    ));
+    if($success)
+      $this->redirect(array('wizardFeed'));
+    else
+    {
+      $this->render('wizardClient', array(
+            'availClients'=>$app->dlManager->getAvailClients(),
+            'config'=>$config, 
+       ));
+    }
   }
 
   public function actionWizardFeed()
   {
+    $torFeed = $nzbFeed = null;
+    $app = Yii::app();
+    if($app->request->isPostRequest && isset($_POST['feed']))
+    {
+      $success = true;
+      $transaction = Yii::app()->db->beginTransaction();
+      try {
+        if(isset($_POST['feed']['nzbUrl']))
+        {
+          $nzbFeed = new feed;
+          $nzbFeed->setAttributes(array(
+                'url'=>$_POST['feed']['nzbUrl'],
+                'downloadType'=>feedItem::TYPE_NZB,
+          ));
+          $success = $nzbFeed->save();
+        }
+        if(isset($_POST['feed']['torUrl']))
+        {
+          $torFeed = new feed;
+          $torFeed->setAttributes(array(
+                'url'=>$_POST['feed']['torUrl'],
+                'downloadType'=>feedItem::TYPE_TORRENT,
+          ));
+          $success = $torFeed->save() && $success;
+        }
+        $transaction->commit();
+      } catch (Exception $e) {
+        $transaction->rollback();
+        throw $e;
+      }
+      if($success)
+        return $this->redirect(array('wizardSettings'));
+    }
+
+    $this->render('wizardFeed', array(
+        'nzbFeed'=>$nzbFeed,
+        'torFeed'=>$torFeed,
+    ));
   }
 
+  public function actionWizardSettings()
+  {
+    $app = Yii::app();
+    $config = $app->dvrConfig;
+    if($app->request->isPostRequest && isset($_POST['dvrConfig']))
+    {
+      $config->setAttributes($_POST['dvrConfig']);
+      $transaction = Yii::app()->db->beginTransaction();
+      try {
+        $success = $config->save();
+        $transaction->commit();
+      } catch (Exception $e) {
+        $transaction->rollback();
+        throw $e;
+      }
+      if($success)
+        return $this->render('wizardFinished');
+    }
+
+    $this->render('wizardSettings', array('config'=>$config));
+  }
 }
