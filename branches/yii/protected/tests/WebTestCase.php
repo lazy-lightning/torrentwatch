@@ -82,7 +82,7 @@ class WebTestCase extends CWebTestCase
     $this->type('name=LoginForm[username]','demo');
     $this->type('name=LoginForm[password]','demo');
     $this->clickAndWait("//input[@value='Login']");
-    // Open page, wait for progress bar to finish
+    // Open page and close initial welcome screen
     $this->open('../index-test.html');
     $this->closeWelcome();
   }
@@ -103,12 +103,14 @@ class WebTestCase extends CWebTestCase
 	/**
 	 * Sets up before each test method runs.
 	 * This mainly sets the base URL for the test application.
+   * and the sub fixtures for the fixture manager
    *
    * @return void
 	 */
 	protected function setUp()
 	{
-		parent::setUp();
+    $this->getFixtureManager()->setSubFixture(explode('::', $this->toString()));
+  	parent::setUp();
 		$this->setBrowserUrl(TEST_BASE_URL);
 	}
 

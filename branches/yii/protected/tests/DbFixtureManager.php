@@ -1,6 +1,6 @@
 <?php
 
-Yii::import('system.test.CDbFixtureManager');
+Yii::import('application.tests.NDbFixtureManager');
 /**
  * DbFixtureManager 
  * 
@@ -11,13 +11,13 @@ Yii::import('system.test.CDbFixtureManager');
  * @author Erik Bernhardson <journey4712@yahoo.com> 
  * @license GNU General Public License v2 http://www.gnu.org/licenses/gpl-2.0.txt
  */
-class DbFixtureManager extends CDbFixtureManager {
+class DbFixtureManager extends NDbFixtureManager {
   /**
-   * isSubFixture 
+   * subFixture 
    * 
    * @var mixed
    */
-  private $isSubFixture = false;
+  private $subFixture = false;
 
   /**
    * setSubFixture 
@@ -25,13 +25,10 @@ class DbFixtureManager extends CDbFixtureManager {
    * @param mixed $dir 
    * @return void
    */
-  public function setSubFixture($dir)
+  public function setSubFixture($breadcrumbs)
   {
-    $this->resetSubFixture();
-    if(!is_dir($this->basePath.DIRECTORY_SEPARATOR.$dir) || strpos($dir, DIRECTORY_SEPARATOR) !== false)
-      throw new CException('Fixture sub directory is invalid: '.$dir);
-    $this->basePath = $this->basePath.DIRECTORY_SEPARATOR.$dir;
-    $this->isSubFixture = true;
+    if(is_array($breadcrumbs) && count($breadcrumbs)===2)
+      $this->subFixture = $breadcrumbs;
   }
 
   /**
@@ -41,32 +38,22 @@ class DbFixtureManager extends CDbFixtureManager {
    */
   public function resetSubFixture()
   {
-    if($this->isSubFixture)
+    $this->subFixture = false;
+  }
+
+  public function getFixtureFile($file)
+  {
+    if($this->subFixture)
     {
-      $this->basePath = dirname($this->basePath);
-      $this->isSubFixture = false;
+      // try basePath/testClass/testMethod/$file
+      $path=$this->basePath.DIRECTORY_SEPARATOR.$this->subFixture[0].DIRECTORY_SEPARATOR.$this->subFixture[1].DIRECTORY_SEPARATOR.$file;
+      // if not, try basePath/testClass/$file
+      if(!file_exists($path))
+        $path=$this->basePath.DIRECTORY_SEPARATOR.$this->subFixture[0].DIRECTORY_SEPARATOR.$file;
     }
-  }
+    if(empty($path) || !file_exists($path))
+      $path = parent::getFixtureFile($file);
 
-  /**
-   * assertPostConditions 
-   * 
-   * @return void
-   */
-  protected function assertPostConditions()
-  {
-    $this->resetSubFixture();
-    parent::assertPostConditions();
-  }
-
-  /**
-   * reset sub fixture on tearDown
-   * 
-   * @return void
-   */
-  public function tearDown()
-  {
-    $this->resetSubFixture();
-    parent::tearDown();
+    return $path;
   }
 }
