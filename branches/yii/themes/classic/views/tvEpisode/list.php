@@ -5,9 +5,9 @@
 $url = Yii::app()->getUrlManager();
 foreach($tvepisodeList as $n => $model) {
   echo "<li id='tvEpisode-".$model->id."' class='torrent hasDuplicates match_".strtok($model->asa('statusText')->getStatusText(), ' ').($n%2?' alt':' notalt')."' >".
-         "<a href='".$url->createUrl('tvEpisode/inspect', array('id'=>$model->id)),"' class='loadInspector ajaxSubmit' title='Get More Information'>".
+         "<a href='".$url->createUrl('tvEpisode/inspect', array('id'=>$model->id)),"' class='loadInspector ajaxSubmit' title='Get More Information'></a>".
          "<div class='itemButtons'>".
-           "<a href='".$url->createUrl('feedItem/list', array('related'=>'tvEpisode', 'id'=>$model->id))."' class='loadDuplicates'>Load Duplicates</a>".
+           "<a href='".$url->createUrl('feedItem/list', array('related'=>'tvEpisode', 'id'=>$model->id))."' class='loadDuplicates'>Related FeedItems</a>".
            "<a href='".$url->createUrl('tvEpisode/startDownload', array('id'=>$model->id))."' class='startDownload ajaxSubmit'>".
            "<img src='images/tor_start.png' alt='Start' height='10' title='Start Download'></a>".
            "<a href='".$url->createUrl('tvEpisode/makeFavorite', array('id'=>$model->id))."' class='makeFavorite ajaxSubmit'>".
