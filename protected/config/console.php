@@ -47,7 +47,7 @@ return array(
     ),
     'db'=>array(
       'class'=>'SqliteConnection',
-      'connectionString'=>'sqlite:protected/data/timb-source.db',
+      'connectionString'=>'sqlite:protected/data/source.db',
     ),
   ),
 
