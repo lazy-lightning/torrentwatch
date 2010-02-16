@@ -6,6 +6,8 @@
           <?php 
             $clientConfig = $config->$client;
             echo CHtml::errorSummary($clientConfig);
+            if($config->torClient == $client && $saved)
+              echo "<div class='saved'>Saved</div>";
             foreach($clientConfig as $key => $value) {
               echo '<div>'.
                      CHtml::activeLabel($clientConfig, $key, array('class'=>'item')).': '.

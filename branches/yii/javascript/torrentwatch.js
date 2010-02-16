@@ -156,6 +156,9 @@
             } else {
                 callback();
             }
+        } else {
+          // dialog is closing, remove any 'saved' markers
+          dialog.find('.saved').remove();
         }
         toHide.fadeOut();
         return this;
@@ -176,7 +179,8 @@
             onDone = function () {
             $(toShow).initForm().show();
         };
-        $this.closest('.tabs-container div').children('.favinfo:visible').hide();
+        $this.closest('.tabs-container div').children('.favinfo:visible').hide()
+          .find('.saved').remove();
         if ($(toShow).length > 0) {
             onDone();
         } else {
@@ -207,12 +211,14 @@
     // Utility function called from ajax response javascript
     // to change the currently displayed favorite
     $.showFavorite = function (hash) {
-        var selector = "a[rel='" + hash + "']";
-        $.waitfor(function() {
-            var link = $(selector), $hash = $(hash);
+        var selector = "a[rel='" + hash + "']", lin;
+        $.waitFor(function() {
+            var $hash = $(hash);
             // wait for link, and hash to exist.  Also wait for hash to be in a dialog_window
-            return !(link.length === 0 || $hash.length === 0 || $hash.parents('.dialog_window').length === 0);
-        }, link.toggleFavorite);
+            return !($(selector).length === 0 || $hash.length === 0 || $hash.parents('.dialog_window').length === 0);
+        }, function() {
+          $(selector).toggleFavorite;
+        });
     }
     // marks the group of elements as alt/notalt
     $.fn.markAlt = function () {

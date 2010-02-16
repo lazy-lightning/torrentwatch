@@ -40,7 +40,7 @@ class DvrConfigTest extends WebTestCase
       'itemsPerLoadInput'          => 'id=dvrConfig_webItemsPerLoad',
       'nzbClientSelect'            => 'id=dvrConfig_nzbClient',
       'nzbTab'                     => 'id=nzbClient',
-      'responseDialog'             => 'id=actionResponse',
+      'savedResponse'              => 'css=.saved',
       'toggleConfigDialog'         => 'link=Configure',
       'toggleFeedTab'              => "xpath=id('configuration')/div[2]/ul/li[4]/a",
       'toggleNzbTab'               => "xpath=id('configuration')/div[2]/ul/li[3]/a",
@@ -78,8 +78,8 @@ class DvrConfigTest extends WebTestCase
   {
     $l = $this->locators; // shorthand access
     $this->assertElementPresent('link=Save');
-    $this->clickAndWaitFor('link=Save', $l['responseDialog'], false);
-    $this->assertText($l['responseDialog'], 'Configuration saved.');
+    $this->clickAndWaitFor('link=Save', $l['savedResponse'], false);
+    $this->assertText($l['savedResponse'], 'Saved');
   }
 
   /**
@@ -93,8 +93,8 @@ class DvrConfigTest extends WebTestCase
     $this->type($l['itemsPerLoadInput'], 'qwerty');
     $this->clickAndWaitFor('link=Save', $l['errorSummary'], false);
     $this->type($l['itemsPerLoadInput'], 200);
-    $this->clickAndWaitFor('link=Save', $l['responseDialog'], false);
-    $this->assertText($l['responseDialog'], 'Configuration saved.');
+    $this->clickAndWaitFor('link=Save', $l['savedResponse'], false);
+    $this->assertText($l['savedResponse'], 'Saved');
     $config = new dvrConfig;
     $config->init();
     $this->assertEquals($config->webItemsPerLoad, 200);
