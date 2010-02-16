@@ -59,11 +59,12 @@ class DvrConfigController extends BaseController
         throw $e;
       }
     }
-    $this->render('global', array('config'=>$config, 'successfullSave' => $success));
+    $this->render('global', array('config'=>$config, 'saved' => $success));
   }
 
   public function actionNzbClient()
   {
+    $saved = false;
     $config = Yii::app()->dvrConfig;
     if(isset($_GET['id']) && Yii::app()->request->isPostRequest &&
        $config->contains($_GET['id']))
@@ -73,7 +74,7 @@ class DvrConfigController extends BaseController
         $config->{$_GET['id']}->attributes = $_POST['dvrConfigCategory'];
       $transaction = Yii::app()->db->beginTransaction();
       try {
-        $config->save();
+        $saved = $config->save();
         $transaction->commit();
       } catch (Exception $e) {
         $transaction->rollback();
@@ -82,13 +83,15 @@ class DvrConfigController extends BaseController
     }
     $this->render('nzbClient', array(
           'availClients'=>Yii::app()->dlManager->availClients[feedItem::TYPE_NZB],
-          'config'=>$config
+          'config'=>$config,
+          'saved'=>$saved,
     ));
   }
 
   public function actionTorClient()
   {
     $config = Yii::app()->dvrConfig;
+    $saved = false;
     if(isset($_GET['id']) && Yii::app()->request->isPostRequest &&
        $config->contains($_GET['id']))
     {
@@ -99,7 +102,7 @@ class DvrConfigController extends BaseController
         $config->{$_GET['id']}->attributes = $_POST['dvrConfigCategory'];
       $transaction = Yii::app()->db->beginTransaction();
       try {
-        $config->save();
+        $saved = $config->save();
         $transaction->commit();
       } catch (Exception $e) {
         $transaction->rollback();
@@ -108,7 +111,8 @@ class DvrConfigController extends BaseController
     }
     $this->render('torClient', array(
           'availClients'=>Yii::app()->dlManager->availClients[feedItem::TYPE_TORRENT],
-          'config'=>$config
+          'config'=>$config,
+          'saved'=>$saved,
     ));
   }
 

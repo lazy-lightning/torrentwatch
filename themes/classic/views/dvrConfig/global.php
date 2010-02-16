@@ -1,5 +1,7 @@
       <?php echo CHtml::beginForm(array('/dvrConfig/globals'), 'post', array('id'=>'global_config'));
       echo CHtml::errorSummary($config); 
+      if($saved)
+        echo "<div class='saved'>Saved</div>";
       ?>
         <h2 class="dialog_heading">Web UI Settings</h2>
         <div id="config_timezone">
@@ -30,4 +32,3 @@
           <?php echo CHtml::link('Wizard', array('welcome', '#'=>'welcome'), array('class'=>'toggleDialog button')); ?>
         </div>
       <?php echo CHtml::endForm(); ?>
-<?php if($successfullSave) $this->widget('actionResponseWidget', array('dialog'=>array('header'=>'Configuration saved.')));

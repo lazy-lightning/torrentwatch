@@ -95,6 +95,7 @@ class WebTestCase extends CWebTestCase
   protected function closeWelcome()
   {
     $this->waitForElementPresent('link=Close');
+    usleep(500000);
     // Click the close wizard button
     $this->click('link=Close');
     $this->waitForElementNotVisible('link=Close');
