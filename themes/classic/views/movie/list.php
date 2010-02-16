@@ -6,10 +6,10 @@ foreach($movieList as $n => $model) {
      "<div class='itemButtons'>".
        CHtml::link('Related FeedItems', array('/feedItem/list', 'related'=>'movie', 'id'=>$model->id),
            array('class'=>'loadDuplicates')).
-       CHtml::link(CHtml::image('images/tor_start.png', 'Start', array('height'=>10)),
-           array('startDownload', 'id'=>$model->id), array('class'=>'startDownload ajaxSubmit', 'title'=>'Start Download')).
-       CHtml::link(CHtml::image('images/tor_fav.png', 'Favorite', array('height'=>10)),
-           array('makeFavorite', 'id'=>$model->id), array('class'=>'makeFavorite ajaxSubmit', 'title'=>'Make Favorite')).
+       CHtml::link('&nbsp;', array('startDownload', 'id'=>$model->id), 
+           array('class'=>'startDownload ajaxSubmit', 'title'=>'Start Download')).
+       CHtml::link('&nbsp',  array('makeFavorite', 'id'=>$model->id), 
+           array('class'=>'makeFavorite ajaxSubmit', 'title'=>'Make Favorite')).
      "</div><div class='itemDetails'>".
      "  <span class='name'>".CHtml::encode($model->fullTitle)."</span>".
      "  <span class='rating'>".CHtml::encode($model->rating)." / 100</span>".
