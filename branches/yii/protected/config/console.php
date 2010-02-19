@@ -34,7 +34,7 @@ return array(
       'routes'=>array(
         array(
           'class'=>'CFileLogRoute',
-          'levels'=>'info, error, warning, profile',
+          'levels'=>'trace, info, error, warning, profile',
         ),
       ),
     ),
@@ -48,6 +48,7 @@ return array(
     'db'=>array(
       'class'=>'SqliteConnection',
       'connectionString'=>'sqlite:protected/data/source.db',
+      'enableParamLogging'=>true,
     ),
   ),
 
