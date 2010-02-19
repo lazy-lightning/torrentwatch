@@ -6,5 +6,5 @@ foreach($tvshowList as $n => $model) {
        "  <span class='name'>".CHtml::encode($model->title)."</span>".
        "</li>";
 } ?>
-<ul>
+</ul>
  

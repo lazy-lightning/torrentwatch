@@ -13,6 +13,11 @@
  <?php 
    echo CHtml::activeLabelEx($model, 'tvShow_id').': ';
    if($model->isNewRecord) {
+     if(is_numeric($model->tvShow_id)) {
+       $model->tvShow_id = (isset($_POST['favoriteTvShow']['tvShow_id'])
+         ? $model->tvShow_id = $_POST['favoriteTvShow']['tvShow_id'] 
+         : $model->tvShow_id = $model->getRelated('tvShow')->title);
+     }
      echo CHtml::activeTextField($model, 'tvShow_id');
    } else {
      echo '<span>'.CHtml::encode($model->name).'</span>';
