@@ -79,12 +79,13 @@ class updateIMDbCommand extends BaseConsoleCommand {
     $reader = $db->createCommand('SELECT id, imdbId'.
                                  '  FROM movie'.
                                  ' WHERE lastImdbUpdate <'.($now-(3600*24)). // one update per 24hrs
+                                 '   AND imdbId IS NOT NULL'.
                                  '   AND rating IS NULL;'
 
     )->queryAll();
     foreach($reader as $row) {
       $scanned[] = $row['id'];
-
+      
       echo "Looking for Imdb Id: ".$row['imdbId']."\n";
       $url = sprintf('http://www.imdb.com/title/tt%07d/', $row['imdbId']);
       $scraper = new IMDbScraper('', $url);
@@ -123,6 +124,7 @@ class updateIMDbCommand extends BaseConsoleCommand {
     $movie->runtime = $scraper->runtime;
     $movie->plot = $scraper->plot;
     $movie->rating = strtok($scraper->rating, '/');
+    $movie->imdbId = $scraper->imdbId;
     if($movie->save()) {
       if(is_array($scraper->genres)) {
         foreach($scraper->genres as $genre) {

@@ -90,9 +90,10 @@ class mediaTitleParser {
   /**
    * factory 
    * 
-   * @var mixed
+   * @var modelFactory
    */
   protected $factory;
+
   /**
    * __construct will take in a title and initialize its properties based
    * on the given title
@@ -118,10 +119,11 @@ class mediaTitleParser {
         list($this->shortTitle, $this->epTitle, $this->season, $this->episode, $this->network) = $result;
         if(!empty($this->network))
           $this->network = $this->factory->networkByTitle($this->network);
-        $this->initRelated();
-        return;
+        break;
       }
     }
+    $this->initRelated();
+    return;
   }
 
   protected function initRelated()
