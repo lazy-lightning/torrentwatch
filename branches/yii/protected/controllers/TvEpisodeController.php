@@ -93,7 +93,7 @@ EOD
     $pageSize = $pages->pageSize=Yii::app()->dvrConfig->webItemsPerLoad;
 
     $cmd = $db->createCommand(
-            "SELECT $vars FROM $tables WHERE $condition LIMIT {$pages->pageSize} OFFSET ".($pages->currentPage*$pageSize)
+            "SELECT $vars FROM $tables WHERE $condition ORDER BY e.lastUpdated DESC LIMIT {$pages->pageSize} OFFSET ".($pages->currentPage*$pageSize)
     );
     if(isset($_GET['tvShow']))
       $cmd->bindParam(':tvShow_id', $_GET['tvShow']);
