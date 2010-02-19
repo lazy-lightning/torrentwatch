@@ -67,48 +67,39 @@ class TvEpisodeController extends BaseController
    */
   public function actionList()
   {
-    $pages = null;
-    $criteria=new CDbCriteria(array(
-          'select'=>'id, status, title, season, episode, tvShow_id', 
-          'order'=>'t.lastUpdated DESC',
-          'with'=>array(
-              'tvShow'=>array(
-                  'select'=>'id,title',
-              ),
-              'feedItem'=>array(
-                  'select'=>'id,status',
-                  'condition'=>'feedItem.id IN ('.
-                    'SELECT id FROM'.
-                    '  (SELECT status,id,tvEpisode_id FROM feedItem'.
-                    '   WHERE tvEpisode_id NOT NULL'.
-                    '   ORDER by status ASC'.
-                    '  )'.
-                    'GROUP BY tvEpisode_id)'
-              ),
-          ),
-          // only display episodes that have a related feeditem
-          // how much slower does this make it, should there be an extra column to flag this
-          'condition'=>'t.id in (select tvEpisode_id from feedItem where '.
-                       'tvEpisode_id not null)'
-    ));
-
+    $db = Yii::app()->getDb();
+    $params = $pages = null;
+    $vars = "e.id as id, e.status as status, e.title as title, e.season as season, e.episode as episode, s.id as tvShow_id, s.title as tvShow_title, i.id as feedItem_id, i.status as feedItem_status";
+    $tables = "tvEpisode e, tvShow s, feedItem i";
+    $condition = <<<EOD
+       s.id = e.tvShow_id
+   AND i.tvEpisode_id = e.id
+   AND i.id IN (
+       SELECT id FROM
+         (SELECT status,id,tvEpisode_id
+            FROM feedItem
+           WHERE tvEpisode_id NOT NULL
+           ORDER BY status ASC
+         )
+       GROUP BY tvEpisode_id)
+EOD
+    ;
     if(isset($_GET['tvShow']))
-    {
-      $criteria->condition .= ' AND t.tvShow_id = :tvShow_id';
-      $criteria->params = array(':tvShow_id'=>$_GET['tvShow']);
-    }
+      $condition = 's.id = :tvShow_id AND '.$condition;
     else
-      $criteria->condition .= ' AND t.tvShow_id NOT IN '.
-        '(SELECT id FROM tvShow WHERE hide = 1)';
+      $condition = 's.id NOT IN (SELECT id FROM tvShow WHERE hide = 1) AND '.$condition;
 
-    $pages=new CPagination(tvEpisode::model()->count($criteria));
-    $pages->pageSize=Yii::app()->dvrConfig->webItemsPerLoad;
-    $pages->applyLimit($criteria);
+    $pages=new CPagination($db->createCommand("SELECT count(*) FROM $tables WHERE $condition")->queryScalar());
+    $pageSize = $pages->pageSize=Yii::app()->dvrConfig->webItemsPerLoad;
 
-    $tvepisodeList=tvEpisode::model()->findAll($criteria);
+    $cmd = $db->createCommand(
+            "SELECT $vars FROM $tables WHERE $condition LIMIT {$pages->pageSize} OFFSET ".($pages->currentPage*$pageSize)
+    );
+    if(isset($_GET['tvShow']))
+      $cmd->bindParam(':tvShow_id', $_GET['tvShow']);
 
     $this->render('list',array(
-      'tvepisodeList'=>$tvepisodeList,
+      'tvepisodeList'=>$cmd->queryAll(),
       'pages'=>$pages,
     ));
   }
