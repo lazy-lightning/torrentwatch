@@ -48,5 +48,4 @@
     <td><?php echo CHtml::link($episode->getEpisodeString(false), array('tvEpisode/show', 'id'=>$episode->id)); ?></td>
   </tr>
 <?php endforeach;?>
-</td>
 </table>
