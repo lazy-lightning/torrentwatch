@@ -4,7 +4,7 @@
     <li><a href="#favoriteTvShows"><span>TV Shows</span></a></li>
     <li><a href="#favoriteMovies"><span>Movies</span></a></li>
     <li><a href="#favoriteStrings"><span>Strings</span></a></li>
-   </ul> 
+   </ul>
    <?php
      // Initialze some listData to be reused by all the favorites
      // Loop through the 3 favorites and display them all
@@ -17,7 +17,7 @@
         <li><?php echo CHtml::link($fav->name, array("/$class/show", 'id'=>$fav->id, '#'=>$favType.'-'.$fav->id)); ?></li>
        <?php endforeach; endif; ?>
       </ul>
-      <?php 
+      <?php
         if(isset($response[$class]))
           Yii::app()->getController()->renderPartial("/$class/show", array('model'=>$response[$class]));
       ?>
