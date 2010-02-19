@@ -5,7 +5,6 @@
       <?php echo CHtml::link($tvepisode->tvShow->title, array('tvShow/show', 'id'=>$tvepisode->tvShow->id),
                                array('rel'=>'#inspector .content')); ?>
     </td>
-  </th>
 </tr>
 <tr>
   <th class="label">Episode</th>

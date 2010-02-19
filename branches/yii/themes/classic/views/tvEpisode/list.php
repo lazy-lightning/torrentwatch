@@ -18,5 +18,5 @@ foreach($tvepisodeList as $n => $model) {
          (empty($model->title)?'':(":  <span class='epTitle'>".CHtml::encode($model->title)."</span>")).
        "</div></li>";
 } ?>
-<ul>
+</ul>
  
