@@ -217,7 +217,7 @@
             // wait for link, and hash to exist.  Also wait for hash to be in a dialog_window
             return !($(selector).length === 0 || $hash.length === 0 || $hash.parents('.dialog_window').length === 0);
         }, function() {
-          $(selector).toggleFavorite;
+          $(selector).toggleFavorite();
         });
     }
     // marks the group of elements as alt/notalt
@@ -240,7 +240,7 @@
         // Handle button click events
         $("body").live('click', function (e) {
             if (e.button !== 0) {
-                return;
+                return true;
             }
             var target = $(e.target);
             // Menu Bar, and other buttons which show/hide a dialog
@@ -309,6 +309,7 @@
                 e.returnValue = false;
                 return false;
             }
+            return true;
         });
     
         // Filter Bar - Buttons
