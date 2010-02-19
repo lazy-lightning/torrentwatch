@@ -30,11 +30,13 @@ class updateFavoriteAction extends CAction
   public $create = False;
 
   /**
-   * extraVars 
+   * beforeRender 
    * 
-   * @var string a function in the controller to call to get extra variables for the view
+   * @var string a function in the controller to call to before rendering
+   *             which can, among other things, return an array of variables
+   *             to pass to the view
    */
-  public $extraVars = '';
+  public $beforeRender = '';
 
   /**
    * Updates the model from POST data
@@ -111,9 +113,13 @@ class updateFavoriteAction extends CAction
         'genresListData'=>genre::getCHtmlListData(),
         'qualitysListData'=>quality::getCHtmlListData(),
     );
-    $extraVarsFunc = array($this->getController(), $this->extraVars);
-    if(!empty($this->extraVars) && method_exists($extraVarsFunc[0], $extraVarsFunc[1]))
-        $vars = array_merge($vars, call_user_func($extraVarsFunc, $model));
+    $beforeRenderFunc = array($this->getController(), $this->beforeRender);
+    if(!empty($this->beforeRender) && method_exists($beforeRenderFunc[0], $beforeRenderFunc[1]))
+    {
+      $retVal = call_user_func($beforeRenderFunc, $model);
+      if(is_array($retVal))
+        $vars = array_merge($vars, call_user_func($beforeRenderFunc, $model));
+    }
 
     Yii::app()->getController()->render('show', $vars);
   }

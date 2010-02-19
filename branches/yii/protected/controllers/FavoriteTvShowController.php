@@ -23,7 +23,7 @@ class FavoriteTvShowController extends BaseController
         'create'=>array(
           'class'=>'updateFavoriteAction',
           'create'=>true,
-          'extraVars'=>'createViewVariables',
+          'beforeRender'=>'createViewVariables',
         ),
     );
   }
