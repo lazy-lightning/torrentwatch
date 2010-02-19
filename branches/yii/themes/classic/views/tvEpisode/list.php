@@ -15,13 +15,13 @@ foreach($tvepisodeList as $n => $row) {
   $epString = CHtml::encode($tvEpisode->getEpisodeString($row['season'], $row['episode']));
   $status = strtok($feedItem->getStatusText($row['feedItem_status']), ' ');
   echo "<li id='tvEpisode-$id' class='torrent hasDuplicates match_$status".($n%2?' alt':' notalt')."' >".
-         "<a href='".str_replace('{id}', $id, $inspect)."' class='loadInspector ajaxSubmit' title='Get More Information'></a>".
+         "<a href='".str_replace('%7Bid%7D', $id, $inspect)."' class='loadInspector ajaxSubmit' title='Get More Information'></a>".
          "<div class='itemButtons'>".
-           "<a href='".str_replace('{id}', $id, $list)."' class='loadDuplicates'>Related FeedItems</a>".
-           "<a href='".str_replace('{id}', $id, $start)."' class='startDownload ajaxSubmit' title='Start Download'>&nbsp;</a>".
-           "<a href='".str_replace('{id}', $id, $makeFav)."' class='makeFavorite ajaxSubmit' title='Make Favorite'>&nbsp;</a>".
+           "<a href='".str_replace('&7Bid&7D', $id, $list)."' class='loadDuplicates'>Related FeedItems</a>".
+           "<a href='".str_replace('&7Bid&7D', $id, $start)."' class='startDownload ajaxSubmit' title='Start Download'>&nbsp;</a>".
+           "<a href='".str_replace('&7Bid&7D', $id, $makeFav)."' class='makeFavorite ajaxSubmit' title='Make Favorite'>&nbsp;</a>".
          "</div><div class='hideButton'>".
-           "<a href='".str_replace('{tid}', $row['tvShow_id'], $hide)."' class='hideTvShow ajaxSubmit'>&nbsp;</a>".
+           "<a href='".str_replace('&7Btid&7D', $row['tvShow_id'], $hide)."' class='hideTvShow ajaxSubmit'>&nbsp;</a>".
          "</div><div class='itemDetails'>".
          "  <span class='name'>".CHtml::encode($row['tvShow_title'])."</span>".
          " - <span class='episode'>$epString</span>".
