@@ -20,6 +20,32 @@ abstract class favoriteManager extends CModel {
     return $timeLimitSQL;
   }
 
+  /**
+   * Check a single favorite for matching
+   * @param BaseFavorite $favorite 
+   * @param integer $itemStatus
+   */
+  public function checkFavorite($favorite, $itemStatus = feedItem::STATUS_NOMATCH)
+  {
+    switch(get_class($favorite))
+    {
+      case 'favoriteTvShow':
+        $this->checkTvShowFavorites($itemStatus, true, $favorite);
+        break;
+      case 'favoriteMovie':
+        $this->checkMovieFavorites($itemStatus, true, $favorite);
+        break;
+      case 'favoriteString':
+        $this->checkStringFavorites($itemStatus, true, $favorite);
+        break;
+      default:
+        throw new CException("Argument must be a subclass of BaseFavorite. Given: ".get_class($favorite));
+    }
+    $this->startDownloads();
+
+    $this->updateItemStatus($itemStatus);
+  }
+
   // there must be a better way than the following for multiple favorites . . .
   /**
    * looks for feedItems that matching a favorite in the database
@@ -42,11 +68,12 @@ abstract class favoriteManager extends CModel {
    * looks for feedItems that matching a favoriteMovie in the database
    * @param integer a feeditem status to limit the search to
    */
-  public function checkMovieFavorites($itemStatus = feedItem::STATUS_NEW, $timeLimit=true) 
+  protected function checkMovieFavorites($itemStatus = feedItem::STATUS_NEW, $timeLimit=true, $fav=null)
   {
     Yii::log('Looking for movie favorites');
     $db = Yii::app()->db;
 
+    $limitFavorite =  ($fav ? ' AND favoriteMovies_id = '.$fav->id : '');
     $trans = $db->beginTransaction();
     try {
         // Mark any previously downloaded movies that are now matching
@@ -56,6 +83,7 @@ abstract class favoriteManager extends CModel {
             ' WHERE feedItem.status = '.$itemStatus.
             '   AND feedItem.id IN ( SELECT feedItem_id'.
             '    FROM matchingFavoriteMovies m'.
+            $limitFavorite.
             '   WHERE m.movie_status = '.movie::STATUS_DOWNLOADED.
             ');'
             )->execute();
@@ -69,6 +97,7 @@ abstract class favoriteManager extends CModel {
     $reader = $db->createCommand(
         'SELECT * FROM matchingFavoriteMovies'.
         ' WHERE feedItem_status='.$itemStatus.
+        $limitFavorite.
         $this->getTimeLimitSQL($timeLimit).
         '   AND movie_status='.movie::STATUS_NEW
     )->queryAll();
@@ -87,14 +116,14 @@ abstract class favoriteManager extends CModel {
    * and starts them.   Needs some work to prevent duplicate downloads
    * @param integer a feeditem status to limit the search to
    */
-  public function checkStringFavorites($itemStatus = feedItem::STATUS_NEW, $timeLimit=true) 
+  protected function checkStringFavorites($itemStatus = feedItem::STATUS_NEW, $timeLimit=true, $fav=null)
   {
     Yii::log('Looking for string favorites');
     $db = Yii::app()->db;
-
     $reader = $db->createCommand(
         'SELECT * FROM matchingFavoriteStrings'.
         '  WHERE feedItem_status='.$itemStatus.
+        ($fav ? ' AND favoriteStrings_id = '.$fav->id : '').
         $this->getTimeLimitSQL($timeLimit)
     )->queryAll();
 
@@ -107,11 +136,12 @@ abstract class favoriteManager extends CModel {
     }
   }
 
-  protected function markOldEpisodes($itemStatus)
+  protected function markOldEpisodes($itemStatus, $fav=null)
   {
     // Start by limiting to the tvShows with a favorite with only newer flagged
     $tvShowIdsSql =
-        "SELECT tvShow_id FROM favoriteTvShows WHERE onlyNewer = 1";
+        "SELECT tvShow_id FROM favoriteTvShows WHERE onlyNewer = 1".
+        ($fav ? ' AND id = '.$fav->id : '');
 
     // Get the id of the newest tv episode of each tvShow in our set
     $newEpisodeIdsSql =
@@ -144,7 +174,7 @@ abstract class favoriteManager extends CModel {
    * looks for feedItems that matching a favoriteTvShow in the database
    * @param integer $itemStatus a feeditem status to limit the search to
    */
-  public function checkTvShowFavorites($itemStatus = feedItem::STATUS_NEW, $timeLimit=true) 
+  protected function checkTvShowFavorites($itemStatus = feedItem::STATUS_NEW, $timeLimit=true, $fav=null)
   {
     Yii::log('Looking for TvShow favorites');
     $db = Yii::app()->db;
@@ -162,7 +192,7 @@ abstract class favoriteManager extends CModel {
             ' );'
             )->execute();
 
-        $this->markOldEpisodes($itemStatus);
+        $this->markOldEpisodes($itemStatus, $fav);
         $trans->commit();
     } catch (Exception $e) {
         $trans->rollback();
@@ -175,6 +205,7 @@ abstract class favoriteManager extends CModel {
         'SELECT * FROM matchingFavoriteTvShows'.
         ' WHERE feedItem_status='.$itemStatus.
         $this->getTimeLimitSQL($timeLimit).
+        ($fav ? ' AND favoriteTvShows_id = '.$fav->id : '').
         '   AND tvEpisode_status='.tvEpisode::STATUS_NEW
     )->queryAll();
 
