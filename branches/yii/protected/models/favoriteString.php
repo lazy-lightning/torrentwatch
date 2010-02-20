@@ -66,12 +66,6 @@ class favoriteString extends BaseFavorite
     );
   }
 
-  public function afterSave()
-  {
-    parent::afterSave();
-    Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NOMATCH);
-  }
-
   public function convertGlobToSQL($attribute, $params)
   {
     $value = $this->$attribute;

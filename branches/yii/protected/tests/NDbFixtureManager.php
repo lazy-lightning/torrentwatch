@@ -12,6 +12,7 @@
  * This file has received very minor changes by erik bernhardson
  * to centralize all occurances of $this->basePath.DIRECTORY_SEPARATOR.$foobar into
  * $this->getFixtureFile($file) so it can be overloaded
+ * Because of this it has been renamed NDbFixtureManager 
  */
 
 /**
@@ -124,13 +125,13 @@ class NDbFixtureManager extends CApplicationComponent
 		$this->checkIntegrity(false);
 
 		if(is_file($initFile))
-			require($initFile);
-		else
-		{
-			foreach($this->getFixtures() as $fixture)
-				$this->loadFixture($fixture);
-		}
-		$this->checkIntegrity(true);
+ 		  require($initFile);
+ 	  else
+  	{
+  		foreach($this->getFixtures() as $fixture)
+  			$this->loadFixture($fixture);
+	 	}
+  	$this->checkIntegrity(true);
 	}
 
 	/**
