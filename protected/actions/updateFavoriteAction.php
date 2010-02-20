@@ -118,7 +118,7 @@ class updateFavoriteAction extends CAction
     {
       $retVal = call_user_func($beforeRenderFunc, $model);
       if(is_array($retVal))
-        $vars = array_merge($vars, call_user_func($beforeRenderFunc, $model));
+        $vars = array_merge($vars, $retVal);
     }
 
     Yii::app()->getController()->render('show', $vars);

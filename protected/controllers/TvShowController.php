@@ -102,7 +102,7 @@ class TvShowController extends BaseController
         $transaction->rollback();
         throw $e;
       }
-      // Somehow the choice between tvEpisode and tvShow controllers
+      // TODO: Somehow the choice between tvEpisode and tvShow controllers
       // should be programatic.
       $this->redirect(array('/tvEpisode/list'));
     }

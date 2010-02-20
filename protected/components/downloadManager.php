@@ -119,6 +119,7 @@ class downloadManager extends favoriteManager {
 
   /**
    * list of classes and names of available torrent clients
+   * @ return array (feedItem type => (class => displayName) )
    */
   public function getAvailClients() {
     return array(
@@ -229,6 +230,7 @@ class downloadManager extends favoriteManager {
    * Entry point for downloading a feed item with a download client
    * @param mixed $opts either a feedItem object or a row returned from the various matching views in the db
    * @param integer $status the status to set related {@link feedItem} to on successfull start,.
+   * @return boolean weather the download successfully started
    */
   // TODO: Perhaps should be reworked to allow for downloading from the net
   //       outside of a locking transaction

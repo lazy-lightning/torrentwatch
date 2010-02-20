@@ -104,6 +104,6 @@ class favoriteTvShow extends BaseFavorite
    */
   public function getName()
   {
-    return $this->tvShow->title;
+    return $this->getRelated('tvShow')->title;
   }
 }
