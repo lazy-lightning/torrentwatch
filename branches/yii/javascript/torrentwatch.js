@@ -69,7 +69,10 @@
     // Special handling occurs for handling forms to initialize them and reset
     // possible parent forms 
     $.loadAjaxUpdate = function (html) {
-        var data = $(html);
+        var data = $(html), login = $('#login_form');
+        // hack for login replacement
+        if(login.length)
+          login.replaceWith('<div id="tv_container" />')
         data.each(function () { 
             if (!this.id) { 
                 return; 
@@ -366,15 +369,16 @@
                 }
             }, 300);
         }).ajaxError(function (event, XMLHttpRequest, ajaxOptions, thrownError) {
-            var content;
+            var content, dialog;
             if (XMLHttpRequest.responseText === '') {
                 content = '<p>NMTDVR has errored in an untraceable manner</p>';
             } else {
                 content = XMLHttpRequest.responseText;
             }
-            $(this).unbind('ajaxStop')
-                .find('.content')
-                .replaceWith(content);
+            $('<div id="ajaxError" class="dialog_window"><div class="content"></div></div>')
+                .find('.content').replaceWith(content).end()
+                .appendTo('body');
+            $('#ajaxError').toggleDialog();
         });
         
         // Initialize the feed items and open wizard if empty on first load

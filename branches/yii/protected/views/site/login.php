@@ -1,5 +1,5 @@
 <?php $this->pageTitle=Yii::app()->name . ' - Login'; ?>
-<div class='login_form'>
+<div class='login_form' id='login_form'>
 <h1>Login</h1>
 
 <div class="yiiForm">
