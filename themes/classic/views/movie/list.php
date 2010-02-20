@@ -15,5 +15,5 @@ foreach($movieList as $n => $model) {
      "  <span class='rating'>".CHtml::encode($model->rating)." / 100</span>".
      "</div></li>";
 } ?>
-<ul>
+</ul>
  
