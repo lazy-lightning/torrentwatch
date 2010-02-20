@@ -115,11 +115,13 @@ class tvEpisode extends CActiveRecord
   /**
    * @return string a string representation of this records episode
    */
-  public function getEpisodeString($empty = TRUE) 
+  public function getEpisodeString($s=null,$e=null)
   {
-    // Performance hack, was spending 10% of a query calling this 100 times
-    $e = $this->episode;
-    $s = $this->season;  
+    if($s === null || $e === null)
+    {
+      $e = $this->episode;
+      $s = $this->season;
+    }
     if($e > 10000) 
     {
       $date = new DateTime('Jan 1 1970', new DateTimeZone('UTC'));
