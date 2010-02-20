@@ -13,6 +13,26 @@ class favoriteManagerTvShowTest extends DbTestCase
       'dvrConfig'=>':dvrConfig',
   );
 
+  public function testTvShowCheckFavorite()
+  {
+    $fav = favoriteTvShow::model()->findByPk(1);
+    // should match both items with default checkFavorite settings
+    $this->assertType('favoriteTvShow', $fav);
+    Yii::app()->dlManager->checkFavorite($fav);
+
+    $this->assertEquals(0, feedItem::model()->count('status = '.feedItem::STATUS_NOMATCH));
+    $this->assertEquals(2, feedItem::model()->count('status = '.feedItem::STATUS_QUEUED));
+  }
+
+  public function testTvShowCheckFavoritesStatus()
+  {
+    // should match no items with STATUS_NEW
+    Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NEW, false);
+
+    $this->assertEquals(2, feedItem::model()->count('status = '.feedItem::STATUS_NOMATCH));
+    $this->assertEquals(0, feedItem::model()->count('status = '.feedItem::STATUS_QUEUED));
+  }
+
   public function testTvShowTimeLimitDisabled()
   {
     // should match both items with no limit

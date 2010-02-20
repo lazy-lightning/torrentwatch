@@ -48,7 +48,7 @@ abstract class BaseFavorite extends CActiveRecord
   public function afterSave()
   {
     parent::afterSave();
-    Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NOMATCH);
+    Yii::app()->dlManager->checkFavorite($this, feedItem::STATUS_NOMATCH);
   }
 
   /**
