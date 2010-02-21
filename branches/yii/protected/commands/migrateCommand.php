@@ -9,7 +9,7 @@ class migrateCommand extends BaseConsoleCommand
    */
   protected $migrations = array(
   // db version => class to migrate to next version
-      0 => 'migrateFromNoVersion',
+      0 => 'migrateFromVersionZero',
       1 => 'migrateFromVersionOne',
       2 => 'migrateFromVersionTwo',
   );
@@ -29,7 +29,7 @@ class migrateCommand extends BaseConsoleCommand
       );
       foreach($cmds as $sql)
         Yii::app()->db->createCommand($sql)->execute();
-      $version = 1;
+      $version = 0;
     }
     return $version;
   }
