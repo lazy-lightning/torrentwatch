@@ -7,6 +7,13 @@ class downloadManager extends favoriteManager {
   private $opts; // the current item being started in the form of either
                  // a feedItem or a row from a matchingFavorite* view
 
+  /**
+   * getters 
+   * 
+   * @var array a list of variable getters specifying the attribute or key
+   *            to use if $this->opts is a feedItem object or an array
+   *            ( variable => ( 'obj'=> attribute, 'arr'=>key )
+   */
   private $getters = array(
       'downloadType' => array('obj'=>'downloadType',       'arr'=>'feedItem_downloadType'),
       'feedId'       => array('obj'=>'feed_id',            'arr'=>'feed_id'),
@@ -17,6 +24,13 @@ class downloadManager extends favoriteManager {
       'title'        => array('obj'=>'title',              'arr'=>'feedItem_title'),
       'tvEpisodeId'  => array('obj'=>'tvEpisode_id',       'arr'=>'tvEpisode_id'),
   );
+
+  /**
+   * started 
+   * 
+   * @var array an array of history items for items started in this run ( history )
+   */
+  private $started = array();
 
   public function __get($name)
   {
@@ -35,7 +49,7 @@ class downloadManager extends favoriteManager {
           // FIXME: uninspired . .
           // allows selecting more than one level deep
           // shifting wont effect the origional array, php makes
-          // copies of arrays by default
+          // copies of arrays by default.
           $foo = $this->opts->{array_shift($attr)};
           foreach($attr as $i)
             $foo = $foo->$i;
@@ -57,7 +71,7 @@ class downloadManager extends favoriteManager {
   }
 
   /**
-   * @return the options of the current item being started
+   * @return mixed the options of the current item being started
    * @param none
    */
   public function getOpts() {
@@ -167,6 +181,16 @@ class downloadManager extends favoriteManager {
   }
 
   /**
+   * getStarted 
+   * 
+   * @var array an array of history objects for items started in this instance ( history )
+   */
+  public function getStarted()
+  {
+    return $this->started;
+  }
+
+  /**
    * Runs actions to take place on successfull start of a download
    * @return none
    */
@@ -195,7 +219,10 @@ class downloadManager extends favoriteManager {
     $history->feed_title = $this->feedTitle;
     $history->favorite_name = $this->favoriteName;
     $history->favorite_type = $this->favoriteType;
-    $history->save();
+    if($history->save())
+      $this->started[] = $history;
+    else
+      Yii::log('Error saving history: '.print_r($history->getErrors(), true), CLogger::LEVEL_ERROR);
 
     // mark the tvEpisode/movie/other as STATUS_DOWNLOADED
     $record = $this->itemTypeRecord;

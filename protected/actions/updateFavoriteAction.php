@@ -86,8 +86,25 @@ class updateFavoriteAction extends CAction
     if(isset($_POST[$class]))
     {
       $this->updateModel($model, $_POST[$class]);
+      if($this->success)
+      {
+        $this->response->resetFeedItems = true;
+        // notify user of any newly started downloads
+        $started = Yii::app()->dlManager->getStarted();
+        $content = '';
+        foreach($started as $history)
+        {
+          $content .= $history->feedItem_title.'<br>';
+        }
+        $this->response->dialog = array(
+            'header' => 'New downloads started',
+            'content' => $content,
+        );
+      }
       if($this->create && $this->success)
       {
+        // move the created elements into place
+        // might be better served in the view
         $this->response->append = array(
             array(
                 'parent'=>"#{$class}List",
@@ -102,7 +119,6 @@ class updateFavoriteAction extends CAction
     }
 
     if($this->success) 
-      $this->response->resetFeedItems = true;
 
     $vars = array(
         'response'=>$this->response->getContent(),
