@@ -129,7 +129,7 @@ class mediaTitleParser {
   protected function initRelated()
   {
     if(($this->season >= 0 && $this->episode >0) ||
-       ($season > 0 && $this->episode === 0))
+       ($this->season > 0 && $this->episode === 0))
     {
       $model = $this->tvEpisode = $this->factory->tvEpisodeByEpisode($this->shortTitle, $this->season, $this->episode); 
       if(!empty($this->epTitle))
