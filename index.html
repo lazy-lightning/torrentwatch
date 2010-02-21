@@ -116,4 +116,27 @@
     </li>
   </ul></div>
 </div>
+<div class="dialog_window" id="reset_data">
+  <div class="content">
+    <h2 class="dialog_heading">Reset Stored Data</h2>
+    <ul>
+      <li class="clearFix">
+        <a href='nmtdvr.php?r=resetData/all' class='button ajaxSubmit'>All</a>
+        <p>Delete both media and feedItem data and update feeds from the internet</p>
+      </li>
+      <li class="clearFix">
+        <a href='nmtdvr.php?r=resetData/media' class='button ajaxSubmit'>Media</a>
+        <p>Reset all media types(episodes, movies, etc) to new status</p>
+      </li>
+      <li class="clearFix">
+        <a href='nmtdvr.php?r=resetData/feedItems' class='button ajaxSubmit'>Items</a>
+        <p>Reset all feed items to unmatched status</p>
+      </li>
+    </ul>
+    <div class="buttonContainer clearFix">
+      <a class="toggleDialog button" href="#">Close</a>
+    </div>
+  </div>
+</div>
+
 </body></html>
