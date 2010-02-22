@@ -76,6 +76,23 @@ class FavoritesTest extends WebTestCase
   }
 
   /**
+   * Performs a test to verify that our floated elements ended up lined up properly
+   * and didn't overflow to the next line
+   * 
+   * @return void
+   */
+  public function testTvShowRender()
+  {
+    $l = $this->getLocators('favoriteTvShow', 'tvShow_id');
+    $this->click($l['newFavoriteLink']);
+    $this->waitForElementPresentAndVisible($l['createFavoriteButton']);
+    $this->assertElementPositionTop('id=favoriteTvShow_saveIn', 
+        $this->getElementPositionTop('css=#favoriteTvShow- .favorite_savein label'));
+    $this->assertElementPositionTop('id=quality_id_1',
+        $this->getElementPositionTop('id=quality_id_3'));
+  }
+
+  /**
    * Performs a test of the favorites TV Show tab
    * 
    * @return void

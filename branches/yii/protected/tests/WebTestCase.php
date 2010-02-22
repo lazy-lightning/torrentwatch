@@ -4,7 +4,7 @@
  * Change the following URL based on your server configuration
  * Make sure the URL ends with a slash so that we can use relative URLs in test cases
  */
-define('TEST_BASE_URL','http://xbmclive/nmtdvr/nmtdvr-test.php/');
+define('TEST_BASE_URL','http://192.168.1.121/nmtdvr/nmtdvr-test.php/');
 
 /**
  * The base class for functional test cases.

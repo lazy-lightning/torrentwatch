@@ -68,6 +68,8 @@ class TvEpisodeTest extends WebTestCase
     $this->waitForElementPresentAndVisible($l['favoriteForm2']);
     // Make sure there is a button to select this favorite
     $this->assertElementVisible($l['createdFavoriteButton2']);
+    // Make sure previous form disapeared
+    $this->assertElementNotVisible($l['favoriteForm']);
   }
 
   public function testStartDownload()
