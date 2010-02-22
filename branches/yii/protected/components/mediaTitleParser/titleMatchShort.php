@@ -5,7 +5,7 @@ class titleMatchShort extends titleMatch
   // three digits (four hits movie years, optional 0 to catch single digit season) with a
   // word boundry on each side, ex: some.show.402.hdtv
   // with at least some data after it to not match a group name at the end
-  public $episode_reg = '\b(0?\d\d\d)\b..'; 
+  public $episode_reg = '\b(0?\d\d\d)\b'; 
  
   function foundMatch($title, $regs)
   {

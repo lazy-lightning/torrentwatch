@@ -14,8 +14,9 @@ class titleMatchPartial extends titleMatch
     $end = strpos($title, $regs[0])+strlen($regs[0]);
     if($end < strlen($title))
       $episodeTitle = substr($title, $end);
-    $season  = $regs[2] == 'S' ? trim($regs[3]) : 1;
-    $episode = $regs[2][0] == 'E' ? trim($regs[3]) : 0;
+    $regs[2] = strtolower($regs[2]);
+    $season  = $regs[2] == 's' ? trim($regs[3]) : 1;
+    $episode = $regs[2][0] == 'e' ? trim($regs[3]) : 0;
     return array($shortTitle, $episodeTitle, $season, $episode);
   }
 }
