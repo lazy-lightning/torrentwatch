@@ -34,7 +34,20 @@ class updateIMDbCommand extends BaseConsoleCommand {
       echo "Searching IMDb for $title\n";
       $scraper = new IMDbScraper($title);
 
-      if($scraper->accuracy < 75) 
+      // maybee it has a prefix
+      if($scraper->accuracy < 75  &&
+         false !== ($pos = strpos($title, '-')))
+      {
+        $scraper = new IMDbScraper(substr($title, $pos+1));
+      }
+      // maybee there are some bs numbers at the begining
+      if($scraper->accuracy < 75 &&
+         $title !== ($tmpTitle = preg_replace('/^\d+\.?/', '', $title)))
+      {
+        $scraper = new IMDbScraper($tmpTitle);
+      }
+
+      if($scraper->accuracy < 75)
       {
         $scanned[] = $row['id'];
         Yii::log("Failed scrape of $title\n", CLogger::LEVEL_INFO);
