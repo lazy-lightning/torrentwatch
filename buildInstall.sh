@@ -10,13 +10,43 @@ LFTP_NET_BOOKMARK="asodown"
 APPINIT="Apps/AppInit/appinit.cgi"
 NAME=$(grep name appinfo.json | sed 's/[ ]*.*="\(.*\)",/\1/g')
 VERSION=$(grep version appinfo.json | sed 's/[ ]*.*="\(.*\)",/\1/g')
-EXCLUDES="install testing protected/data/source.db.BACKUP protected/data/source.db protected/runtime cache buildInstall.sh findNotSvn.sh assets"
+EXCLUDES="install testing protected/data/source.db.BACKUP protected/data/source.db protected/runtime cache buildInstall.sh findNotSvn.sh assets php.sh"
 
-if [ -f testing/yuicompressor-2.4.2.jar ]; then
-  echo "Building all.min.js"
-#  cat $(cat index.html | grep \.js | grep -ve 'all|min' | sed 's,^.*javascript/\(.*\).js.*$,javascript/\1.js,') | java -jar testing/yuicompressor-2.4.2.jar --type js -o javascript/all.min.js
-  echo "Done."
+if [ $VERSION != ${VERSION#svn} ]; then
+  OLDVERSION=$VERSION
+  VERSION="svn$(date +%Y%m%d)"
+  I=0
+  while [ -f install/$NAME-$VERSION.zip ]; do
+    I=$(expr $I + 1)
+    VERSION="svn$(date +%Y%m%d).${I}"
+  done
+  cat appinfo.json | sed "s/${OLDVERSION}/${VERSION}/" > appinfo.json.new
+  mv appinfo.json.new appinfo.json
 fi
+
+FILENAME="$NAME-$VERSION.zip"
+echo "Building $FILENAME"
+if [ -f install/$FILENAME ]; then
+  echo -n "Installl file for this version already exists, overwrite (y/N): "
+  read line;
+  if [ x"$line" != x"y" -o x"$line" != x"Y" ]; then
+    exit;
+  fi
+fi
+
+# test php for basic syntax errors
+find ./ -iname \*.php | egrep -v 'svn|yii_framework' | xargs -L 1 php -l
+if [ ! 0 -eq $? ];then
+  echo <<EOD
+
+Please fix lint errors before building package.
+EOD
+  exit;
+fi
+
+# minify/join some files
+testing/buildMin.sh 2> /dev/null
+php testing/inline-css-to-html.php >/dev/null
 
 # Used to build installation zip
 EXSTRING='--exclude-vcs'
@@ -24,7 +54,8 @@ for EX in $EXCLUDES; do
   EXSTRING="$EXSTRING --exclude=$EX"
 done
 
-tar -cvf install/$NAME.tar . $EXSTRING && cd install && zip $NAME-$VERSION.zip * -x \*.zip
+rm install/*.tar
+tar -cf install/$NAME.tar . $EXSTRING && cd install && zip $FILENAME * -x \*.zip
 
 if [ $? != 0 ]; then
   echo "Build Failed"
@@ -33,7 +64,7 @@ fi
 
 cat <<EOF
 
-Built install/$NAME-$VERSION.zip
+Built install/$FILENAME
 
 Upload to A100 (A) / C200 (C) / Upload to net (U)
 EOF
@@ -54,6 +85,7 @@ if [ -n $BM ]; then
 fi
 
 if [ x"$CHAR" = x"u" -o x"$CHAR" = x"U" ];then
-  echo "put \"$NAME-$VERSION.zip\"" | lftp $LFTP_NET_BOOKMARK
+  echo "put \"$FILENAME\"" | lftp $LFTP_NET_BOOKMARK
+  echo "http://nmtdvr.com/downloads/$NAME-$VERSION.zip"
 fi
 
