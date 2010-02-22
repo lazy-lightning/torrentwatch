@@ -9,8 +9,8 @@
                      CHtml::activeTextField($config, 'timezone'); ?>
         </div>
         <div id="config_webItemsPerLoad">
-          <?php echo CHtml::activeLabel($config, 'webItemsPerLoad', array('class'=>'item')).': '.
-                     CHtml::activeTextField($config, 'webItemsPerLoad'); ?>
+          <?php echo CHtml::activeLabel($config, 'webItemsPerLoad', array('class'=>'item', 'title'=>'The number of items that will be displayed in the tv episodes/movies/others tabs')).': '.
+                     CHtml::activeTextField($config, 'webItemsPerLoad', array('title'=>'The number of items that will be displayed in the tv episodes/movies/others tabs')); ?>
         </div>
         <h2 class="dialog_heading">Client Settings</h2>
         <div id="config_downloaddir" title="Default directory to start items in">
@@ -18,13 +18,13 @@
                      CHtml::activeTextField($config, 'downloadDir'); ?>
         </div>
         <div id="config_savetorrent">
-           <?php echo CHtml::activeLabel($config, 'saveFile', array('class'=>'item checkbox')).': '.
-                      CHtml::activeCheckBox($config, 'saveFile'); ?>
+           <?php echo CHtml::activeLabel($config, 'saveFile', array('class'=>'item checkbox', 'title'=>'Save the related .torrent or .nzb file for started items to their download directory')).': '.
+                      CHtml::activeCheckBox($config, 'saveFile', array('title'=>'Save the related .torrent or .nzb file for started items to their download directory')); ?>
         </div>
         <h2 class="dialog_heading">Database Settings</h2>
         <div id="config_maxItemsPerFeed">
-          <?php echo CHtml::activeLabel($config, 'maxItemsPerFeed', array('class'=>'item')).': '.
-                     CHtml::activeTextField($config, 'maxItemsPerFeed'); ?>
+          <?php echo CHtml::activeLabel($config, 'maxItemsPerFeed', array('class'=>'item', 'title'=>'The maximum number of feed items to be stored in the database per feed')).': '.
+                     CHtml::activeTextField($config, 'maxItemsPerFeed', array('title'=>'The maximum number of feed items to be stored in the database per feed')); ?>
         </div>
         <div class="buttonContainer">
           <a class="submitForm button" id="Save" href="#">Save</a>

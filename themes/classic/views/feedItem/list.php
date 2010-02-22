@@ -11,7 +11,7 @@
            "</div><div class='itemDetails'>".
            "  <span class='torrent_name'>".CHtml::encode($model->title)."</span>".
            "  <span class='torrent_feed'>".CHtml::encode($model->feed->title)."</span>".
-           "  <span class='torrent_pubDate'>".CHtml::encode(date("Y M d h:i a", $model->pubDate))."</span>".
+           "  <span class='torrent_pubDate'>".CHtml::encode(date("M d h:i a", $model->pubDate))."</span>".
            "</div></li>";
     }
   ?>

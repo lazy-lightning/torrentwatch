@@ -8,25 +8,25 @@
 ?>
  <div class="favorite_name">
   <?php 
-    echo CHtml::activeLabelEx($model, 'name').': '.
-         CHtml::activeTextField($model, 'name'); ?>
+    echo CHtml::activeLabelEx($model, 'name', array('title'=>'Must be unique and does not effect matching')).': '.
+         CHtml::activeTextField($model, 'name', array('title'=>'Must be unique and does not effect matching')); ?>
  </div>
  <div class="favorite_savein">
-  <?php echo CHtml::activeLabelEx($model, 'saveIn').': '.
-             CHtml::activeTextField($model, 'saveIn'); ?>
+  <?php echo CHtml::activeLabelEx($model, 'saveIn', array('title'=>'A valid writable directory to pass to the download clients')).': '.
+             CHtml::activeTextField($model, 'saveIn', array('title'=>'A valid writable directory to pass to the download clients')); ?>
  </div>
  <div class="favorite_feed">
   <?php echo CHtml::activeLabelEx($model, 'feed_id').': '.
              CHtml::dropDownList('favoriteMovie[feed_id]', $model->feed_id, $feedsListData); ?>
  </div>
  <div class="favorite_rating">
-   <?php echo CHtml::activeLabelEx($model, 'rating').': '.
-              CHtml::activeTextField($model, 'rating'); ?>
+   <?php echo CHtml::activeLabelEx($model, 'rating', array('title'=>'This minimum rating out of 100 to match')).': '.
+              CHtml::activeTextField($model, 'rating', array('title'=>'The minimum rating out of 100 to match')); ?>
  </div>
  <div class="favorite_years">
-   <?php echo CHtml::activeLabel($model, 'year').': <span>'.
-              CHtml::activeTextField($model, 'minYear').'-'.
-              CHtml::activeTextField($model, 'maxYear').'</span>'; ?>
+   <?php echo CHtml::activeLabel($model, 'year', array('title'=>'Movie must be between these years to be matched')).': <span>'.
+              CHtml::activeTextField($model, 'minYear', array('title'=>'The minimum movie year to match')).'-'.
+              CHtml::activeTextField($model, 'maxYear', array('title'=>'The maximum movie year to match')).'</span>'; ?>
  </div>
  <div class="favorite_genre">
   <?php echo CHtml::activeLabelEx($model, 'genre_id').': '.
@@ -44,8 +44,8 @@
   ?>
  </div>
  <div class="favorite_queue">
-   <?php echo CHtml::activeLabelEx($model, 'queue').': '.
-              CHtml::activeCheckBox($model, 'queue'); ?>
+   <?php echo CHtml::activeLabelEx($model, 'queue', array('title'=>'Do not automatically download. Queue for user input')).': '.
+              CHtml::activeCheckBox($model, 'queue', array('title'=>'Do not automatically download. Queue for user input')); ?>
  </div>
  <div class="buttonContainer">
    <a class="submitForm button" class="update" href="#"><?php echo ($model->isNewRecord ? 'Create' : 'Update'); ?></a>
