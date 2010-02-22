@@ -100,5 +100,7 @@ class dbMaintinanceCommand extends BaseConsoleCommand {
       $transaction->rollback();
       throw $e;
     }
+    // VACUUM must be run outside a transaction
+    $db->createCommand('VACUUM')->execute();
   }
 }
