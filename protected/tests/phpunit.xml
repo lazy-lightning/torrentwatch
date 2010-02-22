@@ -7,7 +7,7 @@
 
 	<selenium>
 		<!-- <browser name="Internet Explorer" browser="*iexplore" /> -->
-		<browser name="Firefox" browser="*firefox" /> 
+		<browser name="Firefox" browser="*firefox /usr/lib/firefox-3.6/firefox-bin" /> 
     <!-- <browser name="Chrome" browser="*googlechrome" /> -->
 	</selenium>
 
