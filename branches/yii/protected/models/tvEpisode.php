@@ -50,10 +50,9 @@ class tvEpisode extends CActiveRecord
   public function rules()
   {
     return array(
-      array('lastUpdated', 'default', 'setOnEmpty'=>false, 'value'=>time()),
       array('tvShow_id', 'exist', 'allowEmpty'=>false, 'attributeName'=>'id', 'className'=>'tvShow'),
-      array('lastTvdbUpdate', 'default', 'value'=>0),
-      array('lastTvdbUpdate, season, episode', 'numerical', 'allowEmpty'=>false, 'integerOnly'=>true, 'min'=>0),
+      array('lastTvdbUpdate, lastUpdated', 'default', 'value'=>0),
+      array('lastUpdated, lastTvdbUpdate, season, episode', 'numerical', 'allowEmpty'=>false, 'integerOnly'=>true, 'min'=>0),
       array('status', 'default', 'value'=>self::STATUS_NEW),
       array('status', 'in', 'allowEmpty'=>false, 'range'=>array_keys($this->getStatusOptions())),
     );

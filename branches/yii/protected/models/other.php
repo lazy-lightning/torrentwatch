@@ -50,9 +50,9 @@ class other extends CActiveRecord
   public function rules()
   {
     return array(
-        array('status', 'default', 'value'=>self::STATUS_NEW),
-        array('lastUpdated', 'default', 'setOnEmpty'=>false, 'value'=>time()),
-        array('lastImdbUpdate', 'default', 'value'=>0),
+      array('status', 'default', 'value'=>self::STATUS_NEW),
+      array('lastUpdated, lastImdbUpdate', 'default', 'value'=>0),
+      array('lastUpdated, lastImdbUpdate', 'numerical', 'integerOnly'=>true, 'min'=>0),
     );
   }
 
