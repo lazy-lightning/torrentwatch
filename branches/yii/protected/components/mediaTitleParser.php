@@ -96,6 +96,13 @@ class mediaTitleParser {
   protected $factory;
 
   /**
+   * related 
+   * 
+   * @var CActiveRecord
+   */
+  protected $related;
+
+  /**
    * __construct will take in a title and initialize its properties based
    * on the given title
    * 
@@ -145,8 +152,7 @@ class mediaTitleParser {
       // later these get scanned in imdb to be re-checked for movies
       $model = $this->other = $this->factory->otherByTitle($this->shortTitle);
     }
-    // Trigger lastUpdated to update itself
-    $model->save();
+    $this->related = $model;
   }
 
   /**
@@ -157,6 +163,12 @@ class mediaTitleParser {
    */
   public function applyTo(feedItem $model)
   {
+    if($this->related->lastUpdated < $model->pubDate)
+    {
+      $this->related->lastUpdated = $model->pubDate;
+      if(!$this->related->save())
+        throw new CException("Failed to update related record");
+    }
     $model->qualityIds = $this->quality;
     $model->setAttributes(array(
         'network_id'   => empty($this->network)   ? null : $this->network->id,
