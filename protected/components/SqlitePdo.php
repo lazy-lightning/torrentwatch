@@ -87,7 +87,11 @@ class SqlitePdo extends PDO
     }
     else
     {
-      $this->exec("SAVEPOINT LEVEL{$this->transLevel}");
+      try {
+        $this->exec("SAVEPOINT LEVEL{$this->transLevel}");
+      } catch (Exception $e) {
+        // savepoints unsupported . . . just pretend it never happened
+      }
     }
 
     $this->transLevel++;
@@ -106,7 +110,11 @@ class SqlitePdo extends PDO
     } 
     else
     {
-      $this->exec("RELEASE SAVEPOINT LEVEL{$this->transLevel}");
+      try {
+        $this->exec("RELEASE SAVEPOINT LEVEL{$this->transLevel}");
+      } catch (Exception $e) {
+        // savepoints unsupported . . . just pretend it never happened
+      }
     }
   }
 
@@ -122,7 +130,11 @@ class SqlitePdo extends PDO
     } 
     else 
     {
-      $this->exec("ROLLBACK TO SAVEPOINT LEVEL{$this->transLevel}");
+      try {
+        $this->exec("ROLLBACK TO SAVEPOINT LEVEL{$this->transLevel}");
+      } catch (Exception $e) {
+        Yii::log('Attempting to rollback unsupported nested transaction', CLogger::LEVEL_ERROR);
+      }
     }
   }
 }
