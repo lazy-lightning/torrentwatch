@@ -24,8 +24,9 @@ foreach($tvepisodeList as $n => $row) {
            "<a href='".str_replace('%7Btid%7D', $row['tvShow_id'], $hide)."' class='hideTvShow ajaxSubmit'>&nbsp;</a>".
          "</div><div class='itemDetails'>".
          "  <span class='name'>".CHtml::encode($row['tvShow_title'])."</span>".
-         " - <span class='episode'>$epString</span>".
+         "  <span class='episode'>$epString</span>".
          (empty($row['title'])?'':(":  <span class='epTitle'>".CHtml::encode($row['title'])."</span>")).
+         "  <span class='torrent_pubDate'>".CHtml::encode(date("Y M d h:i a", $row['lastUpdated']))."</span>".
        "</div></li>";
 } ?>
 </ul>
