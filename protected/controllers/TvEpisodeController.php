@@ -69,7 +69,7 @@ class TvEpisodeController extends BaseController
   {
     $db = Yii::app()->getDb();
     $params = $pages = null;
-    $vars = "e.id as id, e.status as status, e.title as title, e.season as season, e.episode as episode, s.id as tvShow_id, s.title as tvShow_title, i.id as feedItem_id, i.status as feedItem_status";
+    $vars = "e.id as id, e.status as status, e.title as title, e.season as season, e.episode as episode, e.lastUpdated as lastUpdated, s.id as tvShow_id, s.title as tvShow_title, i.id as feedItem_id, i.status as feedItem_status";
     $tables = "tvEpisode e, tvShow s, feedItem i";
     $condition = <<<EOD
        s.id = e.tvShow_id
