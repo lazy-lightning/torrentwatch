@@ -7,9 +7,8 @@ class titleMatchFull extends titleMatch
   {
     $this->episode_reg = 
            '\b('  // must be a word boundry before the episode to prevent turning season 13 into season 3
-          .'S\d+[. _]?E(?:P ?)?\d+'        // S12E1 or S1.E22 or S4 EP 1
-          .'|\d[. _]?+x[. _]?\d+'              // or 1x23
-          .'|\d+[. _]?of[. _]?\d+)'; // or 03of18
+          .'S\d+[. _]?E(?:P ?)?\d+'   // S12E1 or S1.E22 or S4 EP 1
+          .'|\d[. _]?+x[. _]?\d+)';   // or 1x23
   }
 
   function foundMatch($title, $regs)
@@ -21,7 +20,7 @@ class titleMatchFull extends titleMatch
       $episodeTitle = substr($title, $end);
 
     $episode_guess = trim(strtr($regs[2], $this->trFrom, $this->trTo));
-    list($season,$episode) = explode('x', preg_replace('/(S(\d+)[. _]?E(?:P ?)?(\d+)|(\d+)[_ .]?x[_ .]?(\d+)|(\d+)[. _]?of[. _]?(\d+))/i', '\2\4\6x\3\5\7', $episode_guess));
+    list($season,$episode) = explode('x', preg_replace('/(S(\d+)[. _]?E(?:P ?)?(\d+)|(\d+)[_ .]?x[_ .]?(\d+))/i', '\2\4x\3\5', $episode_guess));
 
     return array($shortTitle, $episodeTitle, $season, $episode);
   }

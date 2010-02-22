@@ -22,6 +22,7 @@ class mediaTitleParser {
     'Date',
     'Partial',
     'Short',
+    'Part',
   );
 
   /**
@@ -102,9 +103,9 @@ class mediaTitleParser {
    * @param modelFactory an object to create 
    * @return void
    */
-  public function __construct($title,$factory)
+  public function __construct($title,$factory=null)
   {
-    $this->factory = $factory;
+    $this->factory = $factory === null ? Yii::app()->modelFactory : $factory;
     // Start by splitting the quality and the title into seperate strings
     list($this->shortTitle, $this->quality) = qualityMatch::run($title);
     // Get ID's for all the qualitys
