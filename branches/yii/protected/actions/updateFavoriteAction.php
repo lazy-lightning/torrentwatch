@@ -91,15 +91,18 @@ class updateFavoriteAction extends CAction
         $this->response->resetFeedItems = true;
         // notify user of any newly started downloads
         $started = Yii::app()->dlManager->getStarted();
-        $content = '';
-        foreach($started as $history)
+        if(count($started))
         {
-          $content .= $history->feedItem_title.'<br>';
+          $content = '';
+          foreach($started as $history)
+          {
+            $content .= $history->feedItem_title.'<br>';
+          }
+          $this->response->dialog = array(
+              'header' => 'New downloads started',
+              'content' => $content,
+          );
         }
-        $this->response->dialog = array(
-            'header' => 'New downloads started',
-            'content' => $content,
-        );
       }
       if($this->create && $this->success)
       {
@@ -117,8 +120,6 @@ class updateFavoriteAction extends CAction
         );
       }
     }
-
-    if($this->success) 
 
     $vars = array(
         'response'=>$this->response->getContent(),

@@ -182,7 +182,7 @@
             onDone = function () {
             $(toShow).initForm().show();
         };
-        $this.closest('.tabs-container div').children('.favinfo:visible').hide()
+        $this.closest('.tabs-container > div').children('.favinfo').hide()
           .find('.saved').remove();
         if ($(toShow).length > 0) {
             onDone();

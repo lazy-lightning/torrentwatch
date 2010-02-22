@@ -83,8 +83,8 @@ abstract class favoriteManager extends CModel {
             ' WHERE feedItem.status = '.$itemStatus.
             '   AND feedItem.id IN ( SELECT feedItem_id'.
             '    FROM matchingFavoriteMovies m'.
-            $limitFavorite.
             '   WHERE m.movie_status = '.movie::STATUS_DOWNLOADED.
+            $limitFavorite.
             ');'
             )->execute();
         $trans->commit();
