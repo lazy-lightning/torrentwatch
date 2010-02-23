@@ -143,5 +143,18 @@ class mediaTitleParserTest extends CTestCase
     $this->assertEquals($feedItem->pubDate, $parser->tvEpisode->lastUpdated);
     $parser->tvEpisode->refresh();
     $this->assertEquals($feedItem->pubDate, $parser->tvEpisode->lastUpdated);
+    // With a lower dated pubDate the time shouldn't change
+    $feedItem->pubDate = 200;
+    $parser->applyTo($feedItem);
+    $this->assertEquals(12345, $parser->tvEpisode->lastUpdated);
+    $parser->tvEpisode->refresh();
+    $this->assertEquals(12345, $parser->tvEpisode->lastUpdated);
+    // With a higher date it should change again
+    $feedItem->pubDate = 1234567;
+    $parser->applyTo($feedItem);
+    $this->assertEquals($feedItem->pubDate, $parser->tvEpisode->lastUpdated);
+    $parser->tvEpisode->refresh();
+    $this->assertEquals($feedItem->pubDate, $parser->tvEpisode->lastUpdated);
+
   }
 }
