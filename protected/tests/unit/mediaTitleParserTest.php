@@ -132,4 +132,16 @@ class mediaTitleParserTest extends CTestCase
       $this->assertContains($xvid->id, $parser->quality, $title);
     }
   }
+
+  public function testApplyToSetsLastUpdated()
+  {
+    tvEpisode::model()->deleteAll();
+    $feedItem = new feedItem;
+    $feedItem->pubDate = 12345;
+    $parser = new mediaTitleParser('foobar.s01e01.hdtv');
+    $parser->applyTo($feedItem);
+    $this->assertEquals($feedItem->pubDate, $parser->tvEpisode->lastUpdated);
+    $parser->tvEpisode->refresh();
+    $this->assertEquals($feedItem->pubDate, $parser->tvEpisode->lastUpdated);
+  }
 }
