@@ -17,37 +17,43 @@ if [ ! -d protected/runtime -o ! -d cache/ -o ! -d assets/ ]; then
   mkdir protected/runtime cache/ assets/ 2>/dev/null
 fi
 
-# for some reason on the nmt yiic ends up running with a cwd inside protected, these
-# symlinks allow for that
-if [ ! -h protected/cache -o ! -h protected/protected ]; then
-  rm -f protected/cache protected/protected
-  ln -s '../cache' protected/cache
-  ln -s '.' protected/protected
-fi
-
-# create a faux php cli interpreter in /bin/php
-if [ ! -x /bin/php ]; then
-  rm /bin/php
-  PHP='/share/Apps/lighttpd/bin/php-cgi'
-  if [ ! -x /share/Apps/lighttpd/bin/php-cgi ]; then
-    PHP='/mnt/syb8634/server/php5-cgi'
+# only on nmt platform
+if [ -d /mnt/syb8634 -o -d /nmt ]; then
+  # for some reason on the nmt yiic ends up running with a cwd inside protected, these
+  # symlinks allow for that
+  if [ ! -h protected/cache -o ! -h protected/protected ]; then
+    rm -f protected/cache protected/protected
+    ln -s '../cache' protected/cache
+    ln -s '.' protected/protected
   fi
-  cat >/bin/php <<EOF
+
+  # brute force fix to let webserver write to needed files
+  # might only need to allow the following:
+  # assets/ cache/ protected/runtime protected/data/source.db
+  chmod -R 777 .
+  
+  # clear the APC cache
+  pidof lighttpd >/dev/null
+  if [ $? = 0 ]; then
+    wget -qO /dev/null 'http://localhost:9999/lighttpd_web/apc.php?SCOPE=A&SORT1=H&SORT2=D&COUNT=20&CC=1&OB=1'
+  fi
+  
+  # create a faux php cli interpreter in /bin/php
+  if [ ! -x /bin/php ]; then
+    rm -f /bin/php
+    PHP='/share/Apps/lighttpd/bin/php-cgi'
+    if [ ! -x $PHP ]; then
+      PHP='/mnt/syb8634/server/php5-cgi'
+    fi
+    if [ ! -x $PHP ]; then
+      PHP='/nmt/apps/server/php5-cgi'
+    fi
+    cat >/bin/php <<EOF
 #!/bin/sh
 $PHP -qd register_argc_argv=1 \$*
 EOF
-  chmod +x /bin/php
-fi
-
-# brute force fix to let webserver write to needed files
-# might only need to allow the following:
-# assets/ cache/ protected/runtime protected/data/source.db
-chmod -R 777 .
-
-# clear the APC cache
-pidof lighttpd >/dev/null
-if [ $? = 0 ]; then
-  wget -qO /dev/null 'http://localhost:9999/lighttpd_web/apc.php?SCOPE=A&SORT1=H&SORT2=D&COUNT=20&CC=1&OB=1'
+    chmod +x /bin/php
+  fi
 fi
 
 # perform db migration if neccessary
