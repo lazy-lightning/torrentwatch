@@ -112,6 +112,7 @@ class mediaTitleParser {
    */
   public function __construct($title,$factory=null)
   {
+    Yii::trace("Parsing title: $title", 'application.components.mediaTitleParser');
     $this->factory = $factory === null ? Yii::app()->modelFactory : $factory;
     // Start by splitting the quality and the title into seperate strings
     list($this->shortTitle, $this->quality) = qualityMatch::run($title);
@@ -166,7 +167,9 @@ class mediaTitleParser {
     if($this->related->lastUpdated < $model->pubDate)
     {
       $this->related->lastUpdated = $model->pubDate;
-      if(!$this->related->save())
+      // For some reason $this->related->save() was trying to update a column with null ID even though
+      // id is already set, so instead use updateByPk
+      if(!$this->related->updateByPk($this->related->id, array('lastUpdated'=>$model->pubDate)))
         throw new CException("Failed to update related record");
     }
     $model->qualityIds = $this->quality;
