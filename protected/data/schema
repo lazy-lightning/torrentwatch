@@ -1,3 +1,6 @@
+CREATE TABLE version (
+    version INTEGER
+);
 CREATE TABLE dvrConfig ( 
     key TEXT, 
     value TEXT , 
