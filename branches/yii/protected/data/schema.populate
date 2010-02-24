@@ -1,7 +1,7 @@
 BEGIN TRANSACTION;
 
 -- Database Version
-INSERT INTO version (version) VALUES(3);
+INSERT INTO version (version) VALUES(4);
 
 -- Default username/pass
 INSERT INTO users (id, username, password) VALUES(1,'admin','f6fdffe48c908deb0f4c3bd36c032e72');
