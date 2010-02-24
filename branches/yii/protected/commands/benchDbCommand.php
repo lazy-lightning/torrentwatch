@@ -1,4 +1,4 @@
-<?
+<?php
 
 class benchDbCommand extends BaseConsoleCommand {
   public function run($args)
