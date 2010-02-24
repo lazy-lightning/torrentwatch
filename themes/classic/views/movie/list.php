@@ -13,6 +13,7 @@ foreach($movieList as $n => $model) {
      "</div><div class='itemDetails'>".
      "  <span class='name'>".CHtml::encode($model->fullTitle)."</span>".
      "  <span class='rating'>".CHtml::encode($model->rating)." / 100</span>".
+     "  <span class='torrent_pubDate'>".CHtml::encode(date("M d h:i a", $model->lastUpdated))."</span>".
      "</div></li>";
 } ?>
 </ul>
