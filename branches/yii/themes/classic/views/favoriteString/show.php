@@ -49,10 +49,13 @@
            echo CHtml::link('Delete', array('delete', 'id'=>$model->id), array('class'=>'button ajaxSubmit')); ?>
    <a class="toggleDialog button" href="#">Close</a>
  </div>
-<?php if(isset($addLi) && $addLi)
-        echo "<li id='favoriteString-li-{$model->id}'>".CHtml::link(
-          $model->name,
-          array('show', 'id'=>$model->id),
-          array('rel'=>'#favoriteString-'.$model->id)
-        )."</li>";
-echo CHtml::endForm().(isset($response) ? $response : ''); ?>
+<?php 
+if(isset($success,$create) && $success && $create)
+{
+  echo "<li id='favoriteString-li-{$model->id}'>".CHtml::link(
+    $model->name,
+    array('/favoriteString/show', 'id'=>$model->id),
+    array('rel'=>'#favoriteString-'.$model->id)
+  )."</li>";
+}
+echo CHtml::endForm().(isset($response) ? $response : '');
