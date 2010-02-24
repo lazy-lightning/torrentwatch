@@ -27,6 +27,7 @@ class FavoritesTest extends WebTestCase
   protected $locators = array(
       'actionResponseDialog'    => 'id=actionResponse',
       'actionResponseHeading'   => 'css=#actionResponse .dialog_heading',
+      'createdFavoriteLink'     => "xpath=id('{type}-li-1')/a",
       'createFavoriteButton'    => 'link=Create',
       'deleteFavoriteButton'    => 'link=Delete',
       'errorSummary'            => 'css=.errorSummary',
@@ -155,16 +156,21 @@ class FavoritesTest extends WebTestCase
     // Click the new favorite link and wait for form to load
     $this->click($l['newFavoriteLink']);
     $this->waitForElementPresentAndVisible($l['createFavoriteButton']);
-    // Enter a name and click create
+    // Enter a name
     $this->type($l['favoriteNameInput'],'foobar');
     // favoriteString also requires a filter
     if($this->isElementPresent($l['favoriteFilterInput']))
       $this->type($l['favoriteFilterInput'], 'bazzab');
+    // click create and wait for an update button to appear
     $this->clickAndWaitFor($l['createFavoriteButton'], $l['updateFavoriteButton'],false);
     // Make sure item created successfully
     $this->assertElementNotPresent($l['errorSummary']);
     // Make sure the creation form was hidden
     $this->assertElementNotVisible($l['createFavoriteButton']);
+    // Make sure the creation form is empty
+    $this->assertText($l['favoriteNameInput'], '');
+    // Make sure a listitem was made for our favorite
+    $this->assertElementPresent($l['createdFavoriteLink']); 
     // Make sure the creation form was reset
     $this->assertValue($l['favoriteNameInput'], '');
     // Make sure our name got to this page
