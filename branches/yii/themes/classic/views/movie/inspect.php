@@ -1,11 +1,11 @@
-<div id='movieDetails-<?php echo $model->id; ?> class='mediaDetails'>
+<div id='movieDetails-<?php echo $model->id; ?>' class='mediaDetails'>
 <div>
   <h2><?php echo CHtml::link($model->fullTitle, $model->imdbLink); ?></h2>
 </div>
-<?php if(!empty($item->qualityString)): ?>
+<?php if(!empty($model->qualityString)): ?>
   <div>
     <span>Quality:</span>
-    <span class='content'><?php echo CHtml::encode($item->qualityString); ?></span>
+    <span class='content'><?php echo CHtml::encode($model->qualityString); ?></span>
   </div>
 <?php endif;
       if(!empty($model->year)): ?>
@@ -35,7 +35,7 @@
       if(!empty($model->runtime)): ?>
   <div>
     <span>Runtime:</span>
-    <span class='content'><?php echo CHtml::encode($model->runtime); ?></span>
+    <span class='content'><?php echo CHtml::encode($model->runtime); ?> minutes</span>
   </div>
 <?php endif; ?>
 </div>

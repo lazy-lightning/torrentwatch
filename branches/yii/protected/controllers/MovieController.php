@@ -19,6 +19,7 @@ class MovieController extends BaseController
     return array(
       'startDownload'=>'startDownloadAction',
       'makeFavorite'=>'makeFavoriteAction',
+      'inspect'=>'inspectMediaAction',
     );
   }
 
@@ -41,7 +42,10 @@ class MovieController extends BaseController
 	{
 		return array(
 			array('allow', // allow authenticated user to perform actions
-				'actions'=>array('list', 'show', 'makeFavorite', 'startDownload'),
+				'actions'=>array(
+          'inspect', 'list', 'show', 
+          'makeFavorite', 'startDownload'
+        ),
 				'users'=>array('@'),
 			),
 			array('deny',  // deny all users
@@ -64,7 +68,7 @@ class MovieController extends BaseController
 	public function actionList()
 	{
 		$criteria=new CDbCriteria(array(
-          'select'=>'id,status,title,name,year,rating',
+          'select'=>'id,status,title,name,year,rating,lastUpdated',
           'order'=>'lastUpdated DESC',
           'with'=>array(
               'feedItem'=>array(

@@ -48,6 +48,20 @@ fi
 testing/buildMin.sh 2> /dev/null
 php testing/inline-css-to-html.php >/dev/null
 
+TESTDB='protected/data/source-test.db'
+if [ -h $TESTDB]; then
+  LINK=$(readlink $TESTDB)
+fi
+
+# generate the initial database
+rm -f $TESTDB
+cd protected/data && ./genOrig.sh && cd -
+
+if [ x"$LINK" != x"" ];then
+  rm -f $TESTDB
+  ln -s $LINK $TESTDB
+fi
+
 # Used to build installation zip
 EXSTRING='--exclude-vcs'
 for EX in $EXCLUDES; do

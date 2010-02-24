@@ -2,7 +2,7 @@
 
 Yii::import('application.components.mediaTitleParser.qualityMatch');
 
-class mediaTitleParserTest extends CTestCase 
+class qualityMatchTest extends CTestCase 
 {
   public function testSplitBasic()
   {
@@ -16,7 +16,7 @@ class mediaTitleParserTest extends CTestCase
   public function testDontMatchInsideTitle()
   {
     // The bug was that the quality of 'iNT' short for 'internal' 
-    // would cut this into $short = 'W'
+    // would cut this into $short = 'FOO'
     list($short, $qual) = qualityMatch::run('FOOintBAR.1080p');
     $this->assertEquals('FOOintBAR', $short);
     $this->assertEquals(1, count($qual));
