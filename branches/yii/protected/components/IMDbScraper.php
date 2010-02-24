@@ -295,14 +295,16 @@ class IMDbScraper extends Scraper {
     // Determine attributes for the movie and update the object properties
     if ($this->accuracy >= 75)
     {
+      // Find IMDb ID
+      $this->imdbId = $this->preg_get('#/title/tt(\d+)/#', $html);
       // Find Title
       preg_match("/<title>([^(<]+)/",$html,$title);
       $this->title = trim($title[1]);
       // Find Year
-      $this->year = $this->preg_get('#href=\"/Sections/Years/(\d+)#',$html);
+      $this->year = $this->preg_get('#\((\d\d\d\d)\)(?: \([A-Z]+\))?</title>#i',$html);
 
       // Find Runtime
-      preg_match("/<h5>Runtime:<\/h5>/",$html,$runtime);
+      preg_match("#\n(\d+) min#",$html,$runtime);
       $this->runtime = trim($runtime[1]);
 
       // Limit the rest of the searches to a subsection of the page
@@ -311,8 +313,8 @@ class IMDbScraper extends Scraper {
       $html = substr($html,$start,$end-$start+1);
 
       // Find Synopsis
-      preg_match("/<h5>Plot(| Outline| Summary):<\/h5>([^<]*)</sm",$html,$synopsis);
-      $this->plot = trim(trim($synopsis[2], " |"));
+      preg_match("#Plot:[^\n]+\n[^\n]+\n([^|<]+)#",$html,$synopsis);
+      $this->plot = trim($synopsis[1]);
 
       // Find User Rating
       $user_rating = $this->preg_get("/<h5>User Rating:<\/h5>.*?<b>(.*)\/10<\/b>/sm",$html);
