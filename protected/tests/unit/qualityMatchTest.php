@@ -17,8 +17,8 @@ class mediaTitleParserTest extends CTestCase
   {
     // The bug was that the quality of 'iNT' short for 'internal' 
     // would cut this into $short = 'W'
-    list($short, $qual) = qualityMatch::run('Winter.Olympics.1080p');
-    $this->assertEquals('Winter.Olympics', $short);
+    list($short, $qual) = qualityMatch::run('FOOintBAR.1080p');
+    $this->assertEquals('FOOintBAR', $short);
     $this->assertEquals(1, count($qual));
     $this->assertContains('1080p', $qual);
   }
