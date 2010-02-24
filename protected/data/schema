@@ -304,16 +304,14 @@ SELECT i.feedItem_id feedItem_id,
             AND favoriteTvShows_quality.favoriteTvShows_id = f.id
        ) = fq.count
    AND NOT i.tvEpisode_episode = 0
-   AND ( ( f.minSeason = 0
-           AND f.maxSeason = 0
-           AND f.minEpisode = 0
-           AND f.maxEpisode = 0
-         )
-         OR
-         ( i.tvEpisode_season BETWEEN f.minSeason AND f.maxSeason
-           AND i.tvEpisode_episode BETWEEN f.minEpisode AND f.maxEpisode
-         )
-       );
+   AND ( f.minSeason = 0
+         OR i.tvEpisode_season >= f.minSeason )
+   AND ( f.maxSeason = 0
+         OR i.tvEpisode_season <= f.maxSeason )
+   AND ( f.minEpisode = 0
+         OR i.tvEpisode_episode >= f.minEpisode )
+   AND ( f.maxEpisode = 0
+         OR i.tvEpisode_episode <= f.maxEpisode );
 
 CREATE VIEW movieFeedItem AS
 SELECT feedItem.id feedItem_id,

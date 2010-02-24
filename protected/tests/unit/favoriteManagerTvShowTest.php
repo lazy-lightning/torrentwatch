@@ -4,11 +4,9 @@ class favoriteManagerTvShowTest extends DbTestCase
 {
   public $fixtures = array(
       'favoriteTvShow'=>'favoriteTvShow',
-      'favoriteTvShows_quality'=>':favoriteTvShows_quality',
       'tvShow'=>':tvShow',
       'tvEpisode'=>':tvEpisode',
       'feedItem'=>':feedItem',
-      'feedItem_quality'=>':feedItem_quality',
       'feed'=>':feed',
       'dvrConfig'=>':dvrConfig',
   );

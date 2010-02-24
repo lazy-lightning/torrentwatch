@@ -9,9 +9,11 @@ class migrateCommand extends BaseConsoleCommand
    */
   protected $migrations = array(
   // db version => class to migrate to next version
+  // FIXME: unimaginative class names
       0 => 'migrateFromVersionZero',
       1 => 'migrateFromVersionOne',
       2 => 'migrateFromVersionTwo',
+      3 => 'migrateFromVersionThree',
   );
 
   // get version of database.  if version table doesnt exist create
@@ -34,6 +36,19 @@ class migrateCommand extends BaseConsoleCommand
     return $version;
   }
 
+  public function migrateWith($class)
+  {
+    $transaction = Yii::app()->db->beginTransaction();
+    try {
+      $migrate = new $class($this);
+      $migrate->run();
+      $transaction->commit();
+    } catch (Exception $e) {
+      $transaction->rollback();
+      throw $e;
+    }
+  }
+
   public function run($args)
   {
     Yii::import('application.migrations.*');
@@ -41,18 +56,9 @@ class migrateCommand extends BaseConsoleCommand
     echo "Current db version: $version\n";
     while(isset($this->migrations[$version]))
     {
-      $transaction = Yii::app()->db->beginTransaction();
-      try {
-        $class = $this->migrations[$version];
-        $migrate = new $class($this);
-        $migrate->run();
-        $version = $this->getDbVersion();
-        $transaction->commit();
-        echo "Migrated to version $version\n";
-      } catch (Exception $e) {
-        $transaction->rollback();
-        throw $e;
-      }
+      $this->migrateWith($this->migrations[$version]);
+      $version = $this->getDbVersion();
+      echo "Migrated to version $version\n";
     }
   }
 }

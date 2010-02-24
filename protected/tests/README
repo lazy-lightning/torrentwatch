@@ -1,0 +1,14 @@
+running the unit tests makes excessive use of fixtures which hit the 
+hard disk fairly hard.  Suggest using a ramdisk to store the test
+database with something like the following:
+
+cd protected/data
+mkdir ramdisk
+sudo mke2fs /dev/ram0
+sudo mount /dev/ram0 ramdisk
+cp source-test.db source-test.db.BACKUP
+mv source-test.db ramdisk
+ln -s ramdisk/source-test.db
+
+Tests that take 30 secconds with the db on disk take < 1s on ramdisk
+

@@ -17,6 +17,7 @@ return CMap::mergeArray(
       'db'=>array(
         'class'=>'application.components.SqliteConnection',
         'connectionString'=>'sqlite:'.dirname(__FILE__).'/../data/source-test.db',
+        'enableParamLogging'=>true,
       ),
     ),
   )

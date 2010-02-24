@@ -1,6 +1,9 @@
 -- This is run after schema.populate to fill the test db with some sample data
 BEGIN TRANSACTION;
 
+UPDATE sqlite_sequence SET seq='0' WHERE name='quality' OR name='genre' OR name LIKE '%_quality';
+
+DELETE FROM quality;
 INSERT INTO quality (title) VALUES('WS');
 INSERT INTO quality (title) VALUES('PDTV');
 INSERT INTO quality (title) VALUES('HDTV');
@@ -10,6 +13,7 @@ INSERT INTO quality (title) VALUES('720p');
 INSERT INTO quality (title) VALUES('DVDRip');
 INSERT INTO quality (title) VALUES('AC3');
 
+DELETE FROM genre;
 INSERT INTO genre (title) VALUES('Comedy');
 INSERT INTO genre (title) VALUES('Drama');
 INSERT INTO genre (title) VALUES('Horror');
@@ -17,5 +21,20 @@ INSERT INTO genre (title) VALUES('Sci-Fi');
 INSERT INTO genre (title) VALUES('Thriller');
 INSERT INTO genre (title) VALUES('Action');
 
+DELETE FROM feedItem_quality;
+INSERT INTO feedItem_quality (feedItem_id, quality_id) VALUES(1, 1);
+INSERT INTO feedItem_quality (feedItem_id, quality_id) VALUES(2, 1);
+
+DELETE FROM favoriteTvShows_quality;
+INSERT INTO favoriteTvShows_quality (favoriteTvShows_id, quality_id) VALUES(1, 1);
+INSERT INTO favoriteTvShows_quality (favoriteTvShows_id, quality_id) VALUES(2, 1);
+
+DELETE FROM favoriteMovies_quality;
+INSERT INTO favoriteMovies_quality (favoriteMovies_id, quality_id) VALUES(1, 1);
+INSERT INTO favoriteMovies_quality (favoriteMovies_id, quality_id) VALUES(2, 1);
+
+DELETE FROM favoriteStrings_quality;
+INSERT INTO favoriteStrings_quality (favoriteStrings_id, quality_id) VALUES(1, 1);
+INSERT INTO favoriteStrings_quality (favoriteStrings_id, quality_id) VALUES(2, 1);
 
 COMMIT;
