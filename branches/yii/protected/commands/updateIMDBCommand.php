@@ -2,15 +2,49 @@
 
 class updateIMDbCommand extends BaseConsoleCommand {
 
+  /**
+   * in the future the could be replaced with an adapter for themoviedb
+   * 
+   * @var IMDbAdapter
+   */
+  private $movieDetails;
+
+  private $db;
+
+  /**
+   * factory 
+   * 
+   * @var modelFactory
+   */
   protected $factory;
 
+  /**
+   * toSave 
+   * 
+   * @var array multidimensional array containing values usable by updateDatabase()
+   */
+  protected $toSave = array();
+
+  /**
+   * scanned is a multidimensional array.  The first element of each row
+   * is a CActiveRecord object.  The second element of same row is an array of
+   * primary keys to be updated
+   * 
+   * @var array ( # => ( CActiveRecord, primaryKeys ) )
+   */
+  protected $scanned = array();
+
   public function run($args) {
+    $this->db = Yii::app()->db;
     $this->factory = Yii::app()->modelFactory;
-    $transaction = Yii::app()->db->beginTransaction();
+    $this->movieDetails = new IMDbAdapter;
+
+    $this->scanMovies();
+    $this->scanOthers();
+
+    $transaction = $this->db->beginTransaction();
     try {
-      $this->updateMovies();
-      // EXPERIMENTAL
-      $this->updateOthers();
+      $this->updateDatabase();
       $transaction->commit();
     } catch (Exception $e) {
       $transaction->rollback();
@@ -18,140 +52,101 @@ class updateIMDbCommand extends BaseConsoleCommand {
     }
   }
 
-  protected function updateOthers() {
-    $db = Yii::app()->db;
-    $scanned = $toSave = array();
-    $reader = $db->createCommand('SELECT id, title'.
-                                 '  FROM other'.
-                                 ' WHERE lastImdbUpdate = 0'
-    )->queryAll();
-    foreach($reader as $row) {
-      $scanned[] = $row['id'];
-      $title = $row['title'];
-      if(substr($title, -4) === '1080')
-        $title = substr($title, 0, -4);
-
-      echo "Searching IMDb for $title\n";
-      $scraper = new IMDbScraper($title);
-
-      // maybee it has a prefix
-      if($scraper->accuracy < 75  &&
-         false !== ($pos = strpos($title, '-')))
-      {
-        $scraper = new IMDbScraper(substr($title, $pos+1));
-      }
-      // maybee there are some bs numbers at the begining
-      if($scraper->accuracy < 75 &&
-         $title !== ($tmpTitle = preg_replace('/^\d+\.?/', '', $title)))
-      {
-        $scraper = new IMDbScraper($tmpTitle);
-      }
-
-      if($scraper->accuracy < 75)
-      {
-        $scanned[] = $row['id'];
-        Yii::log("Failed scrape of $title\n", CLogger::LEVEL_INFO);
-        echo "Failed scrape of $title with accuracy of {$scraper->accuracy} and a guess of {$scraper->title}\n";
-      }
-      else
-      {
-        echo "Found! Updating to ".$scraper->title."\n";
-        $toSave[] = array($row['id'], $row['title'], $movie, $scraper);
-      }
-    }
-
-    $transaction = Yii::app()->db->beginTransaction();
-    try {
-      foreach($toSave as $arr) {
-        list($id, $title, $scraper) = $arr;
-
-        $movie = $this->factory->movieByImdbId($scraper->imdbId, $title);
-
-        feedItem::model()->updateAll(
-            array('other_id'=>NULL,
-                  'movie_id'=>$movie->id,
-            ),
-            'other_id = '.$id
-        );
-        other::model()->deleteByPk($id);
-        $this->updateMovieFromScraper($movie, $scraper);
-      }
-      if(count($scanned))
-        other::model()->updateByPk($scanned, array('lastImdbUpdate'=>time()));
-      $transaction->commit();
-    } catch ( Exception $e ) {
-      $transaction->rollback();
-      throw $e;
-    }
+  protected function repointOther($otherId, $movieId)
+  {
+    feedItem::model()->updateAll(
+        array(
+          'other_id'=>NULL,
+          'movie_id'=>$movieId,
+        ),
+        'other_id = '.$otherId
+    );
+    // delete the model, could just let dbMaintinance take care of it
+    other::model()->deleteByPk($arr['other_id']);
   }
 
-  protected function updateMovies() {
-    $db = Yii::app()->db;
-    $now = time();
-    $scanned = $toSave = array();
-    $reader = $db->createCommand('SELECT id, imdbId'.
-                                 '  FROM movie'.
-                                 ' WHERE lastImdbUpdate <'.($now-(3600*24)). // one update per 24hrs
-                                 '   AND imdbId IS NOT NULL'.
-                                 '   AND rating IS NULL;'
+  protected function scanMovies() {
+    $scanned = array();
+    $reader = $this->db->createCommand(
+        'SELECT id, imdbId'.
+        '  FROM movie'.
+        ' WHERE lastImdbUpdate <'.(time()-(3600*48)). // one update per 48hrs
+        '   AND imdbId IS NOT NULL'.
+        '   AND rating IS NULL;'
 
     )->queryAll();
     foreach($reader as $row) {
       $scanned[] = $row['id'];
       
       echo "Looking for Imdb Id: ".$row['imdbId']."\n";
-      $url = sprintf('http://www.imdb.com/title/tt%07d/', $row['imdbId']);
-      $scraper = new IMDbScraper('', $url);
-
-      if($scraper->accuracy < 75) {
-        echo "Failed scrape\n";
-        continue;
+      if(($scraper = $this->movieDetails->getScraper($row['imdbId'])))
+      {
+        $this->toSave[] = array(
+            'scraper'=>$scraper,
+            'movie_id'=>$row['id']
+        );
       }
-
-      echo "Found! Updating ".$scraper->title."\n";
-      $toSave[$row['id']] = $scraper;
     }
 
-    $transaction = Yii::app()->db->beginTransaction();
-    try {
-      foreach($toSave as $id => $scraper)
-        $this->updateMovieFromScraper($id, $scraper);
-
-      if(count($scanned))
-        movie::model()->updateByPk($scanned, array('lastImdbUpdate'=>$now));
-      $transaction->commit();
-      echo 'Saved '.count($toSave).' items'."\n";
-    } catch ( Exception $e) {
-      $transaction->rollback();
-      throw $e;
-    }
+    if(count($scanned))
+      $this->scanned[] = array(movie::model(), $scanned);
   }
 
-  protected function updateMovieFromScraper($movie, $scraper)
+  protected function scanOthers() {
+    $scanned = array();
+    $reader = $this->db->createCommand(
+        'SELECT id, title'.
+        '  FROM other'.
+        ' WHERE lastImdbUpdate = 0'
+    )->queryAll();
+    foreach($reader as $row) {
+      $title = $row['title'];
+      echo "Searching IMDb for $title\n";
+      if(($scraper = $this->movieDetails->getScraper($title)))
+      {
+        $this->toSave[] = array(
+            'other_id'    => $row['id'], 
+            'other_title' => $row['title'],
+            'scraper'     => $scraper
+        );
+      }
+      else
+        $scanned[] = $row['id'];
+    }
+
+    // Seperate from above so the transaction wont be held during network access
+    if(count($scanned))
+      $this->scanned[] = array(other::model(), $scanned);
+  }
+
+  protected function updateDatabase()
   {
-    if(!is_a($movie, 'movie'))
-      $movie = movie::model()->findByPk($movie);
+    $now = time();
+    foreach($this->scanned as $row)
+    {
+      list($model, $scanned) = $row;
+      $model->updateByPk($scanned, array('lastImdbUpdate'=>$now));
+    }
 
-    $movie->year = $scraper->year;
-    $movie->name = $scraper->title;
-    $movie->runtime = $scraper->runtime;
-    $movie->plot = $scraper->plot;
-    $movie->rating = strtok($scraper->rating, '/');
-    $movie->imdbId = $scraper->imdbId;
-    if($movie->save()) {
-      if(is_array($scraper->genres)) {
-        foreach($scraper->genres as $genre) {
-          $record = new movie_genre;
-          $record->movie_id = $movie->id;
-          $record->genre_id = $this->factory->genreByTitle($genre)->id;
-          $record->save();
-        }
+    foreach($this->toSave as $row) {
+      $scraper = $row['scraper'];
+      if(isset($row['other_id']))
+      {
+        $tmpMovie = $this->factory->movieByImdbId($scraper->imdbId, $row['other_title']);
+        // TODO: seems a movie from the factory cant be altered and saved again
+        //       so get another copy of the same model
+        $row['movie_id'] = $tmpMovie->id;
+        // repoint feed items
+        $this->repointOther($row['other_id'], $tmpMovie->id);
       }
-      return True;
-    } else
-      Yii::log('Error saving movie after IMDB update.', CLogger::LEVEL_ERROR);
 
-    return False;
+      $movie = movie::model()->findByPk($row['movie_id']);
+
+      $this->movieDetails->updateMovieFromScraper($movie, $scraper);
+    }
+    echo 'Saved '.count($this->toSave).' items'."\n";
+    $this->toSave = array();
   }
+
 }
 
