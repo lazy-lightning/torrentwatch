@@ -1,7 +1,7 @@
 -- This is run after schema.populate to fill the test db with some sample data
 BEGIN TRANSACTION;
 
-UPDATE sqlite_sequence SET seq='0' WHERE name='quality' OR name='genre' OR name LIKE '%_quality';
+UPDATE sqlite_sequence SET seq='0' WHERE name='quality' OR name='genre' OR name LIKE '%_quality' OR name = 'movie_genre';
 
 DELETE FROM quality;
 INSERT INTO quality (title) VALUES('WS');
@@ -20,6 +20,10 @@ INSERT INTO genre (title) VALUES('Horror');
 INSERT INTO genre (title) VALUES('Sci-Fi');
 INSERT INTO genre (title) VALUES('Thriller');
 INSERT INTO genre (title) VALUES('Action');
+
+DELETE FROM movie_genre;
+INSERT INTO movie_genre (movie_id, genre_id) VALUES(1, 1);
+INSERT INTO movie_genre (movie_id, genre_id) VALUES(2, 1);
 
 DELETE FROM feedItem_quality;
 INSERT INTO feedItem_quality (feedItem_id, quality_id) VALUES(1, 1);

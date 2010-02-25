@@ -1,7 +1,10 @@
 #!/bin/sh
-rm source.db.orig
-sqlite3 source.db.orig < schema
-sqlite3 source.db.orig < schema.populate
+DB='source.db.orig'
+TESTDB='source-test.db'
+
+rm -f ./$DB
+sqlite3 ./$DB < schema
+sqlite3 ./$DB < schema.populate
 # make copy for the test runs
-cp source.db.orig source-test.db
-sqlite3 source-test.db < schema-test.populate
+cp ./$DB $TESTDB
+sqlite3 $TESTDB < schema-test.populate

@@ -1,7 +1,9 @@
 <?php
 
-class favoriteManagerTvShowEpisodeFilterTest extends DbTestCase
+class favoriteManagerTvShowFilterTest extends favoriteManagerFilterTest
 {
+  public $testClass = 'favoriteTvShow';
+
   public $fixtures = array(
       'favoriteTvShow'=>'favoriteTvShow',
       'tvShow'=>':tvShow',
@@ -11,18 +13,21 @@ class favoriteManagerTvShowEpisodeFilterTest extends DbTestCase
       'dvrConfig'=>':dvrConfig',
   );
 
-
-  protected function realTest($modifications, $expected)
+  public function testTvShowNoQuality()
   {
     $fav = favoriteTvShow::model()->findByPk(1);
-    $this->assertType('favoriteTvShow', $fav);
-    $fav->setAttributes($modifications);
-    $this->assertTrue($fav->save());
-
-    Yii::app()->dlManager->checkFavorite($fav);
-
-    foreach($expected as $status => $count)
-      $this->assertEquals($count, feedItem::model()->count('status = :status', array(':status'=>$status)));
+    $ids = $fav->qualityIds;
+    $this->realTest(
+        array('qualityIds'=>array()),
+        array(
+          'STATUS_NOMATCH'=>0,
+          'STATUS_QUEUED'=>2,
+        ),
+        $fav
+    );
+    // above operation was destructive to future tests, so reset that data
+    $fav->qualityIds = $ids;
+    $fav->save();
   }
 
   public function testTvShowMinSeasonLow()
@@ -30,19 +35,18 @@ class favoriteManagerTvShowEpisodeFilterTest extends DbTestCase
     $this->realTest(
         array('minSeason'=>1),
         array(
-          feedItem::STATUS_NOMATCH=>0,
-          feedItem::STATUS_QUEUED=>2,
+          'STATUS_NOMATCH'=>0,
+          'STATUS_QUEUED'=>2,
         )
     );
   }
-
   public function testTvShowMinSeasonMiddle()
   {
     $this->realTest(
         array('minSeason'=>2),
         array(
-          feedItem::STATUS_NOMATCH=>1,
-          feedItem::STATUS_QUEUED=>1,
+          'STATUS_NOMATCH'=>1,
+          'STATUS_QUEUED'=>1,
         )
     );
   }
@@ -52,8 +56,8 @@ class favoriteManagerTvShowEpisodeFilterTest extends DbTestCase
     $this->realTest(
         array('minSeason'=>3),
         array(
-          feedItem::STATUS_NOMATCH=>1,
-          feedItem::STATUS_QUEUED=>1,
+          'STATUS_NOMATCH'=>1,
+          'STATUS_QUEUED'=>1,
         )
     );
   }
@@ -63,8 +67,8 @@ class favoriteManagerTvShowEpisodeFilterTest extends DbTestCase
     $this->realTest(
         array('minSeason'=>4),
         array(
-          feedItem::STATUS_NOMATCH=>2,
-          feedItem::STATUS_QUEUED=>0,
+          'STATUS_NOMATCH'=>2,
+          'STATUS_QUEUED'=>0,
         )
     );
   }
@@ -74,8 +78,8 @@ class favoriteManagerTvShowEpisodeFilterTest extends DbTestCase
     $this->realTest(
         array('maxSeason'=>1),
         array(
-          feedItem::STATUS_NOMATCH=>1,
-          feedItem::STATUS_QUEUED=>1,
+          'STATUS_NOMATCH'=>1,
+          'STATUS_QUEUED'=>1,
         )
     );
   }
@@ -84,8 +88,8 @@ class favoriteManagerTvShowEpisodeFilterTest extends DbTestCase
     $this->realTest(
         array('maxSeason'=>2),
         array(
-          feedItem::STATUS_NOMATCH=>1,
-          feedItem::STATUS_QUEUED=>1,
+          'STATUS_NOMATCH'=>1,
+          'STATUS_QUEUED'=>1,
         )
     );
   }
@@ -94,8 +98,8 @@ class favoriteManagerTvShowEpisodeFilterTest extends DbTestCase
     $this->realTest(
         array('maxSeason'=>3),
         array(
-          feedItem::STATUS_NOMATCH=>0,
-          feedItem::STATUS_QUEUED=>2,
+          'STATUS_NOMATCH'=>0,
+          'STATUS_QUEUED'=>2,
         )
     );
   }
@@ -104,8 +108,8 @@ class favoriteManagerTvShowEpisodeFilterTest extends DbTestCase
     $this->realTest(
         array('maxSeason'=>4),
         array(
-          feedItem::STATUS_NOMATCH=>0,
-          feedItem::STATUS_QUEUED=>2,
+          'STATUS_NOMATCH'=>0,
+          'STATUS_QUEUED'=>2,
         )
     );
   }
@@ -115,8 +119,8 @@ class favoriteManagerTvShowEpisodeFilterTest extends DbTestCase
     $this->realTest(
         array('minEpisode'=>1),
         array(
-          feedItem::STATUS_NOMATCH=>0,
-          feedItem::STATUS_QUEUED=>2,
+          'STATUS_NOMATCH'=>0,
+          'STATUS_QUEUED'=>2,
         )
     );
   }
@@ -125,8 +129,8 @@ class favoriteManagerTvShowEpisodeFilterTest extends DbTestCase
     $this->realTest(
         array('minEpisode'=>2),
         array(
-          feedItem::STATUS_NOMATCH=>1,
-          feedItem::STATUS_QUEUED=>1,
+          'STATUS_NOMATCH'=>1,
+          'STATUS_QUEUED'=>1,
         )
     );
   }
@@ -135,8 +139,8 @@ class favoriteManagerTvShowEpisodeFilterTest extends DbTestCase
     $this->realTest(
         array('minEpisode'=>5),
         array(
-          feedItem::STATUS_NOMATCH=>1,
-          feedItem::STATUS_QUEUED=>1,
+          'STATUS_NOMATCH'=>1,
+          'STATUS_QUEUED'=>1,
         )
     );
   }
@@ -145,8 +149,8 @@ class favoriteManagerTvShowEpisodeFilterTest extends DbTestCase
     $this->realTest(
         array('minEpisode'=>6),
         array(
-          feedItem::STATUS_NOMATCH=>2,
-          feedItem::STATUS_QUEUED=>0,
+          'STATUS_NOMATCH'=>2,
+          'STATUS_QUEUED'=>0,
         )
     );
   }
@@ -155,8 +159,8 @@ class favoriteManagerTvShowEpisodeFilterTest extends DbTestCase
     $this->realTest(
         array('maxEpisode'=>1),
         array(
-          feedItem::STATUS_NOMATCH=>1,
-          feedItem::STATUS_QUEUED=>1,
+          'STATUS_NOMATCH'=>1,
+          'STATUS_QUEUED'=>1,
         )
     );
   }
@@ -165,8 +169,8 @@ class favoriteManagerTvShowEpisodeFilterTest extends DbTestCase
     $this->realTest(
         array('maxEpisode'=>4),
         array(
-          feedItem::STATUS_NOMATCH=>1,
-          feedItem::STATUS_QUEUED=>1,
+          'STATUS_NOMATCH'=>1,
+          'STATUS_QUEUED'=>1,
         )
     );
   }
@@ -175,8 +179,8 @@ class favoriteManagerTvShowEpisodeFilterTest extends DbTestCase
     $this->realTest(
         array('maxEpisode'=>5),
         array(
-          feedItem::STATUS_NOMATCH=>0,
-          feedItem::STATUS_QUEUED=>2,
+          'STATUS_NOMATCH'=>0,
+          'STATUS_QUEUED'=>2,
         )
     );
   }
@@ -185,8 +189,8 @@ class favoriteManagerTvShowEpisodeFilterTest extends DbTestCase
     $this->realTest(
         array('maxEpisode'=>6),
         array(
-          feedItem::STATUS_NOMATCH=>0,
-          feedItem::STATUS_QUEUED=>2,
+          'STATUS_NOMATCH'=>0,
+          'STATUS_QUEUED'=>2,
         )
     );
   }

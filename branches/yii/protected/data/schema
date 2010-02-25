@@ -222,6 +222,9 @@ SELECT i.id feedItem_id,
   FROM favoriteMovies f, movie m, feedItem i, movie_genre mg
   LEFT OUTER JOIN feed
     ON feed.id = i.feed_id
+  LEFT OUTER JOIN
+       (SELECT favoriteMovies_id, count(quality_id) as count FROM favoriteMovies_quality GROUP BY favoriteMovies_id) q
+    ON q.favoriteMovies_id = f.id
  WHERE i.movie_id = m.id
    AND mg.movie_id = m.id
    AND f.genre_id = mg.genre_id
@@ -231,11 +234,14 @@ SELECT i.id feedItem_id,
          OR
          f.feed_id = i.feed_id
        )
-   AND ( SELECT COUNT(*)
-           FROM feedItem_quality iq, favoriteMovies_quality fq
-          WHERE i.id = iq.feedItem_id
-            AND iq.quality_id = fq.quality_id
-            AND fq.favoriteMovies_id = f.id
+   AND ( q.count IS NULL
+         OR
+         q.count = ( SELECT COUNT(*)
+                       FROM feedItem_quality iq, favoriteMovies_quality fq
+                      WHERE i.id = iq.feedItem_id
+                        AND iq.quality_id = fq.quality_id
+                        AND fq.favoriteMovies_id = f.id
+                   )
        );
 
 CREATE VIEW matchingFavoriteStrings AS
@@ -252,20 +258,24 @@ SELECT i.id feedItem_id,
        f.id favoriteStrings_id,
        f.saveIn favorite_saveIn,
        f.queue favorite_queue
-  FROM favoriteStrings f, feedItem i, feed,
-       (SELECT favoriteStrings_id, count(quality_id) AS count FROM favoriteStrings_quality GROUP BY favoriteStrings_id) fq
+  FROM favoriteStrings f, feedItem i, feed
+  LEFT OUTER JOIN
+       (SELECT favoriteStrings_id, count(quality_id) as count FROM favoriteStrings_quality GROUP BY favoriteStrings_id) q
+    ON q.favoriteStrings_id = f.id
  WHERE feed.id = i.feed_id
    AND ( f.feed_id = 0
          OR
          f.feed_id = i.feed_id
        )
-   AND f.id = fq.favoriteStrings_id
-   AND ( SELECT COUNT(fq.quality_id)
-           FROM feedItem_quality iq, favoriteStrings_quality fq
-          WHERE iq.feedItem_id = i.id
-            AND iq.quality_id = fq.quality_id
-            AND fq.favoriteStrings_id = f.id
-       ) = fq.count
+   AND ( q.count IS NULL
+         OR
+         q.count = ( SELECT COUNT(*)
+                       FROM feedItem_quality iq, favoriteStrings_quality fq
+                      WHERE i.id = iq.feedItem_id
+                        AND iq.quality_id = fq.quality_id
+                        AND fq.favoriteStrings_id = f.id
+                   )
+       )
    AND i.title LIKE f.filter
    AND ( f.notFilter IS NULL
          OR
@@ -292,17 +302,12 @@ SELECT i.feedItem_id feedItem_id,
        f.saveIn favorite_saveIn,
        f.onlyNewer favorite_onlyNewer,
        f.queue favorite_queue
-  FROM tvFeedItem i, favoriteTvShows f,
-       (SELECT favoriteTvShows_id, count(quality_id) as count FROM favoriteTvShows_quality GROUP BY favoriteTvShows_id) fq
+  FROM tvFeedItem i, favoriteTvShows f
+  LEFT OUTER JOIN 
+       (SELECT favoriteTvShows_id, count(quality_id) as count FROM favoriteTvShows_quality GROUP BY favoriteTvShows_id) q
+    ON q.favoriteTvShows_id = f.id
  WHERE i.tvShow_id = f.tvShow_id
-   AND f.id = fq.favoriteTvShows_id
    AND (f.feed_id = i.feed_id OR f.feed_id = 0)
-   AND ( SELECT COUNT(*)
-           FROM feedItem_quality, favoriteTvShows_quality
-          WHERE feedItem_quality.feedItem_id = i.feedItem_id
-            AND feedItem_quality.quality_id = favoriteTvShows_quality.quality_id
-            AND favoriteTvShows_quality.favoriteTvShows_id = f.id
-       ) = fq.count
    AND NOT i.tvEpisode_episode = 0
    AND ( f.minSeason = 0
          OR i.tvEpisode_season >= f.minSeason )
@@ -311,7 +316,16 @@ SELECT i.feedItem_id feedItem_id,
    AND ( f.minEpisode = 0
          OR i.tvEpisode_episode >= f.minEpisode )
    AND ( f.maxEpisode = 0
-         OR i.tvEpisode_episode <= f.maxEpisode );
+         OR i.tvEpisode_episode <= f.maxEpisode )
+   AND ( q.count IS NULL
+         OR
+         q.count = ( SELECT COUNT(*)
+                       FROM feedItem_quality iq, favoriteTvShows_quality fq
+                      WHERE i.feedItem_id = iq.feedItem_id
+                        AND iq.quality_id = fq.quality_id
+                        AND fq.favoriteTvShows_id = f.id
+                   )
+       );
 
 CREATE VIEW movieFeedItem AS
 SELECT feedItem.id feedItem_id,
