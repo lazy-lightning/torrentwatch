@@ -64,7 +64,7 @@ class genre extends CActiveRecord
       $list=$load;
     if($list===null)
     {
-      $list=CHtml::listData(self::model()->findAll(array('select'=>'id,title')), 'id', 'title');
+      $list=CHtml::listData(self::model()->findAll(array('select'=>'id,title','order'=>'title ASC')), 'id', 'title');
     }
     return $list;
   }

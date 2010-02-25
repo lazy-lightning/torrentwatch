@@ -70,7 +70,7 @@ class quality extends CActiveRecord
       $list=$load;
     if($list===null)
     {
-      $list=CHtml::listData(self::model()->findAll(array('select'=>'id,title')), 'id', 'title');
+      $list=CHtml::listData(self::model()->findAll(array('select'=>'id,title', 'order'=>'title ASC')), 'id', 'title');
       // prepend a fake empty id as -1
       $list=array('-1'=>'')+$list;
     }
