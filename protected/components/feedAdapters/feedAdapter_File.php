@@ -1,6 +1,6 @@
 <?php
 
-require_once('SimplePie_1.1.3/simplepie.inc');
+require_once('simplepie.inc');
 
 class feedAdapter_File extends SimplePie_File {
   function feedAdapter_File($url, $timeout = 10, $redirects = 5, $headers = null,

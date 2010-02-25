@@ -156,6 +156,8 @@ class feed extends CActiveRecord
    */
   public function updateFeedItems($checkFavorites = True) 
   {
+    // simplepie doesn't like E_STRICT
+    $oldError = error_reporting(E_ALL);
     // id 0 is generic 'All Feeds' placeholder
     if($this->id == 0) 
     {
@@ -177,9 +179,10 @@ class feed extends CActiveRecord
         Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NEW);
     }
 
-    // Solves a memory leak in php
+    // Solves a memory leak in php with SimplePie
     $adapter->__destruct();
-    unset($adapter);
+    unset($adapter); 
+    error_reporting($oldError);
 
     // update the db with new title/description/update time and status
     $trans = Yii::app()->db->beginTransaction();

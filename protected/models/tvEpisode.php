@@ -105,7 +105,7 @@ class tvEpisode extends CActiveRecord
     $favoriteId = $this->dbConnection->createCommand(
           'SELECT favoriteTvShows_id FROM matchingFavoriteTvShows'.
           ' WHERE tvEpisode_id = :id'
-    )->bindParam(':id', $this->getAttribute('id'))->queryScalar();
+    )->bindValue(':id', $this->getAttribute('id'))->queryScalar();
     if($favoriteId)
       return favoriteTvShow::model()->findByPk($favoriteId);
     return false;

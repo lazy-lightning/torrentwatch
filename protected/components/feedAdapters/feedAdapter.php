@@ -1,6 +1,6 @@
 <?php
 
-require_once('SimplePie_1.1.3/simplepie.inc');
+require_once('simplepie.inc');
 require_once('feedAdapter_File.php');
 
 class feedAdapter extends SimplePie {
@@ -9,7 +9,7 @@ class feedAdapter extends SimplePie {
 
   function __construct($feed, $cache_location = null, $cache_duration = null) {
     parent::SimplePie(null, $cache_location, $cache_duration);
-    if(UNIT_TEST)
+    if(defined('UNIT_TEST'))
       $this->cache = false;
     $this->_feedAR = $feed;
     $this->set_feed_url($feed->url);
