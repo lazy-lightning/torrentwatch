@@ -10,7 +10,7 @@ LFTP_NET_BOOKMARK="asodown"
 APPINIT="Apps/AppInit/appinit.cgi"
 NAME=$(grep name appinfo.json | sed 's/[ ]*.*="\(.*\)",/\1/g')
 VERSION=$(grep version appinfo.json | sed 's/[ ]*.*="\(.*\)",/\1/g')
-EXCLUDES="install testing protected/data/source.db.BACKUP protected/data/source.db protected/runtime cache buildInstall.sh findNotSvn.sh assets php.sh"
+EXCLUDES="install testing protected/data/source-test.db.BACKUP protected/data/source.db.BACKUP protected/data/source.db protected/runtime cache buildInstall.sh findNotSvn.sh assets php.sh"
 
 if [ $VERSION != ${VERSION#svn} ]; then
   OLDVERSION=$VERSION
@@ -49,7 +49,7 @@ testing/buildMin.sh 2> /dev/null
 php testing/inline-css-to-html.php >/dev/null
 
 TESTDB='protected/data/source-test.db'
-if [ -h $TESTDB]; then
+if [ -h $TESTDB ]; then
   LINK=$(readlink $TESTDB)
 fi
 
