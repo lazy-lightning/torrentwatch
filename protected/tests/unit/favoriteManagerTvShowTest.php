@@ -21,7 +21,6 @@ class favoriteManagerTvShowTest extends DbTestCase
     $this->assertEquals(0, feedItem::model()->count('status = '.feedItem::STATUS_NOMATCH));
     $this->assertEquals(2, feedItem::model()->count('status = '.feedItem::STATUS_QUEUED));
   }
-
   public function testTvShowCheckFavoritesStatus()
   {
     // should match no items with STATUS_NEW
@@ -61,11 +60,14 @@ class favoriteManagerTvShowTest extends DbTestCase
   public function testTvShowTimeLimitDefault()
   {
     // should match one item with 1 hour limit set in dvrConfig
+    $old = Yii::app()->dvrConfig->matchingTimeLimit;
     Yii::app()->dvrConfig->matchingTimeLimit = 1;
     Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NOMATCH);
 
     $this->assertEquals(1, feedItem::model()->count('status = '.feedItem::STATUS_NOMATCH));
     $this->assertEquals(1, feedItem::model()->count('status = '.feedItem::STATUS_QUEUED));
+    // previous bit was destructive to future tests, so reset it
+    Yii::app()->dvrConfig->matchingTimeLimit = $old;
   }
 }
 

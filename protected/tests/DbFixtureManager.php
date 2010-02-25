@@ -55,6 +55,7 @@ class DbFixtureManager extends NDbFixtureManager {
     if(empty($path) || !file_exists($path))
       $path = parent::getFixtureFile($file);
 
+    file_put_contents('/tmp/foo', "using: $path\n", FILE_APPEND);
     return $path;
   }
 }
