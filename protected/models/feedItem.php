@@ -179,10 +179,7 @@ class feedItem extends CActiveRecord
     }
 
     if($fav) {
-      $ids = array();
-      foreach($this->quality as $quality)
-        $ids[] = $quality->id;
-      $fav->qualityIds = $ids;
+      $fav->asa('quality')->qualityIds = $this->asa('quality')->qualityIds;
     }
 
     return $fav;

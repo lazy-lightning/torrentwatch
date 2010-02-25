@@ -31,6 +31,7 @@ class WebTestCase extends CWebTestCase
    */
   protected function assertPreConditions()
   {
+    error_reporting(E_ALL);
     $this->start();
     $this->login();
   }
