@@ -37,8 +37,8 @@ class favoriteMovie extends BaseFavorite
     return array_merge(parent::rules(), array(
       array('name', 'required'),
       array('minYear', 'default', 'value'=>1900),
-      array('maxYear', 'default', 'value'=>2012),
-      array('rating', 'default', 'value'=>100),
+      array('maxYear', 'default', 'value'=>2020),
+      array('rating', 'default', 'value'=>0),
       array('genre_id', 'exist', 'allowEmpty'=>false, 'attributeName'=>'id', 'className'=>'genre'),
       array('minYear, maxYear', 'numerical', 'allowEmpty'=>false, 'integerOnly'=>true, 'min'=>1900, 'max'=>2100),
       array('rating', 'numerical', 'allowEmpty'=>false, 'integerOnly'=>true, 'min'=>0, 'max'=>100),
