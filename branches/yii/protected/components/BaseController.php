@@ -27,6 +27,7 @@ abstract class BaseController extends CController {
    * @return none
    */
   public function init() {
+    error_reporting(E_ALL|E_STRICT);
     $app = Yii::app();
     date_default_timezone_set(Yii::app()->dvrConfig->timezone);
 
