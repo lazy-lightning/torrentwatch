@@ -3,12 +3,12 @@
 // TvBinz translates spaces to underscores, which is all fine except they no longer match
 // items detected from other usenet indexers, so change them back here
 
-class feedAdapterTvBinz extends feedAdapter 
+class tvBinzAdapter extends rssFeedAdapter 
 {
-  public function __construct($feed, $cache_location = null, $cache_duration = null)
+  public function __construct($feed, $cache_location = null, $simplePie = null)
   {
-    parent::__construct($feed, $cache_location, $cache_duration);
-    $this->set_item_class('tvBinzItem');
+    parent::__construct($feed, $cache_location, $simplePie);
+    $this->simplePie->set_item_class('tvBinzItem');
   }
 }
 

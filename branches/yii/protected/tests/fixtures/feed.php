@@ -1,6 +1,6 @@
 <?php
 
 return array(
-    array('id'=>0, 'title'=>'All Feeds', 'description'=>'', 'url'=>'', 'status'=>0,'lastUpdated'=>0,'downloadType'=>0),
+    'all' => array('id'=>0, 'title'=>'All Feeds', 'description'=>'', 'url'=>'', 'status'=>0,'lastUpdated'=>0,'downloadType'=>0),
 );
 

@@ -9,21 +9,34 @@
 class feedAdapterRouter {
 
   static protected $adapters = array(
-      // Class name                url regexp
-      'feedAdapterNewzleech'  => '/newzleech.com/i',
-      'feedAdapterTvBinz'     => '/tvbinz.net/i',
+      // domain           adapter class
+      'newzleech.com' => 'newzleechAdapter',
+      'tvbinz.net'    => 'tvBinzAdapter',
+      // default adapter class
+      0 => 'rssFeedAdapter',
   );
+
+  static protected function getDomain($url)
+  {
+    return preg_replace('|.*\.([^.]+\.[^.]+)$|', '\1', parse_url($url, PHP_URL_HOST));
+  }
 
   static public function getAdapter($feed) {
     $url = $feed->url;
-    foreach(self::$adapters as $class => $reg) {
-      if(preg_match($reg, $url)) {
-        Yii::log("Initializing $class for $url");
-        return new $class($feed);
-      }
-    }
-    $x = new feedAdapter($feed);
-    return $x; 
+    $domain = self::getDomain($url);
+
+    if(isset(self::$adapters[$domain]))
+      $class = self::$adapters[$domain];
+    else
+      $class = self::$adapters[0];
+
+    Yii::trace("Initializing $class for $url", 'application.components.feedAdapterRouter');
+    $adapter = new $class($feed);
+
+    if($adapter instanceof IFeedAdapter)
+      return $adapter;
+    else
+      throw new CException('Created adapter is not an IFeedAdapter: '.get_class($adapter));
   }
 }
 
