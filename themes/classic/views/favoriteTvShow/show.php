@@ -42,8 +42,8 @@
 <div class="favorite_quality">
  <?php 
    echo CHtml::activeLabelEx($model, 'quality').': ';
-   $j=0;foreach($model->quality as $quality) {
-     echo CHtml::dropDownList('quality_id['.++$j.']', $quality->id, $qualitysListData);
+   $j=0;foreach($model->asa('quality')->qualityIds as $quality) {
+     echo CHtml::dropDownList('quality_id['.++$j.']', $quality, $qualitysListData);
    } 
    for(++$j;$j<4;++$j)
      echo CHtml::dropDownList('quality_id['.$j.']', -1, $qualitysListData);
