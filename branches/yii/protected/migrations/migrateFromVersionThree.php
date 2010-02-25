@@ -36,7 +36,10 @@ SELECT i.feedItem_id feedItem_id,
        (SELECT favoriteTvShows_id, count(quality_id) as count FROM favoriteTvShows_quality GROUP BY favoriteTvShows_id) q
     ON q.favoriteTvShows_id = f.id
  WHERE i.tvShow_id = f.tvShow_id
-   AND (f.feed_id = i.feed_id OR f.feed_id = 0)
+   AND ( f.feed_id = 0
+         OR
+         f.feed_id = i.feed_id 
+       )
    AND NOT i.tvEpisode_episode = 0
    AND ( f.minSeason = 0
          OR i.tvEpisode_season >= f.minSeason )
@@ -126,7 +129,10 @@ SELECT i.id feedItem_id,
     ON q.favoriteMovies_id = f.id
  WHERE i.movie_id = m.id
    AND mg.movie_id = m.id
-   AND f.genre_id = mg.genre_id
+   AND ( f.genre_id = 0
+         OR
+         f.genre_id = mg.genre_id
+       )
    AND m.rating >= f.rating
    AND m.year BETWEEN f.minYear AND f.maxYear
    AND ( f.feed_id = 0

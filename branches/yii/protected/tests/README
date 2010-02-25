@@ -10,5 +10,5 @@ cp source-test.db source-test.db.BACKUP
 mv source-test.db ramdisk
 ln -s ramdisk/source-test.db
 
-Tests that take 30 secconds with the db on disk take < 1s on ramdisk
+Tests that take 2 minutes with the db on disk take 2s on ramdisk
 
