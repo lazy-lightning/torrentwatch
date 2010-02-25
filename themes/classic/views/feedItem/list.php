@@ -2,8 +2,14 @@
   <?php 
     foreach($feeditemList as $n => $model) {
       echo "<li class='torrent match_".strtok(feedItem::getStatusText($model->status), ' ').($n%2?' alt':' notalt')."' ".
-           "    title='".CHtml::encode($model->description)."'>".
-           "<div class='itemButtons'>".
+           "    title='".CHtml::encode($model->description)."'>";
+      if($model->tvEpisode_id)
+        $inspect = array('/tvEpisode/inspect', 'id'=>$model->tvEpisode_id);
+      elseif($model->movie_id)
+        $inspect = array('/movie/inspect', 'id'=>$model->movie_id);
+      if(isset($inspect))
+        echo CHtml::link('', $inspect, array('class'=>'loadInspector ajaxSubmit', 'title'=>'Get Detailed Media Information'));
+      echo "<div class='itemButtons'>".
              CHtml::link('&nbsp;', array('startDownload', 'id'=>$model->id), 
                  array('class'=>'startDownload ajaxSubmit')).
              CHtml::link('&nbsp;', array('makeFavorite', 'id'=>$model->id), 
