@@ -21,12 +21,15 @@
     // optionally delete an item from the dom first
     // needs wait for because sometimes the dialog that contains
     // the parent needs to be loaded first
-    $.ajaxAppend = function (child, parent, deleteSelector) {
+    $.ajaxAppend = function (child, parent, deleteSelector, sortSelector) {
         $.waitFor(parent, function () {
             if (deleteSelector) {
                 $(deleteSelector).remove();
             }
             $(child).remove().appendTo(parent);
+            if(sortSelector) {
+              $(sortSelector).not('li:first').tsort();
+            }
         });
     };
     // open/close the inspector pane

@@ -112,6 +112,7 @@ class updateFavoriteAction extends CAction
             array(
                 'parent'=>"#{$class}List",
                 'selector'=>"#{$class}-{$model->id} li",
+                'sort'=>"#{$class}List li",
             ),
             array(
                 'parent'=>"#{$class}_container",
