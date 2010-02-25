@@ -96,15 +96,15 @@ class ARQualityBehavior extends CBehavior
     $table = $this->Owner->tableName();
     $class = $table.'_quality';
     $id = $table.'_id';
+    // Cache the quality ids first if we dont have any
+    $qualityIds = $this->getQualityIds();
     if(!$this->Owner->isNewRecord) 
     {
-      // Cache the quality ids first if we dont have any
-      $this->getQualityIds();
       CActiveRecord::model($class)->deleteAll($id.'=:id', array(':id'=>$this->Owner->id));
     }
 
     // set quality relations
-    foreach($this->getQualityIds() as $qualityId) 
+    foreach($qualityIds as $qualityId) 
     {
       $relation = new $class;
       $relation->$id = $this->Owner->id;
