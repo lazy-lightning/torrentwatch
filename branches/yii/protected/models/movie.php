@@ -84,7 +84,7 @@ class movie extends CActiveRecord
     $favoriteId = $this->dbConnection->createCommand(
           'SELECT favoriteMovies_id FROM matchingFavoriteMovies'.
           ' WHERE movie_id = :id'
-    )->bindParam(':id', $this->id)->queryScalar();
+    )->bindValue(':id', $this->id)->queryScalar();
     if($favoriteId)
       return favoriteMovie::model()->findByPk($favoriteId);
     return false;
