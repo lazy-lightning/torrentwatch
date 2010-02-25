@@ -77,6 +77,10 @@ class FeedItemController extends BaseController
         $criteria->params = array(':id'=>$id);
       }
     }
+    elseif(isset($_GET['status']) && $_GET['status'] == 'queued')
+    {
+      $criteria->condition = 't.status = '.feedItem::STATUS_QUEUED;
+    }
     else if(false===Yii::app()->getRequest()->getIsAjaxRequest())
     {
   		$pages=new CPagination(feedItem::model()->count($criteria));
