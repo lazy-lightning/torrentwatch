@@ -12,6 +12,36 @@ class favoriteManagerMovieFilterTest extends favoriteManagerFilterTest
       'dvrConfig'=>':dvrConfig',
   );
 
+  public function testMovieAllGenres()
+  {
+    $this->realTest(
+        array('genre_id'=>0),
+        array(
+          'STATUS_NOMATCH'=>0,
+          'STATUS_QUEUED'=>2,
+        )
+    );
+  }
+  public function testMovieOneGenre()
+  {
+    $this->realTest(
+        array('genre_id'=>1),
+        array(
+          'STATUS_NOMATCH'=>0,
+          'STATUS_QUEUED'=>2,
+        )
+    );
+  }
+  public function testMovieBadGenre()
+  {
+    $this->realTest(
+        array('genre_id'=>4),
+        array(
+          'STATUS_NOMATCH'=>2,
+          'STATUS_QUEUED'=>0,
+        )
+    );
+  }
   public function testMovieAllFeeds()
   {
     $this->realTest(

@@ -14,7 +14,7 @@ abstract class favoriteManagerFilterTest extends DbTestCase
     foreach($attributes as $key => $value)
       $fav->$key = $value;
 
-    $this->assertTrue($fav->save());
+    $this->assertTrue($fav->save(), 'Save object before check favorite');
     Yii::app()->dlManager->checkFavorite($fav);
 
     foreach($expected as $status => $count)
