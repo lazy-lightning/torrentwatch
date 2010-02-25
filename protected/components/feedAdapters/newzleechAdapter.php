@@ -1,25 +1,28 @@
 <?php
 
 // TODO:  method to skip items of small size(its stored in feeditem description)
-class feedAdapterNewzleech extends feedAdapter {
+class newzleechAdapter extends rssFeedAdapter {
 
   public $minItemSize;
 
-  public function __construct($feed, $cache_location = null, $cache_duration = null) 
+  public function __construct($feed, $cache_location = null, $simplePie = 'newzleechSimplePie') 
   {
-    $this->minItemSize = array(
+    parent::__construct($feed, $cache_location, $simplePie);
+    $this->set_item_class('newzleechItem');
+  }
+}
+
+class newzleechSimplePie extends SimplePie
+{
+  // Prune out any feed item that are too small
+  public function get_items($start = 0, $end = 0) 
+  {
+    $minItemSize = array(
         0=>array(100, 'MB'), 
         720=>array(600, 'MB'), 
         1080=>array(2, 'GB'),
     );
     
-    parent::__construct($feed, $cache_location, $cache_duration);
-    $this->set_item_class('newzleechItem');
-  }
-
-  // Prune out any feed item that are too small
-  public function get_items($start = 0, $end = 0) 
-  {
     $out = array();
     $types = array('Byte'=>0, 'KB'=>1, 'MB'=>2, 'GB'=>3);
 
@@ -33,8 +36,8 @@ class feedAdapterNewzleech extends feedAdapter {
         else
           $idx = 1080;
       }
-      $minSize = $this->minItemSize[$idx][0];
-      $minType = $this->minItemSize[$idx][1];
+      $minSize = $minItemSize[$idx][0];
+      $minType = $minItemSize[$idx][1];
 
       if(preg_match('/Size: (\d+)(?:,\d+)? (Byte|KB|MB|GB)/', $item->get_description(), $regs))
       {
