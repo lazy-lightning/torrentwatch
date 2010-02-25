@@ -96,7 +96,7 @@ class movie extends CActiveRecord
   public function generateFavorite($feedItem)
   {
     $fav=new favoriteMovie;
-    $fav->rating = empty($this->rating) ? 100 : $this->rating;
+    $fav->rating = empty($this->rating) ? 0 : $this->rating;
     $fav->genre_id = $this->genres[0]->id;
     $fav->name = $this->genres[0]->title.' - '.$feedItem->qualityString;
     if(!empty($this->year))
