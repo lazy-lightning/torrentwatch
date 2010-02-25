@@ -63,7 +63,7 @@ class FeedItemController extends BaseController
 	 */
 	public function actionList()
 	{
-		$criteria=new CDbCriteria(array('select'=>'id,title,status,pubDate', 'order'=>'pubDate DESC'));
+		$criteria=new CDbCriteria(array('select'=>'id,title,status,pubDate,tvEpisode_id,movie_id', 'order'=>'pubDate DESC'));
     $pages = null;
 
     if(isset($_GET['related']) && isset($_GET['id']))
