@@ -50,4 +50,20 @@ class SqliteConnection extends CDbConnection
       $this->_attributes[$name]=$value;
   }
 
+  /**
+   * Creates a command for execution.
+   * overridden to create SqliteCommand instead of CDbCommand
+   *
+   * @param string SQL statement associated with the new command.
+   * @return CDbCommand the DB command
+   * @throws CException if the connection is not active
+   */
+  public function createCommand($sql)
+  {
+    if($this->getActive())
+      return new SqliteCommand($this,$sql);
+    else
+      throw new CDbException(Yii::t('yii','CDbConnection is inactive and cannot perform any DB operations.'));
+  }
+
 }
