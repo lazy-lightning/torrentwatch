@@ -53,6 +53,7 @@ return array(
     'user'=>array(
       // enable cookie-based authentication
       'allowAutoLogin'=>true,
+      'autoRenewCookie'=>true,
     ),
     'db'=>array(
       'class'=>'SqliteConnection',
