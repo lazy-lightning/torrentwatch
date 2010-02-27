@@ -2,6 +2,8 @@
 
 class IMDbAdapter
 {
+  protected $factory;
+
   public function __construct($factory = null)
   {
     if($factory===null)

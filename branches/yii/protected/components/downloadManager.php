@@ -84,7 +84,7 @@ class downloadManager extends favoriteManager {
    * @param none
    */
   public function getUrl() {
-    $is_a = is_a($this->opts, 'feedItem');
+    $is_a = ($this->opts instanceOf feedItem);
     $url = $is_a ? $this->opts->url : $this->opts['feedItem_url'];
     $feed_url = $is_a ? $this->opts->feed->url : $this->opts['feed_url'];
     
