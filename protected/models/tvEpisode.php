@@ -140,7 +140,7 @@ class tvEpisode extends CActiveRecord
     if($utc === null)
       $utc = new DateTime('Jan 1 1970', new DateTimeZone('UTC'));
     $date = clone $utc;
-    $date->modify('+'.$time.'s');
+    $date->modify('+'.$time.' secconds');
     return $date->format('Y-m-d');
   }
 
