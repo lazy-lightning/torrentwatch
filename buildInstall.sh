@@ -9,19 +9,43 @@ LFTP_NET_BOOKMARK="asodown"
 
 APPINIT="Apps/AppInit/appinit.cgi"
 NAME=$(grep name appinfo.json | sed 's/[ ]*.*="\(.*\)",/\1/g')
-VERSION=$(grep version appinfo.json | sed 's/[ ]*.*="\(.*\)",/\1/g')
 EXCLUDES="install testing protected/data/source-test.db.BACKUP protected/data/source.db.BACKUP protected/data/source.db protected/runtime cache buildInstall.sh findNotSvn.sh assets php.sh"
 
-if [ $VERSION != ${VERSION#svn} ]; then
-  OLDVERSION=$VERSION
+# Dont change below here unless you know what you are doing
+
+GENERATE_VERSION=1
+REVERT_APPINFO=0
+CURRENTSVN=$(svn status | egrep -v '^\?|buildInstall.sh')
+
+if [ x"$1" = x"release" ]; then
+  # dont generate an svn version
+  GENERATE_VERSION=0
+  # release mode, allow changes to appinfo
+  CURRENTSVN=$(echo $CURRENTSVN | grep -v appinfo.json)
+fi
+
+if [ x"$CURRENTSVN" != x"" ];then
+  cat <<EOD
+
+Please commit local changes to svn first.
+$CURRENTSVN
+EOD
+  exit 1
+fi
+
+if [ $GENERATE_VERSION -eq 1 ]; then
+  # start with date
   VERSION="svn$(date +%Y%m%d)"
   I=0
+  # if that version already exists, increment i untill it doesnt exist
   while [ -f install/$NAME-$VERSION.zip ]; do
     I=$(expr $I + 1)
     VERSION="svn$(date +%Y%m%d).${I}"
   done
-  cat appinfo.json | sed "s/${OLDVERSION}/${VERSION}/" > appinfo.json.new
+  # changeup the appinfo.json file
+  cat appinfo.json | sed "s/\\\$id\\\$/${VERSION}/" > appinfo.json.new
   mv appinfo.json.new appinfo.json
+  REVERT_APPINFO=1
 fi
 
 FILENAME="$NAME-$VERSION.zip"
@@ -35,19 +59,21 @@ if [ -f install/$FILENAME ]; then
 fi
 
 # test php for basic syntax errors
-find ./ -iname \*.php | egrep -v 'svn|yii_framework' | xargs -L 1 php -l
+find ./ -iname \*.php | egrep -v 'svn|yii_framework|PHPUnit' | xargs -L 1 php -l
 if [ ! 0 -eq $? ];then
-  echo <<EOD
+  cat <<EOD
 
 Please fix lint errors before building package.
 EOD
-  exit;
+  exit 1;
 fi
 
 # minify/join some files
 testing/buildMin.sh 2> /dev/null
 php testing/inline-css-to-html.php >/dev/null
 
+# if the testdb was orrigionally a sym-link, preserve
+# that sym-link
 TESTDB='protected/data/source-test.db'
 if [ -h $TESTDB ]; then
   LINK=$(readlink $TESTDB)
@@ -57,7 +83,9 @@ fi
 rm -f $TESTDB
 cd protected/data && ./genOrig.sh && cd -
 
+# regenerate the sym-link
 if [ x"$LINK" != x"" ];then
+  cp $TESTDB $LINK
   rm -f $TESTDB
   ln -s $LINK $TESTDB
 fi
@@ -70,6 +98,11 @@ done
 
 rm install/*.tar
 tar -cf install/$NAME.tar . $EXSTRING && cd install && zip $FILENAME * -x \*.zip
+
+# revert changes made to appinfo.json
+if [ 1 -eq $REVERT_APPINFO ]; then
+  svn --force revert appinfo.json
+fi
 
 if [ $? != 0 ]; then
   echo "Build Failed"
