@@ -29,34 +29,6 @@ class FavoriteTvShowController extends BaseController
   }
 
   /**
-   * @return array action filters
-   */
-  public function filters()
-  {
-    return array(
-      'accessControl', // perform access control for CRUD operations
-    );
-  }
-
-  /**
-   * Specifies the access control rules.
-   * This method is used by the 'accessControl' filter.
-   * @return array access control rules
-   */
-  public function accessRules()
-  {
-    return array(
-      array('allow', // allow authenticated user 
-        'actions'=>array('create','update','delete','list','show'),
-        'users'=>array('@'),
-      ),
-      array('deny',  // deny all users
-        'users'=>array('*'),
-      ),
-    );
-  }
-
-  /**
    * Lists all favorites.
    */
   public function actionList($options = array())
@@ -82,10 +54,9 @@ class FavoriteTvShowController extends BaseController
    * createViewVariables 
    * 
    * @param favoriteTvShow $model 
-   * @access public
    * @return void
    */
-  function createViewVariables($model)
+  public function createViewVariables($model)
   {
     $out = array();
     if($model->isNewRecord)

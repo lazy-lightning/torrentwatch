@@ -2,6 +2,19 @@
 
 class SiteController extends BaseController
 {
+  
+  /**
+   * runActionWithFilters  allows all access to this controller
+   * 
+   * @param CAction $action 
+   * @param array $filters 
+   * @return void
+   */
+  public function runActionWithFilters($action,$filters)
+  {
+    $this->runAction($action);
+  }
+
   /**
    * Declares class-based actions.
    */
