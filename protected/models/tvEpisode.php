@@ -121,16 +121,27 @@ class tvEpisode extends CActiveRecord
       $e = $this->episode;
       $s = $this->season;
     }
+
     if($e > 10000) 
-    {
-      $date = new DateTime('Jan 1 1970', new DateTimeZone('UTC'));
-      $date->modify('+'.$e.' secconds');
-      return $date->format('Y-m-d');
-    }
-    elseif($s > 0 && $e == 0)
-      return sprintf('S%02dE??', $s);
-    else 
-      return sprintf('S%02dE%02d', $s, $e);
+      return $this->getEpisodeDateString($e);
+    // oddly faster than sprintf
+    if($s<10)
+      $s = '0'.$s;
+    if($e == 0)
+      return "S${s}E??";
+    if($e<10)
+      return "S${s}E0${e}";
+    return "S${s}E${e}";
+  }
+
+  protected function getEpisodeDateString($time)
+  {
+    static $utc = null;
+    if($utc === null)
+      $utc = new DateTime('Jan 1 1970', new DateTimeZone('UTC'));
+    $date = clone $utc;
+    $date->modify('+'.$time.'s');
+    return $date->format('Y-m-d');
   }
 
 }
