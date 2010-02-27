@@ -5,9 +5,8 @@
       array('class'=>'favinfo', 'id'=>'favoriteTvShow-'.$model->id)
   );
   echo CHtml::errorSummary($model);
-?>
-<?php if(isset($success) && $success): ?>
-<div class='saved'>Saved</div>
+if(isset($success) && $success): ?>
+  <div class='saved'>Saved</div>
 <?php endif; ?>
 <div class="favorite_name">
  <?php 

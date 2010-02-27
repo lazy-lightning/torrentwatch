@@ -5,7 +5,9 @@
       array('class'=>'favinfo', 'id'=>'favoriteMovie-'.$model->id)
   );
   echo CHtml::errorSummary($model);
-?>
+  if(isset($success) && $success): ?>
+    <div class='saved'>Saved</div>
+<?php endif; ?>
  <div class="favorite_name">
   <?php 
     echo CHtml::activeLabelEx($model, 'name', array('title'=>'Must be unique and does not effect matching')).': '.
