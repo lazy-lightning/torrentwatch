@@ -1,7 +1,7 @@
 #!/bin/sh
 cd $(echo $0 | sed 's,[^/]*$,,')
-protected/yiic updateFeeds
-protected/yiic dbMaintinance
-protected/yiic updateTVDB
-protected/yiic updateIMDB
-protected/yiic pruneCache
+
+for command in updateFeeds dbMaintinance updateTVDB updateIMDB pruneCache checkVersion
+do
+  protected/yiic $command
+done
