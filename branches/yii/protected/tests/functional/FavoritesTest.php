@@ -41,6 +41,7 @@ class FavoritesTest extends WebTestCase
       'favoriteForm'            => '{}div',
       'newFavoriteLink'         => "xpath=id('{type}-li-')/a",
       'saveFavoriteButton'      => '{}div/a[1]',
+      'saved'                   => "{}x:div[@class='saved']",
       'toggleFavoriteMovieTab'  => "xpath=id('favorites')/div[2]/ul/li[2]/a",
       'toggleFavoriteStringTab' => "xpath=id('favorites')/div[2]/ul/li[3]/a",
       'toggleFavoritesButton'   => 'link=Favorites',
@@ -196,7 +197,8 @@ class FavoritesTest extends WebTestCase
     // Remove one of the qualitys
     $this->select($l['favoriteQualitySelect']."[2]", 'value=-1');
     // Click update button
-    $this->clickAndWaitFor($l['updateFavoriteButton']);
+    $this->click($l['updateFavoriteButton']);
+    $this->waitForElementPresent($l['saved']);
     // Verify it saved
     $this->assertElementNotPresent($l['errorSummary']);
     $this->assertValue($l['favoriteQualitySelect']."[2]", '-1');
