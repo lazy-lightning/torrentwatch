@@ -24,37 +24,6 @@ class TvEpisodeController extends BaseController
   }
 
   /**
-   * @return array action filters
-   */
-  public function filters()
-  {
-    return array(
-      'accessControl', // perform access control for CRUD operations
-    );
-  }
-
-  /**
-   * Specifies the access control rules.
-   * This method is used by the 'accessControl' filter.
-   * @return array access control rules
-   */
-  public function accessRules()
-  {
-    return array(
-      array('allow', // allow authenticated user to perform actions
-        'actions'=>array(
-          'list', 'show', 'inspect',
-          'makeFavorite', 'startDownload',
-        ),
-        'users'=>array('@'),
-      ),
-      array('deny',  // deny all users
-        'users'=>array('*'),
-      ),
-    );
-  }
-
-  /**
    * Shows a particular tvepisode.
    */
   public function actionShow()
@@ -90,7 +59,7 @@ EOD
       $condition = 's.id NOT IN (SELECT id FROM tvShow WHERE hide = 1) AND '.$condition;
 
     $pages=new CPagination($db->createCommand("SELECT count(*) FROM $tables WHERE $condition")->queryScalar());
-    $pageSize = $pages->pageSize=Yii::app()->dvrConfig->webItemsPerLoad;
+    $pageSize = $pages->pageSize = Yii::app()->dvrConfig->webItemsPerLoad;
 
     $cmd = $db->createCommand(
             "SELECT $vars FROM $tables WHERE $condition ORDER BY e.lastUpdated DESC LIMIT {$pages->pageSize} OFFSET ".($pages->currentPage*$pageSize)

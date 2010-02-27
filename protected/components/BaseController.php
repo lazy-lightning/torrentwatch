@@ -5,6 +5,24 @@ abstract class BaseController extends CController {
   public $imageRoot;
 
   /**
+   * runActionWithFilters 
+   * Override normal access control filtering so only check for is/isnot
+   * guest, skips the whole filter chain code set for simplicity.
+   * 
+   * @param CAction $action 
+   * @param array $filters 
+   * @return void
+   */
+  public function runActionWithFilters($action,$filters)
+  {
+    $user = Yii::app()->getUser();
+    if($user->getIsGuest())
+      $user->loginRequired();
+    else
+      $this->runAction($action);
+  }
+
+  /**
    * @return array list of items to be used as the side bar menu
    */
   public function getMainMenuItems() {
