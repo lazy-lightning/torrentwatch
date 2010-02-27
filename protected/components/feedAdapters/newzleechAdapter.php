@@ -8,7 +8,7 @@ class newzleechAdapter extends rssFeedAdapter {
   public function __construct($feed, $cache_location = null, $simplePie = 'newzleechSimplePie') 
   {
     parent::__construct($feed, $cache_location, $simplePie);
-    $this->set_item_class('newzleechItem');
+    $this->simplePie->set_item_class('newzleechItem');
   }
 }
 
