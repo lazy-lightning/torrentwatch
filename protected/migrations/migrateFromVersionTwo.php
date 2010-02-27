@@ -1,14 +1,45 @@
 <?php
 
+/**
+ * migrateFromVersionTwo  encompases changes made to the db in r623 and r648
+ * 
+ * @uses dbMigration
+ * @package nmtdvr
+ * @version $id$
+ * @copyright Copyright &copy; 2009-2010 Erik Bernhardson
+ * @author Erik Bernhardson <journey4712@yahoo.com> 
+ * @license GNU General Public License v2 http://www.gnu.org/licenses/gpl-2.0.txt
+ */
 class migrateFromVersionTwo extends dbMigration {
   public function run()
   {
+    // r623
     $this->db->createCommand(
           "INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('matchingTimeLimit', 24, NULL)"
     )->execute();
+    // r623
+    $this->db->createCommand(
+        "DELETE FROM dvrConfig WHERE key='feedItemLifetime' AND dvrConfigCategory_id IS NULL"
+    )->execute();
+    // r623
     $this->replaceView('matchingFavoriteMovies', $this->getMatchingFavoriteMoviesSql());
+    // r623
     $this->replaceView('matchingFavoriteStrings', $this->getMatchingFavoriteStringsSql());
+    // r623
     $this->replaceView('matchingFavoriteTvShows', $this->getMatchingFavoriteTvShowsSql());
+
+
+    // The status column of other table did not have a type declaration
+    // which sqlite could care less about, but yii needs
+    // r648
+    $this->recreateTable('other', $this->getOtherColumnDef(), array(
+        'id', 'title', 'status', 'lastUpdated', 'lastImdbUpdate'
+    ));
+    // others probably wernt getting scanned, so update 'lastImdbUpdate' to 0 so they get scanned again
+    $this->db->createCommand(
+        'update other set lastImdbUpdate = 0'
+    )->execute();
+
     $this->setDbVersion(3);
   }
 
@@ -137,6 +168,18 @@ SELECT i.feedItem_id feedItem_id,
        );
 EOD
   ;
+  }
+
+  protected function getOtherColumnDef()
+  {
+    return <<<EOD
+      id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+      title TEXT,
+      status INTEGER NOT NULL DEFAULT 0,
+      lastUpdated INTEGER,
+      lastImdbUpdate INTEGER NOT NULL DEFAULT 0
+EOD
+    ;
   }
 
 }
