@@ -5,7 +5,6 @@
  * Make sure the URL ends with a slash so that we can use relative URLs in test cases
  */
 define('TEST_BASE_URL','http://192.168.1.121/nmtdvr/nmtdvr-test.php/');
-
 /**
  * The base class for functional test cases.
  * In this class, we set the base URL for the test application.
@@ -22,6 +21,8 @@ define('TEST_BASE_URL','http://192.168.1.121/nmtdvr/nmtdvr-test.php/');
 class WebTestCase extends CWebTestCase
 {
   public $autostop = false;
+
+  static private $loggedIn = false;
 
   /**
    * Sets up the class before a test is run
@@ -78,11 +79,15 @@ class WebTestCase extends CWebTestCase
    */
   protected function login()
   {
-    // Open and perform login
-    $this->open('?r=site/login');
-    $this->type('name=LoginForm[username]','demo');
-    $this->type('name=LoginForm[password]','demo');
-    $this->clickAndWait("//input[@value='Login']");
+    if(!self::$loggedIn)
+    {
+      // Open and perform login
+      $this->open('?r=site/login');
+      $this->type('name=LoginForm[username]','demo');
+      $this->type('name=LoginForm[password]','demo');
+      $this->clickAndWait("//input[@value='Login']");
+      self::$loggedIn = true;
+    }
     // Open page and close initial welcome screen
     $this->open('../index-test.html');
     $this->closeWelcome();
@@ -95,11 +100,11 @@ class WebTestCase extends CWebTestCase
    */
   protected function closeWelcome()
   {
-    $this->waitForElementPresent('link=Close');
-    usleep(500000);
+    $this->waitForElementPresent('css=div.close');
+    //usleep(500000);
     // Click the close wizard button
-    $this->click('link=Close');
-    $this->waitForElementNotVisible('link=Close');
+    $this->click('css=div.close');
+    $this->waitForElementNotVisible('css=div.close');
   }
 
 	/**
