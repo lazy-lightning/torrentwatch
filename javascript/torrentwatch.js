@@ -385,18 +385,27 @@
         });
         
         // Initialize the feed items and open wizard if empty on first load
+        var onShow = function (clicked, toShow, toHide) {
+            if (showWelcomeScreen && clicked && !clicked.jquery) {
+                if ($(toShow).children('ul').children().length <= 1 && $(".login_form").length === 0) {
+                    $.get($('#wizardLink')[0].href, '', $.loadAjaxUpdate, 'html');
+                }
+                showWelcomeScreen = false;
+            }
+        };
         $("#feedItems_container").tabs({ 
             remote: true,
-            onShow: function (clicked, toShow, toHide) {
-                if (showWelcomeScreen && clicked && !clicked.jquery) {
-                    if ($(toShow).children('ul').children().length <= 1 && $(".login_form").length === 0) {
-                        $.get($('#wizardLink')[0].href, '', $.loadAjaxUpdate, 'html');
-                    }
-                    showWelcomeScreen = false;
-                }
-            }
-        }).tabsResetAjax();
-    
+            onShow: onShow
+        });
+        // grab initial value of feedItems_container
+        var x = function() {
+          if(window.PRELOADED) {
+            onShow(true, $("#remote-tab-1").append(window.PRELOADED), null);
+          }
+          else
+            setTimeout(x,50);
+        };
+        setTimeout(x, 0);
         $("#configuration .content").tabs({
             remote: true,
             onShow: function (clicked, toShow, toHide) {
