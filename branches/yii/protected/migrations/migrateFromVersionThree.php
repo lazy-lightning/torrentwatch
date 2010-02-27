@@ -1,11 +1,25 @@
 <?php
 
+/**
+ * migrateFromVersionThree encompases changes made to the db in r688, r693 and r695
+ * 
+ * @uses dbMigration
+ * @package nmtdvr
+ * @version $id$
+ * @copyright Copyright &copy; 2009-2010 Erik Bernhardson
+ * @author Erik Bernhardson <journey4712@yahoo.com> 
+ * @license GNU General Public License v2 http://www.gnu.org/licenses/gpl-2.0.txt
+ */
 class migrateFromVersionThree extends dbMigration {
   public function run()
   {
+    // r688 && r693 && r695(formattingc change only)
     $this->replaceView('matchingFavoriteTvShows', $this->getTvShowsSql());
+    // r693 && r695
     $this->replaceView('matchingFavoriteMovies', $this->getMoviesSql());
+    // r693
     $this->replaceView('matchingFavoriteStrings', $this->getStringsSql());
+
     $this->setDbVersion(4);
   }
 
