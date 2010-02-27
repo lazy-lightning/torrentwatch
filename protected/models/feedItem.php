@@ -200,11 +200,19 @@ class feedItem extends CActiveRecord
     return null;
   }
 
+  /**
+   * getFavorite will return a a favorite that matches this feed item, if one exists.
+   * if multiple favorites exist tv/movie favorites take precedence over string favorites
+   * otherwise null is returned
+   *
+   * @return BaseFavorite
+   */
   public function getFavorite()
   {
-    if(null!==($related=$this->getItemTypeRecord()))
+    if(null !== ($related=$this->getItemTypeRecord()))
     {
-      return $related->getFavorite();
+      if(($fav = $related->getFavorite()))
+        return $fav;
     }
 
     $favoriteId = $this->dbConnection->createCommand(array(
