@@ -7,29 +7,25 @@ function fakenew($class)
 }
 // This is the first view loaded when opening the page, so most of the 
 // convenience methods were skipped to speed up rendering     
-$url = Yii::app()->getUrlManager();
 $feedItem = fakenew('feedItem');
 $tvEpisode = fakenew('tvEpisode');
-$inspect = $url->createUrl('tvEpisode/inspect', array('id'=>'{id}'));
-$list = $url->createUrl('feedItem/list', array('related'=>'tvEpisode', 'id'=>'{id}'));
-$start = $url->createUrl('tvEpisode/startDownload', array('id'=>'{id}'));
-$makeFav = $url->createUrl('tvEpisode/makeFavorite', array('id'=>'{id}'));
-$hide = $url->createUrl('tvShow/hide', array('tid'=>'{tid}'));
+$charset = Yii::app()->charset;
 foreach($tvepisodeList as $n => $row) {
   $id = $row['id'];
-  $epString = CHtml::encode($tvEpisode->getEpisodeString($row['season'], $row['episode']));
+  $epString = htmlspecialchars($tvEpisode->getEpisodeString($row['season'], $row['episode']), ENT_QUOTES, $charset);
   $status = strtok($feedItem->getStatusText($row['feedItem_status']), ' ');
   $alt = $n%2?' alt':' notalt';
-  $title = CHtml::encode($row['tvShow_title']);
-  $epTitle = empty($row['title'])?'':(":  <span class='epTitle'>".CHtml::encode($row['title'])."</span>");
+  $title = htmlspecialchars($row['tvShow_title'], ENT_QUOTES, $charset);
+  $epTitle = empty($row['title'])?'':(":  <span class='epTitle'>".htmlspecialchars($row['title'], ENT_QUOTES, $charset)."</span>");
   $pubDate = date("M d h:i a", $row['lastUpdated']);
-  $l = str_replace('%7Bid%7D', $id, $list);
-  $s = str_replace('%7Bid%7D', $id, $start);
-  $m = str_replace('%7Bid%7D', $id, $makeFav);
-  $h = str_replace('%7Btid%7D', $row['tvShow_id'], $hide);
+  $i = "nmtdvr.php?r=tvEpisode/inspect&id=$id";
+  $l = "nmtdvr.php?r=tvEpisode/list&id=$id";
+  $s = "nmtdvr.php?r=tvEpisode/startDownload&id=$id";
+  $m = "nmtdvr.php?r=tvEpisode/makeFavorite&id=$id";
+  $h = "nmtdvr.php?r=tvShow/hide&id=".$row['tvShow_id'];
   echo <<<EOD
 <li id='tvEpisode-$id' class='torrent hasDuplicates match_$status $alt'>
-  <a href='".str_replace('%7Bid%7D', $id, $inspect)."' class='loadInspector ajaxSubmit' title='Get Detailed Media Information'></a>
+  <a href='$i' class='loadInspector ajaxSubmit' title='Get Detailed Media Information'></a>
   <div class='itemButtons'>
     <a href='$l' class='loadDuplicates'>Related FeedItems</a>
     <a href='$s' class='startDownload ajaxSubmit' title='Start Download'>&nbsp;</a>
