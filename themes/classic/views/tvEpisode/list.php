@@ -9,6 +9,7 @@ function fakenew($class)
 // convenience methods were skipped to speed up rendering     
 $feedItem = fakenew('feedItem');
 $tvEpisode = fakenew('tvEpisode');
+$baseurl = Yii::app()->request->getScriptUrl();
 $charset = Yii::app()->charset;
 foreach($tvepisodeList as $n => $row) {
   $id = $row['id'];
@@ -18,11 +19,11 @@ foreach($tvepisodeList as $n => $row) {
   $title = htmlspecialchars($row['tvShow_title'], ENT_QUOTES, $charset);
   $epTitle = empty($row['title'])?'':(":  <span class='epTitle'>".htmlspecialchars($row['title'], ENT_QUOTES, $charset)."</span>");
   $pubDate = date("M d h:i a", $row['lastUpdated']);
-  $i = "nmtdvr.php?r=tvEpisode/inspect&id=$id";
-  $l = "nmtdvr.php?r=tvEpisode/list&id=$id";
-  $s = "nmtdvr.php?r=tvEpisode/startDownload&id=$id";
-  $m = "nmtdvr.php?r=tvEpisode/makeFavorite&id=$id";
-  $h = "nmtdvr.php?r=tvShow/hide&id=".$row['tvShow_id'];
+  $i = "$baseurl?r=tvEpisode/inspect&id=$id";
+  $l = "$baseurl?r=tvEpisode/list&id=$id";
+  $s = "$baseurl?r=tvEpisode/startDownload&id=$id";
+  $m = "$baseurl?r=tvEpisode/makeFavorite&id=$id";
+  $h = "$baseurl?r=tvShow/hide&id=".$row['tvShow_id'];
   echo <<<EOD
 <li id='tvEpisode-$id' class='torrent hasDuplicates match_$status $alt'>
   <a href='$i' class='loadInspector ajaxSubmit' title='Get Detailed Media Information'></a>
