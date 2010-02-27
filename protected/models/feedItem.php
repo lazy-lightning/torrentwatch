@@ -215,10 +215,10 @@ class feedItem extends CActiveRecord
         return $fav;
     }
 
-    $favoriteId = $this->dbConnection->createCommand(array(
+    $favoriteId = $this->dbConnection->createCommand(
           'SELECT favoriteStrings_id FROM matchingFavoriteStrings'.
-          ' WHERE feedItem_id = :id', array(':id'=>$this->id)
-    ))->queryScalar();
+          ' WHERE feedItem_id = :id'
+    )->bindValue(':id', $this->id)->queryScalar();
     if($favoriteId)
       return favoriteString::model()->findByPk($favoriteId);
 
