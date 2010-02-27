@@ -8,6 +8,17 @@
   <!--[if IE]>
     <link rel="Stylesheet" type="text/css" href="css/ie.css"></link>
   <![endif]-->
+<script type='text/javascript'>
+var x = new XMLHttpRequest();
+x.open('GET', 'nmtdvr-test.php?r=tvEpisode/list', true);
+x.onreadystatechange = function()
+{
+  if(x.readyState != 4)
+    return;
+  window.PRELOADED = x.responseText;
+};
+x.send(null);
+</script>
   <!--
   <script type="text/javascript" src="javascript/joined.js"></script>
   <script type="text/javascript" src="javascript/min.js"></script>
@@ -16,12 +27,12 @@
   <script type="text/javascript" src="javascript/jquery.cookie.js"></script>
   <script type="text/javascript" src="javascript/jquery.tinysort.js"></script>
   <script type="text/javascript" src="javascript/jquery.tabs.js"></script>
+  <script type="text/javascript" src="javascript/jquery.autocomplete.js"></script>
   <script type="text/javascript" src="javascript/torrentwatch.js"></script>
 </head>
 <body>
 <a id="wizardLink" class="hidden" href="nmtdvr-test.php?r=dvrConfig/welcome"></a>
 <ul class="mainoptions" id="mainoptions">
-  <li class="divider">&nbsp;</li>
   <li id="favoritesMenu"><a class="toggleDialog" rel="#favorites" href="#favorites">Favorites</a></li>
   <li id="config"><a class="toggleDialog" href="#configuration">Configure</a></li>
   <li class="divider">&nbsp;</li>
@@ -39,21 +50,21 @@
 <div class="progressbar dialog_window" id="progressbar">
   <div class="content clearfix">
 <!--<img src="images/ajaxload.gif"> -->
-    <img src="data:image/gif;base64,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">
+    <img alt="Loading" height="44" width="97" src="data:image/gif;base64,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">
   </div>
 </div>
 <div class="expose">&nbsp;</div>
 <div id="inspector_container">
-  <div id="inspector_loading">
-    <h2>Right click any feed item and select Inspect</h2>
+  <div class="mediaDetails">
+    <h2>Click the light blue button at the upper right of an item to get more information</h2>
   </div>
-  <div id="inspector_info"></div>
 </div>
 <div id="feedItems_container">
   <ul>
     <li><a href="nmtdvr-test.php?r=tvEpisode/list"><span>TV Episodes</span></a></li>
     <li><a href="nmtdvr-test.php?r=movie/list"><span>Movies</span></a></li>
     <li><a href="nmtdvr-test.php?r=other/list"><span>Others</span></a></li>
+    <li><a href="nmtdvr-test.php?r=feedItem/list&status=queued"><span>Queued</span></a></li>
   </ul>
 </div>
 <div id="favorites" class="dialog_window">
@@ -91,29 +102,53 @@
     </li>
     <li class="torrent match_Downloaded alt">
       <div class="itemButtons">
-      <h3>Started</h3>
-      <div>Feed item was sent to the download client</div>
+        <h3>Started</h3>
+        <div>Feed item was sent to the download client</div>
       </div>
     </li>
     <li class="torrent match_Old alt">
       <div class="itemButtons">
-      <h3>Old or Duplicate episode</h3>
-      <div>
-        Episode is downloaded previously or older than the most recently downloaded episode
+        <h3>Old or Duplicate episode</h3>
+        <div>
+          Episode is downloaded previously or older than the most recently downloaded episode
+        </div>
       </div>
     </li>
     <li class="torrent match_Queued">
       <div class="itemButtons">
-      <h3>Queued</h3>
-      <div>Feed Item is queued for user to act on</div>
+        <h3>Queued</h3>
+        <div>Feed Item is queued for user to act on</div>
       </div>
     </li>
     <li class="torrent match_New alt">
       <div class="itemButtons">
-      <h3>New</h3>
-      <div>Feed Item is new and has not yet been processed for favorites.  Suggest refreshing page</div>
+        <h3>New</h3>
+        <div>Feed Item is new and has not yet been processed for favorites.  Suggest refreshing page</div>
       </div>
     </li>
   </ul></div>
 </div>
+<div class="dialog_window" id="reset_data">
+  <div class="content">
+    <h2 class="dialog_heading">Reset Stored Data</h2>
+    <ul>
+      <li class="clearFix">
+        <a href='nmtdvr-test.php?r=resetData/all' class='button ajaxSubmit'>All</a>
+        <p>Delete both media and feedItem data and update feeds from the internet</p>
+      </li>
+      <li class="clearFix">
+        <a href='nmtdvr-test.php?r=resetData/media' class='button ajaxSubmit'>Media</a>
+        <p>Reset all media types(episodes, movies, etc) to new status</p>
+      </li>
+      <li class="clearFix">
+        <a href='nmtdvr-test.php?r=resetData/feedItems' class='button ajaxSubmit'>Items</a>
+        <p>Reset all feed items to unmatched status</p>
+      </li>
+    </ul>
+    <div class="buttonContainer clearFix">
+      <a class="toggleDialog button" href="#">Close</a>
+    </div>
+  </div>
+</div>
+
 </body></html>

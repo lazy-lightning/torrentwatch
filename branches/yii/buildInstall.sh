@@ -14,7 +14,6 @@ EXCLUDES="install testing protected/data/source-test.db.BACKUP protected/data/so
 # Dont change below here unless you know what you are doing
 
 GENERATE_VERSION=1
-REVERT_APPINFO=0
 CURRENTSVN=$(svn status | egrep -v '^\?|buildInstall.sh')
 
 # test php for basic syntax errors
@@ -55,7 +54,6 @@ if [ $GENERATE_VERSION -eq 1 ]; then
   # changeup the appinfo.json file
   cat appinfo.json | sed "s/\\\$id\\\$/${VERSION}/" > appinfo.json.new
   mv appinfo.json.new appinfo.json
-  REVERT_APPINFO=1
 fi
 
 FILENAME="$NAME-$VERSION.zip"
@@ -69,8 +67,20 @@ if [ -f install/$FILENAME ]; then
 fi
 
 echo minify and join some files
+cat index.html | sed 's/<script .* src=.*//' > index.html.temp
 testing/buildMin.sh 2> /dev/null
-php testing/inline-css-to-html.php >/dev/null
+testing/inline-css-to-html.php index.html.temp index-joined.html >/dev/null
+rm index.html.temp
+echo "<script type='text/javascript'>" >> index-joined.html
+cat javascript/min.js >> index-joined.html
+echo "</script>" >> index-joined.html
+
+if [ $GENERATE_VERSION -eq 0 ];then
+  # this is a release, use the joined version as main index.html
+  mv index.html index.dev.html
+  mv index-joined.html index.html
+  REVERT_INDEX=1
+fi
 
 # if the testdb was orrigionally a sym-link, preserve
 # that sym-link
@@ -102,10 +112,13 @@ tar -cf install/$NAME.tar . $EXSTRING && cd install && \
 echo "building outer zip archive" && zip $FILENAME * -x \*.zip
 
 # revert changes made to appinfo.json
-if [ 1 -eq $REVERT_APPINFO ]; then
-  FILE="../appinfo.json"
-  svn revert $FILE >/dev/null
+if [ 1 -eq $GENERATE_VERSION ]; then
+  svn revert ../appinfo.json >/dev/null
+else
+  mv ../index.html ../index-joined.html
+  mv ../index.dev.html ../index.html
 fi
+
 
 if [ $? != 0 ]; then
   echo "Build Failed"
