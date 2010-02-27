@@ -17,6 +17,16 @@ GENERATE_VERSION=1
 REVERT_APPINFO=0
 CURRENTSVN=$(svn status | egrep -v '^\?|buildInstall.sh')
 
+# test php for basic syntax errors
+find ./ -iname \*.php | egrep -v 'svn|yii_framework|PHPUnit' | xargs -L 1 php -l 
+if [ ! 0 -eq $? ];then
+  cat <<EOD
+
+Please fix lint errors before building package.
+EOD
+  exit 1;
+fi
+
 if [ x"$1" = x"release" ]; then
   # dont generate an svn version
   GENERATE_VERSION=0
@@ -58,17 +68,7 @@ if [ -f install/$FILENAME ]; then
   fi
 fi
 
-# test php for basic syntax errors
-find ./ -iname \*.php | egrep -v 'svn|yii_framework|PHPUnit' | xargs -L 1 php -l
-if [ ! 0 -eq $? ];then
-  cat <<EOD
-
-Please fix lint errors before building package.
-EOD
-  exit 1;
-fi
-
-# minify/join some files
+echo minify and join some files
 testing/buildMin.sh 2> /dev/null
 php testing/inline-css-to-html.php >/dev/null
 
@@ -79,9 +79,9 @@ if [ -h $TESTDB ]; then
   LINK=$(readlink $TESTDB)
 fi
 
-# generate the initial database
+echo generate the initial database
 rm -f $TESTDB
-cd protected/data && ./genOrig.sh && cd -
+cd protected/data && ./genOrig.sh && cd - >/dev/null
 
 # regenerate the sym-link
 if [ x"$LINK" != x"" ];then
@@ -96,12 +96,15 @@ for EX in $EXCLUDES; do
   EXSTRING="$EXSTRING --exclude=$EX"
 done
 
+echo building inner tar archive
 rm install/*.tar
-tar -cf install/$NAME.tar . $EXSTRING && cd install && zip $FILENAME * -x \*.zip
+tar -cf install/$NAME.tar . $EXSTRING && cd install && \
+echo "building outer zip archive" && zip $FILENAME * -x \*.zip
 
 # revert changes made to appinfo.json
 if [ 1 -eq $REVERT_APPINFO ]; then
-  svn --force revert appinfo.json
+  FILE="../appinfo.json"
+  svn revert $FILE >/dev/null
 fi
 
 if [ $? != 0 ]; then
@@ -113,9 +116,16 @@ cat <<EOF
 
 Built install/$FILENAME
 
-Upload to A100 (A) / C200 (C) / Upload to net (U)
+Upload to A100 (A) / C200 (C) / Upload to net (U) / Delete (D)
 EOF
 read CHAR
+
+if [ x"$CHAR" = x"D" ];then
+  echo "Deleting $FILENAME"
+  echo
+  rm $FILENAME
+  exit
+fi
 
 if [ x"$CHAR" = x"a" -o x"$CHAR" = x"A" ];then
   BM=$LFTP_A100_BOOKMARK
@@ -127,8 +137,8 @@ if [ x"$CHAR" = x"c" -o x"$CHAR" = x"C" ]; then
   REMOTE_ADDR=$C200_ADDR
 fi
 
-if [ -n $BM ]; then
-  echo "put \"$NAME.tar\"" | lftp $BM && wget -q --header "Host: localhost.drives" -O - "http://$REMOTE_ADDR/$APPINIT?install&%2Fshare%2F$NAME.tar"
+if [ x"$BM" != x"" ]; then
+  echo "put \"$FILENAME.tar\"" | lftp $BM && wget -q --header "Host: localhost.drives" -O - "http://$REMOTE_ADDR/$APPINIT?install&%2Fshare%2F$NAME.tar"
 fi
 
 if [ x"$CHAR" = x"u" -o x"$CHAR" = x"U" ];then
