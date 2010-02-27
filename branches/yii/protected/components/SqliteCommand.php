@@ -45,10 +45,11 @@ class SqliteCommand extends CDbCommand
     }
     catch (CDbException $e)
     {
-      echo "caught error\n";
       if(false !== strpos($e->getMessage(), 'General error: 17'))
       {
-        // database schema has changed
+        // database schema has changed, re-prepare the query
+        // sqlite cant do this on its own because it doesnt know the querys
+        // sql after preparing it, but we do.
         $this->cancel();
         $ret = parent::queryInternal($method, $mode, $params);
       }

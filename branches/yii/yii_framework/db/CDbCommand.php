@@ -335,7 +335,7 @@ class CDbCommand extends CComponent
 	 * This parameter has been available since version 1.0.10.
 	 * @return mixed the method execution result
 	 */
-	private function queryInternal($method,$mode,$params=array())
+	protected function queryInternal($method,$mode,$params=array())
 	{
 		if($this->_connection->enableParamLogging && ($pars=array_merge($this->_params,$params))!==array())
 		{
