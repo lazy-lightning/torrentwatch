@@ -190,22 +190,24 @@ class Scraper {
     {
       $chars = similar_text(trim($needle),trim($haystack[$i]),$pc);
       $haystack[$i] .= " (".round($pc,2)."%)";
-
       if ( ($chars > $best_match["chars"] && $pc >= $best_match["pc"]) || $pc > $best_match["pc"])
         $best_match = array("id" => $i, "chars" => $chars, "pc" => $pc);
+      // if detcted title is title (subtitle) (year) retry as title (year)
+      // TODO: does this effect regular matching?  does this even work entirely as intended
+      //if(preg_match('/^([^(]+)\([A-Z]+[^)]+\) *(\(\d+\))? /', $haystack[$i], $regs))
+      //  $haystack[$i--] = $regs[1].(isset($regs[2]) ? trim($regs[2]) : '');
     }
 
     // If we are sure that we found a good result, then get the file details.
     if ($best_match["pc"] > 75)
     {
-      Yii::log('Possible matches are:',$haystack);
-      Yii::log('Best guess: ['.$best_match["id"].'] - '.$haystack[$best_match["id"]]);
+      Yii::log('Best guess: ['.$best_match["id"].'] - '.$haystack[$best_match["id"]], CLogger::LEVEL_INFO);
       $this->accuracy = $best_match["pc"];
       return $best_match["id"];
     }
     else
     {
-      Yii::log('Multiple Matches found, No match > 75%',$haystack);
+      Yii::log('Multiple Matches found, No match > 75%', CLogger::LEVEL_ERROR);
       return false;
     }
   }
@@ -241,7 +243,7 @@ class IMDbScraper extends Scraper {
     }
     else
     {
-      // User IMDb's internal search to get a list a possible matches
+      // Use IMDb's internal search to get a list a possible matches
       // IMDB doesn't like year in search, so save it for later reference
       if (preg_match("/(.*)(\d\d\d\d)/",$title,$title_regs) != 0) 
       {
@@ -260,11 +262,13 @@ class IMDbScraper extends Scraper {
     if(isset($title_year))
     {
       $html = preg_replace('/<\/a>\s+\((\d\d\d\d).*\)/Ui',' ($1)</a>',$html);
-      $title .= ' ('.$title_year[0].')';
+      $title .= ' ('.$title_year.')';
     }
 
     // Examine returned page
-    if (strpos(strtolower($html),"no matches") !== false)
+    $lhtml = strtolower($html);
+    if (strpos($lhtml,"no matches") !== false ||
+        strpos($lhtml, "enter a word or phrase to search on") !== false)
     {
       // There are no matches found... do nothing
       $this->accuracy = 0;

@@ -81,6 +81,7 @@ class updateIMDbCommand extends BaseConsoleCommand {
       echo "Looking for Imdb Id: ".$row['imdbId']."\n";
       if(($scraper = $this->movieDetails->getScraper($row['imdbId'])))
       {
+        echo "Found ".$scraper->title."\n";
         $this->toSave[] = array(
             'scraper'=>$scraper,
             'movie_id'=>$row['id']
@@ -95,7 +96,7 @@ class updateIMDbCommand extends BaseConsoleCommand {
   protected function scanOthers() {
     $scanned = array();
     $reader = $this->db->createCommand(
-        'SELECT id, title'.
+        'SELECT id, title, lastUpdated'.
         '  FROM other'.
         ' WHERE lastImdbUpdate = 0'
     )->queryAll();
@@ -104,9 +105,11 @@ class updateIMDbCommand extends BaseConsoleCommand {
       echo "Searching IMDb for $title\n";
       if(($scraper = $this->movieDetails->getScraper($title)))
       {
+        echo "Found ".$scraper->title."\n";
         $this->toSave[] = array(
             'other_id'    => $row['id'], 
             'other_title' => $row['title'],
+            'other_lastUpdated' => $row['lastUpdated'],
             'scraper'     => $scraper
         );
       }
@@ -114,9 +117,25 @@ class updateIMDbCommand extends BaseConsoleCommand {
         $scanned[] = $row['id'];
     }
 
-    // Seperate from above so the transaction wont be held during network access
     if(count($scanned))
       $this->scanned[] = array(other::model(), $scanned);
+  }
+
+  /**
+   * prepareOther gets the movie 
+   * 
+   * @param array $row 
+   * @return movie
+   */
+  protected function prepareOther($row)
+  {
+    $movie = $this->factory->movieByImdbId($row['scraper']->imdbId, $row['other_title']);
+    $movie->lastUpdated = max($movie->lastUpdated, $row['other_lastUpdated']);
+    // repoint feed items
+    $this->repointOther($row['other_id'], $movie->id);
+    // fix bug where newly saved CActiveRecords cant be saved again
+    $movie->setPrimaryKey($movie->id);
+    return $movie;
   }
 
   protected function updateDatabase()
@@ -129,20 +148,12 @@ class updateIMDbCommand extends BaseConsoleCommand {
     }
 
     foreach($this->toSave as $row) {
-      $scraper = $row['scraper'];
       if(isset($row['other_id']))
-      {
-        $tmpMovie = $this->factory->movieByImdbId($scraper->imdbId, $row['other_title']);
-        // TODO: seems a movie from the factory cant be altered and saved again
-        //       so get another copy of the same model
-        $row['movie_id'] = $tmpMovie->id;
-        // repoint feed items
-        $this->repointOther($row['other_id'], $tmpMovie->id);
-      }
+        $movie = $this->prepareOther($row);
+      else
+        $movie = movie::model()->findByPk($row['movie_id']);
 
-      $movie = movie::model()->findByPk($row['movie_id']);
-
-      $this->movieDetails->updateMovieFromScraper($movie, $scraper);
+      $this->movieDetails->updateMovieFromScraper($movie, $row['scraper']);
     }
     echo 'Saved '.count($this->toSave).' items'."\n";
     $this->toSave = array();
