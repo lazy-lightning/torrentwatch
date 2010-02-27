@@ -21,6 +21,7 @@ interface IFeedAdapter
   /**
    * checkFeedItems will contain all database activity including
    * adding any new items from a feed
+   * if a factory is not provided Yii::app()->modelFactory is to be used
    *
    * @param modelFactory the factory with which to initialize feed items
    * @return void
