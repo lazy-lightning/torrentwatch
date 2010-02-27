@@ -41,6 +41,8 @@ class IMDbAdapter
       if(substr($title, -4) === '1080')
         $title = substr($title, 0, -4);
 
+      // replace . with space, imdb isn't a fan of this.movie.name.(2009)
+      $title = str_replace('.', ' ', $title);
       $scraper = new IMDbScraper($title);
 
       // maybee it has a prefix
@@ -67,10 +69,11 @@ class IMDbAdapter
 
   public function updateMovieFromScraper($movie, $scraper)
   {
+    // imdb returns iso-8859-1
     $movie->year = $scraper->year;
-    $movie->name = $scraper->title;
+    $movie->name = iconv('ISO-8859-1', Yii::app()->charset, $scraper->title);
     $movie->runtime = $scraper->runtime;
-    $movie->plot = $scraper->plot;
+    $movie->plot = iconv('ISO-8859-1', Yii::app()->charset, $scraper->plot);
     $movie->rating = strtok($scraper->rating, '/');
     $movie->imdbId = $scraper->imdbId;
     $movie->lastImdbUpdate = time();
