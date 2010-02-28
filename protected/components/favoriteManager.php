@@ -11,7 +11,13 @@ abstract class favoriteManager extends CModel {
   protected function getTimeLimitSQL($timeLimit=true)
   {
     if($timeLimit === true)
-      $timeLimit = 60*60*Yii::app()->dvrConfig->matchingTimeLimit;
+    {
+      $timeLimit = Yii::app()->dvrConfig->matchingTimeLimit;
+      if($timeLimit == 0)
+        return '';
+      $timeLimit = $timeLimit*60*60;
+    }
+
     $timeLimitSQL = '';
     if(is_integer($timeLimit))
       $timeLimitSQL = ' AND feedItem_pubDate>=(SELECT pubDate-'.$timeLimit.' FROM feedItem ORDER BY pubDate DESC LIMIT 1)';
