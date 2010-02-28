@@ -14,7 +14,7 @@ EXCLUDES="install testing protected/data/source-test.db.BACKUP protected/data/so
 # Dont change below here unless you know what you are doing
 
 IS_SVN_RELEASE=1
-CURRENTSVN=$(svn status | egrep -v '^\?|buildInstall.sh')
+CURRENTSVN=$(svn status | egrep -v '^\?|buildInstall.sh|source-test.db')
 
 # test php for basic syntax errors
 find ./ -iname \*.php | egrep -v 'svn|yii_framework|PHPUnit' | xargs -L 1 php -l 
@@ -156,19 +156,20 @@ fi
 
 if [ x"$CHAR" = x"u" -o x"$CHAR" = x"U" ];then
   echo Uploading
-  echo "put \"$FILENAME\"" | lftp $LFTP_NET_BOOKMARK
+#  echo "put \"$FILENAME\"" | lftp $LFTP_NET_BOOKMARK
 
   echo Updating latest.php
   mkdir /tmp/buildinstall.$$
   cd /tmp/buildinstall.$$
   echo "get ../latest.php" | lftp $LFTP_NET_BOOKMARK
   MARKER='// SVN'
-  if [ $IS_SVN_RELEASE -eq 0]; then
+  if [ $IS_SVN_RELEASE -eq 0 ]; then
     MARKER='// RELEASE'
   fi
-  cat latest.php  | sed 's|.*'$MARKER'|  echo "'$VERSION'"; '$MARKER'|' | tee > latest.php.new
-  mv latest.php.new > latest.php
-  echo "cd ..;put latest.php" | lftp $LFTP_NET_BOOKMARK
+  cat latest.php  | sed "s|.*$MARKER|  echo '$VERSION'; $MARKER|" | tee > latest.php.new
+#  mv latest.php.new latest.php
+#  echo "cd ..;put latest.php" | lftp $LFTP_NET_BOOKMARK
+  cd - && rm $FILENAME
 
   echo "Now available As: "
   echo "http://nmtdvr.com/downloads/$NAME-$VERSION.zip"
