@@ -23,6 +23,9 @@ return array(
 
   // application components
   'components'=>array(
+    'cache'=>array(
+      'class'=>'CDbCache',
+    ),
     'dlManager'=>array(
       'class'=>'downloadManager',
     ),
