@@ -2,12 +2,12 @@
 
 class ResetDataController extends BaseController
 {
-	const PAGE_SIZE=10;
+  const PAGE_SIZE=10;
 
-	/**
-	 * @var string specifies the default action to be 'list'.
-	 */
-	public $defaultAction='list';
+  /**
+   * @var string specifies the default action to be 'list'.
+   */
+  public $defaultAction='list';
 
   /**
    * response
@@ -58,10 +58,10 @@ class ResetDataController extends BaseController
     $this->widget('actionResponseWidget', $this->response);
   }
 
-	public function actionList()
-	{
+  public function actionList()
+  {
     $this->render('list');
-	}
+  }
 
   public function actionMedia()
   {
