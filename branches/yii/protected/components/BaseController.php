@@ -22,6 +22,45 @@ abstract class BaseController extends CController {
       $this->runAction($action);
   }
 
+  protected function whitelist($attributes, $whitelist)
+  {
+    $out = array();
+    foreach($whitelist as $key)
+    {
+      if(isset($attributes[$key]))
+        $out[$key] = $attributes[$key];
+    }
+    return $out;
+  }
+
+  protected function applyAttributes($model, $attributes, $whiteList = false)
+  {
+    if($whiteList)
+      $attributes = $this->whitelist($attributes, $whiteList);
+    $transaction = $model->getDbConnection()->beginTransaction();
+    try {
+      $model->attributes=$attributes;
+      $success = $model->save();
+      $transaction->commit();
+    } catch (Exception $e) {
+      $transaction->rollback();
+      throw $e;
+    }
+    return $success;
+  }
+
+  protected function deleteModel($model)
+  {
+    $transaction = $model->getDbConnection()->beginTransaction();
+    try {
+      $success = $model->delete();
+      $transaction->commit();
+    } catch (Exception $e) {
+      $transaction->rollback();
+      throw $e;
+    }
+    return $success;
+  }
   /**
    * @return array list of items to be used as the side bar menu
    */

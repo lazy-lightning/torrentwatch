@@ -64,6 +64,7 @@
     // generic submit form handler
     $.submitForm = function (button) {
         var form = $(button).closest('form');
+        form.find('input.gray').attr('value', '');
         $.post(form.get(0).action, form.serialize(), $.loadAjaxUpdate, 'html');
     }; 
     // handles almost all ajax responses.
@@ -267,6 +268,15 @@
                 e.returnValue = false;
                 return false;
             }
+            // toggle visible favorite
+            if (target.is('ul.favorite > li')) {
+                target = target.find("a");
+            }
+            if (target.is('ul.favorite > li a')) {
+                target.toggleFavorite();
+                e.returnValue = false;
+                return false;
+            }
             // History details hide/reveal
             if (target.closest("#history li").length) {
                 target.closest("#history li").children(".hItemDetails").slideToggle(300);
@@ -279,15 +289,9 @@
                 e.returnValue = false;
                 return false;
             }
-            // toggle visible favorite
-            if (target.is('ul.favorite > li')) {
-                target = target.find("a");
-            }
-            if (target.is('ul.favorite > li a')) {
-                target.toggleFavorite();
-                e.returnValue = false;
-                return false;
-            }
+            // display update feed form
+            if(target.is(".activeFeed"))
+              target=target.find("a:not(.button)");
             // Standard ajax submit with reload
             if (target.is("img") && target.parent().is("a.ajaxSubmit")) {
                 target = target.parent();
@@ -317,7 +321,11 @@
             }
             return true;
         });
-    
+   
+        // Auto-empty text fields with gray'd text
+        $("input.gray").live('focus', function() {
+          $(this).filter(".gray").removeClass("gray").attr("value", "")
+        });
         // Filter Bar - Buttons
         $("ul#filterbar_container li:not(#filter_bytext)").click(function () {
             // If filter already selected do nothing
@@ -395,19 +403,24 @@
         };
         $("#feedItems_container").tabs({ 
             remote: true,
+            onHide: function(clicked, toShow, toHide) {
+              $(toHide).find('.saved').remove();
+            },
             onShow: onShow
         });
         // grab initial value of feedItems_container
-        var x = function() {
-          if(window.PRELOADED) {
+        var setPreloaded = function() {
+          if(window.PRELOADED)
             onShow(true, $("#remote-tab-1").append(window.PRELOADED), null);
-          }
           else
-            setTimeout(x,50);
+            setTimeout(setPreloaded,50);
         };
-        setTimeout(x, 0);
+        setPreloaded();
         $("#configuration .content").tabs({
             remote: true,
+            onHide: function(clicked, toShow, toHide) {
+              $(toHide).find('.saved').remove();
+            },
             onShow: function (clicked, toShow, toHide) {
                 var show = $(toShow);
                 show.find('form').initForm();
@@ -426,6 +439,9 @@
         $("#favorites > .content").tabs({ 
             fxAutoHeight: true,
             remote: true,
+            onHide: function(clicked, toShow, toHide) {
+              $(toHide).find('.saved').remove();
+            },
             onShow: function (clicked, toShow, toHide) {
                 $(toShow).addClass('clearfix');
             }

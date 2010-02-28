@@ -3,7 +3,7 @@
 class FeedController extends BaseController
 {
   // TODO: some thought should be given to this
-  const PAGE_SIZE=100;
+  const PAGE_SIZE=10;
 
   /**
    * @var string specifies the default action to be 'list'.
@@ -35,22 +35,19 @@ class FeedController extends BaseController
     $feed=new feed;
     if(isset($_POST['feed']))
     {
-      $response = array('dialog'=>array('header'=>'Create Feed'));
-      $transaction = $feed->getDbConnection()->beginTransaction();
-      try {
-        $feed->attributes=$_POST['feed'];
-        $success = $feed->save();
-        $transaction->commit();
-      } catch (Exception $e) {
-        $transaction->rollback();
-        throw $e;
+      $success = $this->applyAttributes($feed, $_POST['feed'], array('downloadType', 'url', 'userTitle'));
+      if($feed->status === feed::STATUS_ERROR) 
+      {
+        $feed->addError('url', $feed->getStatusText());
+        $this->deleteModel($feed);
       }
-      if($success) {
+      else if ($success)
+      {
         Yii::app()->getUser()->setFlash('response', array('resetFeedItems'=>true));
         $this->redirect(array('list'));
       }
     }
-    $this->render('update',array('model'=>$feed));
+    $this->render('create',array('model'=>$feed));
   }
 
   /**
@@ -60,24 +57,36 @@ class FeedController extends BaseController
   public function actionUpdate()
   {
     $feed=$this->loadfeed();
+    $response = array();
     $success = false;
     if(isset($_POST['feed']))
     {
-      $transaction = $feed->getDbConnection()->beginTransaction();
-      try {
-        $feed->attributes=$_POST['feed'];
-        $success = $feed->save();
-        $transaction->commit();
-      } catch (Exception $e) {
-        $transaction->rollback();
-        throw $e;
-      }
-      if($success) {
-        Yii::app()->getUser()->setFlash('response', array('resetFeedItems'=>true));
-        $this->redirect(array('list'));
+      $oldAttr = $feed->getAttributes(array('downloadType', 'status', 'url', 'userTitle'));
+      $success = $this->applyAttributes($feed, $_POST['feed'], array('downloadType', 'url', 'userTitle'));
+      if($oldAttr['url'] != $feed->url)
+      {
+        $feed->updateFeedItems();
+        if($feed->status === feed::STATUS_ERROR)
+        {
+          // use a clone to revert settings so DB stays the same as before action
+          // but without affecting the model we need to put back in the form.
+          // could have used a transaction and rolled back, but then holding
+          // transaction during network access.
+          $this->applyAttributes(clone $feed, $oldAttr);
+          $feed->addError('url', $feed->getStatusText());
+          $success = false;
+        }
+        else
+        {
+          $response['resetFeedItems'] = true;
+        }
       }
     }
-    $this->render('update',array('model'=>$feed));
+    $this->render('update',array(
+          'model'=>$feed,
+          'respose'=>$response,
+          'success'=>$success,
+    ));
   }
 
   /**
@@ -86,15 +95,8 @@ class FeedController extends BaseController
    */
   public function actionDelete()
   {
-    $feed = $this->loadfeed();
-    $transaction = $feed->getDbConnection()->beginTransaction();
-    try {
-      $feed->delete();
-      $transaction->commit();
-    } catch (Exception $e) {
-      $transaction->rollback();
-      throw $e;
-    }
+    $this->deleteModel($this->loadfeed());
+
     Yii::app()->getUser()->setFlash('response', array('resetFeedItems'=>true));
     $this->redirect(array('list'));
   }
@@ -105,41 +107,26 @@ class FeedController extends BaseController
   public function actionList()
   {
     $criteria=new CDbCriteria;
+    $pages=false;
 
-    $pages=new CPagination(feed::model()->count($criteria));
-    $pages->pageSize=self::PAGE_SIZE;
-    $pages->applyLimit($criteria);
-
-    $feedList=feed::model()->findAll($criteria);
+    if(isset($_GET['id']))
+      $feedList = array($this->loadfeed());
+    else
+    {
+      if(false === Yii::app()->request->isAjaxRequest)
+      {
+        $pages=new CPagination(feed::model()->count($criteria));
+        $pages->pageSize=self::PAGE_SIZE;
+        $pages->applyLimit($criteria);
+      }
+  
+      $feedList=feed::model()->findAll($criteria);
+    }
     $this->render('list',array(
       'feedList'=>$feedList,
+      'fullList'=>!isset($_GET['id']),
       'pages'=>$pages,
       'response'=>Yii::app()->getUser()->getFlash('response'),
-    ));
-  }
-
-  /**
-   * Manages all feeds.
-   */
-  public function actionAdmin()
-  {
-    $this->processAdminCommand();
-
-    $criteria=new CDbCriteria;
-
-    $pages=new CPagination(feed::model()->count($criteria));
-    $pages->pageSize=self::PAGE_SIZE;
-    $pages->applyLimit($criteria);
-
-    $sort=new CSort('feed');
-    $sort->applyOrder($criteria);
-
-    $feedList=feed::model()->findAll($criteria);
-
-    $this->render('admin',array(
-        'feedList'=>$feedList,
-        'pages'=>$pages,
-        'sort'=>$sort,
     ));
   }
 
@@ -160,38 +147,4 @@ class FeedController extends BaseController
     return $this->_feed;
   }
 
-  /**
-   * Executes any command triggered on the admin page.
-   */
-  protected function processAdminCommand()
-  {
-    if(isset($_POST['command'], $_POST['id']) && $_POST['command']==='delete')
-    {
-      $transaction = Yii::app()->db->beginTransaction();
-      try {
-        $this->loadfeed($_POST['id'])->delete();
-        $transaction->commit();
-      } 
-      catch (Exception $e) {
-        $transaction->rollback();
-        throw $e;
-      }
-      // reload the current page to avoid duplicated delete actions
-      $this->refresh();
-    }
-
-    if (isset($_GET['command']) && $_GET['command']==='updateFeedItems')
-    {
-      // NOTE: transaction is handled inside updateFeedItems due to network
-      //       access and lock length
-      if(isset($_GET['id'])) {
-        Yii::log('performing single update');
-        $this->loadfeed($_GET['id'])->updateFeedItems();
-        Yii::log('update complete');
-      } else {
-        foreach(feed::model()->findAll() as $feed)
-          $feed->updateFeedItems();
-      }
-    }
-  }
 }
