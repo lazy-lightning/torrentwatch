@@ -35,7 +35,7 @@ class FavoriteTvShowController extends BaseController
   {
     $criteria=new CDbCriteria(array('order'=>'title ASC'));
     $pages=null;
-    if(true===Yii::app()->request->getIsAjaxRequest())
+    if(false===Yii::app()->request->getIsAjaxRequest())
     {
       $pages=new CPagination(favoriteTvShow::model()->count($criteria));
       $pages->pageSize=self::PAGE_SIZE;
