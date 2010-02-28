@@ -11,10 +11,10 @@
  */
 class DvrConfigTest extends WebTestCase
 {
-  protected $autoStop = false;
+  public $autoStop = false;
 
   // need many fixtures to constantly reset any new saved feeds
-  protected $fixtures = array(
+  public $fixtures = array(
       'dvrConfig'=>':dvrConfig',
       'feed'=>'feed',
       'feedItem'=>'feedItem',
@@ -26,7 +26,7 @@ class DvrConfigTest extends WebTestCase
   // These are element locators  used throughout the test
   // they offer a single place to change a locator and 
   // more obvious names
-  protected $locators = array(
+  public $locators = array(
       'closeConfigDialogButton'    => "css=#configuration > div.close",
       'configDialog'               => 'id=configuration',
       'deleteFirstFeedButton'      => "xpath=id('feed-1')/x:a",
@@ -81,7 +81,7 @@ class DvrConfigTest extends WebTestCase
    * 
    * @return void
    */
-  protected function testDefaultSave()
+  public function testDefaultSave()
   {
     $l = $this->locators; // shorthand access
     $this->assertElementPresent('link=Save');
@@ -94,7 +94,7 @@ class DvrConfigTest extends WebTestCase
    * 
    * @return void
    */
-  protected function testUpdateGlobalConfig()
+  public function testUpdateGlobalConfig()
   {
     $l = $this->locators; // shorthand access
     $this->type($l['itemsPerLoadInput'], 'qwerty');
@@ -112,7 +112,7 @@ class DvrConfigTest extends WebTestCase
    * 
    * @return void
    */
-  protected function testTorClient()
+  public function testTorClient()
   {
     $l = $this->locators; // shorthand access
     // click button to load torrent client configuration
@@ -148,7 +148,7 @@ class DvrConfigTest extends WebTestCase
    * 
    * @return void
    */
-  protected function testNzbClient()
+  public function testNzbClient()
   {
     $l = $this->locators; // shorthand access
     // click button to load torrent client configuration
