@@ -64,7 +64,7 @@ class rssFeedAdapterTest extends DbTestCase
               ->will($this->returnValue($this->get_items));
 
     $factory = $this->getMock('modelFactory');
-    $factory->expects($this->exactly(4))->method('feedItemByAttributes');
+    $factory->expects($this->exactly(count($this->get_items)))->method('feedItemByAttributes');
 
     $this->adapter->checkFeedItems($factory);
     $this->assertEquals(feed::STATUS_OK, $this->feed->status);
@@ -84,8 +84,8 @@ class rssFeedAdapterTest extends DbTestCase
     $cmd->bindValue(':hash', md5($this->get_items[1]->get_id()))->execute();
 
     $factory = $this->getMock('modelFactory');
-    // with 2 feedItems already having their hash only the other 2 should match
-    $factory->expects($this->exactly(2))->method('feedItemByAttributes');
+    // with 2 feedItems already having their hash we should have feedItemByAttributes called 2 less times
+    $factory->expects($this->exactly(count($this->get_items)-2))->method('feedItemByAttributes');
 
     $this->adapter->checkFeedItems($factory);
     $this->assertEquals(feed::STATUS_OK, $this->feed->status);

@@ -21,53 +21,60 @@ class favoriteManagerTvShowTest extends DbTestCase
     $this->assertEquals(0, feedItem::model()->count('status = '.feedItem::STATUS_NOMATCH));
     $this->assertEquals(2, feedItem::model()->count('status = '.feedItem::STATUS_QUEUED));
   }
-  public function testTvShowCheckFavoritesStatus()
-  {
-    // should match no items with STATUS_NEW
-    Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NEW, false);
 
-    $this->assertEquals(2, feedItem::model()->count('status = '.feedItem::STATUS_NOMATCH));
-    $this->assertEquals(0, feedItem::model()->count('status = '.feedItem::STATUS_QUEUED));
+  /**
+   * testTimeLimit 
+   * 
+   * @dataProvider timeLimitProvider
+   * @return void
+   */
+  public function testTimeLimit($limit, $status, $nomatch, $queued)
+  {
+    Yii::app()->dlManager->checkFavorites($status, $limit);
+
+    $this->assertEquals($nomatch, feedItem::model()->count('status = '.feedItem::STATUS_NOMATCH));
+    $this->assertEquals($queued, feedItem::model()->count('status = '.feedItem::STATUS_QUEUED));
   }
 
-  public function testTvShowTimeLimitDisabled()
+  /**
+   * testTimeLimitInDvrConfig 
+   * 
+   * @dataProvider timeLimitProvider
+   * @return void
+   */
+  public function testTimeLimitInDvrConfig($limit, $status, $nomatch, $queued)
   {
-    // should match both items with no limit
-    Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NOMATCH, false);
+    if($limit === false)
+      $limit = 0;
+    else
+      $limit = $limit/60/60;
 
-    $this->assertEquals(0, feedItem::model()->count('status = '.feedItem::STATUS_NOMATCH));
-    $this->assertEquals(2, feedItem::model()->count('status = '.feedItem::STATUS_QUEUED));
-  }
-
-  public function testTvShowTimeLimitLong()
-  {
-    // should match both items with 24 hours limit
-    Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NOMATCH, 24*60*60);
-
-    $this->assertEquals(0, feedItem::model()->count('status = '.feedItem::STATUS_NOMATCH));
-    $this->assertEquals(2, feedItem::model()->count('status = '.feedItem::STATUS_QUEUED));
-  }
-
-  public function testTvShowTimeLimitShort()
-  {
-    // should match one item with 1 hour limit
-    Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NOMATCH, 60*60);
-
-    $this->assertEquals(1, feedItem::model()->count('status = '.feedItem::STATUS_NOMATCH));
-    $this->assertEquals(1, feedItem::model()->count('status = '.feedItem::STATUS_QUEUED));
-  }
-
-  public function testTvShowTimeLimitDefault()
-  {
-    // should match one item with 1 hour limit set in dvrConfig
     $old = Yii::app()->dvrConfig->matchingTimeLimit;
-    Yii::app()->dvrConfig->matchingTimeLimit = 1;
-    Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NOMATCH);
+    Yii::app()->dvrConfig->matchingTimeLimit = $limit;
+    Yii::app()->dlManager->checkFavorites($status);
 
-    $this->assertEquals(1, feedItem::model()->count('status = '.feedItem::STATUS_NOMATCH));
-    $this->assertEquals(1, feedItem::model()->count('status = '.feedItem::STATUS_QUEUED));
-    // previous bit was destructive to future tests, so reset it
+    $nomatchCount = feedItem::model()->count('status = '.feedItem::STATUS_NOMATCH);
+    $queuedCount = feedItem::model()->count('status = '.feedItem::STATUS_QUEUED);
+    // previous bit was destructive to future tests, so reset it before any assert()
     Yii::app()->dvrConfig->matchingTimeLimit = $old;
+
+    $this->assertEquals($nomatch, $nomatchCount, 'nomatch count');
+    $this->assertEquals($queued, $queuedCount, 'queued count');
+  }
+
+  public function timeLimitProvider()
+  {
+    return array(
+        //  timelimit    status               nomatch   queued
+        // should match no items with STATUS_NEW
+        array(false,    feedItem::STATUS_NEW,       2,    0),
+        // should match both items with no limit
+        array(false,    feedItem::STATUS_NOMATCH,   0,    2),
+        // should match both items with 24 hours limit
+        array(24*60*60, feedItem::STATUS_NOMATCH,   0,    2),
+        // should match one item with 1 hour limit
+        array(60*60,    feedItem::STATUS_NOMATCH,   1,    1),
+    );
   }
 }
 

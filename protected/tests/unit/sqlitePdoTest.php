@@ -12,7 +12,7 @@ class sqlitePdoTest extends CTestCase
     return $conn;
   }
 
-  function testSchemaChanged()
+  public function testSchemaChanged()
   {
     try {
       unlink($this->path);
@@ -29,7 +29,7 @@ class sqlitePdoTest extends CTestCase
     // Create a second connection
     $conn_2 = $this->getConnection();
     // create table : perform a schema change operation
-    $conn_1->createCommand('CREATE TABLE test2 ( key2, value2 )')->execute();
+    $conn_2->createCommand('CREATE TABLE test2 ( key2, value2 )')->execute();
 
     // Fetch list of tables using first connection
     $y = $conn_1->createCommand("SELECT name FROM sqlite_master;");
