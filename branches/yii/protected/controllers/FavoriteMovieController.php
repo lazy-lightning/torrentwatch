@@ -40,9 +40,17 @@ class FavoriteMovieController extends BaseController
   		$pages=new CPagination(favoriteMovie::model()->count($criteria));
   		$pages->pageSize=self::PAGE_SIZE;
   		$pages->applyLimit($criteria);
+  		$favoritemovieList=favoriteMovie::model()->findAll($criteria);
+    }
+    else
+    {
+		  $favoritemovieList=Yii::app()->getDb()->createCommand(
+          'SELECT id, name FROM favoriteMovies ORDER BY name ASC'
+      )->queryAll();
+      foreach($favoritemovieList as $key => $value)
+        $favoritemovieList[$key] = (object)$value;
     }
 
-		$favoritemovieList=favoriteMovie::model()->findAll($criteria);
 
 		$this->render('list',array(
 			'favoriteList'=>$favoritemovieList,

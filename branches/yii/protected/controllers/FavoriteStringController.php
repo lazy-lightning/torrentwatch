@@ -40,9 +40,16 @@ class FavoriteStringController extends BaseController
   		$pages=new CPagination(favoriteString::model()->count($criteria));
   		$pages->pageSize=self::PAGE_SIZE;
   		$pages->applyLimit($criteria);
+			$favoritestringList=favoriteString::model()->findAll($criteria);
     }
-
-		$favoritestringList=favoriteString::model()->findAll($criteria);
+    else
+    {
+      $favoritestringList = Yii::app()->getDb()->createCommand(
+          'SELECT id,name FROM favoriteStrings ORDER BY name ASC'
+      )->queryAll();
+      foreach($favoritestringList as $key=>$value)
+        $favoritestringList[$key] = (object) $value;
+    }
 
 		$this->render('list',array(
 			'favoriteList'=>$favoritestringList,
