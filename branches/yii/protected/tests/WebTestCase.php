@@ -79,7 +79,7 @@ class WebTestCase extends CWebTestCase
    */
   protected function login()
   {
-    if(!self::$loggedIn)
+    if(!self::$loggedIn || true)
     {
       // Open and perform login
       $this->open('?r=site/login');
@@ -160,6 +160,11 @@ class WebTestCase extends CWebTestCase
     $this->waitForElementPresentAndVisible($waitFor);
   }
 
+  public function escapeJS($string)
+  {
+    return "'".str_replace("'", "\'", $string)."'";
+  }
+
   /**
    * Pause execution until element is visible
    *
@@ -168,7 +173,7 @@ class WebTestCase extends CWebTestCase
    */
   public function waitForElementVisible($locator)
   {
-    $locator = escapeshellarg($locator); // only escapes single quotes
+    $locator = $this->escapeJS($locator);
     $this->waitForCondition("selenium.isVisible($locator);");
   }
 
@@ -180,7 +185,7 @@ class WebTestCase extends CWebTestCase
    */
   public function waitForElementNotVisible($locator)
   {
-    $locator = escapeshellarg($locator); // only escapes single quotes
+    $locator = $this->escapeJS($locator); // only escapes single quotes
     $this->waitForCondition("!selenium.isVisible($locator);");
   }
 
