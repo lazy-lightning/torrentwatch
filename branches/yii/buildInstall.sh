@@ -13,7 +13,7 @@ EXCLUDES="install testing protected/data/source-test.db.BACKUP protected/data/so
 
 # Dont change below here unless you know what you are doing
 
-GENERATE_VERSION=1
+IS_SVN_RELEASE=1
 CURRENTSVN=$(svn status | egrep -v '^\?|buildInstall.sh')
 
 # test php for basic syntax errors
@@ -28,12 +28,12 @@ fi
 
 if [ x"$1" = x"release" ]; then
   # dont generate an svn version
-  GENERATE_VERSION=0
+  IS_SVN_RELEASE=0
   # release mode, allow changes to appinfo
   CURRENTSVN=$(echo $CURRENTSVN | grep -v appinfo.json)
 fi
 
-if [ x"$CURRENTSVN" != x"" ];then
+if [ x"$CURRENTSVN" != x"" -o x"SKIPSVN" = x"1" ];then
   cat <<EOD
 
 Please commit local changes to svn first.
@@ -42,7 +42,7 @@ EOD
   exit 1
 fi
 
-if [ $GENERATE_VERSION -eq 1 ]; then
+if [ $IS_SVN_RELEASE -eq 1 ]; then
   # start with date
   VERSION="svn$(date +%Y%m%d)"
   I=0
@@ -75,7 +75,7 @@ echo "<script type='text/javascript'>" >> index-joined.html
 cat javascript/min.js >> index-joined.html
 echo "</script>" >> index-joined.html
 
-if [ $GENERATE_VERSION -eq 0 ];then
+if [ $IS_SVN_RELEASE -eq 0 ];then
   # this is a release, use the joined version as main index.html
   mv index.html index.dev.html
   mv index-joined.html index.html
@@ -112,7 +112,7 @@ tar -cf install/$NAME.tar . $EXSTRING && cd install && \
 echo "building outer zip archive" && zip $FILENAME * -x \*.zip
 
 # revert changes made to appinfo.json
-if [ 1 -eq $GENERATE_VERSION ]; then
+if [ 1 -eq $IS_SVN_RELEASE ]; then
   svn revert ../appinfo.json >/dev/null
 else
   mv ../index.html ../index-joined.html
@@ -155,7 +155,22 @@ if [ x"$BM" != x"" ]; then
 fi
 
 if [ x"$CHAR" = x"u" -o x"$CHAR" = x"U" ];then
+  echo Uploading
   echo "put \"$FILENAME\"" | lftp $LFTP_NET_BOOKMARK
+
+  echo Updating latest.php
+  mkdir /tmp/buildinstall.$$
+  cd /tmp/buildinstall.$$
+  echo "get ../latest.php" | lftp $LFTP_NET_BOOKMARK
+  MARKER='// SVN'
+  if [ $IS_SVN_RELEASE -eq 0]; then
+    MARKER='// RELEASE'
+  fi
+  cat latest.php  | sed 's|.*'$MARKER'|  echo "'$VERSION'"; '$MARKER'|' | tee > latest.php.new
+  mv latest.php.new > latest.php
+  echo "cd ..;put latest.php" | lftp $LFTP_NET_BOOKMARK
+
+  echo "Now available As: "
   echo "http://nmtdvr.com/downloads/$NAME-$VERSION.zip"
 fi
 
