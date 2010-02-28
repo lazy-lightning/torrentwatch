@@ -173,6 +173,7 @@ class favoriteManagerMovieFilterTest extends favoriteManagerFilterTest
         ),
         $fav
     );
+    // these wont get reset if there is an assert() problem
     $fav->qualityIds = $ids;
     $fav->save();
   }

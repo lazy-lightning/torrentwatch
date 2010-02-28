@@ -4,31 +4,38 @@ Yii::import('application.components.mediaTitleParser.qualityMatch');
 
 class qualityMatchTest extends CTestCase 
 {
-  public function testSplitBasic()
+  /**
+   * testQualityMatch 
+   * 
+   * @dataProvider provider
+   * @param string $title the title to test
+   * @param string $short the expected short title
+   * @param array $qual the expected string qualitys
+   * @return void
+   */
+  public function testQualityMatch($title, $short, $qual)
   {
-    list($short, $qual) = qualityMatch::run('Foo.Bar.iNT.HDTV');
-    $this->assertEquals('Foo.Bar', $short);
-    $this->assertEquals(2, count($qual));
-    $this->assertContains('iNT', $qual);
-    $this->assertContains('HDTV', $qual);
+    $result = qualityMatch::run($title);
+    $this->assertEquals($short, $result[0], $title);
+    $this->assertEquals(count($qual), count($result[1]), $title);
+    foreach($qual as $text)
+      $this->assertContains($text, $qual, $title);
   }
 
-  public function testDontMatchInsideTitle()
+  /**
+   * provider 
+   * 
+   * @return void
+   */
+  public function provider()
   {
-    // The bug was that the quality of 'iNT' short for 'internal' 
-    // would cut this into $short = 'FOO'
-    list($short, $qual) = qualityMatch::run('FOOintBAR.1080p');
-    $this->assertEquals('FOOintBAR', $short);
-    $this->assertEquals(1, count($qual));
-    $this->assertContains('1080p', $qual);
+    return array(
+        array('Foo.Bar.iNT.HDTV', 'Foo.Bar', array('iNT', 'HDTV')),
+        array('Foo.Bar_-_(720p)(repack)', 'Foo.Bar', array('720p', 'repack')),
+        // The bug was that the quality of 'iNT' short for 'internal' 
+        // would cut this into $short = 'FOO'
+        array('FOOintBAR.1080p', 'FOOintBAR', array('1080p')),
+    );
   }
-
-  public function testQualityInBraces()
-  {
-    list($short, $qual) = qualityMatch::run('Foo.Bar_-_(720p)(repack)');
-    $this->assertEquals('Foo.Bar', $short);
-    $this->assertEquals(2, count($qual));
-    $this->assertContains('repack', $qual);
-    $this->assertContains('720p', $qual);
-  }
+  
 }

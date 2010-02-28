@@ -13,6 +13,7 @@ class feedItemTest extends DbTestCase
       'dvrConfig'=>':dvrConfig',
   );
 
+  // this function has its own fixture
   public function testGetFavoriteTvShow()
   {
     $favorite = feedItem::model()->findByPk(1)->getFavorite();
@@ -21,6 +22,7 @@ class feedItemTest extends DbTestCase
     $this->assertEquals($this->favoriteTvShows['first']['id'], $favorite->id);
   }
 
+  // this function has its own fixture
   public function testGetFavoriteMovie()
   {
     $favorite = feedItem::model()->findByPk(1)->getFavorite();

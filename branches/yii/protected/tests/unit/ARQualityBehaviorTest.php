@@ -17,7 +17,9 @@ class ARQualityBehaviorTest extends DbTestCase
 
     // re-fetch from db so ids arn't pre loaded
     $fav = favoriteTvShow::model()->findByPk(1);
+    // save without fetching the ids manually
     $this->assertTrue($fav->save());
+    // verify the ids didn't dissapear
     $this->assertNotEquals(0, count($fav->asa('quality')->getQualityIds()), 'after save');
   }
 }

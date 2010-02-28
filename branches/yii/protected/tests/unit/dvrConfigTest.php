@@ -49,6 +49,7 @@ class dvrConfigTest extends DbTestCase
     $z = unserialize(serialize($y));
 
     $string = 'http://192.168.0.51:9091/transmission/';
+    // if we start with the same string the test is pointless
     $this->assertNotEquals($string, $z->clientTransRPC->baseApi);
     $z->clientTransRPC->baseApi = $string;
     $this->assertTrue($z->save());
