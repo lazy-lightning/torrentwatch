@@ -2,7 +2,10 @@
 // TODO: this class is fairly ugly, fix it
 class qualityMatch {
   public static $qual_reg =
-      '\b(DVB|720p|DSR(ip)?|DVBRip|DVDR(ip)?|DVDScr|HR.HDTV|HDTV|HR.PDTV|PDTV|SatRip|SVCD|TVRip|WebRip|WS|1080[ip]|DTS|AC3|XViD|Blue?Ray|internal|limited|proper|repack|subbed|x264|iTouch|telesync|dvd5|int|ntsc|rarfix|pal|festival|complete)\b';
+      '\b(DVB|720p|DSR(ip)?|DVBRip|DVDR(ip)?|DVDScr|HR.HDTV|HDTV|HR.PDTV|PDTV|SatRip|SVCD|TVRip|WebRip|WS|1080[ip]|DTS|AC3|XViD|Blue?Ray|internal|limited|proper|repack|subbed|x264|iTouch|telesync|dvd5|int|ntsc|rarfix|pal|festival)\b';
+
+  public static $strip_reg =
+    '\b(subpack|complete)\b';
 
   public static function run($title)
   {
@@ -14,13 +17,14 @@ class qualityMatch {
       if(isset($q['720p'], $q['hdtv'])) {
         unset($regs[1][$q['hdtv']]);
       }
-      // FIXME: is this guaranteed an array? check reference
-      if(is_array($regs[1]) && count($regs[1]) > 0)
+      if(count($regs[1]) > 0)
         $quality = $regs[1];
-      $shortTitle = trim(preg_replace("/".qualityMatch::$qual_reg.".*/i", "", $title), '- _.[]{}<>()@#$%^&*|\/;~`');
+      $shortTitle = preg_replace("/".self::$qual_reg.".*/i", "", $title);
     }
     else
       $shortTitle = $title;
-    return array($shortTitle, $quality);
+
+    $shortTitle = preg_replace("/".self::$strip_reg.".*/i", "", $shortTitle);
+    return array(trim($shortTitle, ' \'"- _.[]{}<>()@#$%^&*|\/;~`'."\t\n"), $quality);
   }
 }
