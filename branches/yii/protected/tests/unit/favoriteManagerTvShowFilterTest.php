@@ -13,6 +13,130 @@ class favoriteManagerTvShowFilterTest extends favoriteManagerFilterTest
       'dvrConfig'=>':dvrConfig',
   );
 
+  /**
+   * testTvShowFilter 
+   * 
+   * @dataProvider provider
+   * @return void
+   */
+  public function testTvShowFilter($attributes, $expectedStatus)
+  {
+    $this->realTest($attributes, $expectedStatus);
+  }
+
+  /**
+   * provider 
+   * 
+   * @return array
+   */
+  public function provider()
+  {
+    return array(
+      array(
+        array('minSeason'=>1),
+        array(
+          'STATUS_NOMATCH'=>0,
+          'STATUS_QUEUED'=>2,
+      )),
+      array(
+        array('minSeason'=>2),
+        array(
+          'STATUS_NOMATCH'=>1,
+          'STATUS_QUEUED'=>1,
+      )),
+      array(
+        array('minSeason'=>3),
+        array(
+          'STATUS_NOMATCH'=>1,
+          'STATUS_QUEUED'=>1,
+      )),
+      array(
+        array('minSeason'=>4),
+        array(
+          'STATUS_NOMATCH'=>2,
+          'STATUS_QUEUED'=>0,
+      )),
+      array(
+        array('maxSeason'=>1),
+        array(
+          'STATUS_NOMATCH'=>1,
+          'STATUS_QUEUED'=>1,
+      )),
+      array(
+        array('maxSeason'=>2),
+        array(
+          'STATUS_NOMATCH'=>1,
+          'STATUS_QUEUED'=>1,
+      )),
+      array(
+        array('maxSeason'=>3),
+        array(
+          'STATUS_NOMATCH'=>0,
+          'STATUS_QUEUED'=>2,
+      )),
+      array(
+        array('maxSeason'=>4),
+        array(
+          'STATUS_NOMATCH'=>0,
+          'STATUS_QUEUED'=>2,
+      )),
+      array(
+        array('minEpisode'=>1),
+        array(
+          'STATUS_NOMATCH'=>0,
+          'STATUS_QUEUED'=>2,
+      )),
+      array(
+        array('minEpisode'=>2),
+        array(
+          'STATUS_NOMATCH'=>1,
+          'STATUS_QUEUED'=>1,
+      )),
+      array(
+        array('minEpisode'=>5),
+        array(
+          'STATUS_NOMATCH'=>1,
+          'STATUS_QUEUED'=>1,
+      )),
+      array(
+        array('minEpisode'=>6),
+        array(
+          'STATUS_NOMATCH'=>2,
+          'STATUS_QUEUED'=>0,
+      )),
+      array(
+        array('maxEpisode'=>1),
+        array(
+          'STATUS_NOMATCH'=>1,
+          'STATUS_QUEUED'=>1,
+      )),
+      array(
+        array('maxEpisode'=>4),
+        array(
+          'STATUS_NOMATCH'=>1,
+          'STATUS_QUEUED'=>1,
+      )),
+      array(
+        array('maxEpisode'=>5),
+        array(
+          'STATUS_NOMATCH'=>0,
+          'STATUS_QUEUED'=>2,
+      )),
+      array(
+        array('maxEpisode'=>6),
+        array(
+          'STATUS_NOMATCH'=>0,
+          'STATUS_QUEUED'=>2,
+      )),
+    );
+  }
+
+  /**
+   * testMovieNoQuality is destructive to database state, so gets its own
+   * function to enable resetting that data
+   * 
+   * @return void
+   */
   public function testTvShowNoQuality()
   {
     $fav = favoriteTvShow::model()->findByPk(1);
@@ -25,174 +149,8 @@ class favoriteManagerTvShowFilterTest extends favoriteManagerFilterTest
         ),
         $fav
     );
-    // above operation was destructive to future tests, so reset that data
     $fav->qualityIds = $ids;
     $fav->save();
-  }
-
-  public function testTvShowMinSeasonLow()
-  {
-    $this->realTest(
-        array('minSeason'=>1),
-        array(
-          'STATUS_NOMATCH'=>0,
-          'STATUS_QUEUED'=>2,
-        )
-    );
-  }
-  public function testTvShowMinSeasonMiddle()
-  {
-    $this->realTest(
-        array('minSeason'=>2),
-        array(
-          'STATUS_NOMATCH'=>1,
-          'STATUS_QUEUED'=>1,
-        )
-    );
-  }
-
-  public function testTvShowMinSeasonHigh()
-  {
-    $this->realTest(
-        array('minSeason'=>3),
-        array(
-          'STATUS_NOMATCH'=>1,
-          'STATUS_QUEUED'=>1,
-        )
-    );
-  }
-
-  public function testTvShowMinSeasonHigher()
-  {
-    $this->realTest(
-        array('minSeason'=>4),
-        array(
-          'STATUS_NOMATCH'=>2,
-          'STATUS_QUEUED'=>0,
-        )
-    );
-  }
-
-  public function testTvShowMaxSeasonLow()
-  {
-    $this->realTest(
-        array('maxSeason'=>1),
-        array(
-          'STATUS_NOMATCH'=>1,
-          'STATUS_QUEUED'=>1,
-        )
-    );
-  }
-  public function testTvShowMaxSeasonMiddle()
-  {
-    $this->realTest(
-        array('maxSeason'=>2),
-        array(
-          'STATUS_NOMATCH'=>1,
-          'STATUS_QUEUED'=>1,
-        )
-    );
-  }
-  public function testTvShowMaxSeasonHigh()
-  {
-    $this->realTest(
-        array('maxSeason'=>3),
-        array(
-          'STATUS_NOMATCH'=>0,
-          'STATUS_QUEUED'=>2,
-        )
-    );
-  }
-  public function testTvShowMaxSeasonHigher()
-  {
-    $this->realTest(
-        array('maxSeason'=>4),
-        array(
-          'STATUS_NOMATCH'=>0,
-          'STATUS_QUEUED'=>2,
-        )
-    );
-  }
-
-  public function testTvShowMinEpisodeLow()
-  {
-    $this->realTest(
-        array('minEpisode'=>1),
-        array(
-          'STATUS_NOMATCH'=>0,
-          'STATUS_QUEUED'=>2,
-        )
-    );
-  }
-  public function testTvShowMinEpisodeMiddle()
-  {
-    $this->realTest(
-        array('minEpisode'=>2),
-        array(
-          'STATUS_NOMATCH'=>1,
-          'STATUS_QUEUED'=>1,
-        )
-    );
-  }
-  public function testTvShowMinEpisodeHigh()
-  {
-    $this->realTest(
-        array('minEpisode'=>5),
-        array(
-          'STATUS_NOMATCH'=>1,
-          'STATUS_QUEUED'=>1,
-        )
-    );
-  }
-  public function testTvShowMinEpisodeHigher()
-  {
-    $this->realTest(
-        array('minEpisode'=>6),
-        array(
-          'STATUS_NOMATCH'=>2,
-          'STATUS_QUEUED'=>0,
-        )
-    );
-  }
-  public function testTvShowMaxEpisodeLow()
-  {
-    $this->realTest(
-        array('maxEpisode'=>1),
-        array(
-          'STATUS_NOMATCH'=>1,
-          'STATUS_QUEUED'=>1,
-        )
-    );
-  }
-  public function testTvShowMaxEpisodeMiddle()
-  {
-    $this->realTest(
-        array('maxEpisode'=>4),
-        array(
-          'STATUS_NOMATCH'=>1,
-          'STATUS_QUEUED'=>1,
-        )
-    );
-  }
-  public function testTvShowMaxEpisodeHigh()
-  {
-    $this->realTest(
-        array('maxEpisode'=>5),
-        array(
-          'STATUS_NOMATCH'=>0,
-          'STATUS_QUEUED'=>2,
-        )
-    );
-  }
-  public function testTvShowMaxEpisode()
-  {
-    $this->realTest(
-        array('maxEpisode'=>6),
-        array(
-          'STATUS_NOMATCH'=>0,
-          'STATUS_QUEUED'=>2,
-        )
-    );
   }
 
 }
