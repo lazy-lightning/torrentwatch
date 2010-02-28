@@ -323,8 +323,23 @@
         });
    
         // Auto-empty text fields with gray'd text
-        $("input.gray").live('focus', function() {
-          $(this).filter(".gray").removeClass("gray").attr("value", "")
+        $("input.gray").live('focusin', function() {
+          $(this).filter('.gray').each(function() {
+            var $t = $(this), data = $t.data('gray');
+            if(!data) {
+              $t.data('gray', $t.attr('value'));
+            }
+            $t.attr('value', '');
+          }).removeClass('gray').addClass('notgray');
+        });
+        $("input.notgray").live('focusout', function() {
+          $(this).filter('.notgray').each(function() {
+            var $t = $(this);
+            if($t.attr('value') == '') {
+              $t.attr('value', $t.data('gray'))
+                .removeClass('notgray').addClass('gray');
+            }
+          });
         });
         // Filter Bar - Buttons
         $("ul#filterbar_container li:not(#filter_bytext)").click(function () {
