@@ -1,6 +1,6 @@
 <?php
 
-require_once('simplepie.inc');
+require_once('feedAdapters/simplepie.inc');
 require_once('feedAdapter_File.php');
 
 class rssFeedAdapter implements IFeedAdapter {
