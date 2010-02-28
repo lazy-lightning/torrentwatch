@@ -2,17 +2,17 @@
 
 class MovieController extends BaseController
 {
-	const PAGE_SIZE=10;
+  const PAGE_SIZE=10;
 
-	/**
-	 * @var string specifies the default action to be 'list'.
-	 */
-	public $defaultAction='list';
+  /**
+   * @var string specifies the default action to be 'list'.
+   */
+  public $defaultAction='list';
 
-	/**
-	 * @var CActiveRecord the currently loaded data model instance.
-	 */
-	private $_movie;
+  /**
+   * @var CActiveRecord the currently loaded data model instance.
+   */
+  private $_movie;
 
   public function actions()
   {
@@ -23,20 +23,20 @@ class MovieController extends BaseController
     );
   }
 
-	/**
-	 * Shows a particular movie.
-	 */
-	public function actionShow()
-	{
-		$this->render('show',array('movie'=>$this->loadmovie()));
-	}
+  /**
+   * Shows a particular movie.
+   */
+  public function actionShow()
+  {
+    $this->render('show',array('movie'=>$this->loadmovie()));
+  }
 
-	/**
-	 * Lists all movies.
-	 */
-	public function actionList()
-	{
-		$criteria=new CDbCriteria(array(
+  /**
+   * Lists all movies.
+   */
+  public function actionList()
+  {
+    $criteria=new CDbCriteria(array(
           'select'=>'id,status,title,name,year,rating,lastUpdated',
           'order'=>'lastUpdated DESC',
           'with'=>array(
@@ -55,32 +55,32 @@ class MovieController extends BaseController
                        'movie_id not null)'
     ));
 
-		$pages=new CPagination(movie::model()->count($criteria));
-		$pages->pageSize=Yii::app()->dvrConfig->webItemsPerLoad;
-		$pages->applyLimit($criteria);
+    $pages=new CPagination(movie::model()->count($criteria));
+    $pages->pageSize=Yii::app()->dvrConfig->webItemsPerLoad;
+    $pages->applyLimit($criteria);
 
-		$movieList=movie::model()->findAll($criteria);
+    $movieList=movie::model()->findAll($criteria);
 
-		$this->render('list',array(
-			'movieList'=>$movieList,
-			'pages'=>$pages,
-		));
-	}
+    $this->render('list',array(
+      'movieList'=>$movieList,
+      'pages'=>$pages,
+    ));
+  }
 
-	/**
-	 * Returns the data model based on the primary key given in the GET variable.
-	 * If the data model is not found, an HTTP exception will be raised.
-	 * @param integer the primary key value. Defaults to null, meaning using the 'id' GET variable
-	 */
-	public function loadmovie($id=null)
-	{
-		if($this->_movie===null)
-		{
-			if($id!==null || isset($_GET['id']))
-				$this->_movie=movie::model()->findbyPk($id!==null ? $id : $_GET['id']);
-			if($this->_movie===null)
-				throw new CHttpException(500,'The requested movie does not exist.');
-		}
-		return $this->_movie;
-	}
+  /**
+   * Returns the data model based on the primary key given in the GET variable.
+   * If the data model is not found, an HTTP exception will be raised.
+   * @param integer the primary key value. Defaults to null, meaning using the 'id' GET variable
+   */
+  public function loadmovie($id=null)
+  {
+    if($this->_movie===null)
+    {
+      if($id!==null || isset($_GET['id']))
+        $this->_movie=movie::model()->findbyPk($id!==null ? $id : $_GET['id']);
+      if($this->_movie===null)
+        throw new CHttpException(500,'The requested movie does not exist.');
+    }
+    return $this->_movie;
+  }
 }
