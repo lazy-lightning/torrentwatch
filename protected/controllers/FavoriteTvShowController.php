@@ -35,14 +35,22 @@ class FavoriteTvShowController extends BaseController
   {
     $criteria=new CDbCriteria(array('order'=>'title ASC'));
     $pages=null;
-    if(false===Yii::app()->request->getIsAjaxRequest())
+    if(true===Yii::app()->request->getIsAjaxRequest())
     {
       $pages=new CPagination(favoriteTvShow::model()->count($criteria));
       $pages->pageSize=self::PAGE_SIZE;
       $pages->applyLimit($criteria);
+      $favoriteList=favoriteTvShow::model()->with(array('tvShow'=>array('select'=>'id,title')))->findAll($criteria);
     }
-
-    $favoriteList=favoriteTvShow::model()->with(array('tvShow'=>array('select'=>'id,title')))->findAll($criteria);
+    else
+    {
+      $favoriteList=Yii::app()->db->createCommand(
+          'SELECT favoriteTvShows.id AS id, tvShow.title AS name FROM favoriteTvShows,tvShow WHERE tvShow.id = favoriteTvShows.tvShow_id ORDER BY tvShow.title ASC'
+      )->queryAll();
+      // fake it being an object
+      foreach($favoriteList as $key=>$value)
+        $favoriteList[$key] = (object)$value;
+    }
 
     $this->render('list',array_merge($options, array(
       'favoriteList'=>$favoriteList,
