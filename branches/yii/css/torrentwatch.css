@@ -12,26 +12,28 @@ html {
   height: 100%;
   }
 
-body {
+body, input, select {
   font: 12px "lucida grande", Tahoma, Verdana, Arial, Helvetica, sans-serif;
+  }
+
+body {
   color: #323232;
   text-align: left;
   overflow: hidden;
   }
 
-input, select {
+input, select, label {
   margin-left: 1em;
   display: inline;
   }
 
-input[type=hidden] {
+input[type=hidden],
+.hidden {
   display: none;
   }
 
 label {
-  display: inline;
   font-size: 0.9em;
-  margin-left: 1em;
   vertical-align: middle;
   }
 
@@ -47,10 +49,6 @@ label.item {
   float: none;
   font-size: 1.2em;
   margin-top: 1.5em;
-  }
-
-.hidden {
-  display: none;
   }
 
 .gray {
@@ -777,7 +775,8 @@ background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAApAAAAIOCAYAAAAP2
   }
 
 
-.favorite_name span {
+.favorite_name span,
+.favorite_episodes span {
   margin-left: 1em;
   }
 
@@ -786,22 +785,14 @@ background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAApAAAAIOCAYAAAAP2
   width: 4.7em;
   }
 
-.favorite_years input {
-  width: 3em !important;
-  margin-left: .2em !important;
-}
-
+.favorite_years input,
 .favorite_episodes input {
-  width: 2em !important;
+  width: 3em !important;
   margin-left: .2em !important;
   }
 
 .favorite_years span {
   margin-left: .8em;
-  }
-
-.favorite_episodes span {
-  margin-left: 1em;
   }
 
 .favorite_episodes input.min {
