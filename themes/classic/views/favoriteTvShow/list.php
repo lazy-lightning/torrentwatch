@@ -1,17 +1,18 @@
 <div id="favoriteTvShow_container">
   <ul id="favoriteTvShowList" class="favorite loadContent">
     <?php 
-    echo "<li id='favoriteTvShow-li-'>".CHtml::link(
-        "New Favorite", 
-        array('create'),
-        array('rel'=>'#favoriteTvShow-')
-    )."</li>";
+    $baseurl = Yii::app()->getRequest()->getScriptUrl();
+    echo "<li id='favoriteTvShow-li-'><a href='$baseurl?r=favoriteTvShow/create' rel='#favoriteTvShow-'>New Favorite</a></li>";
     foreach($favoriteList as $model) {
-      echo "<li id='favoriteTvShow-li-{$model->id}'>".CHtml::link(
-          $model->name, 
-          array('show', 'id'=>$model->id), 
-          array('rel'=>'#favoriteTvShow-'.$model->id)
-      )."</li>";
+      $id = $model->id;
+      echo <<<EOD
+    <li id='favoriteTvShows-li-$id'>
+      <a href='$baseurl?r=favoriteTvShow/show&id=$id' rel='#favoriteTvShow-$id'>
+        {$model->name}
+      </a>
+    </li>
+EOD
+      ;
     } ?>
   </ul>
   <?php 
