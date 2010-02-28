@@ -79,7 +79,7 @@ class WebTestCase extends CWebTestCase
    */
   protected function login()
   {
-    if(!self::$loggedIn || true)
+    if(!self::$loggedIn)
     {
       // Open and perform login
       $this->open('?r=site/login');
