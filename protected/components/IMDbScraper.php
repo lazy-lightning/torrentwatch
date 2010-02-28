@@ -288,6 +288,8 @@ class IMDbScraper extends Scraper {
         $url_imdb = substr($url_imdb, 0, strpos($url_imdb,"?fr=")-1);
         $this->imdbId = substr($matches[1][$index], 9, 7);
         $html = html_entity_decode(file_get_contents( $url_imdb ), ENT_QUOTES);
+        // replace characters like &#x27; with ' again
+        $html = preg_replace('~&#x([0-9a-f]+);~ei', 'chr(hexdec("\\1"))', $html);
       }
     }
     else
