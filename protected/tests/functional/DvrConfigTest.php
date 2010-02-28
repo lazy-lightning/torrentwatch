@@ -11,7 +11,7 @@
  */
 class DvrConfigTest extends WebTestCase
 {
-  public $autoStop = false;
+  protected $autoStop = false;
 
   // need many fixtures to constantly reset any new saved feeds
   protected $fixtures = array(
@@ -29,14 +29,20 @@ class DvrConfigTest extends WebTestCase
   protected $locators = array(
       'closeConfigDialogButton'    => "css=#configuration > div.close",
       'configDialog'               => 'id=configuration',
-      'deleteFirstFeedButton'      => "xpath=id('feeds')/div[1]/a",
-      'errorSummary'               => 'css=.errorSummary',
+      'deleteFirstFeedButton'      => "xpath=id('feed-1')/x:a",
+      'errorResponse'               => 'css=.errorSummary',
+      'feedItem'                   => 'css=#feedItems_container .torrent',
       'feedSaveButton'             => "xpath=id('newFeed')/form/a",
       'feedsTab'                   => 'id=feeds',
+      'feedStatus'                 => "xpath=id('feed-1')/x:form/x:div[2]/x:span",
+      'feedUpdateUrl'              => "css=.url input",
+      'feedUserTitle'              => "id=feed_userTitle",
+      'feedUpdateForm'             => 'css=.updateFeed',
       'feedUrlInput'               => 'id=feed_url',
-      'feedItem'                   => 'css=#feedItems_container .torrent',
-      'firstFeedTitle'             => "xpath=id('feeds')/div[1]/span",
+      'firstFeed'                  => "id=feed-1",
+      'firstFeedTitle'             => "xpath=id('feed-1')/x:span",
       'globalConfigTab'            => 'id=global_config',
+      'hideFeedButton'             => "xpath=id('feed-1')/x:form/x:a[2]",
       'itemsPerLoadInput'          => 'id=dvrConfig_webItemsPerLoad',
       'nzbClientSelect'            => 'id=dvrConfig_nzbClient',
       'nzbTab'                     => 'id=nzbClient',
@@ -50,6 +56,7 @@ class DvrConfigTest extends WebTestCase
       'transRpcUsernameInput'      => "xpath=id('clientTransRPC')/div[3]/input",
       'transRpcPasswordInput'      => "xpath=id('clientTransRPC')/div[4]/input",
       'transRpcSaveButton'         => "xpath=id('clientTransRPC')/div/a[1]",
+      'updateFeedButton'           => "xpath=id('feed-1')/x:form/x:a[1]",
       'sabnzbdCategoryInput'       => "xpath=id('clientSABnzbd')/div[1]/input",
       'sabnzbdConfig'              => 'id=clientSABnzbd',
       'sabnzbdSaveButton'          => "xpath=id('clientSABnzbd')/div/a[1]",
@@ -74,7 +81,7 @@ class DvrConfigTest extends WebTestCase
    * 
    * @return void
    */
-  public function testDefaultSave()
+  protected function testDefaultSave()
   {
     $l = $this->locators; // shorthand access
     $this->assertElementPresent('link=Save');
@@ -87,11 +94,11 @@ class DvrConfigTest extends WebTestCase
    * 
    * @return void
    */
-  public function testUpdateGlobalConfig()
+  protected function testUpdateGlobalConfig()
   {
     $l = $this->locators; // shorthand access
     $this->type($l['itemsPerLoadInput'], 'qwerty');
-    $this->clickAndWaitFor('link=Save', $l['errorSummary'], false);
+    $this->clickAndWaitFor('link=Save', $l['errorResponse'], false);
     $this->type($l['itemsPerLoadInput'], 200);
     $this->clickAndWaitFor('link=Save', $l['savedResponse'], false);
     $this->assertText($l['savedResponse'], 'Saved');
@@ -105,7 +112,7 @@ class DvrConfigTest extends WebTestCase
    * 
    * @return void
    */
-  public function testTorClient()
+  protected function testTorClient()
   {
     $l = $this->locators; // shorthand access
     // click button to load torrent client configuration
@@ -141,7 +148,7 @@ class DvrConfigTest extends WebTestCase
    * 
    * @return void
    */
-  function testNzbClient()
+  protected function testNzbClient()
   {
     $l = $this->locators; // shorthand access
     // click button to load torrent client configuration
@@ -174,7 +181,7 @@ class DvrConfigTest extends WebTestCase
    * 
    * @return void
    */
-  function testFeeds()
+  public function testFeeds()
   {
     $l = $this->locators; // shorthand access
     // click button to load feeds configuration
@@ -184,14 +191,14 @@ class DvrConfigTest extends WebTestCase
     $this->type($l['feedUrlInput'], 'Ipsum');
     $this->click($l['feedSaveButton']);
     // wait for error message
-    $this->waitForElementPresentAndVisible($l['errorSummary']);
+    $this->waitForElementPresentAndVisible($l['errorResponse']);
     // Try a valid sample feed
     // NOTE: bad reference to static data
     //       also requires a localhost.com to be defined in /etc/hosts
     $this->type($l['feedUrlInput'], 'http://localhost.com/nmtdvr/testing/index.html');
     $this->click($l['feedSaveButton']);
     // wait for error message to disapear
-    $this->waitForElementNotPresent($l['errorSummary']);
+    $this->waitForElementNotPresent($l['errorResponse']);
     // verify our sample feeds title is displayed
     $this->assertText($l['firstFeedTitle'], "Sample Feed");
     // verify feed items have not yet been loaded
@@ -203,6 +210,33 @@ class DvrConfigTest extends WebTestCase
     usleep(500000);
     // reopen the configuration dialog
     $this->clickAndWaitFor($l['toggleConfigDialog'], $l['configDialog'], false);
+    // click the li and pull up the 'update' view
+    $this->clickAndWaitFor($l['firstFeed'], $l['feedUpdateForm']);
+    // Put some random url in the url button
+    $this->type($l['feedUserTitle'], 'Super Fun Title');
+    // Click the update button and wait for saved response
+    $this->clickAndWaitFor($l['updateFeedButton'], $l['savedResponse']);
+    // Click the hide button
+    $this->clickAndWaitFor($l['hideFeedButton'], $l['deleteFirstFeedButton']);
+    // Check our custom title was saved
+    $this->assertText($l['firstFeed'], 'Super Fun Title');
+    // Re-Open
+    $this->clickAndWaitFor($l['firstFeed'], $l['feedUpdateForm']);
+    // Fill in a bs url
+    $this->type($l['feedUpdateUrl'], 'http://www.google.com/foo/bar/unreachable');
+    // Click Update and wait for error response
+    $this->clickAndWaitFor($l['updateFeedButton'], $l['errorResponse']);
+    // Verify bad url got sent back
+    $this->assertValue($l['feedUpdateUrl'], 'http://www.google.com/foo/bar/unreachable');
+    // Click hide, and then open one more time
+    $this->clickAndWaitFor($l['hideFeedButton'], $l['deleteFirstFeedButton']);
+    $this->clickAndWaitFor($l['firstFeed'], $l['feedUpdateForm']);
+    // Verify it didn't save our url
+    $this->assertNotValue($l['feedUpdateUrl'], 'http://www.google.com/foo/bar/unreachable');
+    // Verify feed status is still good
+    $this->assertText($l['feedStatus'], 'Successful');
+    // Click hide, wait for delete button
+    $this->clickAndWaitFor($l['hideFeedButton'], $l['deleteFirstFeedButton']);
     // click the delete button
     $this->click($l['deleteFirstFeedButton']);
     // wait till the feeds list is one element shorter

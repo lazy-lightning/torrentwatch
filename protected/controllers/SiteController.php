@@ -57,6 +57,7 @@ class SiteController extends BaseController
       if($contact->validate())
       {
         $headers="From: {$contact->email}\r\nReply-To: {$contact->email}";
+        // TODO: submit via POST (json?) to nmtdvr.com
         mail(Yii::app()->params['adminEmail'],$contact->subject,$contact->body,$headers);
         Yii::app()->user->setFlash('contact','Thank you for contacting us. We will respond to you as soon as possible.');
         $this->refresh();

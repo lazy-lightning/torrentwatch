@@ -44,7 +44,7 @@ class feed extends CActiveRecord
       array('url', 'url', 'allowEmpty'=>false),
       array('status', 'default', 'value'=>self::STATUS_NEW),
       array('status', 'in', 'allowEmpty'=>false, 'range'=>array_keys($this->getStatusOptions())),
-      array('title', 'safe'),
+      array('title, userTitle', 'safe'),
     );
   }
 
@@ -75,7 +75,7 @@ class feed extends CActiveRecord
       // force to false so the save from in updateFeedItems doesn't fail
       $this->isNewRecord = False;
       // also set the old pk so it doesnt update a null row
-      $this->setPrimaryKey($this->getPrimaryKey());
+      $this->setPrimaryKey($this->id);
       $this->updateFeedItems();
       $this->refresh();
     }
