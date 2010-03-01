@@ -39,9 +39,12 @@ label {
 
 label.item {
   float: left;
-  padding-top: 5px;
   min-height: 1em;
   width: 150px;
+  }
+
+label.error {
+  font-weight: bold;
   }
 
 .category {
@@ -274,10 +277,6 @@ background: #FFF url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAQA
 .errorSummary li {
   }
 
-label.error {
-  font-weight: bold;
-  }
-
 /*-------------------------
  *
  * L O G I N   F O R M
@@ -367,11 +366,6 @@ background: transparent url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAA
   padding-left: .7em;
   margin-left: .5em;
 }
-
-.hideButton img {
-  border: 1px solid #b0b0b0;
-  margin: 0 .5em 0 .3em;
-  }
 
 .loadInspector {
   float: right;
@@ -556,9 +550,6 @@ background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAApAAAAIOCAYAAAAP2
   font-size: 0.8em;
   clear: left;
   cursor: pointer;
-  }
-
-.button {
   width: 50px;
   text-align: center;
   }
@@ -679,9 +670,7 @@ background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAApAAAAIOCAYAAAAP2
   }
 
 .static {
-  padding-top: 5px;
   padding-left: 1em;
-  font-size: 130%;
   }
 
 .updateFeed {
