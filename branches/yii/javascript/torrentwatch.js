@@ -194,6 +194,10 @@
             tabs = $this.closest('.tabs-container div');
             $.get(this[0].href, null, function (html) {
                 tabs.append(html);
+                // connect saveIn auto complete
+                setTimeout(function() {
+                  tabs.find('.favorite_saveIn').children('input').autocomplete('checkDirectory.php', { matchCase: true });
+                }, 0);
                 onDone();
             }, 'html');
         }

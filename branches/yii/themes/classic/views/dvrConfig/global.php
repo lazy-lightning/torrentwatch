@@ -5,8 +5,14 @@
       ?>
         <h2 class="dialog_heading">Web UI Settings</h2>
         <div id="config_timezone">
-          <?php echo CHtml::activeLabel($config, 'timezone', array('class'=>'item')).': '.
-                     CHtml::activeTextField($config, 'timezone'); ?>
+          <?php 
+            echo CHtml::activeLabel($config, 'timezone', array('class'=>'item')).': ';
+            foreach(DateTimeZone::listIdentifiers() as $key => $value) {
+              if($key > 0) // skip first element: localtime
+                $zones[$value] = $value;
+            }
+            echo CHtml::dropDownList('dvrConfig[timezone]', $config->timezone, $zones); 
+          ?>
         </div>
         <div id="config_webItemsPerLoad">
           <?php echo CHtml::activeLabel($config, 'webItemsPerLoad', array('class'=>'item', 'title'=>'The number of items that will be displayed in the tv episodes/movies/others tabs')).': '.
@@ -32,3 +38,6 @@
           <?php echo CHtml::link('Wizard', array('welcome', '#'=>'welcome'), array('class'=>'toggleDialog button')); ?>
         </div>
       <?php echo CHtml::endForm(); ?>
+      <script type='text/javascript'>
+        $('#dvrConfig_downloadDir').autocomplete('checkDirectory.php', { matchCase: true });
+      </script>

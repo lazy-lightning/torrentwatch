@@ -29,6 +29,9 @@
     <?php echo CHtml::endForm(); ?>
   </div>
 </div>
+      <script type='text/javascript'>
+        $('#dvrConfig_downloadDir').autocomplete('checkDirectory.php', { matchCase: true });
+      </script>
 <?php $this->widget('actionResponseWidget', array(
       'showDialog'=>'#welcomeSettings',
       // this actually belongs with wizardFeed, but quick and easy because this is next page
