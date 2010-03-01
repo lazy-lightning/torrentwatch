@@ -20,7 +20,7 @@ foreach($tvepisodeList as $n => $row) {
   $epTitle = empty($row['title'])?'':(":  <span class='epTitle'>".htmlspecialchars($row['title'], ENT_QUOTES, $charset)."</span>");
   $pubDate = date("M d h:i a", $row['lastUpdated']);
   $i = "$baseurl?r=tvEpisode/inspect&id=$id";
-  $l = "$baseurl?r=tvEpisode/list&id=$id";
+  $l = "$baseurl?r=feedItem/list&related=tvEpisode&id=$id";
   $s = "$baseurl?r=tvEpisode/startDownload&id=$id";
   $m = "$baseurl?r=tvEpisode/makeFavorite&id=$id";
   $h = "$baseurl?r=tvShow/hide&id=".$row['tvShow_id'];
