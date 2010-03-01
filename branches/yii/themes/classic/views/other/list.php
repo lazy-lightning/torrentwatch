@@ -11,6 +11,7 @@ foreach($otherList as $n => $model) {
              array('class'=>'makeFavorite ajaxSubmit', 'title'=>'Make Favorite')).
        "</div><div class='itemDetails'>".
        "  <span class='name'>".CHtml::encode($model->title)."</span>".
+       "  <span class='torrent_pubDate'>".CHtml::encode(date("M d h:i a", $model->lastUpdated))."</span>".
        "</div></li>";
 } ?>
 
