@@ -29,32 +29,46 @@ class fakeApp {
   function init($realBase) { 
     session_start();
     $this->base = $realBase;
-    $this->state = unserialize(file_get_contents($this->base.'/runtime/state.bin'));
+    // This provides the cache used by CStatePersistor
+    $this->cache = new CApcCache;
+    $this->cache->init();
+    // This authenticates the user cookie
     $this->security = new CSecurityManager; 
+    $this->security->init();
+    // This fakes the CCookieCollection so CWebUser can check the cookies
     $this->cookies = new fakeCookies($this->security);
+    // CSecurityManager needs the state persister for the validation key
+    $state = new CStatePersister;
+    $state->init();
+    $this->state = $state->load();
   }
   function __get($value) { return $this; }
   function __call($func, $args) { return $this; }
 
   function getCookies() { return $this->cookies; }
+  function getComponent($c) { return $c==='cache'?$this->cache:null; }
   function getId() { return sprintf("%x", crc32($this->base.'NMTDVR')); }
   function getSecurityManager() { return $this->security; }
   function getGlobalState($key) { return (isset($this->state[$key]) ? $this->state[$key] : null); }
+  function getRuntimePath() { return $this->base.'/runtime/'; }
 }
 
 class Yii {
   static function app() { 
     static $fake;
-    if($fake===null) { $fake = new fakeApp; $fake->init(realpath(dirname(__FILE__).'/../protected')); }
+    if($fake===null) { $fake = new fakeApp; $fake->init(realpath(dirname(__FILE__).'/protected')); }
     return $fake;
   }
 }
 
-$yii='../yii_framework/';
+$yii='yii_framework/';
 require_once($yii.'base/interfaces.php');
 require_once($yii.'base/CComponent.php');
 require_once($yii.'base/CApplicationComponent.php');
 require_once($yii.'base/CSecurityManager.php');
+require_once($yii.'base/CStatePersister.php');
+require_once($yii.'caching/CCache.php');
+require_once($yii.'caching/CApcCache.php');
 require_once($yii.'web/auth/CWebUser.php');
 
 $user = new CWebUser;
