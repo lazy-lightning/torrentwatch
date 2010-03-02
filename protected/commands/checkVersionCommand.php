@@ -23,7 +23,7 @@ class checkVersionCommand extends BaseConsoleCommand
    * @var integer the time to wait between updates, in minutes defaults to 1430
    *              which is one day minus 10 minutes.
    */
-  public $updateFrequency = 0; //1430;
+  public $updateFrequency = 1430;
 
   protected function afterRun()
   {
