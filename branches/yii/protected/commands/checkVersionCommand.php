@@ -3,14 +3,6 @@
 class checkVersionCommand extends BaseConsoleCommand
 {
   /**
-   * url 
-   * 
-   * @var string the url to query for latest version.  Current version will be
-   *             appended as 'version' GET variable ( ?version=foo )
-   */
-  public $url = 'http://nmtdvr.com/latest.php';
-
-  /**
    * cacheKey 
    * 
    * @var string the key used to store the last update in cache
@@ -18,29 +10,20 @@ class checkVersionCommand extends BaseConsoleCommand
   public $cacheKey = 'application.commands.checkVersion';
   
   /**
-   * updateFrequency 
-   * 
-   * @var integer the time to wait between updates, in minutes defaults to 1430
-   *              which is one day minus 10 minutes.
-   */
-  public $updateFrequency = 1430;
-
-  /**
    * lastUpdated
    * 
    * @var integer the last time the version was checked, in unix time() format
    *              loaded from cache as $this->cacheKey
    */
-  protected $lastUpdated = 0;
+  protected $lastUpdated;
 
-  public function run($args)
-  {
-    if($this->beforeRun($args))
-    {
-      $this->checkVersion();
-      $this->afterRun();
-    }
-  }
+  /**
+   * updateFrequency 
+   * 
+   * @var integer the time to wait between updates, in minutes defaults to 1430
+   *              which is one day minus 10 minutes.
+   */
+  public $updateFrequency = 0; //1430;
 
   protected function afterRun()
   {
@@ -56,9 +39,7 @@ class checkVersionCommand extends BaseConsoleCommand
 //    if(!Yii::app()->dvrConfig->checkVersion)
 //      return false;
 
-    $this->lastUpdated = Yii::app()->getCache()->get($this->cacheKey);
-
-    if($this->lastUpdated === false)
+    if(false === ($this->lastUpdated = Yii::app()->getCache()->get($this->cacheKey)))
       return true;
     if($this->lastUpdated + ($this->updateFrequency*60) < time())
       return true;
@@ -66,45 +47,41 @@ class checkVersionCommand extends BaseConsoleCommand
     return false;
   }
 
-  protected function checkVersion()
+  public function run($args)
   {
-    $version = $this->getVersion();
-    $newest = file_get_contents($this->url."?version=".urlencode($version));
-
-    if($version === false || $version === '$id')
+    if($this->beforeRun($args))
     {
-      echo 'You are using an undefined version of NMTDVR.  No information available';
-      return;
+      echo "Checking Version . . .\n";
+      Yii::import('application.extensions.versionCheck');
+      $v = new versionCheck;
+      $v->url = 'http://nmtdvr.com/latest.php';
+      // What to do with the data?
+      $v->init();
+      if(false !==($newest = $v->getNewestVersion()))
+      {
+        echo "New version available";
+      /* TODO: create a migration to take care of new dvrConfig value
+       *       and find a non-intrusive way to inform the user.
+       * Yii::app()->dvrConfig->newVersion = $newest;
+       * Yii::app()->dvrConfig->save();
+       */
+      } else
+        echo "Complete.\n";
+          
+      echo "\nSending usage logs . . .\n";
+      Yii::import('application.extensions.sendLogs');
+      $l = new sendLogs;
+      // The categories that only log the query request, such as show tvEpisode 733, or update tvShow 412
+      // or list feedItems related to movie 612
+      $l->categories = array('fakeYii.init', 'application.components.BaseController');
+      $l->url = 'http://nmtdvr.com/usageLogs.php';
+      $l->init();
+      $l->submitLogs();
+      echo $l->requestResponse."\n\n";
+
+      $this->afterRun();
     }
-
-    switch(strcmp($version, $newest))
-    {
-      case -1:
-        $this->newVersion($newest);
-        break;
-      case 0:
-        echo "You are up to date: $version\n";
-        break;
-      case 1:
-        echo "Your version is newer than available, odd\n";
-        break;
-      default:
-        echo "strcmp returned odd value\n";
-        break;
-    }
-  }
-
-  protected function getVersion()
-  {
-    if(preg_match('/version="(.*)"/', file_get_contents(basename(__FILE__).'../../appinfo.json'), $regs))
-      return $regs[1];
-    return false;
-  }
-
-  protected function newVersion($version)
-  {
-    // stub for now, should setup to inform user in a non-invasive manner
-    echo "New Version Available: $version\n";
   }
 
 }
+
