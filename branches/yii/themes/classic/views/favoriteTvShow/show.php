@@ -29,10 +29,10 @@ if(isset($success) && $success): ?>
 </div>
 <div class="favorite_episodes">
   <?php echo html::activeLabelEx($model, 'episodes',array('title'=>'A range of episodes to match from.  Set all to 0 or empty to match all episodes')).': <span>S'.
-             html::activeTextField($model, 'minSeason', array('class'=>'min', 'title'=>'minimum season to match', 'gray'=>'min')).'-'.
-             html::activeTextField($model, 'maxSeason', array('title'=>'maximum season to match', 'gray'=>'max')).' E'.
-             html::activeTextField($model, 'minEpisode', array('class'=>'min', 'title'=>'minimum episode to match', 'gray'=>'min')).'-'.
-             html::activeTextField($model, 'maxEpisode', array('title'=>'maximum episode to match', 'gray'=>'max')).'</span>'; ?>
+             html::activeTextField($model, 'minSeason', array('class'=>'numeric min', 'title'=>'minimum season to match', 'gray'=>'min')).'-'.
+             html::activeTextField($model, 'maxSeason', array('class'=>'numeric', 'title'=>'maximum season to match', 'gray'=>'max')).' E'.
+             html::activeTextField($model, 'minEpisode', array('class'=>'numeric min', 'title'=>'minimum episode to match', 'gray'=>'min')).'-'.
+             html::activeTextField($model, 'maxEpisode', array('class'=>'numeric', 'title'=>'maximum episode to match', 'gray'=>'max')).'</span>'; ?>
 </div>
 <div class="favorite_feed">
  <?php echo html::activeLabelEx($model, 'feed_id').': '.

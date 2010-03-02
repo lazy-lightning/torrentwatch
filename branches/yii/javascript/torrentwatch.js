@@ -389,7 +389,20 @@
                 }
             }).markAlt(); 
         });
-    
+   
+        // prevent non-numeric input in certain spots
+        $("input.numeric").live('keypress', function(e) {
+            // KEY_0 = 48 KEY_9 = 57
+            // NUM_0 = 96 NUM_9 = 105 NUM_DEL = 45
+            // BACK  = 8  DEL   = 46 
+            var key = e.which;
+            if((key < 48 || key > 57) && key != 0 && key != 8) {
+              // not numeric or delete
+              e.preventDefault();
+              e.returnValue = false;
+              return false;
+            }
+        });
         // Ajax progress bar
         $("#progressbar").ajaxStart(function () {
             ajaxCount = ajaxCount + 1;

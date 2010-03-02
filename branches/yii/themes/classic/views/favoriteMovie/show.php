@@ -23,12 +23,12 @@
  </div>
  <div class="favorite_rating">
    <?php echo html::activeLabelEx($model, 'rating', array('title'=>'This minimum rating out of 100 to match')).': '.
-              html::activeTextField($model, 'rating', array('title'=>'The minimum rating out of 100 to match', 'gray'=>'Minimum out of 100')); ?>
+              html::activeTextField($model, 'rating', array('title'=>'The minimum rating out of 100 to match', 'gray'=>'Minimum out of 100', 'class'=>'numeric')); ?>
  </div>
  <div class="favorite_years">
    <?php echo html::activeLabel($model, 'year', array('title'=>'Movie must be between these years to be matched')).': <span>'.
-              html::activeTextField($model, 'minYear', array('title'=>'The minimum movie year to match', 'gray'=>'min')).'-'.
-              html::activeTextField($model, 'maxYear', array('title'=>'The maximum movie year to match', 'gray'=>'max')).'</span>'; ?>
+              html::activeTextField($model, 'minYear', array('title'=>'The minimum movie year to match', 'gray'=>'min', 'class'=>'numeric')).'-'.
+              html::activeTextField($model, 'maxYear', array('title'=>'The maximum movie year to match', 'gray'=>'max', 'class'=>'numeric')).'</span>'; ?>
  </div>
  <div class="favorite_genre">
   <?php echo html::activeLabelEx($model, 'genre_id').': '.

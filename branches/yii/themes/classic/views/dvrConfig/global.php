@@ -16,7 +16,7 @@
         </div>
         <div id="config_webItemsPerLoad">
           <?php echo CHtml::activeLabel($config, 'webItemsPerLoad', array('class'=>'item', 'title'=>'The number of items that will be displayed in the tv episodes/movies/others tabs')).': '.
-                     CHtml::activeTextField($config, 'webItemsPerLoad', array('title'=>'The number of items that will be displayed in the tv episodes/movies/others tabs')); ?>
+                     CHtml::activeTextField($config, 'webItemsPerLoad', array('title'=>'The number of items that will be displayed in the tv episodes/movies/others tabs', 'class'=>'numeric')); ?>
         </div>
         <h2 class="dialog_heading">Client Settings</h2>
         <div id="config_downloaddir" title="Default directory to start items in">
@@ -30,7 +30,7 @@
         <h2 class="dialog_heading">Database Settings</h2>
         <div id="config_maxItemsPerFeed">
           <?php echo CHtml::activeLabel($config, 'maxItemsPerFeed', array('class'=>'item', 'title'=>'The maximum number of feed items to be stored in the database per feed')).': '.
-                     CHtml::activeTextField($config, 'maxItemsPerFeed', array('title'=>'The maximum number of feed items to be stored in the database per feed')); ?>
+                     CHtml::activeTextField($config, 'maxItemsPerFeed', array('title'=>'The maximum number of feed items to be stored in the database per feed', 'class'=>'numeric')); ?>
         </div>
         <div class="buttonContainer">
           <a class="submitForm button" id="Save" href="#">Save</a>
