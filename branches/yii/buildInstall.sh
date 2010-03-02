@@ -41,7 +41,7 @@ EOD
   exit 1;
 fi
 
-if [ x"$CURRENTSVN" != x"" -o x"SKIPSVN" = x"1" ];then
+if [ x"$CURRENTSVN" != x"" -a x"$SKIPSVN" != x"1" ];then
   cat <<EOD
 
 Please commit local changes to svn first.
