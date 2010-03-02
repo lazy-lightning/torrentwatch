@@ -39,7 +39,7 @@ return array(
       'routes'=>array(
         array(
           'class'=>'CFileLogRoute',
-          'levels'=>'trace, info, error, warning, profile',
+          'levels'=>'info, error, warning, profile',
         ),
         array(
           'class'=>'CWebLogRoute',

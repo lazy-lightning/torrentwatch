@@ -117,7 +117,7 @@ rm install/*.tar
 tar -cf install/$NAME.tar . $EXSTRING && cd install && \
 echo "building outer zip archive" && zip $FILENAME * -x \*.zip
 
-ZIP_SUCESS=$?
+ZIP_SUCCESS=$?
 
 # regenerate the test db sym-link if needed
 if [ x"$LINK" != x"" ];then
@@ -135,7 +135,7 @@ else
 fi
 
 
-if [ ! ZIP_SUCCESS -eq 0 ]; then
+if [ ! $ZIP_SUCCESS -eq 0 ]; then
   echo "Build Failed"
   exit 1
 fi
