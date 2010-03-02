@@ -86,7 +86,7 @@ class WebTestCase extends CWebTestCase
       $this->type('name=LoginForm[username]','demo');
       $this->type('name=LoginForm[password]','demo');
       $this->clickAndWait("//input[@value='Login']");
-      self::$loggedIn = true;
+  //    self::$loggedIn = true;
     }
     // Open page and close initial welcome screen
     $this->open('../index-test.html');

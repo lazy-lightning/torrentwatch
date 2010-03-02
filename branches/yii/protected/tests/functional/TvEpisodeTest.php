@@ -19,16 +19,55 @@ class TvEpisodeTest extends WebTestCase
       'favoriteForm'          => "id=favoriteTvShow-",
       'favoriteNameInput'     => "id=favoriteTvShow_tvShow_id",
       'favoriteTvShowList'    => "id=favoriteTvShowList",
+      'feedItem'              => "css=.torrent_feed",
+      'feedItemDetails'       => "xpath=id('tv_container')/x:li[1]/x:div[2]",
+      'inspect-1'             => "xpath=id('tvEpisode-1')/x:a",
+      'inspect-2'             => "xpath=id('tvEpisode-2')/x:a",
+      'inspectorContainer'    => "id=inspector_container",
+      'inspector-1'           => "id=tvEpisodeDetails-1",
+      'inspector-2'           => "id=tvEpisodeDetails-2",
       'makeFavoriteButton'    => "xpath=id('tvEpisode-1')/div[1]/a[3]",
       'makeFavoriteButton2'   => "xpath=id('tvEpisode-2')/div[1]/a[3]",
       'newFavoriteButton'     => "xpath=id('favoriteTvShow-li-')/a",
       'startDownloadButton'   => "xpath=id('tvEpisode-1')/div[1]/a[2]",
-      'tvEpisode'             => 'id=tvEpisode-1',
+      'toggleInspector'       => "css=#inspector a",
+      'tvEpisode'             => "xpath=id('tvEpisode-1')/x:div[3]",
   );
 
   // This method is overridden because with active tvEpisodes the welcome
   // screen wont be displayed
   protected function closeWelcome() {
+  }
+
+  public function testGetFeedItems()
+  {
+    $l = $this->locators;
+    $this->waitForElementPresent($l['tvEpisode']);
+    $this->click($l['tvEpisode']);
+    $this->waitForElementPresent($l['feedItem']);
+    $this->assertText($l['feedItemDetails'], $this->feedItems['first']['title']);
+  }
+
+  public function testInspector()
+  {
+    $l = $this->locators;
+    $hiddenLeft = $this->getElementPositionLeft($l['inspectorContainer']);
+    $this->waitForElementPresent($l['tvEpisode']);
+    $this->click($l['inspect-1']);
+    $this->waitForElementPresentAndVisible($l['inspector-1']);
+    sleep(1);
+    $displayLeft = $this->getElementPositionLeft($l['inspectorContainer']);
+    $this->assertLessThan($hiddenLeft-300, $displayLeft);
+    $this->assertText($l['inspector-1'], $this->tvShows['sample']['description']);
+    $this->click($l['toggleInspector']);
+    sleep(1);
+    $this->assertElementPositionLeft($l['inspectorContainer'], $hiddenLeft);
+    $this->click($l['toggleInspector']);
+    sleep(1);
+    $this->assertElementPositionLeft($l['inspectorContainer'], $displayLeft);
+    $this->click($l['inspect-2']);
+    $this->waitForElementPresentAndVisible($l['inspector-2']);
+    $this->assertElementNotPresent($l['inspector-1']);
   }
 
   public function testMakeFavorite()
