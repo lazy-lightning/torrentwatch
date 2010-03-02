@@ -2,7 +2,7 @@
   <?php 
     foreach($feeditemList as $n => $model) {
       echo "<li class='torrent match_".strtok($model->getStatusText(), ' ').($n%2?' alt':' notalt')."' ".
-           "    title='".CHtml::encode($model->description)."'>";
+           "    title='".CHtml::encode($model->description)."' id='feedItem-{$model->id}' >";
       if($model->tvEpisode_id)
         $inspect = array('/tvEpisode/inspect', 'id'=>$model->tvEpisode_id);
       elseif($model->movie_id)
