@@ -7,6 +7,7 @@
 // CWebApplication properties can be configured here.
 return array(
   'basePath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..',
+  'charset'=>'UTF-8',
   'name'=>'NMTDVR',
 
   // preloading 'log' component
@@ -49,6 +50,9 @@ return array(
     ),
     'modelFactory'=>array(
         'class'=>'modelFactory',
+    ),
+    'request'=>array(
+        'enableCookieValidation'=>true,
     ),
     'user'=>array(
       // enable cookie-based authentication

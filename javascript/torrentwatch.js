@@ -183,8 +183,16 @@
     // be loaded and appended to the closest tabs container child div
     $.fn.toggleFavorite = function () {
         var $this = $(this), toShow = $this.attr('rel'), tabs,
-            onDone = function () {
-            $(toShow).initForm().show();
+        onDone = function () {
+          setTimeout(function() {
+              $(toShow).initForm().show()
+              .find('.favorite_saveIn')
+              .children('input:not(.init)').addClass('init')
+              .autocomplete('nmtdvr.php', {
+                  matchCase: true,
+                  extraParams: { f: 'autocompleteDirectory' } 
+              });
+            });
         };
         $this.closest('.tabs-container > div').children('.favinfo').hide()
           .find('.saved').remove();
@@ -195,9 +203,6 @@
             $.get(this[0].href, null, function (html) {
                 tabs.append(html);
                 // connect saveIn auto complete
-                setTimeout(function() {
-                  tabs.find('.favorite_saveIn').children('input').autocomplete('checkDirectory.php', { matchCase: true });
-                }, 0);
                 onDone();
             }, 'html');
         }
