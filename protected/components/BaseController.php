@@ -16,10 +16,17 @@ abstract class BaseController extends CController {
   public function runActionWithFilters($action,$filters)
   {
     $user = Yii::app()->getUser();
-    if($user->getIsGuest())
+    $msg = ' page:: '.$_SERVER['QUERY_STRING'];
+    $cat = 'application.components.BaseController';
+    if($user->getIsGuest()) {
+      Yii::log('Denying'.$msg, CLogger::LEVEL_INFO, $cat);
       $user->loginRequired();
+    }
     else
+    {
+      Yii::log('Serving'.$msg, CLogger::LEVEL_INFO, $cat);
       $this->runAction($action);
+    }
   }
 
   protected function whitelist($attributes, $whitelist)
