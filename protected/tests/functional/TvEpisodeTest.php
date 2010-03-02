@@ -48,28 +48,6 @@ class TvEpisodeTest extends WebTestCase
     $this->assertText($l['feedItemDetails'], $this->feedItems['first']['title']);
   }
 
-  public function testInspector()
-  {
-    $l = $this->locators;
-    $hiddenLeft = $this->getElementPositionLeft($l['inspectorContainer']);
-    $this->waitForElementPresent($l['tvEpisode']);
-    $this->click($l['inspect-1']);
-    $this->waitForElementPresentAndVisible($l['inspector-1']);
-    sleep(1);
-    $displayLeft = $this->getElementPositionLeft($l['inspectorContainer']);
-    $this->assertLessThan($hiddenLeft-300, $displayLeft);
-    $this->assertText($l['inspector-1'], $this->tvShows['sample']['description']);
-    $this->click($l['toggleInspector']);
-    sleep(1);
-    $this->assertElementPositionLeft($l['inspectorContainer'], $hiddenLeft);
-    $this->click($l['toggleInspector']);
-    sleep(1);
-    $this->assertElementPositionLeft($l['inspectorContainer'], $displayLeft);
-    $this->click($l['inspect-2']);
-    $this->waitForElementPresentAndVisible($l['inspector-2']);
-    $this->assertElementNotPresent($l['inspector-1']);
-  }
-
   public function testMakeFavorite()
   {
     $l = $this->locators; // shorthand access
