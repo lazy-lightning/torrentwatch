@@ -30,7 +30,10 @@
   </div>
 </div>
       <script type='text/javascript'>
-        $('#dvrConfig_downloadDir').autocomplete('checkDirectory.php', { matchCase: true });
+        $('#dvrConfig_downloadDir').autocomplete('nmtdvr.php', {
+            matchCase: true,
+            extraParams: { f: 'autocompleteDirectory' } 
+        });
       </script>
 <?php $this->widget('actionResponseWidget', array(
       'showDialog'=>'#welcomeSettings',
