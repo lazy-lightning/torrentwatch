@@ -35,7 +35,7 @@ class versionCheck
   {
     if($this->current !== null)
       return $this->current;
-    if(preg_match('/version="(.*)"/', file_get_contents(basename(__FILE__).'../../appinfo.json'), $regs))
+    if(preg_match('/version="(.*)"/', file_get_contents(dirname(__FILE__).'/../../appinfo.json'), $regs))
       return $regs[1];
     return false;
   }
