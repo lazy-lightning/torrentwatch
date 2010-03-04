@@ -3,18 +3,9 @@
     // given callback.  selector can also be a function whih
     // must return not false when the callback is ready to run
     $.waitFor = function (selector, callback) {
-        var test = selector, wait = function () {
-            if (!test()) {
-                setTimeout(wait, 200);
-            } else  {
-                callback();
-            }
-        };
-        if(typeof test !== 'function') {
-            test = function() {
-                return $(selector).length;
-            };
-        }
+        var test = typeof selector === 'function' ? selector :
+              function() { return $(selector).length; }, 
+        wait = function () { test() ? callback() : setTimeout(wait, 200); };
         wait();
     };
     // append child to parent once parent exists in the dom
@@ -39,7 +30,7 @@
     };
     $.toggleInspector = function () {
         inspect_status = !inspect_status;
-        $("div#feedItems_container,div#feedItems_container > div,ul#filterbar_container,div#inspector_container").stop(true, true).animate(
+        $("#feedItems_container,#feedItems_container > div,#filterbar_container,#inspector_container").stop(true, true).animate(
                 { right: (inspect_status ? '+' : '-') + "=350" },
                 { duration: 600 }
         );
@@ -47,10 +38,8 @@
     // reset all forms in the container
     // 
     $.fn.reset = function () {
-        this.find('errorSummary').remove().end().each(function () {
-            if ($(this).is('form')) { 
-                this.reset(); 
-            }
+        this.filter('form').find('errorSummary').remove().end().each(function () {
+            this.reset(); 
         });
         return this;
     };
@@ -67,7 +56,7 @@
         form.find('input.gray').attr('value', '');
         $.post(form.get(0).action, form.serialize(), $.loadAjaxUpdate, 'html');
     }; 
-    // handles almost all ajax responses.
+    // handles almost all ajax responses(exceptions: ajax tabs, toggleFavorite).
     // If an element of same id as that in response exists it will be replaced
     // remaining elements will be attached to the document body.
     // Special handling occurs for handling forms to initialize them and reset
@@ -83,13 +72,13 @@
             }
             var id = this.id, target = $('#' + id), oldForm, onShow;
             if ($(this).is('form')) {
-                setTimeout(function () { 
-                    $('#' + id).initForm().show(); 
-                }, 100);
-            }
-            if (target.length === 0 && $(this).is('form')) {
+              setTimeout(function () { 
+                $('#' + id).initForm().show(); 
+              }, 100);
+              if (target.length === 0) {
                 // could this be done in the view instead?
                 oldForm = $('#' + id.replace(/\d+$/, '')).reset().hide();
+              }
             }
             if (target.length) {
                 // if replacing visible dialog, make the replacement visible
@@ -110,6 +99,7 @@
     // Auto-hiding expose.  Elements acted upon will be hidden when
     // no dialog windows are visible.  Upon hide the feed items container
     // is checked to see if a reset is required.
+    // FIXME: this was lazy
     $.fn.autoHideExpose = function () {
         var $this = $(this), wait = function () {
             if ($this.is(':visible') && $('.dialog_window:visible').length === 0) {
@@ -123,50 +113,41 @@
         };
         setInterval(wait, 300);
     };
-    // toggleDialog is a click handler for anchors.  Can also be called
-    // on any element in a dialog window to toggle the container.
-    // when called on an anchor if the given dialog is non-existant
-    // the contents of the result page will be appended to the body element
-    // This function also ensures all dialogs have a close button, and that the
-    // tabs onShow event is run to when a dialog with tabs is displayed
+    // toggleDialog can be called on either an anchor or an element in
+    // a dialog.  When called on an element in a dialog the dialog will be 
+    // closed
+    // When called on an anchor the element indicated as an id by the anchors hash
+    // will be displayed.  If not available the href attribute of the anchor will
+    // be queried and loaded with $.loadAjaxUpdate
+    // Special handling is done when a dialog with tabs is loaded and the active
+    // tab has no content.  In this case the tab is unselected and a click event
+    // is raised.
+    // Also adds a close button to each dialog
     $.fn.toggleDialog = function () {
-        var dialog, dialogSelector, toHide, callback;
-        if (this.is('a') && this[0].hash) {
-            dialog = $(this[0].hash);
-        } else if (this.is('.dialog_window')) {
-            dialog = this;
-        } else {
-            dialog = this.closest('.dialog_window');
-        }
-        dialogSelector = this[0].hash || ('#' + dialog[0].id);
-        toHide = $('.dialog_window:visible').not('.progressbar');
+        var dialog = (this.is('a') && this[0].hash) ? $(this[0].hash) :
+          this.closest('.dialog_window'),
+        dialogSelector = this[0].hash || ('#' + dialog[0].id),
+        toHide = $('.dialog_window:visible:not(.progressbar)'),
         callback = function () {
+            $('div.expose').not(':animated').fadeIn();
             dialog = $(dialogSelector).fadeIn();
             // all dialogs must have a close button
             if (dialog.find('div.close').length === 0) {
-                dialog.prepend('<div class="close"></div>');
+                dialog.prepend('<div class="close" />');
             }
             // if tabs are initialized but the active one is empty trigger the ajax load
             var tabs = dialog.find('.tabs-container');
             if (tabs.length !== 0 && tabs.filter('.tabs-hide').children().length === 0) {
-                dialog.find('.tabs-nav .tabs-selected').removeClass('tabs-selected').find('a').click();
+                dialog.find('.tabs-selected').removeClass('tabs-selected').find('a').click();
             }
         };
 
-        if (!dialog.is(':visible')) {
-            $('div.expose').not(':animated').fadeIn();
-            if (dialog.length === 0) {
-                $.get(this.attr('href'), '', function (html) {
-                    $.loadAjaxUpdate(html);
-                    callback();
-                }, 'html');
-            } else {
-                callback();
-            }
-        } else {
-          // dialog is closing, remove any 'saved' markers
-          dialog.find('.saved').remove();
-        }
+        dialog.is(':visible') ? dialog.find('.saved').remove() :
+          dialog.length !== 0 ? callback() : 
+            $.get(this.attr('href'), '', function (html) {
+              $.loadAjaxUpdate(html);
+              callback();
+            }, 'html');
         toHide.fadeOut();
         return this;
     };
@@ -182,39 +163,32 @@
     // or if non-existant the page referenced by the anchor will
     // be loaded and appended to the closest tabs container child div
     $.fn.toggleFavorite = function () {
-        var $this = $(this), toShow = $this.attr('rel'), tabs,
-        onDone = function () {
-          setTimeout(function() {
-              $(toShow).initForm().show()
-              .find('.favorite_saveIn')
-              .children('input:not(.init)').addClass('init')
-              .autocomplete('nmtdvr.php', {
-                  matchCase: true,
-                  extraParams: { f: 'autocompleteDirectory' } 
-              });
+      var $this = $(this), toShow = $this.attr('rel'), tabs,
+      onDone = function () {
+        setTimeout(function() {
+            $(toShow).initForm().show()
+            .find('.favorite_saveIn')
+            .children('input:not(.init)').addClass('init')
+            .autocomplete('nmtdvr.php', {
+                matchCase: true,
+                extraParams: { f: 'autocompleteDirectory' } 
             });
+          });
         };
         $this.closest('.tabs-container > div').children('.favinfo').hide()
           .find('.saved').remove();
-        if ($(toShow).length > 0) {
-            onDone();
-        } else {
-            tabs = $this.closest('.tabs-container div');
-            $.get(this[0].href, null, function (html) {
-                tabs.append(html);
-                // connect saveIn auto complete
-                onDone();
-            }, 'html');
-        }
+        $(toShow).length > 0 ? onDone() :
+          $.get(this[0].href, null, function (html) {
+              $this.closest('.tabs-container div').append(html);
+              onDone();
+          }, 'html');
         return this;
     };
 
     // Utility function called from ajax response javascript
     // to make a tab and its parent dialog visible
     $.showTab = function (linkSelector) {
-        var link = $(linkSelector);
-        // click to trigger tab switch, and show the parent dialog
-        $.showDialog('#' + link.click().closest('.dialog_window').attr('id'));
+        $.showDialog('#' + $(linkSelector).click().closest('.dialog_window').attr('id'));
     };
     // Utility function called from ajax response javascript
     // to make a dialog visible.
@@ -227,7 +201,7 @@
     // Utility function called from ajax response javascript
     // to change the currently displayed favorite
     $.showFavorite = function (hash) {
-        var selector = "a[rel='" + hash + "']", lin;
+        var selector = "a[rel='" + hash + "']";
         $.waitFor(function() {
             var $hash = $(hash);
             // wait for link, and hash to exist.  Also wait for hash to be in a dialog_window
@@ -334,11 +308,8 @@
         // Auto-empty text fields with gray'd text
         $("input.gray").live('focusin', function() {
           $(this).filter('.gray').each(function() {
-            var $t = $(this), data = $t.data('gray');
-            if(!data) {
-              $t.data('gray', $t.attr('value'));
-            }
-            $t.attr('value', '');
+            $(this).data('gray', $(this).attr('value'))
+              .attr('value', '');
           }).removeClass('gray').addClass('notgray');
         });
         $("input.notgray").live('focusout', function() {
@@ -346,9 +317,8 @@
             var $t = $(this);
             if($t.attr('value') == '') {
               $t.attr('value', $t.data('gray'))
-                .removeClass('notgray').addClass('gray');
             }
-          });
+          }).removeClass('notgray').addClass('gray');
         });
         // Filter Bar - Buttons
         $("ul#filterbar_container li:not(#filter_bytext)").click(function () {
@@ -365,7 +335,7 @@
             // Hide the container while filtering
             container.slideUp(400, function () {
                 // Get all the currently known about feed items
-                var tor = $("li.torrent:not(.duplicate)").removeClass('hidden');
+                var tor = $("li.torrent").removeClass('hidden');
                 if (filter === 'filter_matching') {
                     // Hide the following classes
                     tor.filter(".match_New, .match_Unmatched, .match_Auto").addClass('hidden');
@@ -393,8 +363,7 @@
         // prevent non-numeric input in certain spots
         $("input.numeric").live('keypress', function(e) {
             // KEY_0 = 48 KEY_9 = 57
-            // NUM_0 = 96 NUM_9 = 105 NUM_DEL = 45
-            // BACK  = 8  DEL   = 46 
+            // BACK  = 8  DEL   = 0
             var key = e.which;
             if((key < 48 || key > 57) && key != 0 && key != 8) {
               // not numeric or delete
@@ -424,40 +393,39 @@
                 content = XMLHttpRequest.responseText;
             }
             $('<div id="ajaxError" class="dialog_window"><div class="content"></div></div>')
-                .find('.content').replaceWith(content).end()
+                .find('.content').html(content).end()
                 .appendTo('body');
             $('#ajaxError').toggleDialog();
         });
         
         // Initialize the feed items and open wizard if empty on first load
-        var onShow = function (clicked, toShow, toHide) {
+        var 
+          onShow = function (clicked, toShow, toHide) {
             if (showWelcomeScreen && clicked && !clicked.jquery) {
                 if ($(toShow).children('ul').children().length <= 1 && $(".login_form").length === 0) {
                     $.get($('#wizardLink')[0].href, '', $.loadAjaxUpdate, 'html');
                 }
                 showWelcomeScreen = false;
             }
-        };
+          },
+          onHide = function(clicked, toShow, toHide) {
+              $(toHide).find('.saved').remove();
+          };
         $("#feedItems_container").tabs({ 
             remote: true,
-            onHide: function(clicked, toShow, toHide) {
-              $(toHide).find('.saved').remove();
-            },
+            onHide: onHide,
             onShow: onShow
         });
         // grab initial value of feedItems_container
         var setPreloaded = function() {
-          if(window.PRELOADED)
-            onShow(true, $("#remote-tab-1").append(window.PRELOADED), null);
-          else
+          window.PRELOADED ?
+            onShow(true, $("#remote-tab-1").append(window.PRELOADED), null) :
             setTimeout(setPreloaded,50);
         };
         setPreloaded();
         $("#configuration .content").tabs({
             remote: true,
-            onHide: function(clicked, toShow, toHide) {
-              $(toHide).find('.saved').remove();
-            },
+            onHide: onHide,
             onShow: function (clicked, toShow, toHide) {
                 var show = $(toShow);
                 show.find('form').initForm();
@@ -466,8 +434,9 @@
                 if (show.children('.client_config').length) {
                     // setup the auto switch of form information for client tabs
                     show.find('.client_config select').change(function () {
-                        $(this).closest('.client_config').find('form').hide().end()
-                            .find('#' + $(this).val()).show();
+                        $(this).closest('.client_config')
+                          .find('form').hide().end()
+                          .find('#' + $(this).val()).show();
                     }).change();
                 }
             }
@@ -476,9 +445,7 @@
         $("#favorites > .content").tabs({ 
             fxAutoHeight: true,
             remote: true,
-            onHide: function(clicked, toShow, toHide) {
-              $(toHide).find('.saved').remove();
-            },
+            onHide: onHide,
             onShow: function (clicked, toShow, toHide) {
                 $(toShow).addClass('clearfix');
             }
