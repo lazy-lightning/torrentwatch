@@ -1,4 +1,7 @@
 <?php
+// sometimes doesn't get pulled in for some reason in functional testing
+// needed for feedAdapter_File which extends from SimplePie_File
+require_once('feedAdapters/simplepie.inc');
 
 // base class which all download clients extend from
 abstract class baseClient {
