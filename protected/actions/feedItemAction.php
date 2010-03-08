@@ -2,7 +2,7 @@
 
 /*
  * This action can be attached to any AR controller which has a relation to
- * feedItem. The corresponding runAction class will be called with an AR
+ * feedItem. The corresponding runAction function will be called with an AR
  * feedItem.
  * 
  * @uses CAction
