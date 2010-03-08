@@ -32,6 +32,14 @@
           <?php echo CHtml::activeLabel($config, 'maxItemsPerFeed', array('class'=>'item', 'title'=>'The maximum number of feed items to be stored in the database per feed')).': '.
                      CHtml::activeTextField($config, 'maxItemsPerFeed', array('title'=>'The maximum number of feed items to be stored in the database per feed', 'class'=>'numeric')); ?>
         </div>
+        <div>
+            <?php echo CHtml::activeLabel($config, 'checkNewVersion', array('class'=>'item checkbox', 'title'=>'Periodically check for new versions of NMTDVR')).': '.
+                       CHtml::activeCheckBox($config, 'checkNewVersion', array('title'=>'Periodically check for new versions of NMTDVR')); ?>
+        </div>
+        <div>
+            <?php echo CHtml::activeLabel($config, 'submitUsageLogs', array('class'=>'item checkbox', 'title'=>'Submit anonymous usage logs to help focus development')).': '.
+                       CHtml::activeCheckBox($config, 'submitUsageLogs', array('title'=>'Submit anonymous usage logs to help focus development')); ?>
+        </div>
         <div class="buttonContainer">
           <a class="submitForm button" id="Save" href="#">Save</a>
           <a class='toggleDialog button' href='#'>Close</a>

@@ -35,10 +35,6 @@ class checkVersionCommand extends BaseConsoleCommand
 
   protected function beforeRun($args)
   {
-    // TODO: needs adding column to dvrConfig in migrations
-//    if(!Yii::app()->dvrConfig->checkVersion)
-//      return false;
-
     if(false === ($this->lastUpdated = Yii::app()->getCache()->get($this->cacheKey)))
       return true;
     if($this->lastUpdated + ($this->updateFrequency*60) < time())
@@ -47,40 +43,49 @@ class checkVersionCommand extends BaseConsoleCommand
     return false;
   }
 
+  protected function checkVerion()
+  {
+    echo "Checking Version . . .\n";
+    Yii::import('application.extensions.versionCheck');
+    $v = new versionCheck;
+    $v->url = 'http://nmtdvr.com/latest.php';
+    $v->init();
+    if(false === ($newest = $v->getNewestVersion()))
+    {
+      echo "System already up to date.\n";
+    }
+    else 
+    {
+      echo "New version available";
+      Yii::app()->dvrConfig->newVersion = $newest;
+      Yii::app()->dvrConfig->save();
+    } 
+  }
+
   public function run($args)
   {
     if($this->beforeRun($args))
     {
-      echo "Checking Version . . .\n";
-      Yii::import('application.extensions.versionCheck');
-      $v = new versionCheck;
-      $v->url = 'http://nmtdvr.com/latest.php';
-      // What to do with the data?
-      $v->init();
-      if(false !==($newest = $v->getNewestVersion()))
-      {
-        echo "New version available";
-      /* TODO: create a migration to take care of new dvrConfig value
-       *       and find a non-intrusive way to inform the user.
-       * Yii::app()->dvrConfig->newVersion = $newest;
-       * Yii::app()->dvrConfig->save();
-       */
-      } else
-        echo "Complete.\n";
-          
-      echo "\nSending usage logs . . .\n";
-      Yii::import('application.extensions.sendLogs');
-      $l = new sendLogs;
-      // The categories that only log the query request, such as show tvEpisode 733, or update tvShow 412
-      // or list feedItems related to movie 612
-      $l->categories = array('fakeYii.init', 'application.components.BaseController');
-      $l->url = 'http://nmtdvr.com/usageLogs.php';
-      $l->init();
-      $l->submitLogs();
-      echo $l->requestResponse."\n\n";
-
+      if(Yii::app()->dvrConfig->newVersion)
+        $this->checkVersion();
+      if(Yii::app()->dvrConfig->submitUsage)
+        $this->submitLogs();
       $this->afterRun();
     }
+  }
+
+  protected function submitLogs()
+  {
+    echo "\nSending usage logs . . .\n";
+    Yii::import('application.extensions.sendLogs');
+    $l = new sendLogs;
+    // The categories that only log the query request, such as show tvEpisode 733, or update tvShow 412
+    // or list feedItems related to movie 612
+    $l->categories = array('fakeYii.init', 'application.components.BaseController');
+    $l->url = 'http://nmtdvr.com/usageLogs.php';
+    $l->init();
+    $l->submitLogs();
+    echo $l->requestResponse."\n\n";
   }
 
 }

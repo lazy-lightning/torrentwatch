@@ -417,8 +417,7 @@ SELECT DISTINCT tvShow.*
 CREATE INDEX favoriteMovies_quality_index ON favoriteMovies_quality (favoriteMovies_id DESC, quality_id ASC);
 CREATE INDEX favoriteStrings_quality_index ON favoriteStrings_quality (favoriteStrings_id ASC, quality_id ASC);
 CREATE INDEX favoriteTvShows_quality_index ON favoriteTvShows_quality (favoriteTvShows_id ASC, quality_id ASC);
-CREATE INDEX feedItem_pubDate ON feedItem (pubDate DESC);
 CREATE INDEX feedItem_quality_index ON feedItem_quality (feedItem_id DESC, quality_id ASC);
-CREATE INDEX feedItem_status ON feedItem (status DESC);
+CREATE INDEX feedItem_tvEpisode ON feedItem(tvEpisode_id, status DESC);
 CREATE INDEX movie_genre_index ON movie_genre (movie_id DESC, genre_id ASC);
 CREATE INDEX tvShow_genre_index ON tvShow_genre (tvShow_id DESC, genre_id ASC);
