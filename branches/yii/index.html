@@ -10,7 +10,7 @@
   <![endif]-->
 <script type='text/javascript'>
 var x = new XMLHttpRequest();
-x.open('GET', 'nmtdvr.php?r=tvEpisode/list', true);
+x.open('GET', 'nmtdvr.php?f=listTvEpisodes', true);
 x.onreadystatechange = function()
 {
   if(x.readyState != 4)
@@ -60,7 +60,7 @@ x.send(null);
 </div>
 <div id="feedItems_container">
   <ul>
-    <li><a href="nmtdvr.php?r=tvEpisode/list"><span>TV Episodes</span></a></li>
+    <li><a href="nmtdvr.php?f=listTvEpisodes"><span>TV Episodes</span></a></li>
     <li><a href="nmtdvr.php?r=movie/list"><span>Movies</span></a></li>
     <li><a href="nmtdvr.php?r=other/list"><span>Others</span></a></li>
     <li><a href="nmtdvr.php?r=feedItem/list&status=queued"><span>Queued</span></a></li>
