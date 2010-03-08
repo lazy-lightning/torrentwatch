@@ -62,7 +62,7 @@ class updateIMDbCommand extends BaseConsoleCommand {
         'other_id = '.$otherId
     );
     // delete the model, could just let dbMaintinance take care of it
-    other::model()->deleteByPk($arr['other_id']);
+    other::model()->deleteByPk($otherId);
   }
 
   protected function scanMovies() {
@@ -146,6 +146,7 @@ class updateIMDbCommand extends BaseConsoleCommand {
       list($model, $scanned) = $row;
       $model->updateByPk($scanned, array('lastImdbUpdate'=>$now));
     }
+    $this->scanned = array();
 
     foreach($this->toSave as $row) {
       if(isset($row['other_id']))

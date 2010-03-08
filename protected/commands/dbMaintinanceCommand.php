@@ -7,7 +7,6 @@ class dbMaintinanceCommand extends BaseConsoleCommand {
     // NOTE: these querys are run after pruning the feed items table to a max count specified in dvrConfig
     $querys = array(
         // create temp table containing feeditems that point to others that are also in movies
-        // perhaps this should be run after feed update instead?
         'CREATE TEMP TABLE convert AS'.
         ' SELECT i.id as feedItem_id, m.id as movie_id, o.id as other_id'.
         ' FROM movie m,other o,feedItem i'.
