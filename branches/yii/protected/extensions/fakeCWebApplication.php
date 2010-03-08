@@ -92,6 +92,7 @@ class fakeCWebApplication {
     if($this->user->isGuest)
     {
       error_log(date('Y/m/d H:i:s')." [info] [fakeYii.init] [Denying page: {$_SERVER['QUERY_STRING']}]\n", 3, $this->basePath.'/runtime/application.log');
+      $this->user->setReturnUrl($this->getUrl());
       $this->redirect($this->loginUrl);
       exit; // just in case
     }
@@ -175,6 +176,22 @@ class fakeCWebApplication {
     return $this->scriptUrl;
   }
 
+  // copy from CHttpRequest
+  public function getUrl()
+  {
+    if(isset($_SERVER['REQUEST_URI']))
+      $this->_url=$_SERVER['REQUEST_URI'];
+    else
+    {
+      $this->_url=$this->getScriptUrl();
+      if(($pathInfo=$this->getPathInfo())!=='')
+        $this->_url.='/'.$pathInfo;
+      if(($queryString=$this->getQueryString())!=='')
+        $this->_url.='?'.$queryString;
+    }
+    return $this->_url;
+  }
+  
   function loadClasses($a) { foreach($a as $b=>$c) { foreach($c as $d) { require_once("$b/$d.php"); } } }
   function redirect($url) { header('Location: '.$url); exit; }
 
