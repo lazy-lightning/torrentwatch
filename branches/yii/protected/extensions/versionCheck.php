@@ -28,7 +28,7 @@ class versionCheck
 
   protected function compareVersions($current, $newest)
   {
-    return strcmp($this->current, $this->newest) === -1;
+    return strcmp($current, $newest) === -1;
   }
 
   public function getCurrentVersion()
