@@ -43,7 +43,7 @@ class checkVersionCommand extends BaseConsoleCommand
     return false;
   }
 
-  protected function checkVerion()
+  protected function checkVersion()
   {
     echo "Checking Version . . .\n";
     Yii::import('application.extensions.versionCheck');
@@ -57,8 +57,8 @@ class checkVersionCommand extends BaseConsoleCommand
     else 
     {
       echo "New version available";
-      Yii::app()->dvrConfig->newVersion = $newest;
-      Yii::app()->dvrConfig->save();
+//      Yii::app()->dvrConfig->newVersion = $newest;
+//      Yii::app()->dvrConfig->save();
     } 
   }
 
@@ -66,9 +66,9 @@ class checkVersionCommand extends BaseConsoleCommand
   {
     if($this->beforeRun($args))
     {
-      if(Yii::app()->dvrConfig->newVersion)
+      if(Yii::app()->dvrConfig->checkNewVersion)
         $this->checkVersion();
-      if(Yii::app()->dvrConfig->submitUsage)
+      if(Yii::app()->dvrConfig->submitUsageLogs)
         $this->submitLogs();
       $this->afterRun();
     }
