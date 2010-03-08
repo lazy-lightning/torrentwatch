@@ -14,6 +14,7 @@ class migrateCommand extends BaseConsoleCommand
       1 => 'migrateFromVersionOne',
       2 => 'migrateFromVersionTwo',
       3 => 'migrateFromVersionThree',
+      4 => 'migrateFromVersionFour',
   );
 
   // get version of database.  if version table doesnt exist create

@@ -11,6 +11,46 @@ abstract class dbMigration {
   }
 
   /**
+   * addIndex 
+   * 
+   * @param string $name 
+   * @param string $index the contents of the create index ON clause
+   * @return void
+   */
+  protected function addIndex($name, $index)
+  {
+    $this->dropIndex($name);
+    $this->db->createCommand(
+        "CREATE INDEX $name ON $index"
+    )->execute();
+  }
+
+  /**
+   * dropIndex 
+   * 
+   * @param string $name the index to be dropped
+   * @return void
+   */
+  protected function dropIndex($name)
+  {
+    $this->db->createCommand(
+        "DROP INDEX IF EXISTS $name"
+    )->execute();
+  }
+
+  /**
+   * dropView 
+   * 
+   * @param string $name the view to be dropped
+   * @return void
+   */
+  protected function dropView($name)
+  {
+    $this->db->createCommand(
+        "DROP VIEW IF EXISTS $name"
+    )->execute();
+  }
+  /**
    * replaceView 
    * 
    * @param mixed $view the name of the view
@@ -19,9 +59,7 @@ abstract class dbMigration {
    */
   protected function replaceView($view, $sql)
   {
-    $this->db->createCommand(
-        "DROP VIEW IF EXISTS $view"
-    )->execute();
+    $this->dropView($view);
     $this->db->createCommand(
         "CREATE VIEW $view AS $sql"
     )->execute();

@@ -34,6 +34,9 @@ INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('timezone', 'Ame
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('webuiTheme', 'classic', NULL);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('gayauiTheme', 'gaya', NULL);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('matchingTimeLimit', 24, NULL);
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('submitUsageLogs', 1, NULL);
+INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('checkNewVersion', 1, NULL);
+
 -- BTPD
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('executable','/mnt/syb8634/bin/btcli',2);
 INSERT INTO dvrConfig (key, value, dvrConfigCategory_id) VALUES('directory','/share/.btpd',2);
