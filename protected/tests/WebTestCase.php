@@ -156,7 +156,7 @@ class WebTestCase extends CWebTestCase
   public function clickAndWaitFor($locator, $waitFor, $mid='id=progressbar')
   {
     $this->click($locator);
-    !empty($mid) && $this->waitForElementVisible($mid);
+    //!empty($mid) && $this->waitForElementVisible($mid);
     $this->waitForElementPresentAndVisible($waitFor);
   }
 
