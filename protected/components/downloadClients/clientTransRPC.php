@@ -13,7 +13,7 @@ class clientTransRPC extends BaseClient {
    * @param contents of a .torrent file to be added to transmission
    * @return boolean if download was started
    */
-  function addByData($data) {
+  public function addByData($data) {
     $be = $this->getBrowserEmulator();
 
     $be->addPostData(json_encode(array(
@@ -33,7 +33,7 @@ class clientTransRPC extends BaseClient {
    * @param array responce array returned from transmission json request
    * @return boolean if transmission successfully received the torrent
    */
-  function checkResponse($response)
+  public function checkResponse($response)
   {
     if(isset($response->result) && in_array($response->result, $this->successWhitelist))
       return True;
@@ -58,7 +58,7 @@ class clientTransRPC extends BaseClient {
   /**
    * @return browserEmulator object for communicating with transmission via RPC
    */
-  function getBrowserEmulator()
+  public function getBrowserEmulator()
   {
     if($this->_be === null) 
     {
@@ -85,7 +85,7 @@ class clientTransRPC extends BaseClient {
    * @param browserEmulator instance fully configured with post data to query transmission
    * @return mixed response from transmission
    */
-  function getJsonResponse($be)
+  public function getJsonResponse($be)
   {
     $api = $this->getApi();
     $response = $be->file_get_contents($api);

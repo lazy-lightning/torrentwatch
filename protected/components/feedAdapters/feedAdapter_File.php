@@ -3,7 +3,7 @@
 require_once('feedAdapters/simplepie.inc');
 
 class feedAdapter_File extends SimplePie_File {
-  function feedAdapter_File($url, $timeout = 10, $redirects = 5, $headers = null,
+  public function feedAdapter_File($url, $timeout = 10, $redirects = 5, $headers = null,
                             $useragent = null, $force_fsockopen = false) {
 
     // pretend for the sake of a particular private feed

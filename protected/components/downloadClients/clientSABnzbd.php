@@ -15,7 +15,7 @@ class clientSABnzbd extends clientPostFile {
     return $this->config->baseApi.'addFile';
   }
 
-  function getClassName() 
+  public function getClassName() 
   {
     return __CLASS__;
   }

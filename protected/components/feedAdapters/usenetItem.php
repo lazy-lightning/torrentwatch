@@ -19,11 +19,11 @@ class usenetItem extends feedAdapter_Item {
     return $in;
   }
 
-  function get_orig_title() {
+  public function get_orig_title() {
     return parent::get_title();
   }
 
-  function get_title() {
+  public function get_title() {
     if($this->cleanTitle === null) {  
       $title = parent::get_title();
       // regular expressions are good at parsing regular data, not random gibberish usenet titles

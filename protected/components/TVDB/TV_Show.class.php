@@ -128,7 +128,7 @@
      * @param SimpleXMLObject $config A simplexmlobject created from thetvdb.com's xml data for the tv show
      * @return void
      **/
-    function __construct($config) {
+    public function __construct($config) {
       
       $this->id = (string)$config->id;
       $this->seriesName = (string)$config->SeriesName;
