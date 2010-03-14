@@ -7,7 +7,7 @@ class titleMatchPartial extends titleMatch
   // only episode or season, not both
   public $episode_reg = '\b(S|EP?)[ _.]?(\d+)\b';
 
-  function foundMatch($title, $regs)
+  public function foundMatch($title, $regs)
   {
     $shortTitle = trim($regs[1]);
     $episodeTitle = '';

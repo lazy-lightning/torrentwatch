@@ -12,7 +12,6 @@
  * Translated into class for NMTDVR
  * very raw translation, not object oriented just contained
  */
-
 class Scraper {
   // many of these functions are from base/utils.c or video_something_something.php in swisscenter
 
@@ -25,48 +24,22 @@ class Scraper {
    * @return string
    */
   
-  function preg_get( $pattern, $subject )
+  public function preg_get( $pattern, $subject )
   {
     preg_match( $pattern, $subject, $matches);
     return (isset($matches[1]) ? $matches[1] : '');
   }
 
-  //-------------------------------------------------------------------------------------------------
-  // Makes the given filepath acceptable to the webserver (\ become /)
-  //-------------------------------------------------------------------------------------------------
   
-  function make_url_path( $fsp )
-  {
-    // On linux/unix systems, we need to modify the path to access the file via the symbolic link
-    // rather than trying to access it directly
-    if ( is_unix() )
-    {
-      foreach ( db_toarray("select name,concat('media/',location_id) dir from media_locations") as $dir)
-      {
-        $pos = strpos($fsp, $dir["NAME"]);
-        if ( $pos == 0 and $pos !== false)
-          $fsp = $dir["DIR"].substr($fsp, strlen($dir["NAME"]));
-      }
-    }
-  
-    $parts = split('/',str_replace('\\','/',$fsp));
-  
-    // On windows, we should ensure that the drive letter is converted to uppercase
-    if ( is_windows() )
-      $parts[0] = strtoupper($parts[0]);
-  
-    for ($i=0; $i<count($parts); $i++)
-      $parts[$i] = rawurlencode($parts[$i]);
-  
-    return join('/',$parts);
-  }
-  
-  // ----------------------------------------------------------------------------------------
-  // Removes common parts of filenames that we don't want to search for...
-  // (eg: file extension, file suffix ("CD1",etc) and non-alphanumeric chars.
-  // ----------------------------------------------------------------------------------------
-  
-  function strip_title ($title)
+  /**
+   * strip_title 
+   * Removes common parts of filenames that we don't want to search for...
+   * (eg: file extension, file suffix ("CD1",etc) and non-alphanumeric chars.
+   * 
+   * @param string $title 
+   * @return string
+   */
+  public function strip_title ($title)
   {
     $search  = array ( '/\.[^.]*$/U'
                      , '/\(.*\)/'
@@ -91,11 +64,17 @@ class Scraper {
     return preg_replace($search, $replace, $title);
   }
   
-  // ----------------------------------------------------------------------------------
-  // Returns the text between two given strings
-  // ----------------------------------------------------------------------------------
   
-  function substr_between_strings( &$string, $startstr, $endstr)
+  /**
+   * substr_between_strings 
+   * Returns the text between two given strings
+   * 
+   * @param string $string 
+   * @param string $startstr 
+   * @param string $endstr 
+   * @return string
+   */
+  public function substr_between_strings( &$string, $startstr, $endstr)
   {
     $start  = ( empty($startstr) ? 0 : strpos($string,$startstr));
     $end    = strpos($string,$endstr, $start+strlen($startstr));
@@ -115,12 +94,17 @@ class Scraper {
     }
   }
   
-  // ----------------------------------------------------------------------------------
-  // Returns all the hyperlinks that are in the given string that match the specified
-  // regular expression ($search) within the href portion of the link.
-  // ----------------------------------------------------------------------------------
   
-  function get_urls_from_html ($string, $search )
+  /**
+   * get_urls_from_html 
+   * Returns all the hyperlinks that are in the given string that match the specified
+   * regular expression ($search) within the href portion of the link.
+   * 
+   * @param string $string 
+   * @param string $search 
+   * @return array 
+   */
+  public function get_urls_from_html ($string, $search )
   {
     preg_match_all ('/<a.*href="(.*'.$search.'[^"]*)"[^>]*>(.*)<\/a>/Ui', $string, &$matches);
   
@@ -130,12 +114,17 @@ class Scraper {
     return $matches;
   }
   
-  // ----------------------------------------------------------------------------------
-  // Returns the given URL ($url) as a properly formatted URL, using $site as the site
-  // address if one is not present.
-  // ----------------------------------------------------------------------------------
   
-  function add_site_to_url ( $url, $site )
+  /**
+   * add_site_to_url 
+   * Returns the given URL ($url) as a properly formatted URL, using $site as the site
+   * address if one is not present.
+   * 
+   * @param string $url 
+   * @param string $site 
+   * @return string
+   */
+  public function add_site_to_url ( $url, $site )
   {
     if ( strpos($url,'http:/') === false)
       return rtrim($site,'/').'/'.ltrim($url,'/');
@@ -143,21 +132,31 @@ class Scraper {
       return $url;
   }
   
-  // ----------------------------------------------------------------------------------
-  // Returns all the hyperlinks is the given string
-  // ----------------------------------------------------------------------------------
   
-  function get_images_from_html ($string)
+  /**
+   * get_images_from_html 
+   * Returns all the hyperlinks is the given string
+   * 
+   * @param string $string 
+   * @return array
+   */
+  public function get_images_from_html ($string)
   {
     preg_match_all ('/<img.*src="([^"]*)"[^>]*>/i', $string, &$matches);
     return $matches;
   }
 
-  // ----------------------------------------------------------------------------------------
-  // Gets the value of an attrbute for a particluar tag (often the "alt" of an "img" tag)
-  // ----------------------------------------------------------------------------------------
-
-  function get_html_tag_attrib( $html, $tag, $find, $attribute )
+  /**
+   * get_html_tag_attrib 
+   * Gets the value of an attrbute for a particluar tag (often the "alt" of an "img" tag)
+   * 
+   * @param string $html the html to be searched
+   * @param string $tag the tag to find in the html
+   * @param string $find a string to match in the tag
+   * @param string $attribute the attribute to find
+   * @return string the value of the attribute, or false
+   */
+  public function get_html_tag_attrib( $html, $tag, $find, $attribute )
   {
     preg_match ('¬<.*'.$tag.'.*'.$find.'.*>¬Ui', $html, &$tag_html);
     preg_match ('¬'.$attribute.'="(.*)"¬Ui',$tag_html[0],$val);
@@ -167,7 +166,15 @@ class Scraper {
       return false;
   }
 
-  function get_html_tag_value( $html, $tag, $find)
+  /**
+   * get_html_tag_value 
+   * 
+   * @param string $html the html to search
+   * @param string $tag the tag to find in the html
+   * @param string $find a string to match in the tag
+   * @return string the text between <tag> and </tag>
+   */
+  public function get_html_tag_value( $html, $tag, $find)
   {
     preg_match ('¬<.*'.$tag.'.*'.$find.'.*>(.*)</'.$tag.'>¬Ui', $html, &$val);
     if (isset($val[1]) && !empty($val[1]))
@@ -176,13 +183,17 @@ class Scraper {
       return false;
   }
 
-  // ----------------------------------------------------------------------------------------
-  // Given a string to search for ($needle) and an array of possible matches ($haystack) this
-  // function will return the index number of the best match and set $this->accuracy to the value
-  // determined (0-100). If no match is found, then this function returns FALSE
-  // ----------------------------------------------------------------------------------------
-
-  function best_match ( $needle, $haystack)
+  /**
+   * best_match 
+   * Given a string to search for ($needle) and an array of possible matches ($haystack) this
+   * function will return the index number of the best match and set $this->accuracy to the value
+   * determined (0-100). If no match is found, then this function returns FALSE
+   * 
+   * @param string $needle  the string to search for
+   * @param array $haystack possible matches 
+   * @return integer the index of the best match in haystack, or false
+   */
+  public function best_match ( $needle, $haystack)
   {
     $best_match = array("id" => 0, "chars" => 0, "pc" => 0);
 
@@ -223,7 +234,15 @@ class IMDbScraper extends Scraper {
   var $rating;
   var $genres;
 
-  function __construct($title, $description = '')
+  /**
+   * __construct 
+   * Excessively long function copied from swisscenter
+   * 
+   * @param string $title 
+   * @param string $description 
+   * @return void
+   */
+  public function __construct($title, $description = '')
   {
     // Perform search for matching titles
     $site_url    = 'http://www.imdb.com/';
@@ -399,7 +418,4 @@ class IMDbScraper extends Scraper {
     }
   }
 }
-/**************************************************************************************************
-                                               End of file
- **************************************************************************************************/
 ?>

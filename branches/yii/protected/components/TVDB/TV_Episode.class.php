@@ -95,7 +95,7 @@
      * @return void
      * @param simplexmlobject $config simplexmlobject created from thetvdb.com's xml data for the tv episode
      **/
-    function __construct($config) {
+    public function __construct($config) {
       
       $this->id = (string)$config->id;
       $this->season = (string)$config->SeasonNumber;

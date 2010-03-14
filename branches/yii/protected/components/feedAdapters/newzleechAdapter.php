@@ -63,7 +63,7 @@ class newzleechItem extends usenetItem {
   //    http://newzleech.com/?p=12345678
   // we want
   //    http://newzleech.com/?m=gen&dl=1&post=12345678
-  function get_link() {
+  public function get_link() {
     list($foo, $id) = explode('=',parent::get_link(), 2);
     return "http://newzleech.com/?m=gen&dl=1&post=".$id;
   }

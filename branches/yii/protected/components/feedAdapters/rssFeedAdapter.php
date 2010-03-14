@@ -106,7 +106,7 @@ class rssFeedAdapter implements IFeedAdapter {
 
 class feedAdapter_Item extends SimplePie_Item {
   // attempt to detect imdb from description, can be overridden for a better match
-  function get_imdbId() {
+  public function get_imdbId() {
     $desc = $this->get_description();
     if(preg_match('/imdb.com\/title\/tt(\d+)/i', $desc, $regs))
       return (int) $regs[1];
@@ -114,7 +114,7 @@ class feedAdapter_Item extends SimplePie_Item {
       return 0;
   }
 
-  function get_link() {
+  public function get_link() {
     // Prefer a link from enclosure over link from item
     // TDOO: only if application/x-bittorrent 
     //            or application/whatever nzb is  ?
@@ -127,11 +127,11 @@ class feedAdapter_Item extends SimplePie_Item {
     return $link;
   }
 
-  function get_title() {
+  public function get_title() {
     return html_entity_decode(parent::get_title());
   }
 
-  function get_description() {
+  public function get_description() {
     return html_entity_decode(parent::get_description());
   }
 }
@@ -139,7 +139,7 @@ class feedAdapter_Item extends SimplePie_Item {
 // Allows for broken feeds that dont encode & as &amp;
 class feedAdapter_Parser extends SimplePie_Parser
 {
-  function parse(&$data, $encoding)
+  public function parse(&$data, $encoding)
   {
     $data = str_replace(' & ', '&#38;', $data);
     return parent::parse($data, $encoding);

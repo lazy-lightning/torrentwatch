@@ -77,7 +77,7 @@ class BrowserEmulator {
   var $debug = false;
   var $customHttp = False;
  
-  function BrowserEmulator() {
+  public function BrowserEmulator() {
     $this->resetHeaderLines();
     $this->resetPort();
   }
@@ -86,7 +86,7 @@ class BrowserEmulator {
   * line will have the format
   * $name: $value\n
   **/
-  function addHeaderLine($name, $value) {
+  public function addHeaderLine($name, $value) {
     $this->headerLines[$name] = $value;
   }
  
@@ -94,7 +94,7 @@ class BrowserEmulator {
   * Deletes all custom header lines. This will not remove the User-Agent header field,
   * which is necessary for correct operation.
   **/
-  function resetHeaderLines() {
+  public function resetHeaderLines() {
     $this->headerLines = Array();
    
     /*******************************************************************************/
@@ -115,18 +115,18 @@ class BrowserEmulator {
   /**
   * Add a post parameter. Post parameters are sent in the body of an HTTP POST request.
   **/
-  function addPostData($name, $value = '') {
+  public function addPostData($name, $value = '') {
     $this->postData[$name] = $value;
   }
  
   /**
   * Deletes all custom post parameters.
   **/
-  function resetPostData() {
+  public function resetPostData() {
     $this->postData = Array();
   }
 
-  function handleMultiPart() {
+  public function handleMultiPart() {
     $boundry = '----------------------------795088511166260704540879626';
 
     $this->headerLines["Accept"] = ' text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
@@ -155,28 +155,28 @@ class BrowserEmulator {
   * Sets an auth user and password to use for the request.
   * Set both as empty strings to disable authentication.
   **/
-  function setAuth($user, $pass) {
+  public function setAuth($user, $pass) {
     $this->authUser = $user;
     $this->authPass = $pass;
   }
   /**
   * Selects a custom port to use for the request.
   **/
-  function setPort($portNumber) {
+  public function setPort($portNumber) {
     $this->port = $portNumber;
   }
  
   /**
   * Resets the port used for request to the HTTP default (80).
   **/
-  function resetPort() {
+  public function resetPort() {
     $this->port = 80;
   }
 
   /**
    * Parse any cookies set in the URL, and return the trimed string
    **/
-  function preparseURL($url) {
+  public function preparseURL($url) {
     if($cookies = stristr($url, ':COOKIE:')) {
       $url = rtrim(substr($url, 0, -strlen($cookies)), '&');
       $this->addHeaderLine("Cookie", '$Version=1; '.strtr(substr($cookies, 8), '&', ';'));
@@ -189,7 +189,7 @@ class BrowserEmulator {
   * method calls. Send all set headers, post data and user authentication data.
   * Returns a file handle on success, or false on failure.
   **/
-  function fopen($url) {
+  public function fopen($url) {
     $url = $this->preparseURL($url);
     $this->lastResponse = Array();
    
@@ -284,7 +284,7 @@ class BrowserEmulator {
   * method calls. Send all set headers, post data and user authentication data.
   * Returns the requested file as a string on success, or false on failure.
   **/
-  function file_get_contents($url) {
+  public function file_get_contents($url) {
     if(file_exists($url)) // local file
       return file_get_contents($url);
     $file = '';
@@ -312,14 +312,14 @@ class BrowserEmulator {
   /**
    * Simulate a file() call by exploding file_get_contents()
    **/
-  function file($url) {
+  public function file($url) {
     $data = $this->file_get_contents($url);
     if($data)
       return explode('\n', $data);
     return False;
   }
  
-  function getLastResponseHeaders() {
+  public function getLastResponseHeaders() {
     return $this->lastResponse;
   }
 }

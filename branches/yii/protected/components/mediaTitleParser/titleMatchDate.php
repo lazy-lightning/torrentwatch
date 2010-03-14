@@ -2,7 +2,7 @@
 // This class matches a title that has a dated episode as oposed to season/episode
 class titleMatchDate extends titleMatch
 {
-  function __construct()
+  public function __construct()
   {
     $this->episode_reg = 
            '\b('
@@ -12,9 +12,9 @@ class titleMatchDate extends titleMatch
           .')';
   }
 
-  function fakeErrorHandler() { return False; }
+  public function fakeErrorHandler() { return False; }
 
-  function foundMatch($title, $regs)
+  public function foundMatch($title, $regs)
   {
     $shortTitle = trim($regs[1]);
     $episodeTitle = '';

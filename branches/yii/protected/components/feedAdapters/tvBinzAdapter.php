@@ -14,7 +14,7 @@ class tvBinzAdapter extends rssFeedAdapter
 
 class tvBinzItem extends feedAdapter_Item 
 {
-  function get_title()
+  public function get_title()
   {
     return strtr(parent::get_title(), '_', ' ');
   }

@@ -15,9 +15,9 @@ abstract class titleMatch {
   public $trFrom = '._-';
   public $trTo = '   ';
  
-  abstract function foundMatch($title, $regs);
+  abstract public function foundMatch($title, $regs);
 
-  function getRegExp()
+  public function getRegExp()
   {
     return "/{$this->title_reg}{$this->episode_reg}/i";
   }

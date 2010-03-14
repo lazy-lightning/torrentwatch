@@ -7,7 +7,7 @@ class titleMatchShort extends titleMatch
   // with at least some data after it to not match a group name at the end
   public $episode_reg = '\b(0?\d\d\d)\b'; 
  
-  function foundMatch($title, $regs)
+  public function foundMatch($title, $regs)
   {
     // 3 digit season/episode identifier
     $shortTitle = trim($regs[1]);

@@ -3,7 +3,7 @@
 class titleMatchPart extends titleMatch
 {
 
-  function __construct()
+  public function __construct()
   {
     $this->episode_reg = 
            '\b('  // must be a word boundry before the episode to prevent turning season 13 into season 3
@@ -12,7 +12,7 @@ class titleMatchPart extends titleMatch
           .')\b';
   }
 
-  function foundMatch($title, $regs)
+  public function foundMatch($title, $regs)
   {
     $shortTitle = trim($regs[1]);
     $episodeTitle = '';
