@@ -63,7 +63,13 @@ if [ $IS_SVN_RELEASE -eq 1 ]; then
   # changeup the appinfo.json file
   cat appinfo.json | sed "s/\\\$id\\\$/${VERSION}/" > appinfo.json.new
   mv appinfo.json.new appinfo.json
+else
+  VERSION=$(cat appinfo.json | grep version | sed 's/.*version="\(.*\)",/\1/')
 fi
+
+# replace version number in protected/config/main.php
+cat protected/config/main.php | sed "s/\\\$id\\\$/${VERSION}/" > protected/config/main.php.new
+mv protected/config/main.php.net protected/config/main.php
 
 FILENAME="$NAME-$VERSION.zip"
 echo "Building $FILENAME"
@@ -134,6 +140,8 @@ else
   mv ../index.dev.html ../index.html
 fi
 
+# revert changes made to protected/config/main.php
+svn revert ../protected/config/main.php
 
 if [ ! $ZIP_SUCCESS -eq 0 ]; then
   echo "Build Failed"

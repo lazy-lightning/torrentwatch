@@ -5,7 +5,14 @@ class BaseController
   protected function render($view, $data)
   { 
     extract($data);
+    if($view[0] === '/')
+      $view = '..'.$view;
     require(Yii::app()->basePath.'/../themes/classic/views/tvEpisode/'.$view.'.php');
+  }
+
+  public function renderPartial($view, $data)
+  {
+    $this->render($view, $data);
   }
 }
 

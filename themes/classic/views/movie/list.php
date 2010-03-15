@@ -15,6 +15,8 @@ foreach($movieList as $n => $model) {
      "  <span class='rating'>".CHtml::encode($model->rating)." / 100</span>".
      "  <span class='torrent_pubDate'>".CHtml::encode(date("M d h:i a", $model->lastUpdated))."</span>".
      "</div></li>";
-} ?>
+}
+$this->renderPartial('/site/version');
+?>
 </ul>
  
