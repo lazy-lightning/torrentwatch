@@ -1,4 +1,4 @@
-<?
+<?php
 
 class html extends CHtml {
   public static function activeTextField($model,$attribute,$htmlOptions=array())
