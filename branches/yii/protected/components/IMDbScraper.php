@@ -106,7 +106,7 @@ class Scraper {
    */
   public function get_urls_from_html ($string, $search )
   {
-    preg_match_all ('/<a.*href="(.*'.$search.'[^"]*)"[^>]*>(.*)<\/a>/Ui', $string, &$matches);
+    preg_match_all ('/<a.*href="(.*'.$search.'[^"]*)"[^>]*>(.*)<\/a>/Ui', $string, $matches);
   
     for ($i = 0; $i<count($matches[2]); $i++)
       $matches[2][$i] = preg_replace('/<[^>]*>/','',$matches[2][$i]);
@@ -142,7 +142,7 @@ class Scraper {
    */
   public function get_images_from_html ($string)
   {
-    preg_match_all ('/<img.*src="([^"]*)"[^>]*>/i', $string, &$matches);
+    preg_match_all ('/<img.*src="([^"]*)"[^>]*>/i', $string, $matches);
     return $matches;
   }
 
@@ -158,7 +158,7 @@ class Scraper {
    */
   public function get_html_tag_attrib( $html, $tag, $find, $attribute )
   {
-    preg_match ('¬<.*'.$tag.'.*'.$find.'.*>¬Ui', $html, &$tag_html);
+    preg_match ('¬<.*'.$tag.'.*'.$find.'.*>¬Ui', $html, $tag_html);
     preg_match ('¬'.$attribute.'="(.*)"¬Ui',$tag_html[0],$val);
     if (isset($val[1]) && !empty($val[1]))
       return $val[1];
@@ -176,7 +176,7 @@ class Scraper {
    */
   public function get_html_tag_value( $html, $tag, $find)
   {
-    preg_match ('¬<.*'.$tag.'.*'.$find.'.*>(.*)</'.$tag.'>¬Ui', $html, &$val);
+    preg_match ('¬<.*'.$tag.'.*'.$find.'.*>(.*)</'.$tag.'>¬Ui', $html, $val);
     if (isset($val[1]) && !empty($val[1]))
       return $val[1];
     else
