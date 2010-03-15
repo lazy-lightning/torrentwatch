@@ -9,6 +9,11 @@ class updateIMDbCommand extends BaseConsoleCommand {
    */
   private $movieDetails;
 
+  /**
+   * db 
+   * 
+   * @var CDbConnection
+   */
   private $db;
 
   /**
@@ -27,7 +32,7 @@ class updateIMDbCommand extends BaseConsoleCommand {
 
   /**
    * scanned is a multidimensional array.  The first element of each row
-   * is a CActiveRecord object.  The second element of same row is an array of
+   * is a CActiveRecord descendent.  The second element of same row is an array of
    * primary keys to be updated
    * 
    * @var array ( # => ( CActiveRecord, primaryKeys ) )
@@ -52,6 +57,15 @@ class updateIMDbCommand extends BaseConsoleCommand {
     }
   }
 
+  /**
+   * repointOther 
+   * given a valid otherId and movieId this function will repoint all
+   * feedItems currently related to otherId to movieId
+   * 
+   * @param integer $otherId 
+   * @param integer $movieId 
+   * @return void
+   */
   protected function repointOther($otherId, $movieId)
   {
     feedItem::model()->updateAll(
@@ -61,11 +75,20 @@ class updateIMDbCommand extends BaseConsoleCommand {
         ),
         'other_id = '.$otherId
     );
-    // delete the model, could just let dbMaintinance take care of it
     other::model()->deleteByPk($otherId);
   }
 
-  protected function scanMovies() {
+  /**
+   * scanMovies 
+   * Fetches all movies from the database that have an IMDb ID and no rating
+   * that have not been checked in the last 48 hours.
+   * If a valid scraper can be found the relevant information is appended to
+   * $this->toSave
+   * 
+   * @return void
+   */
+  protected function scanMovies() 
+  {
     $scanned = array();
     $reader = $this->db->createCommand(
         'SELECT id, imdbId'.
@@ -73,9 +96,9 @@ class updateIMDbCommand extends BaseConsoleCommand {
         ' WHERE lastImdbUpdate <'.(time()-(3600*48)). // one update per 48hrs
         '   AND imdbId IS NOT NULL'.
         '   AND rating IS NULL;'
-
     )->queryAll();
-    foreach($reader as $row) {
+    foreach($reader as $row) 
+    {
       $scanned[] = $row['id'];
       
       echo "Looking for Imdb Id: ".$row['imdbId']."\n";
@@ -93,14 +116,25 @@ class updateIMDbCommand extends BaseConsoleCommand {
       $this->scanned[] = array(movie::model(), $scanned);
   }
 
-  protected function scanOthers() {
+  /**
+   * scanOthers 
+   * Fetches all others from the database that have never been checked
+   * in the imdb.
+   * If a valid scraper can be found the relevant information is appended to
+   * $this->toSave
+   * 
+   * @return void
+   */
+  protected function scanOthers() 
+  {
     $scanned = array();
     $reader = $this->db->createCommand(
         'SELECT id, title, lastUpdated'.
         '  FROM other'.
         ' WHERE lastImdbUpdate = 0'
     )->queryAll();
-    foreach($reader as $row) {
+    foreach($reader as $row) 
+    {
       $title = $row['title'];
       echo "Searching IMDb for $title\n";
       if(($scraper = $this->movieDetails->getScraper($title)))
@@ -114,7 +148,11 @@ class updateIMDbCommand extends BaseConsoleCommand {
         );
       }
       else
+      {
+        // Dont add id of successfull scrapes because the model will
+        // be deleted making this update irrelevant
         $scanned[] = $row['id'];
+      }
     }
 
     if(count($scanned))
@@ -122,7 +160,8 @@ class updateIMDbCommand extends BaseConsoleCommand {
   }
 
   /**
-   * prepareOther gets the movie 
+   * prepareOther
+   * 
    * 
    * @param array $row 
    * @return movie
@@ -131,7 +170,6 @@ class updateIMDbCommand extends BaseConsoleCommand {
   {
     $movie = $this->factory->movieByImdbId($row['scraper']->imdbId, $row['other_title']);
     $movie->lastUpdated = max($movie->lastUpdated, $row['other_lastUpdated']);
-    // repoint feed items
     $this->repointOther($row['other_id'], $movie->id);
     // fix bug where newly saved CActiveRecords cant be saved again
     $movie->setPrimaryKey($movie->id);
