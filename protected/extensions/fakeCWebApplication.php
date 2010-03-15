@@ -51,6 +51,8 @@ class fakeCWebApplication {
   public $loginUrl = 'nmtdvr.php?r=site/login';
   //
   public $charset;
+  public $params;
+  public $name;
 
   private $cookies, $db, $logFile, $scriptUrl, $security, $state, $user;
 
@@ -78,6 +80,8 @@ class fakeCWebApplication {
       throw new Exception('Please set the path to yii in protected.extensions.fakeYii');
 
     session_start();
+    $this->name = $this->config['name'];
+    $this->params = $this->config['params'];
     $this->charset = $this->config['charset'];
     $this->yii = rtrim($this->yii, '/');
 
