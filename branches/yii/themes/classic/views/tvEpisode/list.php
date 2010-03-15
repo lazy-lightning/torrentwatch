@@ -42,6 +42,8 @@ foreach($tvepisodeList as $n => $row) {
 </li>
 EOD
   ;
-} ?>
+} 
+$this->renderPartial('/site/version');
+?>
 </ul>
  

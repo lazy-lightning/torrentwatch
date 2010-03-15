@@ -13,6 +13,8 @@ foreach($otherList as $n => $model) {
        "  <span class='name'>".CHtml::encode($model->title)."</span>".
        "  <span class='torrent_pubDate'>".CHtml::encode(date("M d h:i a", $model->lastUpdated))."</span>".
        "</div></li>";
-} ?>
+}
+$this->renderPartial('/site/version');
+?>
 
 <ul>
