@@ -8617,7 +8617,7 @@ class SimplePie_Cache_File
 	{
 		if (file_exists($this->name))
 		{
-			return touch($this->name);
+			return @touch($this->name);
 		}
 		return false;
 	}
