@@ -58,12 +58,15 @@ abstract class favoriteManager extends CModel {
    * @param integer $itemStatus a feeditem status to limit the search to
    * @param mixed $timeLimit either boolean true/false for defaults, or integer timeLimit in secconds
    */
-  public function checkFavorites($itemStatus = feedItem::STATUS_NEW, $timeLimit=true) 
+  public function checkFavorites($itemStatus = feedItem::STATUS_NEW, $timeLimit=true, $type='all') 
   {
     Yii::trace('Checking for matching favorites');
-    $this->checkTvShowFavorites($itemStatus, $timeLimit);
-    $this->checkMovieFavorites($itemStatus, $timeLimit);
-    $this->checkStringFavorites($itemStatus, $timeLimit);
+    if($type==='all' || $type==='tvShow')
+      $this->checkTvShowFavorites($itemStatus, $timeLimit);
+    if($type==='all' || $type==='movie')
+      $this->checkMovieFavorites($itemStatus, $timeLimit);
+    if($type==='all' || $type==='string')
+      $this->checkStringFavorites($itemStatus, $timeLimit);
 
     $this->startDownloads();
 

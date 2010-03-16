@@ -55,6 +55,8 @@ class updateIMDbCommand extends BaseConsoleCommand {
       $transaction->rollback();
       throw $e;
     }
+    // scan newly modified movies for favorites
+    Yii::app()->dlManager->checkFavorites(feedItem::STATUS_NOMATCH, true, 'movie');
   }
 
   /**
