@@ -31,6 +31,8 @@ if [ -d /mnt/syb8634 -o -d /nmt ]; then
   # might only need to allow the following:
   # assets/ cache/ protected/runtime protected/data/source.db
   chmod -R 777 .
+  # switch ownership of certain things to nobody (the lighttpd and fastcgi user)
+  chown -R 99.99 assets/ cache/ protected/runtime
   
   # clear the APC cache
   pidof lighttpd >/dev/null
