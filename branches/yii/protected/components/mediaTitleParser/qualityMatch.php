@@ -5,7 +5,7 @@ class qualityMatch {
       '\b(DVB|720p|DSR(ip)?|DVBRip|DVDR(ip)?|DVDScr|HR.HDTV|HDTV|HR.PDTV|PDTV|SatRip|SVCD|TVRip|WebRip|WS|1080[ip]|DTS|AC3|XViD|Blue?Ray|internal|limited|proper|repack|subbed|x264|iTouch|telesync|dvd5|int|ntsc|rarfix|pal|festival)\b';
 
   public static $strip_reg =
-    '\b(subpack|complete)\b';
+    '\b(subpack|complete|rerip|stv)\b';
 
   public static function run($title)
   {
