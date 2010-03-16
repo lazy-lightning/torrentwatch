@@ -88,6 +88,7 @@ class fakeCWebApplication {
     $this->loadClasses(array($this->yii=>array(
             'base/interfaces','base/CComponent','base/CApplicationComponent','web/auth/CWebUser')));
 
+    date_default_timezone_set($this->getComponent('dvrConfig')->timezone);
     // finally the CWebUser we wanted
     $this->user = new CWebUser;
     $this->user->allowAutoLogin = true;
