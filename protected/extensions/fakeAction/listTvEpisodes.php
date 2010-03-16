@@ -2,15 +2,16 @@
 
 class BaseController
 {
-  protected function render($view, $data)
+  protected function render($view, $data=array())
   { 
-    extract($data);
+    if(count($data))
+      extract($data);
     if($view[0] === '/')
       $view = '..'.$view;
     require(Yii::app()->basePath.'/../themes/classic/views/tvEpisode/'.$view.'.php');
   }
 
-  public function renderPartial($view, $data)
+  public function renderPartial($view, $data=array())
   {
     $this->render($view, $data);
   }
