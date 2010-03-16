@@ -16,7 +16,7 @@ abstract class fakeYiiBase {
   static public function trace() { }
   static protected function getFake($framework, $config) {
     $fake = new fakeCWebApplication;
-    $fake->config = include($config);
+    $fake->config = $config;
     $fake->yii = $framework;
     return $fake;
   }
@@ -75,18 +75,21 @@ class fakeCWebApplication {
   function init() { 
     if(empty($this->config))
       throw new Exception('Please set config in '.__CLASS__);
-    $this->basePath = realpath($this->config['basePath']);
     if(empty($this->yii))
       throw new Exception('Please set the path to yii in protected.extensions.fakeYii');
 
     session_start();
+    $this->yii = rtrim($this->yii, '/');
+    $this->loadClasses(array($this->yii=>array(
+            'base/interfaces','base/CComponent','base/CApplicationComponent','web/auth/CWebUser')));
+    if(defined('UNIT_TEST') && UNIT_TEST)
+      $this->loadClasses(array($this->yii=>array('collections/CMap')));
+    if(is_string($this->config))
+      $this->config = include($this->config);
+    $this->basePath = realpath($this->config['basePath']);
     $this->name = $this->config['name'];
     $this->params = $this->config['params'];
     $this->charset = $this->config['charset'];
-    $this->yii = rtrim($this->yii, '/');
-
-    $this->loadClasses(array($this->yii=>array(
-            'base/interfaces','base/CComponent','base/CApplicationComponent','web/auth/CWebUser')));
 
     date_default_timezone_set($this->getComponent('dvrConfig')->timezone);
     // finally the CWebUser we wanted
@@ -118,7 +121,8 @@ class fakeCWebApplication {
       $config = $this->config['components']['db'];
       $class = isset($config['class'])?$config['class']:'CDbConnection';
       unset($config['class']);
-
+      if(false !== ($pos = strrpos($class, '.')))
+        $class = substr($class, $pos+1);
       $this->db = new $class;
       foreach($config as $key=>$value)
         $this->db->$key = $value;
