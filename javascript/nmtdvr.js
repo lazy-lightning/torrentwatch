@@ -316,9 +316,9 @@
           $(this).filter('.notgray').each(function() {
             var $t = $(this);
             if($t.attr('value') == '') {
-              $t.attr('value', $t.data('gray'))
+              $t.removeClass('notgray').addClass('gray').attr('value', $t.data('gray'))
             }
-          }).removeClass('notgray').addClass('gray');
+          });
         });
         // Filter Bar - Buttons
         $("ul#filterbar_container li:not(#filter_bytext)").click(function () {

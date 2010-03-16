@@ -1,16 +1,16 @@
 <html>
 <head>
-  <title>Torrentwatch</title>
+  <title>NMTDVR</title>
   <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
   <link rel="Stylesheet" type="text/css" href="css/reset.css" />
-  <link rel="Stylesheet" type="text/css" href="css/torrentwatch.css" />
+  <link rel="Stylesheet" type="text/css" href="css/nmtdvr.css" />
   <link rel="Stylesheet" type="text/css" href="css/jquery.tabs.css" />
   <!--[if IE]>
     <link rel="Stylesheet" type="text/css" href="css/ie.css"></link>
   <![endif]-->
 <script type='text/javascript'>
 var x = new XMLHttpRequest();
-x.open('GET', 'nmtdvr-test.php?r=tvEpisode/list', true);
+x.open('GET', 'nmtdvr-test.php?f=listTvEpisodes', true);
 x.onreadystatechange = function()
 {
   if(x.readyState != 4)
@@ -24,11 +24,10 @@ x.send(null);
   <script type="text/javascript" src="javascript/min.js"></script>
   -->
   <script type="text/javascript" src="javascript/jquery-1.4.1.js"></script>
-  <script type="text/javascript" src="javascript/jquery.cookie.js"></script>
   <script type="text/javascript" src="javascript/jquery.tinysort.js"></script>
   <script type="text/javascript" src="javascript/jquery.tabs.js"></script>
   <script type="text/javascript" src="javascript/jquery.autocomplete.js"></script>
-  <script type="text/javascript" src="javascript/torrentwatch.js"></script>
+  <script type="text/javascript" src="javascript/nmtdvr.js"></script>
 </head>
 <body>
 <a id="wizardLink" class="hidden" href="nmtdvr-test.php?r=dvrConfig/welcome"></a>
@@ -45,7 +44,7 @@ x.send(null);
   <li id="filter_all" class="selected"><a href="#">All</a></li>
   <li id="filter_matching"><a href="#">Matching</a></li>
   <li id="filter_downloaded"><a href="#">Downloaded</a></li>
-  <li id="filter_bytext"><input type="text" id="filter_text_input"></li>
+  <li id="filter_bytext"><input class='gray' type="text" id="filter_text_input" value='Quick Search'></li>
 </ul>
 <div class="progressbar dialog_window" id="progressbar">
   <div class="content clearfix">
@@ -61,7 +60,7 @@ x.send(null);
 </div>
 <div id="feedItems_container">
   <ul>
-    <li><a href="nmtdvr-test.php?r=tvEpisode/list"><span>TV Episodes</span></a></li>
+    <li><a href="nmtdvr-test.php?f=listTvEpisodes"><span>TV Episodes</span></a></li>
     <li><a href="nmtdvr-test.php?r=movie/list"><span>Movies</span></a></li>
     <li><a href="nmtdvr-test.php?r=other/list"><span>Others</span></a></li>
     <li><a href="nmtdvr-test.php?r=feedItem/list&status=queued"><span>Queued</span></a></li>
