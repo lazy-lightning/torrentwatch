@@ -2,8 +2,21 @@
 
 class IMDbAdapter
 {
+  /**
+   * factory 
+   * 
+   * @var modelFactory
+   */
   protected $factory;
 
+  /**
+   * __construct 
+   * Accepts a modelFactory for creating movies.  If not provided
+   * Yii::app()->modelFactory will be used.
+   *
+   * @param modelFactory $factory 
+   * @return void
+   */
   public function __construct($factory = null)
   {
     if($factory===null)
@@ -11,6 +24,15 @@ class IMDbAdapter
     $this->factory = $factory;
   }
 
+  /**
+   * getScraper 
+   * Attempt to get a scraper with accuracy greater than accuracyLimit
+   * 
+   * @param mixed $attribute  either string (title) or integer (imdbid) accepted
+   * @param int $accuracyLimit the minimum accuracy to accept as valid
+   * @return IMDbScraper
+   * @throws CException when $attribute is of an invalid type
+   */
   public function getScraper($attribute, $accuracyLimit = 75)
   {
     // trimming 't' allows for url fragment from http://imdb.com/title/tt012345/
@@ -28,8 +50,9 @@ class IMDbAdapter
       $url = sprintf('http://www.imdb.com/title/tt%07d/', $row['imdbId']);
       $scraper = new IMDbScraper('', $url);
 
-      if($scraper->accuracy < $accuracyLimit) {
-        Yii::log("Failed scrape of id $id\n", CLogger::LEVEL_INFO);
+      if($scraper->accuracy < $accuracyLimit) 
+      {
+        Yii::log("Failed scrape of id $id\n", CLogger::LEVEL_INFO, 'application.components.IMDbAdapter');
         $scraper = false;
       }
 
@@ -60,7 +83,7 @@ class IMDbAdapter
       }
       if($scraper->accuracy < $accuracyLimit)
       {
-        Yii::log("Failed scrape of $title\n", CLogger::LEVEL_INFO);
+        Yii::log("Failed scrape of $title\n", CLogger::LEVEL_INFO, 'application.components.IMDbAdapter');
         $scraper = false;
       }
 
@@ -77,10 +100,14 @@ class IMDbAdapter
     $movie->rating = strtok($scraper->rating, '/');
     $movie->imdbId = $scraper->imdbId;
     $movie->lastImdbUpdate = time();
-    if($movie->save()) {
-      Yii::trace("Updated $scraper->title", 'application.commands.updateIMDbCommand');
-      if(is_array($scraper->genres)) {
-        foreach($scraper->genres as $genre) {
+    if($movie->save()) 
+    {
+      Yii::trace("Updated $scraper->title", 'application.components.IMDbAdapter');
+      // TODO: the following logic should be moved into the movie class, or a genres behavior
+      if(is_array($scraper->genres)) 
+      {
+        foreach($scraper->genres as $genre) 
+        {
           $record = new movie_genre;
           $record->movie_id = $movie->id;
           $record->genre_id = $this->factory->genreByTitle($genre)->id;
@@ -90,7 +117,8 @@ class IMDbAdapter
       return True;
     }
     
-    Yii::log('Error saving movie after IMDB update.', CLogger::LEVEL_ERROR);
+    Yii::log('Error saving movie after IMDB update.', CLogger::LEVEL_ERROR, 'application.components.IMDbAdapter');
+    Yii::log(print_r($movie->getErrors(), true), CLogger::LEVEL_ERROR, 'application.components.IMDbAdapter');
     return False;
   }
 
