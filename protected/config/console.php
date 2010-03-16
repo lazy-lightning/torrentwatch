@@ -61,5 +61,6 @@ return array(
     // this is used in contact page
     'adminEmail'=>'webmaster@example.com',
     'dateFormat'=>'m-d-Y h:i a',
+    'version'=>'$id$',
   ),
 );

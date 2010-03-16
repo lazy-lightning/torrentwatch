@@ -22,6 +22,5 @@ require_once('protected/models/tvEpisode.php');
 require_once('protected/models/feedItem.php');
 require_once('protected/controllers/TvEpisodeController.php');
 
-date_default_timezone_set(Yii::app()->getComponent('dvrConfig')->timezone);
 $controller = new TvEpisodeController;
 $controller->actionList();

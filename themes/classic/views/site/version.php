@@ -6,4 +6,4 @@ if(!isset($lastFeedUpdate)) {
 } 
 $lastFeedUpdate = date('D h:i a', $lastFeedUpdate); 
 ?>
-<li id='version'><?php echo Yii::app()->name.' Version '.Yii::app()->params['version'].' --- Last Updated: '.$lastFeedUpdate; ?></li>
+<li id='version'><?php echo Yii::app()->name.' Version '.Yii::app()->params['version'].' --- Last feed update: '.$lastFeedUpdate; ?></li>

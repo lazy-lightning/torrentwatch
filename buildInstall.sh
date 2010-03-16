@@ -11,6 +11,8 @@ APPINIT="Apps/AppInit/appinit.cgi"
 NAME=$(grep name appinfo.json | sed 's/[ ]*.*="\(.*\)",/\1/g')
 EXCLUDES="install testing protected/data/source-test.db.BACKUP protected/data/source.db.BACKUP protected/data/source.db protected/runtime cache buildInstall.sh findNotSvn.sh assets php.sh"
 
+CONFIG_FILES="main.php console.php"
+
 # Dont change below here unless you know what you are doing
 
 IS_SVN_RELEASE=1
@@ -50,7 +52,9 @@ EOD
   exit 1
 fi
 
-# Generate a new versioo number for svn releases
+# Generate a new version number (ex: svn20100310) for svn releases
+# based on todays date, with multiple releases on same day marked
+# in numeric order (ex: svn20100310.1)
 if [ $IS_SVN_RELEASE -eq 1 ]; then
   # start with date
   VERSION="svn$(date +%Y%m%d)"
@@ -61,18 +65,24 @@ if [ $IS_SVN_RELEASE -eq 1 ]; then
     VERSION="svn$(date +%Y%m%d).${I}"
   done
   # changeup the appinfo.json file
+  cp appinfo.json appinfo.json.orig.$$
   cat appinfo.json | sed "s/\\\$id\\\$/${VERSION}/" > appinfo.json.new
   mv appinfo.json.new appinfo.json
 else
+# otherwise source the current version from the appinfo.json file
   VERSION=$(cat appinfo.json | grep version | sed 's/.*version="\(.*\)",/\1/')
 fi
 
-# replace version number in protected/config/main.php
-cat protected/config/main.php | sed "s/\\\$id\\\$/${VERSION}/" > protected/config/main.php.new
-mv protected/config/main.php.net protected/config/main.php
+# replace version number placeholder in config files with actual version
+for i in $CONFIG_FILES; do
+  cp protected/config/$i protected/config/$i.orig.$$
+  cat protected/config/$i | sed "s/\\\$id\\\$/${VERSION}/" > protected/config/$i.new
+  mv protected/config/$i.new protected/config/$i
+done
 
 FILENAME="$NAME-$VERSION.zip"
 echo "Building $FILENAME"
+# check if the file already exists, verify the user wants to overwrite
 if [ -f install/$FILENAME ]; then
   echo -n "Installl file for this version already exists, overwrite (y/N): "
   read CHAR;
@@ -132,16 +142,19 @@ if [ x"$LINK" != x"" ];then
   ln -s $LINK $TESTDB
 fi
 
-# revert changes made to appinfo.json
+# if this is svn and we changed appinfo.json change it back
 if [ 1 -eq $IS_SVN_RELEASE ]; then
-  svn revert ../appinfo.json >/dev/null
+  mv ../appinfo.json.orig.$$ ../appinfo.json
 else
+# otherwise swap back the index files from release state to development
   mv ../index.html ../index-joined.html
   mv ../index.dev.html ../index.html
 fi
 
 # revert changes made to protected/config/main.php
-svn revert ../protected/config/main.php
+for i in $CONFIG_FILES; do
+  mv ../protected/config/$i.orig.$$ ../protected/config/$i
+done
 
 if [ ! $ZIP_SUCCESS -eq 0 ]; then
   echo "Build Failed"
