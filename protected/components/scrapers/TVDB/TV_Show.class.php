@@ -23,6 +23,7 @@
      * @var string
      */
     public $seriesName;
+    public $name;
     
     /**
      * Current status of the TV Show. Values are 'Ended', 'Continuing' (other unknown values possible)
@@ -131,7 +132,7 @@
     public function __construct($config) {
       
       $this->id = (string)$config->id;
-      $this->seriesName = (string)$config->SeriesName;
+      $this->name = $this->seriesName = (string)$config->SeriesName;
       $this->status = (string)$config->Status;
       $this->firstAired = strtotime((string)$config->FirstAired);
       $this->network = (string)$config->Network;
