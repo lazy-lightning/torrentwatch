@@ -52,7 +52,7 @@ class movie extends CActiveRecord
     return array(
       array('status', 'default', 'value'=>self::STATUS_NEW),
       array('lastUpdated, lastImdbUpdate', 'default', 'value'=>0),
-      array('lastUpdated, lastImdbUpdate, imdbId', 'numerical', 'integerOnly'=>true, 'min'=>0),
+      array('lastUpdated, lastImdbUpdate', 'numerical', 'integerOnly'=>true, 'min'=>0),
     );
   }
 
@@ -75,7 +75,6 @@ class movie extends CActiveRecord
     return array(
       'id'=>'Id',
       'title'=>'Title',
-      'imdbId'=>'Imdb ',
     );
   }
 
@@ -105,14 +104,6 @@ class movie extends CActiveRecord
       $fav->maxYear = $this->year + 5;
     }
     return $fav;
-  }
-
-  /**
-   * @return string url to imdb page
-   */
-  public function getImdbLink()
-  {
-    return 'http://www.imdb.com/title/tt'.$this->imdbId;
   }
 
   /**

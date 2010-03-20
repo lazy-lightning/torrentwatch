@@ -1,13 +1,7 @@
 <?php $tvShow = $model->getRelated('tvShow'); ?>
 <div id='tvEpisodeDetails-<?php echo $model->id; ?>' class='mediaDetails'>
 <div>
-  <h2 class='content'><?php 
-    if(empty($tvShow->tvdbId))
-      echo CHtml::encode($tvShow->title);
-    else
-      echo CHtml::link($tvShow->title, 'http://thetvdb.com/?tab=series&id='.$tvShow->tvdbId);
-    ?>
-  </h2>
+  <h2 class='content'><?php echo CHtml::encode($tvShow->title); ?></h2>
 </div>
 <?php if(!empty($tvShow->network_id)): ?>
   <div>

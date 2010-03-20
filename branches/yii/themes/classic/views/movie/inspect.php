@@ -1,6 +1,6 @@
 <div id='movieDetails-<?php echo $model->id; ?>' class='mediaDetails'>
 <div>
-  <h2><?php echo CHtml::link($model->fullTitle, $model->imdbLink); ?></h2>
+  <h2><?php CHtml::encode($model->fullTitle); ?></h2>
 </div>
 <?php if(!empty($model->qualityString)): ?>
   <div>
