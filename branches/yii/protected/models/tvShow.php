@@ -78,4 +78,12 @@ class tvShow extends CActiveRecord
       $desc = substr($this->description, 0, $length-strlen($append)).$append;
     return $desc;
   }
+
+  public function getBannerLocation($title = null)
+  {
+    if($title===null)
+      $title = $this->title;
+    // FIXME: probably going to cause bugs forcing jpg
+    return 'images/TvBanners/'.strtr($title, '!@#$%^&*()/?;\'"{}[]>\\|', '_').'.jpg';
+  }
 }

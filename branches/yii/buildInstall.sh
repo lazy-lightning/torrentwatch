@@ -9,7 +9,7 @@ LFTP_NET_BOOKMARK="asodown"
 
 APPINIT="Apps/AppInit/appinit.cgi"
 NAME=$(grep name appinfo.json | sed 's/[ ]*.*="\(.*\)",/\1/g')
-EXCLUDES="install testing protected/data/source-test.db.BACKUP protected/data/source.db.BACKUP protected/data/source.db protected/runtime cache buildInstall.sh findNotSvn.sh assets php.sh"
+EXCLUDES="install testing protected/data/source-test.db.BACKUP protected/data/source.db.BACKUP protected/data/source.db protected/runtime cache buildInstall.sh findNotSvn.sh assets php.sh images/TvBanners/"
 
 CONFIG_FILES="main.php console.php"
 
