@@ -23,7 +23,6 @@
      * @var string
      */
     public $seriesName;
-    public $name;
     
     /**
      * Current status of the TV Show. Values are 'Ended', 'Continuing' (other unknown values possible)
@@ -132,7 +131,7 @@
     public function __construct($config) {
       
       $this->id = (string)$config->id;
-      $this->name = $this->seriesName = (string)$config->SeriesName;
+      $this->seriesName = (string)$config->SeriesName;
       $this->status = (string)$config->Status;
       $this->firstAired = strtotime((string)$config->FirstAired);
       $this->network = (string)$config->Network;
@@ -157,7 +156,8 @@
     
     /**
      * Get a specific episode by season and episode number
-     *
+     * TODO: make this accessible with only a tvdbTvShowId 
+     *       without full instantiation
      * @var int $season required the season number
      * @var int $episode required the episode number
      * @return TV_Episode 
@@ -177,6 +177,16 @@
           return new TV_Episode($xml->Episode);
       }
       return false;
+    }
+
+    public function getId()
+    {
+      return $this->id;
+    }
+
+    public function getName()
+    {
+      return $this->seriesName;
     }
   }
 ?>
