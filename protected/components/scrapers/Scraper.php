@@ -9,11 +9,29 @@
  *************************************************************************************************/
 
 /**
- * Translated into class for NMTDVR
- * very raw translation, not object oriented just contained
+ * Translated into class by Erik Bernhardson
+ * very raw translation, not truly object oriented just contained
  */
-class Scraper {
+abstract class Scraper {
   // many of these functions are from base/utils.c or video_something_something.php in swisscenter
+  // other functions have been written by Erik Bernhardson
+
+  public $accuracy;
+
+  /**
+   * Must be set by implementing scraper to uniquly identify
+   * this result, and possibly be able to retreive it again.
+   *
+   * @return mixed
+   */
+  abstract public function getId();
+
+  /**
+   * getName 
+   * 
+   * @return string
+   */
+  abstract public function getName();
 
   /**
    * Simple function to search a string using a regular expression and then
@@ -193,7 +211,7 @@ class Scraper {
    * @param array $haystack possible matches 
    * @return integer the index of the best match in haystack, or false
    */
-  public function best_match ( $needle, $haystack)
+  public function best_match ( $needle, $haystack, $accuracyLimit = 75)
   {
     $best_match = array("id" => 0, "chars" => 0, "pc" => 0);
 
@@ -210,7 +228,7 @@ class Scraper {
     }
 
     // If we are sure that we found a good result, then get the file details.
-    if ($best_match["pc"] > 75)
+    if ($best_match["pc"] > $accuracyLimit)
     {
       Yii::log('Best guess: ['.$best_match["id"].'] - '.$haystack[$best_match["id"]], CLogger::LEVEL_INFO);
       $this->accuracy = $best_match["pc"];
@@ -218,7 +236,7 @@ class Scraper {
     }
     else
     {
-      Yii::log('Multiple Matches found, No match > 75%', CLogger::LEVEL_ERROR);
+      Yii::log("Multiple Matches found, No match > {$accuracyLimit}%", CLogger::LEVEL_ERROR);
       return false;
     }
   }

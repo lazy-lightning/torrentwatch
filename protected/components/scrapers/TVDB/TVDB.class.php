@@ -30,7 +30,7 @@
      * @param $url string The url to fetch data from
      * @return string The data
      **/
-    protected function fetchData($url) {
+    static protected function fetchData($url) {
       if(function_exists('curl_init')) {
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_HEADER, 1);
@@ -61,7 +61,7 @@
      * @param $params An array containing parameters for the request to thetvdb.com
      * @return string The data from thetvdb.com
      **/
-    protected function request($params) {
+    static protected function request($params) {
       
       switch($params['action']) {
         
