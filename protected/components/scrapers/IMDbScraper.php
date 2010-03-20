@@ -110,7 +110,7 @@ class IMDbScraper extends Scraper {
       $url_imdb = $this->add_site_to_url($matches[1][$index],$this->site_url);
       $url_imdb = substr($url_imdb, 0, strpos($url_imdb,"?fr=")-1);
       $this->imdbId = substr($matches[1][$index], 9, 7);
-      $html = $this->decodeHtml(file_get_contents($url_imdb));
+      $html = $this->decodeHtml(@file_get_contents($url_imdb));
     }
     return $html;
   }
@@ -122,12 +122,12 @@ class IMDbScraper extends Scraper {
     // Filename includes an explicit IMDb title such as '[tt0076759]', use that to find the movie
     if (preg_match("/\[(tt\d+)\]/",$title, $imdbtt) != 0)
     {
-      $html = file_get_contents($this->site_url.$this->search_append.$imdbtt[1]);
+      $html = @file_get_contents($this->site_url.$this->search_append.$imdbtt[1]);
     }
     // description includes an imdb url, use that to find the movie
     elseif (preg_match("/imdb.com\/title\/(tt\d+)/",$description, $imdbtt) != 0)
     {
-      $html = file_get_contents($this->site_url.$this->search_append.$imdbtt[1]);
+      $html = @file_get_contents($this->site_url.$this->search_append.$imdbtt[1]);
     }
     // Use IMDb's internal search to get a list a possible matches
     // IMDB doesn't like year in search, so save it for later reference
@@ -138,7 +138,7 @@ class IMDbScraper extends Scraper {
         $title = $title_regs[1];
         $title_year = $title_regs[2];
       }
-      $html = file_get_contents($this->site_url.$this->search_append.str_replace('%20','+',urlencode($title)));
+      $html = @file_get_contents($this->site_url.$this->search_append.str_replace('%20','+',urlencode($title)));
     }
     $html = $this->decodeHtml($html);
     // If the title contains a year then adjust the returned page to include year in search
