@@ -2,3 +2,80 @@
 div#history {
   height: 256px;
   }
+
+.mainoptions {
+  background: transparent url('../images/menu_bg.gif') repeat-x;
+}
+
+#favoritesMenu a {
+    background: url('../images/nuvola_bookmark.png') no-repeat 15px 0;
+}
+
+#config a {
+    background: url('../images/nuvola_configure.png') no-repeat 15px 0;
+}
+
+#empty a {
+    background: url('../images/remove.png') no-repeat 18px 0;
+}
+
+#toggleLegend a {
+    background: url('../images/nuvola_help.png') no-repeat 9px 0;
+}
+
+#inspector a {
+    background: url('../images/info.png') no-repeat 15px 0; 
+}
+
+li.divider {
+    background: transparent url('../images/menu_divider.png') no-repeat 0 0;
+}
+
+#filterbar_container {
+    background: #C0C8D6 url('../images/filter_bar_bg.png') repeat-x;
+}
+
+#filterbar_container li:not(#filter_bytext):hover {
+    background: transparent url('../images/filter_hover_left.png') no-repeat top left;*/
+}
+
+#filterbar_container li:hover a {
+     background: transparent url('../images/filter_hover_right.png') no-repeat top right;
+}
+
+#filterbar_container li.selected {
+    background: transparent url('../images/filter_selected_left.png') no-repeat top left;*/
+}
+
+#filterbar_container .selected a {
+    background: transparent url('../images/filter_selected_right.png') no-repeat top right;*/
+}
+
+#filter_text_input {
+    background: #FFF url('../images/filter_icon.png') no-repeat 0 0;
+}
+
+.startDownload {
+    background: transparent url('../images/tor_start_small.png') no-repeat;
+}
+
+.makeFavorite {
+    background: transparent url('../images/tor_fav_small.png') no-repeat;
+}
+
+.hideTvShow {
+    background: transparent url('../images/hide.png') no-repeat;
+}
+
+.loadInspector {
+    background: transparent url('../images/info_small.png') no-repeat;*/
+}
+
+.content {
+    background-image: url('../images/overlay/white.png');
+}
+
+.dialog_window:after {
+    background: url('../images/overlay/white.png') 0 -493px;
+}
+
