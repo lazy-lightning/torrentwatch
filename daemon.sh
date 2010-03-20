@@ -13,8 +13,8 @@ if [ ! -f protected/data/source.db ]; then
 fi
 
 # create the runtime directorys
-if [ ! -d protected/runtime -o ! -d cache/ -o ! -d assets/ ]; then
-  mkdir protected/runtime cache/ assets/ 2>/dev/null
+if [ ! -d protected/runtime -o ! -d cache/ -o ! -d assets/ -o ! -d images/TvBanners]; then
+  mkdir protected/runtime cache/ assets/ images/TvBanners 2>/dev/null
 fi
 
 # only on nmt platform
