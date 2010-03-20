@@ -2,10 +2,10 @@
 // TODO: this class is fairly ugly, fix it
 class qualityMatch {
   public static $qual_reg =
-      '\b(DVB|720p|DSR(ip)?|DVBRip|DVDR(ip)?|DVDScr|HR.HDTV|HDTV|HR.PDTV|PDTV|SatRip|SVCD|TVRip|WebRip|WS|1080[ip]|DTS|AC3|XViD|Blue?Ray|internal|limited|proper|repack|subbed|x264|iTouch|telesync|dvd5|int|ntsc|rarfix|pal|festival)\b';
+      '\b(DVB|720p|DSR(ip)?|DVBRip|DVDR(ip)?|DVDScr|HR.HDTV|HDTV|HR.PDTV|PDTV|SatRip|SVCD|TVRip|WebRip|WS|1080[ip]|DTS|AC3|XViD|Blue?Ray|internal|limited|proper|repack|subbed|[xh]264|iTouch|telesync|dvd5|int|ntsc|rarfix|pal|festival|iphone|ts|r5)\b';
 
   public static $strip_reg =
-    '\b(subpack|complete|rerip|stv)\b';
+    '\b(subpack|complete|rerip|stv|readnfo)\b';
 
   public static function run($title)
   {
