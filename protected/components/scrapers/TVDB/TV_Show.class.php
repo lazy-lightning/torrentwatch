@@ -163,20 +163,7 @@
      * @return TV_Episode 
      **/
     public function getEpisode($season, $episode) {
-      $params = array('action' => 'get_episode', 
-              'season' => (int)$season, 
-              'episode' => (int)$episode,
-              'show_id' => $this->id);
-      
-      $data = self::request($params);
-      
-      if ($data) {
-        libxml_use_internal_errors(true);
-        $xml = simplexml_load_string($data);
-        if($xml)
-          return new TV_Episode($xml->Episode);
-      }
-      return false;
+      return TV_Episodes::search($this->id, $season, $episode);
     }
 
     public function getId()

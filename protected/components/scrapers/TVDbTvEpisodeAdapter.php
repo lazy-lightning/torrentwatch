@@ -55,9 +55,7 @@ EOD
   {
     if($resultRow['episode'] > 1000)
       return false; // dont have methods for date based episodes
-    if(!($tvShow = $this->tvShowAdapter->getScraperById($resultRow['tvdbTvShow_id'])))
-      return false;
-    return $tvShow->getEpisode($resultRow['season'], $resultRow['episode']);
+    return TV_Episodes::search($resultRow['tvdbTvShow_id'], $resultRow['season'], $resultRow['episode']);
   }
 
   public function init()
