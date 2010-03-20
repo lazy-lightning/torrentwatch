@@ -2,13 +2,38 @@ CREATE TABLE version (
     version INTEGER
 );
 CREATE TABLE dvrConfig ( 
-    key TEXT, 
+    key TEXT,
     value TEXT , 
     dvrConfigCategory_id INTEGER
 );
 CREATE TABLE dvrConfigCategory ( 
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, 
     title TEXT 
+);
+CREATE TABLE TVDbTvShowAdapter (
+    tvShow_id INTEGER NOT NULL PRIMARY KEY,
+    tvdbShowId INTEGER,
+    lastUpdated INTEGER NOT NULL
+);
+CREATE TABLE TVDbTvEpisodeAdapter (
+    tvEpisode_id INTEGER NOT NULL PRIMARY KEY,
+    tvdbEpisodeId INTEGER,
+    lastUpdated INTEGER NOT NULL
+);
+CREATE TABLE IMDbMovieAdapter (
+    movie_id INTEGER NOT NULL PRIMARY KEY,
+    imdbId INTEGER,
+    lastUpdated INTEGER NOT NULL
+);
+CREATE TABLE IMDbOtherAdapter (
+    other_id INTEGER NOT NULL PRIMARY KEY,
+    unused INTEGER,
+    lastUpdated INTEGER NOT NULL
+);
+CREATE TABLE TVcomTvShowAdapter (
+    tvShow_id INTEGER NOT NULL PRIMARY KEY,
+    tvComId INTEGER,
+    lastUpdated INTEGER NOT NULL
 );
 CREATE TABLE favoriteMovies (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -112,15 +137,13 @@ CREATE TABLE history (
 CREATE TABLE movie (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     title TEXT,
-    imdbId INTEGER,
     status INTEGER NOT NULL DEFAULT 0,
     name TEXT,
     year TEXT,
     runtime TEXT,
     rating INTEGER,
     plot TEXT, 
-    lastUpdated INTEGER,
-    lastImdbUpdate INTEGER DEFAULT 0
+    lastUpdated INTEGER
 );
 CREATE TABLE movie_genre (
     movie_id INTEGER NOT NULL,
@@ -136,8 +159,7 @@ CREATE TABLE other (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     title TEXT, 
     status INTEGER NOT NULL DEFAULT 0, 
-    lastUpdated INTEGER,
-    lastImdbUpdate INTEGER NOT NULL DEFAULT 0
+    lastUpdated INTEGER
 );
 CREATE TABLE quality (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -153,7 +175,6 @@ CREATE TABLE tvEpisode (
     lastUpdated INTEGER,
     status INTEGER, 
     firstAired INTEGER, 
-    lastTvdbUpdate INTEGER NOT NULL DEFAULT 0,
     FOREIGN KEY (tvShow_id) REFERENCES tvShow(id)
 );
 CREATE TABLE tvShow (
@@ -162,9 +183,7 @@ CREATE TABLE tvShow (
     title TEXT,
     description TEXT, 
     rating INTEGER, 
-    tvdbId INTEGER, 
     hide INTEGER,
-    lastTvdbUpdate INTEGER NOT NULL DEFAULT 0,
     FOREIGN KEY (network_id) REFERENCES network(id)
 );
 CREATE TABLE tvShow_genre (
@@ -344,7 +363,6 @@ SELECT feedItem.id feedItem_id,
        feed.url feed_url,
        feed.title feed_title,       movie.id as movie_id,
        movie.title as movie_title,
-       movie.imdbId as movie_imdbId,
        movie.rating as movie_rating
   FROM feed, feedItem, movie
  WHERE feedItem.movie_id = movie.id

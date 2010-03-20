@@ -11,7 +11,7 @@
       Click the heart shaped button to make any item a favorite.  Once favorited it will be downloaded every
       an undownloaded episode matching the filters is seen in the feed.  Click the triangle next to the heart
       to start downloading without favoriting.  On the right side of Tv Episodes and Movies there is also a
-      blue button which will display information detected from TheTvDB.com and IMDb.com about this media item.
+      blue button which will display information detected from TheTvDB.com, TV.com and IMDb.com about this media item.
     </p>
     <div class='buttonContainer clearFix'>
       <?php echo CHtml::link('Back', array('wizardSettings'), array('class'=>'ajaxSubmit button')); ?>

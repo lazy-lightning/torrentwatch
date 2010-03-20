@@ -7,7 +7,7 @@
     </span>
     <span class="item">
         NMTDVR receives information about available media over the internet
-        via an RSS feed provided by the user. TheTVDB.com and IMDB.com are
+        via an RSS feed provided by the user. TheTVDB.com, TV.com and IMDB.com are
         used to find out information about the individual media files.
     </span>
     <span class="item">

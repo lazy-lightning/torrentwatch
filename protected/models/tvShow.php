@@ -38,9 +38,6 @@ class tvShow extends CActiveRecord
       array('title','required'),
       array('network_id', 'exist', 'attributeName'=>'id', 'className'=>'network'),
       array('rating', 'numerical', 'integerOnly'=>true, 'min'=>0, 'max'=>10),
-      array('tvdbId', 'numerical', 'integerOnly'=>true, 'min'=>0),
-      array('lastTvdbUpdate', 'default', 'value'=>0),
-      array('lastTvdbUpdate', 'numerical', 'allowEmpty'=>false, 'integerOnly'=>true, 'min'=>0),
       array('hide', 'numerical', 'integerOnly'=>true, 'min'=>0, 'max'=>1),
     );
   }

@@ -4,6 +4,8 @@ abstract class dbMigration {
   protected $owner;
   protected $db;
 
+  abstract public function run();
+
   public function __construct($owner)
   {
     $this->owner = $owner;
@@ -126,5 +128,12 @@ abstract class dbMigration {
     {
       $this->db->createCommand($sql)->execute();
     }
+  }
+
+  protected function createTable($table, $columnDef)
+  {
+    $this->db->createCommand(
+        "CREATE TABLE IF NOT EXISTS $table (\n$columnDef\n);"
+    )->execute();
   }
 }

@@ -78,7 +78,6 @@ class rssFeedAdapter implements IFeedAdapter {
             'hash'        => $hash,
             'feed_id'     => $this->feedModel->id,
             'downloadType'=> $this->feedModel->downloadType,
-            'imdbId'      => $item->get_imdbId(),
             'title'       => $title,
             'url'         => $item->get_link(),
             'description' => $item->get_description(),
