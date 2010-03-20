@@ -156,8 +156,6 @@
     
     /**
      * Get a specific episode by season and episode number
-     * TODO: make this accessible with only a tvdbTvShowId 
-     *       without full instantiation
      * @var int $season required the season number
      * @var int $episode required the episode number
      * @return TV_Episode 
