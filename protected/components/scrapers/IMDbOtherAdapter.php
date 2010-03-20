@@ -7,6 +7,8 @@ class IMDbOtherAdapter extends IMDbMovieAdapter
 
   protected function repointOther($other, $movie)
   {
+    // FIXME: this is hard coded to the feedItem class and to the particular
+    //        ids used.  It could instead be a generalized solution
     feedItem::model()->updateAll(
         array(
           'other_id'=>NULL,

@@ -28,13 +28,18 @@ abstract class ScraperAdapter {
 
   public function __construct($db=null, $factory=null)
   {
-    if(empty($this->table) || empty($this->modelClass))
+    if(empty($this->table) || !is_string($this->table) ||
+       empty($this->modelClass) || !is_string($this->modelClass))
       throw new CException('Basic configuration of '.get_class($this).' not completed');
     if($db === null)
       $db = Yii::app()->getDb();
+    if(!$db instanceof CDbConnection)
+      throw new CException('Expected CDbConnection got '.get_class($db));
     $this->db = $db;
     if($factory === null)
       $factory = Yii::app()->modelFactory;
+    if(!$factory instanceof modelFactory)
+      throw new CException('Expected modelFactory got '.get_class($factory));
     $this->factory = $factory;
     $this->builder = $db->getSchema()->getCommandBuilder();
   }
@@ -153,8 +158,8 @@ EOD
 
   protected function logError($model)
   {
-    Yii::log("Error saving ".get_class($model)." after update", CLogger::LEVEL_ERROR, 'application.components.scrapers.ScrapeAdapter');
-    Yii::log(print_r($model->errors, true), CLogger::LEVEL_ERROR, 'application.components.scrapers.ScrapeAdapter');
+    Yii::log("Error saving ".get_class($model)." after update", CLogger::LEVEL_ERROR, 'application.components.scrapers.ScraperAdapter');
+    Yii::log(print_r($model->errors, true), CLogger::LEVEL_ERROR, 'application.components.scrapers.ScraperAdapter');
   }
 
   public function recordScrape($model_id, $scraperId)
