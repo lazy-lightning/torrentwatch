@@ -8,3 +8,4 @@ require_once 'TVDB/TVDB.class.php';
 require_once 'TVDB/TV_Show.class.php';
 require_once 'TVDB/TV_Shows.class.php';
 require_once 'TVDB/TV_Episode.class.php';
+require_once 'TVDB/TV_Episodes.class.php';
