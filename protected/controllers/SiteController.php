@@ -42,7 +42,7 @@ class SiteController extends BaseController
           array('label'=>'Movies', 'url'=>array('movie/list')),
           array('label'=>'Other', 'url'=>array('other/list')),
     ));
-    $this->render('index_'.$this->resolution,array('items'=>$items, 'firstLine'=>$items[0]['index']));
+    $this->render('index', array('items'=>$items, 'firstLine'=>$items[0]['index']));
   }
 
   /**

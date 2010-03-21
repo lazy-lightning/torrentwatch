@@ -1,0 +1,117 @@
+body {
+color:#FFFFFF;
+}
+a {
+text-decoration:none;
+}
+.block {
+background-color:#444444;
+color:#FFFFFF;
+font-family:arial,helvetica;
+font-size:16px;
+height:45px;
+}
+a {
+text-decoration:none;
+}
+#prev {
+left:5px;
+position:absolute;
+top:300px;
+}
+#next {
+left:1058px;
+position:absolute;
+top:300px;
+}
+#day {
+color:#FFFFFF;
+font-family:arial,helvetica;
+font-size:35px;
+left:360px;
+position:absolute;
+top:5px;
+}
+.info {
+color:#06889F;
+font-family:arial,helvetica;
+font-size:16px;
+position:absolute;
+}
+#source1 {
+font-size:13px;
+left:1000px;
+text-align:right;
+top:643px;
+width:50px;
+}
+#source2 {
+font-size:13px;
+left:1050px;
+text-align:right;
+top:643px;
+width:50px;
+}
+#info1 {
+left:950px;
+text-align:right;
+top:5px;
+width:150px;
+}
+#info2 {
+left:950px;
+text-align:right;
+top:23px;
+width:150px;
+}
+#home {
+left:1px;
+position:absolute;
+top:606px;
+}
+.blockinfo {
+color:#A2A2A2;
+font-family:arial,helvetica;
+font-size:18px;
+position:absolute;
+top:68px;
+}
+.logotext {
+color:#06889F;
+font-family:arial,helvetica;
+font-size:24px;
+}
+.smallblock {
+font-size:13px;
+}
+.highlight {
+color:#F9FF5B;
+}
+.highlight1 {
+color:#FF8181;
+}
+.highlight2 {
+color:#6BF84A;
+}
+.highlight3 {
+color:#F9FF5B;
+}
+.highlight4 {
+color:#81B0FF;
+}
+.spacer {
+font-size:1px;
+width:6px;
+}
+.channelnumber {
+color:#CCCCCC;
+font-size:25px;
+}
+.channelnumberselected {
+color:#1CA800;
+font-size:25px;
+}
+.added {
+text-decoration:underline;
+}
+
