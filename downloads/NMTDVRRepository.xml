@@ -9,7 +9,7 @@
       <Author>journey4712</Author>
       <Maintainer>journey4712</Maintainer>
       <Description>Automated Tv Show and Movie Downloads via Usenet and Torrent.</Description>
-      <Homepage>http://www.networkedmediatank.com/showthread.php?tid=5446</Homepage>
+      <Homepage>http://www.networkedmediatank.com/showthread.php?tid=38218</Homepage>
       <InstallScript>Apps/AppInit/appinit.cgi?install&amp;NMTDVR.tar</InstallScript>
       <WebInterfaceURL>http://[NMT_IP]:9999/NMTDVR_web/index.html</WebInterfaceURL>
       <GayaInterfaceURL />
