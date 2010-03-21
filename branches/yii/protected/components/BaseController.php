@@ -7,7 +7,8 @@ abstract class BaseController extends CController {
   /**
    * runActionWithFilters 
    * Override normal access control filtering so only check for is/isnot
-   * guest, skips the whole filter chain code set for simplicity.
+   * guest, skips the whole filter chain code set for simplicity and to
+   * reduce framework setup time(important on A100 line)
    * 
    * @param CAction $action 
    * @param array $filters 
@@ -29,6 +30,14 @@ abstract class BaseController extends CController {
     }
   }
 
+  /**
+   * Returns a copy of the $attributes array containing only the keys
+   * specified in $whitelist
+   * 
+   * @param array $attributes the array to be filtered ( key => value )
+   * @param array $whitelist list of valid keys ( key1, key2, ..., keyn )
+   * @return array the filtered $attributes array
+   */
   protected function whitelist($attributes, $whitelist)
   {
     $out = array();
@@ -40,6 +49,16 @@ abstract class BaseController extends CController {
     return $out;
   }
 
+  /**
+   * applyAttributes applies and saves attributes to a model inside
+   * a database transaction
+   * 
+   * @param CActiveRecord $model the record to be updated
+   * @param array $attributes the values to be applied to $model
+   * @param mixed $whiteList optional list of keys to set.  Default false
+   *              means set all keys in $attributes
+   * @return boolean true when $model is successfully saved to database
+   */
   protected function applyAttributes($model, $attributes, $whiteList = false)
   {
     if($whiteList)
@@ -56,6 +75,12 @@ abstract class BaseController extends CController {
     return $success;
   }
 
+  /**
+   * deleteModel deletes a record inside a database transaction
+   * 
+   * @param CActiveRecord $model 
+   * @return boolean true on successfull delete
+   */
   protected function deleteModel($model)
   {
     $transaction = $model->getDbConnection()->beginTransaction();
@@ -68,8 +93,9 @@ abstract class BaseController extends CController {
     }
     return $success;
   }
+
   /**
-   * @return array list of items to be used as the side bar menu
+   * @return array list of items to be used as the side bar menu ( n => ( ... ) )
    */
   public function getMainMenuItems() {
     return array(
@@ -93,31 +119,9 @@ abstract class BaseController extends CController {
   public function init() {
     error_reporting(E_ALL|E_STRICT);
     $app = Yii::app();
-    date_default_timezone_set(Yii::app()->dvrConfig->timezone);
 
-    $this->_resolution = 'hd';
-    if(isset($_SERVER['HTTP_USER_AGENT']))
-    {
-      // if the user agent is an NMT load images with file://, otherwise relative url
-      if(stristr($_SERVER['HTTP_USER_AGENT'], 'Syabas') === False) 
-      { // Not A Syabas browser delivering request
-        $this->imageRoot = dirname($_SERVER['SCRIPT_NAME']).'/images/';
-        $app->setTheme($app->dvrConfig->webuiTheme);
-      }
-      else
-      {
-        // sd if reported in user agent, otherwise default to hd
-        $this->_resolution = stristr($_SERVER['HTTP_USER_AGENT'], 'Res720x576') === False?'hd':'sd';
-        $this->imageRoot = 'file:///opt/sybhttpd/localhost.images/';
-        $app->setTheme($app->dvrConfig->gayauiTheme);
-      }
-    }
-
-    $this->imageRoot .= $this->_resolution.'/';
-
-    // Switch to ajax view when required
-    if($app->request->isAjaxRequest)
-      $this->layout = 'ajax';
+    date_default_timezone_set($app->getComponent('dvrConfig')->timezone);
+    $this->setupTheme();
 
     // Auto-login hack from localhost 
     if(isset($_SERVER['REMOTE_ADDR']) && $app->user->getIsGuest() && $_SERVER['REMOTE_ADDR'] === '127.0.0.1')
@@ -141,6 +145,29 @@ abstract class BaseController extends CController {
       $out[] = $item2;
     }
     return $out;
+  }
+
+  protected function setupTheme()
+  {
+    $app = Yii::app();
+    if($app->getRequest()->getIsAjaxRequest())
+    {
+      $theme = $app->dvrConfig->webuiTheme;
+      $this->layout = 'ajax';
+    }
+    else if(isset($_SERVER['HTTP_USER_AGENT']) && 
+        // verify its a Syabas client
+        false !== stripos($_SERVER['HTTP_USER_AGENT'], 'Syabas') &&
+        // verify its an SD resolution Syabas client
+        false !== stripos($_SERVER['HTTP_USER_AGENT'], 'Res720x576'))
+    {
+      $theme = $app->dvrConfig->gayauiTheme.'_SD';
+    }
+    else
+    {
+      $theme = $app->dvrConfig->gayauiTheme.'_HD';
+    }
+    $app->setTheme($theme);
   }
 }
 
