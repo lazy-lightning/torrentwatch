@@ -34,18 +34,18 @@ class MainMenu extends CWidget
     {
       if(isset($item['visible']) && !$item['visible'])
         continue;
-      $item2=array();
-      $item2['label']=$item['label'];
+      $outputItem=array();
+      $outputItem['label']=$item['label'];
       if(is_array($item['url']))
-        $item2['url']=$controller->createUrl($item['url'][0]);
+        $outputItem['url']=$controller->createUrl($item['url'][0]);
       else
-        $item2['url']=$item['url'];
+        $outputItem['url']=$item['url'];
       $pattern=isset($item['pattern'])?$item['pattern']:$item['url'];
-      $item2['active']=$this->isActive($pattern,$controller->uniqueID,$action->id);
-      $item2['name'] = isset($item['name'])?$item['name']:strtok($item['label'], ' ');
-      $item2['onkeyleftset'] = isset($last)?$last['name']:$item2['name'];
-      $item2['onkeyupset'] = isset($last)?$last['name']:$item2['name'];
-      $items[]=$last=$item2;
+      $outputItem['active']=$this->isActive($pattern,$controller->uniqueID,$action->id);
+      $outputItem['name'] = isset($item['name'])?$item['name']:strtok($item['label'], ' ');
+      $outputItem['onkeyleftset'] = isset($last)?$last['name']:$outputItem['name'];
+      $outputItem['onkeyupset'] = isset($last)?$last['name']:$outputItem['name'];
+      $items[]=$last=$outputItem;
     }
     $this->render('mainMenu_'.$this->resolution,array(
           'onKeyRight'=>$this->onKeyRight,
