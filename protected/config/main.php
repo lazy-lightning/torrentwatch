@@ -52,6 +52,7 @@ return array(
         'class'=>'modelFactory',
     ),
     'request'=>array(
+        'class' => 'httpRequest',
         'enableCookieValidation'=>true,
     ),
     'user'=>array(
