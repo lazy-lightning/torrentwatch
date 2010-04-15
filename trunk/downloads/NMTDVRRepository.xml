@@ -3,6 +3,23 @@
     <Applications>
 
     <Application>
+      <Name>TorrentWatch-X</Name>
+      <Version>0.6.3</Version>
+      <DownloadURL>http://torrentwatch-x.googlecode.com/files/TorrentWatchX-NMT-0.6.3.zip</DownloadURL>
+      <Author>Wiebel</Author>
+      <Maintainer>Wiebel</Maintainer>
+      <Description>TorrentWatch-X is a web based tool to automate downloads of tv shows via torrents and rss. Based on the torrentwatch project (now known as NMTDVR).</Description>
+      <Homepage>http://code.google.com/p/torrentwatch-x/</Homepage>
+      <InstallScript>Apps/AppInit/appinit.cgi?install&amp;Torrentwatchx.tar</InstallScript>
+      <WebInterfaceURL>http://[NMT_IP]:9999/Torrentwatchx_web/index.html</WebInterfaceURL>
+      <GayaInterfaceURL />
+      <Screenshots />
+      <UsageInstructions />
+      <Forum />
+      <Changelog />
+    </Application>
+
+    <Application>
       <Name>NMTDVR</Name>
       <Version>0.9.0-rc1</Version>
       <DownloadURL>http://nmtdvr.com/downloads/NMTDVR-0.9.0-rc1.zip</DownloadURL>
